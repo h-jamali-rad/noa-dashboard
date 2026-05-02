@@ -1,0 +1,748 @@
+{
+  "literature": {
+    "references": [
+      {
+        "id": "1",
+        "authors": "Maharlouei N, Morshed Behbahani B, Doryanizadeh L, Kazemi M.",
+        "year": "2021",
+        "title": "Prevalence and pattern of infertility in Iran: A systematic review and meta-analysis study.",
+        "source": "Women's Health Bulletin. 2021;8(2):63–71.",
+        "relevance": "Establishes infertility prevalence and pattern in Iran (~12.8%); foundational epidemiological evidence justifying the study."
+      },
+      {
+        "id": "2",
+        "authors": "Abangah G, Rashidian T, Parizad Nasirkandy M, Azami M.",
+        "year": "2023",
+        "title": "A meta-analysis of the prevalence and etiology of infertility in Iran.",
+        "source": "International Journal of Fertility and Sterility. 2023;17(3):160–73.",
+        "relevance": "Provides prevalence data and etiology distribution (32% male, 43% female, 12% both, 13% unknown) used in problem statement."
+      },
+      {
+        "id": "3",
+        "authors": "Akhondi MM, Ranjbar F, Shirzad M, Ardakani ZB, Kamali K, Mohammad K.",
+        "year": "2019",
+        "title": "Practical difficulties in estimating the prevalence of primary infertility in Iran.",
+        "source": "International Journal of Fertility & Sterility. 2019;13(2):113.",
+        "relevance": "Methodological context for Iranian primary-infertility prevalence figures."
+      },
+      {
+        "id": "4",
+        "authors": "Njagi P, Groot W, Arsenijevic J, Dyer S, Mburu G, Kiarie J.",
+        "year": "2023",
+        "title": "Financial costs of assisted reproductive technology for patients in low- and middle-income countries: a systematic review.",
+        "source": "Human Reproduction Open. 2023;2023(2):hoad007.",
+        "relevance": "Supports argument that ART costs can exceed average annual income in LMICs."
+      },
+      {
+        "id": "5",
+        "authors": "Dyer SJ, Patel M.",
+        "year": "2012",
+        "title": "The economic impact of infertility on women in developing countries — a systematic review.",
+        "source": "Facts, Views & Vision in ObGyn. 2012;4(2):102.",
+        "relevance": "Evidence on economic burden of infertility leading to treatment dropout."
+      },
+      {
+        "id": "6",
+        "authors": "Morshed-Behbahani B, Lamyian M, Joulaei H, Montazeri A.",
+        "year": "2020",
+        "title": "Analysis and exploration of infertility policies in Iran: A study protocol.",
+        "source": "Health Research Policy and Systems. 2020;18(1):1–7.",
+        "relevance": "Iran-specific policy analysis aligning with this proposal's national-policy rationale."
+      },
+      {
+        "id": "7",
+        "authors": "Rebar RW.",
+        "year": "2013",
+        "title": "What are the risks of the assisted reproductive technologies (ART) and how can they be minimized?",
+        "source": "Reproductive Medicine and Biology. 2013;12:151–8.",
+        "relevance": "Side effects and risks of ART procedures."
+      },
+      {
+        "id": "8",
+        "authors": "Ombelet W.",
+        "year": "2011",
+        "title": "Global access to infertility care in developing countries: a case of human rights, equity and social justice.",
+        "source": "Facts, Views & Vision in ObGyn. 2011;3(4):257.",
+        "relevance": "Social-justice / access-to-care framing."
+      },
+      {
+        "id": "9",
+        "authors": "Aanchal S, Deepti S.",
+        "year": "2022",
+        "title": "Psychological Problems Related to Infertility.",
+        "source": "Cureus. 2022;14(10).",
+        "relevance": "Psychological consequences of infertility / treatment failure."
+      },
+      {
+        "id": "10",
+        "authors": "Moghbelinejad S, Mozdarani H, Ghoraeian P, Asadi R.",
+        "year": "2018",
+        "title": "Basic and clinical genetic studies on male infertility in Iran during 2000-2016: A review.",
+        "source": "International Journal of Reproductive BioMedicine. 2018;16(3):131.",
+        "relevance": "Genetic causes of male infertility in Iran."
+      },
+      {
+        "id": "11",
+        "authors": "Chiba K, Enatsu N, Fujisawa M.",
+        "year": "2016",
+        "title": "Management of non-obstructive azoospermia.",
+        "source": "Reproductive Medicine and Biology. 2016 Jul;15(3):165–73.",
+        "relevance": "Core review on NOA management — foundational reference."
+      },
+      {
+        "id": "12",
+        "authors": "Sharma M, Leslie SW.",
+        "year": "2022",
+        "title": "Azoospermia.",
+        "source": "StatPearls / 2022.",
+        "relevance": "Definitions and clinical overview of azoospermia."
+      },
+      {
+        "id": "13",
+        "authors": "Saccà A, Pastore AL, Roscigno M, Naspro R, Pellucchi F, Fuschi A, et al.",
+        "year": "2016",
+        "title": "Conventional testicular sperm extraction (TESE) and non-obstructive azoospermia: is there still a chance in the era of microdissection TESE? Results from a single non-academic community hospital.",
+        "source": "Andrology. 2016 May;4(3):425–9.",
+        "relevance": "Comparison cTESE vs microTESE; sperm retrieval contexts."
+      },
+      {
+        "id": "14",
+        "authors": "Tharakan T, Luo R, Jayasena CN, Minhas S.",
+        "year": "2021",
+        "title": "Non-obstructive azoospermia: current and future perspectives.",
+        "source": "Faculty Reviews. 2021;10.",
+        "relevance": "Central review used multiple times — defines AI's role, ML predictive modelling and microTESE retrieval rates (50–60% vs 20–45%)."
+      },
+      {
+        "id": "15",
+        "authors": "Esteves SC.",
+        "year": "2022",
+        "title": "Microdissection TESE versus conventional TESE for men with nonobstructive azoospermia undergoing sperm retrieval.",
+        "source": "International Brazilian Journal of Urology. 2022 Jun;48(3):569–78.",
+        "relevance": "microTESE vs cTESE comparison."
+      },
+      {
+        "id": "16",
+        "authors": "Aljubran A, Safar O, Elatreisy A, Alwadai R, Shalkamy O, Assiri HM, et al.",
+        "year": "2022",
+        "title": "Factors predicting successful sperm retrieval in men with nonobstructive azoospermia: A single center perspective.",
+        "source": "Health Science Reports. 2022 Jul;5(4). https://onlinelibrary.wiley.com/doi/10.1002/hsr2.727",
+        "relevance": "Reviewed in detail in 'Previous Studies' — 108 NOA patients, 47.2% retrieval, age & FSH as independent predictors."
+      },
+      {
+        "id": "17",
+        "authors": "Vahidi S, Horoki AZ, Talkhooncheh MH, Jambarsang S, Marvast LD, Sadeghi A, et al.",
+        "year": "2021",
+        "title": "Success rate and ART outcome of microsurgical sperm extraction in non obstructive azoospermia: A retrospective study.",
+        "source": "International Journal of Reproductive BioMedicine. 2021;19(9):781.",
+        "relevance": "Iranian microTESE success rate study."
+      },
+      {
+        "id": "18",
+        "authors": "Zarinara A, Zeraati H, Kamali K, Mohammad K, Rahmati M, Akhondi MM.",
+        "year": "2020",
+        "title": "The success rate and factors affecting the outcome of assisted reproductive treatment in subfertile men.",
+        "source": "Iranian Journal of Public Health. 2020;49(2):332.",
+        "relevance": "Outcome factors in ART for subfertile men."
+      },
+      {
+        "id": "19",
+        "authors": "Ozveri H, Kayabasoglu F, Demirel C, Donmez E.",
+        "year": "2015",
+        "title": "Outcomes of micro-dissection TESE in patients with non-mosaic Klinefelter's syndrome without hormonal treatment.",
+        "source": "International Journal of Fertility & Sterility. 2015;8(4):421.",
+        "relevance": "microTESE outcomes in Klinefelter without hormonal treatment."
+      },
+      {
+        "id": "20",
+        "authors": "Axelrod DA, Schnitzler M, Salvalaggio PR, Swindle J, Abecassis MM.",
+        "year": "2007",
+        "title": "The economic impact of the utilization of liver allografts with high donor risk index.",
+        "source": "American Journal of Transplantation. 2007;7(4):990–7.",
+        "relevance": "Cited as analogy for economic-impact methodology."
+      },
+      {
+        "id": "21",
+        "authors": "Lacey L, Henderson I, Hassan S, Hunter H, Sajjad Y, Akhtar M.",
+        "year": "2021",
+        "title": "Can preoperative parameters predict successful sperm retrieval and live birth in couples undergoing testicular sperm extraction and intracytoplasmic sperm injection for azoospermia?",
+        "source": "Middle East Fertility Society Journal. 2021;26(1):1–9.",
+        "relevance": "Preoperative predictors of TESE success and live birth."
+      },
+      {
+        "id": "22",
+        "authors": "Arshad MA, Majzoub A, Esteves SC.",
+        "year": "2020",
+        "title": "Predictors of surgical sperm retrieval in non-obstructive azoospermia: summary of current literature.",
+        "source": "International Urology and Nephrology. 2020;52(11):2015–38.",
+        "relevance": "Comprehensive review of NOA sperm-retrieval predictors."
+      },
+      {
+        "id": "23",
+        "authors": "Qi L, Liu YP, Zhang NN, Su YC.",
+        "year": "2021",
+        "title": "Predictors of testicular sperm retrieval in patients with non-obstructive azoospermia: a review.",
+        "source": "Journal of International Medical Research. 2021 Apr;49(4):030006052110027.",
+        "relevance": "Review of predictors used to justify the gap that no single predictor is decisive."
+      },
+      {
+        "id": "24",
+        "authors": "Caroppo E, Colpi GM.",
+        "year": "2021",
+        "title": "Prediction models for successful sperm retrieval in patients with non-obstructive azoospermia undergoing microdissection testicular sperm extraction: is there any room for further studies?",
+        "source": "Journal of Clinical Medicine. 2021;10(23):5538.",
+        "relevance": "Directly motivates further prediction-model studies — supports research gap."
+      },
+      {
+        "id": "25",
+        "authors": "Rong G, Mendez A, Assi EB, Zhao B, Sawan M.",
+        "year": "2020",
+        "title": "Artificial intelligence in healthcare: review and prediction case studies.",
+        "source": "Engineering. 2020;6(3):291–301.",
+        "relevance": "AI in healthcare — prediction as core medical application."
+      },
+      {
+        "id": "26",
+        "authors": "Aronson JK, Ferner RE.",
+        "year": "2017",
+        "title": "Biomarkers — a general review.",
+        "source": "Current Protocols in Pharmacology. 2017;76(1):9–23.",
+        "relevance": "Theoretical basis of biomarkers used in the proposal."
+      },
+      {
+        "id": "27",
+        "authors": "Zarinara A, Zeraati H, Kamali K, Mohammad K, Shahnazari P, Akhondi MM.",
+        "year": "2016",
+        "title": "Models predicting success of infertility treatment: a systematic review.",
+        "source": "Journal of Reproduction & Infertility. 2016;17(2):68.",
+        "relevance": "Systematic review of infertility-treatment success-prediction models."
+      },
+      {
+        "id": "28",
+        "authors": "Li JP, Du CQ, Liu ZB, Zhang FB, Li LJ, Wu JG, et al.",
+        "year": "2022",
+        "title": "Development and validation predictive models of sperm retrieval for azoospermic men undergoing testicular sperm aspiration: a multicentre, retrospective, cohort study.",
+        "source": "Journal of Assisted Reproduction and Genetics. 2022;39(8):1779–87.",
+        "relevance": "Predictive models for TESA in azoospermic men — methodological precedent."
+      },
+      {
+        "id": "29",
+        "authors": "Kresch E, Efimenko I, Gonzalez D, Rizk PJ, Ramasamy R.",
+        "year": "2021",
+        "title": "Novel methods to enhance surgical sperm retrieval: a systematic review.",
+        "source": "Arab Journal of Urology. 2021;19(3):227–37.",
+        "relevance": "Used for ML / CDSS knowledge-base claims."
+      },
+      {
+        "id": "30",
+        "authors": "Medenica S, Zivanovic D, Batkoska L, Marinelli S, Basile G, Perino A, et al.",
+        "year": "2022",
+        "title": "The Future Is Coming: Artificial Intelligence in the Treatment of Infertility Could Improve Assisted Reproduction Outcomes — The Value of Regulatory Frameworks.",
+        "source": "Diagnostics. 2022;12(12):2979.",
+        "relevance": "AI in infertility treatment — context for ML algorithms applied to male infertility."
+      },
+      {
+        "id": "31",
+        "authors": "Agarwal A, Baskaran S, Parekh N, Cho CL, Henkel R, Vij S, et al.",
+        "year": "2021",
+        "title": "Male infertility.",
+        "source": "The Lancet. 2021;397(10271):319–33.",
+        "relevance": "Authoritative Lancet review on male infertility."
+      },
+      {
+        "id": "32",
+        "authors": "Sahoo AJ, Kumar Y.",
+        "year": "2014",
+        "title": "Seminal quality prediction using data mining methods.",
+        "source": "Technology and Health Care. 2014;22(4):531–45.",
+        "relevance": "Data-mining methods for semen-quality prediction; cited for MLP/SVM/DT/ANN use in male infertility."
+      },
+      {
+        "id": "33",
+        "authors": "Deng CY, Liu DF, Zhao LM, Lin HC, Mao JM, Zhang Z, et al.",
+        "year": "2023",
+        "title": "Development of a predictive model for increasing sperm retrieval success by microdissection testicular sperm extraction in patients with nonobstructive azoospermia.",
+        "source": "Asian Journal of Andrology. 2023;10–4103.",
+        "relevance": "Direct microTESE predictive model development."
+      },
+      {
+        "id": "34",
+        "authors": "Uemura K, Iwahata T, Ide H, Osaka A, Hiramatsu I, Sugimoto K, et al.",
+        "year": "2022",
+        "title": "Preoperative testosterone and follicle stimulating hormone levels are important predictors for sperm retrieval by microdissection testicular sperm extraction in non-mosaic Klinefelter syndrome.",
+        "source": "Andrologia. 2022;54(11):e14588.",
+        "relevance": "Hormonal predictors (Testosterone, FSH) for microTESE in Klinefelter."
+      },
+      {
+        "id": "35",
+        "authors": "Xu T, Peng L, Lin X, Li J, Xu W.",
+        "year": "2017",
+        "title": "Predictors for successful sperm retrieval of salvage microdissection testicular sperm extraction (TESE) following failed TESE in nonobstructive azoospermia patients.",
+        "source": "Andrologia. 2017;49(4):e12642.",
+        "relevance": "Predictors of salvage microTESE success after failed TESE."
+      },
+      {
+        "id": "36",
+        "authors": "Tammimy Z, Alizadeh S.",
+        "year": "2022",
+        "title": "ICSI Protocol Advisor: A decision support system for infertility protocol suggestion.",
+        "source": "Scientia Iranica. 2022.",
+        "relevance": "Iranian CDSS example for infertility protocol selection — precedent for current proposal."
+      },
+      {
+        "id": "37",
+        "authors": "Sutton RT, Pincock D, Baumgart DC, Sadowski DC, Fedorak RN, Kroeker KI.",
+        "year": "2020",
+        "title": "An overview of clinical decision support systems: benefits, risks, and strategies for success.",
+        "source": "NPJ Digital Medicine. 2020;3(1):17.",
+        "relevance": "Foundational CDSS overview used as theoretical framework."
+      },
+      {
+        "id": "38",
+        "authors": "Bachelot G, Dhombres F, Sermondade N, Haj Hamid R, Berthaut I, Frydman V, et al.",
+        "year": "2023",
+        "title": "A Machine Learning Approach for the Prediction of Testicular Sperm Extraction in Nonobstructive Azoospermia: Algorithm Development and Validation Study.",
+        "source": "Journal of Medical Internet Research. 2023;25:e44047.",
+        "relevance": "Reviewed in 'Previous Studies' — 175 NOA patients, 16 parameters, 8 ML models; Decision-Tree-based ensembled model best."
+      },
+      {
+        "id": "39",
+        "authors": "GhoshRoy D, Alvi PA, Santosh K.",
+        "year": "2022",
+        "title": "Explainable AI to Predict Male Fertility Using Extreme Gradient Boosting Algorithm with SMOTE.",
+        "source": "Electronics. 2022;12(1):15.",
+        "relevance": "Reviewed in 'Previous Studies' — XGB + SMOTE + LIME/SHAP/ELI5; AUC 0.98."
+      },
+      {
+        "id": "40",
+        "authors": "Lantsberg D, Mizrachi Y, Katz DJ.",
+        "year": "2022",
+        "title": "Micro-testicular sperm extraction outcomes for non-obstructive azoospermia in a single large clinic in Victoria.",
+        "source": "Australian and New Zealand Journal of Obstetrics and Gynaecology. 2022;62(2):300–5.",
+        "relevance": "Reviewed in 'Previous Studies' — 88 NOA patients in Melbourne; histopathology was main retrieval-rate factor."
+      },
+      {
+        "id": "41",
+        "authors": "Zeadna A, Khateeb N, Rokach L, Lior Y, Har-Vardi I, Harlev A, et al.",
+        "year": "2020",
+        "title": "Prediction of sperm extraction in non-obstructive azoospermia patients: a machine-learning perspective.",
+        "source": "Human Reproduction. 2020;35(7):1505–14.",
+        "relevance": "Reviewed in 'Previous Studies' — 119 NOA, GBT vs MvLRM vs Random Forest, leave-one-out CV, ROC; ML can underpin CDSS for NOA TESE."
+      }
+    ],
+    "research_gaps": [
+      {
+        "id": 1,
+        "gap_fa_en": "هیچ یک از فاکتورهای پیش بینی کننده (کلینیکی/هورمونی/هیستوپاتولوژیک/ژنتیکی) به تنهایی یا ترکیبی، اطالعات قطعی در مورد شانس استخراج اسپرم در مردان مبتال به NOA ارائه نمی دهند — No single predictor (clinical / hormonal / histopathologic / genetic) or combination thereof provides definitive information regarding sperm retrieval chance in NOA patients.",
+        "addressed_by": "Project develops integrated multi-modal ML model combining clinical, hormonal, histopathologic features (no single predictor relied upon)."
+      },
+      {
+        "id": 2,
+        "gap_fa_en": "نتیجه گیری در مورد پیش بینی کننده های پیش از عمل میکروتسه (سن، حجم بیضه، FSH، LH، AMH، Inhibin B، تستوسترون، …) همچنان قابل بحث است — Conclusions about pre-microTESE predictors remain debatable and inconsistent across studies.",
+        "addressed_by": "Pre-microTESE predictors systematically evaluated via SHAP/LIME XAI; clinical nomogram derived to settle debate empirically on Iranian cohort."
+      },
+      {
+        "id": 3,
+        "gap_fa_en": "حجم زیاد داده های بالینی نیاز به پردازش به موقع و دقیق دارد که از توانایی انسان خارج است؛ ابزارهای CDSS مبتنی بر AI کم‌توسعه‌اند — Manual analysis of large clinical datasets is infeasible without AI; AI-driven CDSS for NOA/microTESE remain underdeveloped.",
+        "addressed_by": "Develops AI-driven CDSS web platform for NOA/microTESE specifically tackling underdevelopment in this domain."
+      },
+      {
+        "id": 4,
+        "gap_fa_en": "نتایج مطالعات مرور شده (به‌ویژه Zeadna et al. 2020) نیاز به اعتبارسنجی با مطالعات بزرگ‌تر و آینده‌نگر دارد — Existing ML models (e.g., Zeadna 2020) require validation with larger and prospective cohorts.",
+        "addressed_by": "Provides validation of Zeadna-type GBT models on a separate Iranian cohort with internal validation, calibration (Platt scaling), and decision curve analysis."
+      },
+      {
+        "id": 5,
+        "gap_fa_en": "فقدان یک پلتفرم تحت وب یکپارچه برای ثبت داده های NOA و ارائه پیش بینی موفقیت میکروتسه به پزشکان — Absence of an integrated web-based CDSS platform for NOA data registration and microTESE success prediction in real clinical settings, especially in Iran.",
+        "addressed_by": "Builds full web-based CDSS platform (Next.js + Prisma) enabling NOA data registration and real-time microTESE success prediction in Iranian clinical settings."
+      },
+      {
+        "id": 6,
+        "gap_fa_en": "هزینه باال و عوارض جراحی میکروتسه و فقدان روشی برای شخصی سازی درمان از طریق پیش بینی هوشمند — High microTESE surgical costs and complications without an AI-based personalization mechanism.",
+        "addressed_by": "Enables personalized risk stratification & counterfactual explanations to reduce unnecessary surgeries and personalize patient counselling."
+      },
+      {
+        "id": 7,
+        "gap_fa_en": "شکاف در پژوهش های کاربردی ایرانی هم‌راستا با سیاست های جوانی جمعیت و سالمت باروری — Gap in applied Iranian research aligned with national 'youthful population / reproductive health' policy.",
+        "addressed_by": "Aligns with Iranian 'youthful population / reproductive health' policy by producing applied Iranian-cohort research with deployable CDSS."
+      }
+    ],
+    "theoretical_frameworks": [
+      {
+        "id": 1,
+        "framework": "Clinical Decision Support System (CDSS) framework — matching patient features with a computerized clinical knowledge base to provide evaluations/recommendations to the physician"
+      },
+      {
+        "id": 2,
+        "framework": "Artificial Intelligence in Healthcare framework (data-driven prediction & pattern recognition)"
+      },
+      {
+        "id": 3,
+        "framework": "Machine Learning paradigm — learning from past data without predetermined equations"
+      },
+      {
+        "id": 4,
+        "framework": "Biomarker theory — biological surrogate observations predicting harder-to-measure clinical endpoints (screening, diagnosis, monitoring, prognosis, individualized therapy)"
+      },
+      {
+        "id": 5,
+        "framework": "Explainable AI (XAI) framework — using LIME / SHAP / ELI5 to make ML models interpretable for clinical use"
+      },
+      {
+        "id": 6,
+        "framework": "Personalized medicine framework — patient-specific treatment recommendations driven by predictive modeling"
+      },
+      {
+        "id": 7,
+        "framework": "Reproductive-health policy framework — aligning research with national policies (Supreme Leader's directives) on healthy fertility, demographic rejuvenation, and accessible infertility services"
+      },
+      {
+        "id": 8,
+        "framework": "Knowledge engineering / expert-driven feature selection (combining literature-derived features with domain-expert validation)"
+      },
+      {
+        "id": 9,
+        "framework": "Predictive modelling framework for surgical outcomes (pre-operative biomarker-based prediction of sperm retrieval success)"
+      }
+    ],
+    "methodologies_reviewed": [
+      {
+        "id": 1,
+        "method": "Multilayer Perceptron (MLP) for sperm concentration/motility analysis"
+      },
+      {
+        "id": 2,
+        "method": "Support Vector Machine (SVM)"
+      },
+      {
+        "id": 3,
+        "method": "Decision Trees (and Decision-Tree-based Ensembled Models — best performer in Bachelot 2023)"
+      },
+      {
+        "id": 4,
+        "method": "Artificial Neural Networks (ANN) for semen profile analysis (count, viability, morphology, hormonal & genetic features)"
+      },
+      {
+        "id": 5,
+        "method": "Adaptive Boosting (AdaBoost)"
+      },
+      {
+        "id": 6,
+        "method": "Extreme Gradient Boosting (XGBoost / XGB) — best performer in GhoshRoy 2022 (AUC 0.98)"
+      },
+      {
+        "id": 7,
+        "method": "Random Forest (RF)"
+      },
+      {
+        "id": 8,
+        "method": "Extra Trees algorithm"
+      },
+      {
+        "id": 9,
+        "method": "Gradient Boosted Trees (GBT) — Zeadna 2020"
+      },
+      {
+        "id": 10,
+        "method": "Univariate and Multivariate Binary Logistic Regression (MvLRM)"
+      },
+      {
+        "id": 11,
+        "method": "Multivariate Logistic Regression Analysis (Aljubran study)"
+      },
+      {
+        "id": 12,
+        "method": "ROC curve analysis with optimal cut-off determination"
+      },
+      {
+        "id": 13,
+        "method": "Leave-One-Out Cross-Validation (LOOCV)"
+      },
+      {
+        "id": 14,
+        "method": "SMOTE (Synthetic Minority Over-sampling Technique) for imbalanced data"
+      },
+      {
+        "id": 15,
+        "method": "Explainable AI (XAI): LIME (Local Interpretable Model-agnostic Explanations), SHAP (Shapley Additive Explanations), ELI5 (feature-importance inspection)"
+      },
+      {
+        "id": 16,
+        "method": "Data preprocessing: partial imputation, partial interpolation, full analysis, partial deletion (missing values handling)"
+      },
+      {
+        "id": 17,
+        "method": "Class-imbalance handling: Resampling (Over/Under sampling), SMOTE, Balanced Classifier Bagging"
+      },
+      {
+        "id": 18,
+        "method": "Dimensionality reduction: filtering, PCA, ICA, Zero Variance (ZV)"
+      },
+      {
+        "id": 19,
+        "method": "Retrospective cohort study designs (Lantsberg 2022, Zeadna 2020)"
+      },
+      {
+        "id": 20,
+        "method": "Bench-marking against models from prior studies"
+      },
+      {
+        "id": 21,
+        "method": "Internal validation followed by usability evaluation of resulting CDSS platform"
+      }
+    ],
+    "sections": [
+      {
+        "title": "مشکل و ضرورت (Problem Statement and Necessity)",
+        "content": "ناباروری به ناتوانی زوجین در رسیدن به بارداری پس از حداقل یک سال رابطه جنسی منظم و محافظت نشده تلقی می گردد. ناباروری یک مشکل جدی بهداشتی در سراسر جهان است... میزان شیوع جهانی ناباروری بر اساس گزارش سازمان بهداشت جهانی در فاصله سالهای ۱۹۹۰ تا ۲۰۲۱ حدود ۱۷.۵ درصد از جمعیت بزرگسال - تقریبًا یک در شش نفر در سراسر جهان می باشد. بر اساس مطالعات انجام شده در ایران میزان شیوع ناباروری حدود ۱۲.۸ درصد از کل جمعیت را شامل می شود... علل ناباروری در حدود ۳۲ درصد علت مردانه، ۴۳ درصد علت زنانه، ۱۲ درصد هر دو جنس و ۱۳ درصد ناشناخته است. درمان های ناباروری در کشورهایی با درآمد کم یا متوسط از میانگین درآمد ساالنه آنها می تواند باالتر باشد. هزینه های گزاف درمان ناباروری در صورت تکرار درمان و عدم پوشش بیمه ای به ۲۸.۳ درصد ترک درمان منجر می شود. شکست در درمان ناباروری می تواند آسیب پذیری روانی برای زوجین به همراه داشته باشد.",
+        "key_points": [
+          "Infertility = inability of couples to conceive after at least one year of regular unprotected intercourse",
+          "WHO global prevalence 1990–2021: ~17.5% of adults (≈1 in 6 worldwide)",
+          "Iran prevalence: ~12.8% of population",
+          "Iranian etiology distribution: ~32% male, ~43% female, ~12% both, ~13% unknown",
+          "Treatment costs in low/middle income countries can exceed average annual income",
+          "Lack of insurance coverage causes ~28.3% treatment dropout",
+          "Failure of infertility treatment causes psychological vulnerability (depression, anxiety, rejection stress)",
+          "Aligned with policies of the Supreme Leader regarding youthful population, healthy fertility programs"
+        ],
+        "references": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "title": "علل ناباروری مردان و آزواسپرمی (Causes of Male Infertility and Azoospermia)",
+        "content": "از جمله این عوامل، آنتی بادی ضد اسپرم، تحویل ناقص اسپرم، انسداد مجرای منی، کاهش تولید اسپرم، عملکرد غیر طبیعی اسپرم، انسداد در عبور اسپرم و اختالل نعوظ می توانند در ناباروری مردان نقش داشته باشند. در این میان، آزواسپرمی به عنوان عدم وجود اسپرم در انزال، به عنوان شدیدترین و اصلی ترین علت ناباروری در مردان مطرح می شود. بر اساس وجود یا عدم وجود انسداد مجاری یا واس دفران، عنوان آزواسپرمی انسدادی (OA) یا آزواسپرمی غیر انسدادی (NOA) طبقه بندی می شود. پاتولوژی دقیق آزواسپرمی غیر انسدادی همیشه مشخص نیست، و می تواند بر اساس دالیلی مانند عدم حساسیت به آندروژن، شیمی درمانی، Sertoli cell-only syndrome، قرار گرفتن در معرض فلزات سنگین، هایپرپروالکتینمی، هیپوگنادیسم مانند سندرم کالمن، اختالل در تولید اسپرم به دلیل ناهنجاری های کروموزومی مانند سندرم کالین فلتر و ریزحذف های کروموزوم Y در مناطق فرعی AZFa، AZFb، یا AZFc، عفونت هایی مانند اوریون و اورکیت، پرتودرمانی، پیچ خوردگی بیضه، انتقال یا وارونگی کریپتورکیدیسم عامل آزواسپرمی و واریکوسل نام برد.",
+        "key_points": [
+          "Male infertility causes: anti-sperm antibodies, incomplete sperm delivery, ductal obstruction, reduced sperm production, abnormal sperm function, erectile dysfunction",
+          "Azoospermia = absence of sperm in ejaculate; most severe cause of male infertility",
+          "Classification: Obstructive Azoospermia (OA) vs Non-Obstructive Azoospermia (NOA)",
+          "NOA etiologies: androgen insensitivity, chemotherapy, Sertoli cell-only syndrome, heavy metals, hyperprolactinemia, Kallmann syndrome, Klinefelter syndrome, Y chromosome microdeletions (AZFa, AZFb, AZFc), mumps/orchitis, radiotherapy, testicular torsion, cryptorchidism, varicocele"
+        ],
+        "references": [
+          "10",
+          "11",
+          "12"
+        ]
+      },
+      {
+        "title": "روش های درمانی استخراج اسپرم و میکروتسه (Sperm Retrieval Techniques and microTESE)",
+        "content": "روش های درمانی مختلفی برای استخراج اسپرم در آزواسپرمی غیر انسدادی است: آسپیراسیون با سوزن ظریف (TESA) تحت هدایت اولتراسوند، استخراج معمولی اسپرم از بیضه (c-TESE) و میکرودیسکشن (micro TESE). میکروتسه برای شناسایی و استخراج لوله‌های اسپرم ساز به یک میکروسکوپ عامل و تکنیک میکروسرجری متکی است. در این روش بافت کمتری برداشته می شود، احتمال هماتوم، فیبروز و آتروفی بیضه کمتر است. موفقیت استخراج اسپرم در روش میکروتسه ۵۰ تا ۶۰ درصد در مقابل ۲۰ تا ۴۵ درصد در روش cTESE می باشد. میکروتسه به عنوان یک استاندارد طالیی برای استخراج اسپرم از طریق جراحی در نظر گرفته شده است، اما این تکنیک به تخصص بیشتر، زمان طوالنی تر و هزینه باالتری نیاز دارد.",
+        "key_points": [
+          "ART techniques: TESA (ultrasound-guided fine-needle aspiration), c-TESE (conventional), micro-TESE (microdissection)",
+          "TESA/cTESE: random sampling, risk of vascular damage",
+          "microTESE: uses operating microscope and microsurgery, less tissue removal, lower hematoma/fibrosis/atrophy risk",
+          "microTESE success rate: 50–60% vs cTESE: 20–45%",
+          "microTESE = gold standard, but requires more expertise, longer time, higher cost",
+          "Selecting appropriate treatment method reduces costs and side effects"
+        ],
+        "references": [
+          "13",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20"
+        ]
+      },
+      {
+        "title": "فاکتورهای پیش بینی کننده موفقیت میکروتسه (Predictive Factors for microTESE Success)",
+        "content": "بر اساس مطالعات مختلف رنج وسیعی از ویژگی ها مانند ویژگی های کلینیکی(سن/شاخص توده بدن/استعمال دخانیات/مصرف الکل/سوابق درمانی)، ویژگی های هورمونی (FSH/LH/Testosterone)، متغیرهای هیستوپاتولوژی (SCO/Focal SCO/Hypo Spermatogenesis) و متغیرهای کرموزومی (Karyotype/Y Chromosome microdeletion AZFx) به عنوان ویژگی پیش بینی کننده معرفی شده اند. ولی هیچ یک از پیش بینی کننده ها به تنهایی یا ترکیبی، اطالعات قطعی در مورد شانس استخراج اسپرم در مردان مبتال به آزواسپرمی غیرانسدادی ارائه نمی دهند.",
+        "key_points": [
+          "Clinical features: age, BMI, smoking, alcohol, medical history",
+          "Hormonal variables: FSH, LH, Testosterone, AMH, Inhibin B (INHB)",
+          "Histopathological variables: SCO (Sertoli Cell Only), Focal SCO, Hypo Spermatogenesis",
+          "Chromosomal variables: Karyotype, Y-chromosome microdeletion (AZFa/b/c)",
+          "No single predictor or combination provides definitive information about sperm retrieval chance",
+          "Testicular histopathology appears to be a primary predictor"
+        ],
+        "references": [
+          "14",
+          "16",
+          "21",
+          "22",
+          "23",
+          "24",
+          "33",
+          "34",
+          "35"
+        ]
+      },
+      {
+        "title": "هوش مصنوعی و یادگیری ماشین در پزشکی (Artificial Intelligence and Machine Learning in Medicine)",
+        "content": "هوش مصنوعی شاخه ای از علوم کامپیوتر است که برای کمک به تجزیه و تحلیل داده ها به کار گرفته شده است و می تواند الگوهای بین متغیرهای پیچیده را تشخیص دهد و پیش بینی را از طریق الگوریتم ها فرموله کند. یکی از مهم ترین کاربردهای هوش مصنوعی در پزشکی، پیش بینی می باشد. یادگیری ماشین، یک تکنیکی از هوش مصنوعی است که به الگوریتم ها یاد می‌دهد که از داده های گذشته بیاموزند. در زمینه ناباروری مردان از الگوریتم های مختلف هوش مصنوعی استفاده شده است: پرسپترون های چند الیه و ماشین بردار پشتیبان برای تمرکز و حرکت اسپرم، درخت تصمیم در رویکرد نمایشی، شبکه های عصبی مصنوعی برای آنالیز پروفایل مایع منی.",
+        "key_points": [
+          "AI = computer science branch enabling data analysis and pattern recognition",
+          "Most important medical AI application = prediction",
+          "ML algorithms learn from past data without predetermined equations",
+          "Used in male-infertility: Multilayer Perceptron (MLP), SVM (sperm concentration/motility), Decision Trees, Artificial Neural Networks for semen profile analysis"
+        ],
+        "references": [
+          "14",
+          "25",
+          "29",
+          "30",
+          "31",
+          "32"
+        ]
+      },
+      {
+        "title": "نشانگرهای زیستی (Biomarkers)",
+        "content": "نشانگرهای زیستی یک مشاهده بیولوژیکی است که جایگزین و به طور ایده آل یک نقطه پایانی مرتبط بالینی یا نتیجه میانی را که مشاهده آن دشوارتر است، پیش بینی می کند. استفاده از نشانگرهای زیستی بالینی آسانتر و کم هزینه تر از اندازه گیری مستقیم نقطه پایانی بالینی است. آنها را می توان در غربالگری بیماری، تشخیص، شناسایی، نظارت، شاخص های پیش آگهی، توسعه مداخالت درمانی فردی، پیش بینی و درمان عوارض جانبی دارو، شناسایی انواع سلول و مطالعات فارماکودینامیک و دوز-پاسخ استفاده کرد.",
+        "key_points": [
+          "Biomarker = biological observation predicting clinical endpoints",
+          "Easier and cheaper than direct endpoint measurement, shorter timeframe",
+          "Uses: screening, diagnosis, monitoring, prognosis, individualized therapy, drug side-effect prediction, cell-type identification, pharmacodynamic / dose-response studies",
+          "Good biomarkers must be measurable with little/no variation and respond reliably to changes"
+        ],
+        "references": [
+          "26",
+          "27",
+          "28"
+        ]
+      },
+      {
+        "title": "سیستم پشتیبان تصمیم بالینی (CDSS – Clinical Decision Support Systems)",
+        "content": "هوش مصنوعی در پزشکی، قابلیت فراهم کردن سیستم‌های پشتیبانی تصمیم‌گیری بالینی (CDSS) را دارد. در یک سیستم پشتیبان تصمیم بالینی، ویژگی های هر بیمار با یک پایگاه دانش بالینی کامپیوتری مطابقت داده می شود و ارزیابی ها یا توصیه های خاص برای تصمیم گیری به پزشک ارائه می شود. پزشک باید دانش خود را با اطالعات یا پیشنهادات ارائه شده توسط CDSS ترکیب کند. استفاده از این سیستم منجر به حذف آزمایش های غیر ضروری، افزایش ایمنی بیمار و اجتناب از عوارض بالقوه خطرناک و پرهزینه می گردد. پایگاه های دانش بالینی عموما از اطالعات مکتوب در گایدالین ها و یا دانش استخراج شده از داده ها توسط مدل های هوش مصنوعی تغذیه می گردند.",
+        "key_points": [
+          "CDSS = Clinical Decision Support System, helps clinicians with diagnosis and treatment decisions",
+          "Matches patient features against computerized clinical knowledge base",
+          "Reduces unnecessary tests, improves patient safety, avoids dangerous and costly complications",
+          "Knowledge bases derived from clinical guidelines or AI-extracted knowledge from data"
+        ],
+        "references": [
+          "29",
+          "36",
+          "37"
+        ]
+      },
+      {
+        "title": "مروری بر مطالعات گذشته (Review of Previous Studies)",
+        "content": "Five recent key studies were reviewed: Bachelot et al. (2023), GhoshRoy et al. (2022), Lantsberg et al. (2022), Aljubran et al. (2022), and Zeadna et al. (2020).",
+        "key_points": [
+          "Bachelot et al. 2023 — 175 NOA patients, 16 hormonal+genetic parameters, 8 ML models compared; Decision-Tree-based ensembled model best; basis for advanced CDSS in azoospermia",
+          "GhoshRoy et al. 2022 — 9 lifestyle/environmental features, 5 AI tools (SVM, AdaBoost, XGB, RF, ExtraTrees) on balanced/imbalanced data, with Explainable AI (LIME, SHAP, ELI5); XGB best with AUC 0.98",
+          "Lantsberg et al. 2022 — Retrospective on 88 NOA patients (Melbourne, Aug 2014–Sep 2020); microTESE + ICSI outcomes; histopathology was the key factor influencing sperm retrieval rate",
+          "Aljubran et al. — 108 NOA patients, 47.2% sperm retrieval success; multivariate logistic regression: age and FSH were independent predictors of successful microTESE; 13.7% achieved pregnancy with 28.6% live birth",
+          "Zeadna et al. 2020 — Retrospective cohort of 119 NOA patients (1995–2017) at IVF unit; Gradient Boosted Trees (GBT) vs Multivariate Logistic Regression (MvLRM) and Random Forest; leave-one-out cross-validation, ROC cut-off; ML models can form basis of a CDSS for NOA TESE decisions; needs larger prospective validation"
+        ],
+        "references": [
+          "38",
+          "39",
+          "40",
+          "16",
+          "41"
+        ]
+      }
+    ],
+    "citation_map": {
+      "by_section": {
+        "مشکل و ضرورت (Problem Statement and Necessity)": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ],
+        "علل ناباروری مردان و آزواسپرمی (Causes of Male Infertility and Azoospermia)": [
+          "10",
+          "11",
+          "12"
+        ],
+        "روش های درمانی استخراج اسپرم و میکروتسه (Sperm Retrieval Techniques and microTESE)": [
+          "13",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20"
+        ],
+        "فاکتورهای پیش بینی کننده موفقیت میکروتسه (Predictive Factors for microTESE Success)": [
+          "14",
+          "16",
+          "21",
+          "22",
+          "23",
+          "24",
+          "33",
+          "34",
+          "35"
+        ],
+        "هوش مصنوعی و یادگیری ماشین در پزشکی (Artificial Intelligence and Machine Learning in Medicine)": [
+          "14",
+          "25",
+          "29",
+          "30",
+          "31",
+          "32"
+        ],
+        "نشانگرهای زیستی (Biomarkers)": [
+          "26",
+          "27",
+          "28"
+        ],
+        "سیستم پشتیبان تصمیم بالینی (CDSS – Clinical Decision Support Systems)": [
+          "29",
+          "36",
+          "37"
+        ],
+        "مروری بر مطالعات گذشته (Review of Previous Studies)": [
+          "38",
+          "39",
+          "40",
+          "16",
+          "41"
+        ]
+      },
+      "project_alignment": {
+        "AI/ML core methods used in our project": [
+          "XGBoost",
+          "Random Forest",
+          "Logistic Regression",
+          "SHAP",
+          "LIME",
+          "SMOTE"
+        ],
+        "Dataset & cohort design": [
+          "Retrospective cohort"
+        ],
+        "CDSS platform delivery": [
+          "CDSS framework"
+        ],
+        "Iranian reproductive health context": [
+          "Maharlouei 2021",
+          "Abangah 2023"
+        ],
+        "Benchmark studies": [
+          "Zeadna 2020 (GBT)",
+          "Bachelot 2023 (DT ensembles)",
+          "GhoshRoy 2022 (XGB AUC 0.98)",
+          "Aljubran",
+          "Lantsberg 2022"
+        ]
+      },
+      "key_benchmarks": {
+        "Zeadna_2020": "Used GBT for microTESE prediction; our project benchmarks against this and extends with XAI + Iranian cohort + CDSS platform",
+        "Bachelot_2023": "Decision-tree ensembles best performer; we adopt tree-based ensembles (RF, XGBoost) as core models",
+        "GhoshRoy_2022": "XGBoost achieved AUC 0.98 on semen profile features; informs our XGBoost selection",
+        "Aljubran": "Multivariate logistic regression baseline; we include LR as interpretable baseline",
+        "Lantsberg_2022": "Retrospective cohort precedent for predictor analysis"
+      }
+    }
+  }
+}

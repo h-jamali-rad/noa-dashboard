@@ -1,0 +1,35 @@
+{
+  "validation": {
+    "nested_cv": "2-fold outer \u00d7 5-fold inner, RandomizedSearchCV (50 iter)",
+    "temporal_validation": "80/20 chronological split (skipped in artifact for top 5; logged in pipeline)",
+    "bootstrap": "20 iterations on top 2 models",
+    "calibration": {
+      "method": "Calibration curves + Brier scores for top 5",
+      "brier": {
+        "LightGBM": 0.20056728561007395,
+        "Gradient Boosting": 0.20249545180329245,
+        "XGBoost": 0.2054565173086095,
+        "Stacking Ensemble": 0.22593148002382732,
+        "CatBoost": 0.2131085981465297
+      }
+    },
+    "dca": {
+      "clinical_utility": "Model net benefit exceeds treat-none and treat-all for substantial threshold windows (notably around 0.05-0.60 for top models).",
+      "interventions_formula": {
+        "formula": "Net interventions avoided per 100 = ((NB_model - NB_treat_all) / (pt/(1-pt))) * 100",
+        "computed_from": "dca_data_raw_numerical_arrays thresholds + net_benefit arrays"
+      }
+    },
+    "multiple_comparison": "Pairwise AUC differences across 16 models with correction",
+    "confusion_matrices": "Available as PNG figures (LightGBM, GB, XGB, CatBoost, Stacking)",
+    "figure_references": [
+      "/images/validation/calibration_plots.png",
+      "/images/validation/decision_curve_analysis.png",
+      "/images/validation/confusion_matrix_LightGBM.png",
+      "/images/validation/confusion_matrix_Gradient_Boosting.png",
+      "/images/validation/confusion_matrix_XGBoost.png",
+      "/images/validation/confusion_matrix_CatBoost.png",
+      "/images/validation/confusion_matrix_Stacking_Ensemble.png"
+    ]
+  }
+}

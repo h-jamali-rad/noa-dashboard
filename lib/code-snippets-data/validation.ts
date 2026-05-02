@@ -1,0 +1,53 @@
+import type { CodeStep } from '../code-snippets'
+
+export const validationSteps: CodeStep[] = [
+  {
+    id: 'v1',
+    title: 'Step 1 - Calibration and Brier audit for top models',
+    objective: 'Validate probabilistic reliability after corrected nested-CV training.',
+    initialCondition: 'Top-5 models selected from the corrected 16-model benchmark.',
+    language: 'python',
+    code: [
+      'from sklearn.calibration import calibration_curve',
+      'from sklearn.metrics import brier_score_loss',
+      '',
+      'for model_name, model in top_models.items():',
+      '    probs = model.predict_proba(X_test)[:, 1]',
+      '    frac_pos, mean_pred = calibration_curve(y_test, probs, n_bins=10)',
+      '    brier = brier_score_loss(y_test, probs)',
+      '    print(model_name, round(brier, 4))',
+    ].join('\n'),
+    outputLabel: 'Brier score summary',
+    outputType: 'log',
+    output: [
+      'LightGBM: 0.2006',
+      'Gradient Boosting: 0.2025',
+      'XGBoost: 0.2055',
+      'Stacking Ensemble: 0.2259',
+      'CatBoost: 0.2131',
+    ].join('\n'),
+    deliverables: ['Calibration arrays', 'Brier comparison table'],
+  },
+  {
+    id: 'v2',
+    title: 'Step 2 - Decision curve analysis (DCA)',
+    objective: 'Estimate clinical utility versus treat-all and treat-none strategies.',
+    initialCondition: 'Predicted probabilities for top corrected models available.',
+    language: 'python',
+    code: [
+      'import numpy as np',
+      '',
+      'thresholds = np.linspace(0.01, 0.99, 200)',
+      'for t in thresholds:',
+      '    yhat = (probs >= t).astype(int)',
+      '    tp = ((yhat == 1) & (y_test == 1)).sum()',
+      '    fp = ((yhat == 1) & (y_test == 0)).sum()',
+      '    nb = (tp/len(y_test)) - (fp/len(y_test)) * (t/(1-t))',
+      '    dca.append((t, nb))',
+    ].join('\n'),
+    outputLabel: 'DCA utility note',
+    outputType: 'log',
+    output: 'Top models show net benefit above treat-all and treat-none across substantial threshold windows (~0.05 to ~0.60).',
+    deliverables: ['Threshold-wise net-benefit arrays', 'DCA figure for dashboard and manuscript'],
+  },
+]

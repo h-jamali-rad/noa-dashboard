@@ -1,0 +1,50 @@
+{
+  "xai": {
+    "method": "SHAP (TreeExplainer) on best LightGBM model",
+    "top5_features": [
+      "LH",
+      "Age",
+      "FSH",
+      "Testosterone_levels",
+      "Boby_Weight"
+    ],
+    "global_shap_top10": {
+      "LH": 0.3170224435045276,
+      "Age": 0.27013426179481914,
+      "FSH": 0.25032088680111114,
+      "Testosterone_levels": 0.21181623281879083,
+      "Boby_Weight": 0.17398276979950172,
+      "Sakamoto_LT_mL": 0.1705756237327989,
+      "BMI": 0.16904280050038387,
+      "Hieght": 0.16621722472910835,
+      "RT_XYZ__Sono_": 0.1563766924285414
+    },
+    "feature_importance_top10_lightgbm": {
+      "FSH": 865,
+      "Age": 819,
+      "LH": 755,
+      "Testosterone_levels": 568,
+      "BMI": 437,
+      "RT_XYZ__Sono_": 276,
+      "Boby_Weight": 274,
+      "Hieght": 224,
+      "Testicular_volume_LT__Guess_": 215
+    },
+    "interpretation_notes": [
+      "Hormonal and demographic variables dominate global SHAP ranking.",
+      "Partner Age was excluded from the final model as it lacks biological plausibility for predicting sperm retrieval success in NOA patients.",
+      "Pathology_RT and Pathology_LT had near-zero global SHAP contribution in corrected preoperative model."
+    ],
+    "n_local_cases": 5,
+    "outputs": [
+      "SHAP bar plot",
+      "SHAP beeswarm",
+      "Dependence plots for top features"
+    ],
+    "figure_references": [
+      "/images/xai/feature_importance_LightGBM.png",
+      "/images/xai/shap_bar_LightGBM.png",
+      "/images/xai/shap_beeswarm_LightGBM.png"
+    ]
+  }
+}

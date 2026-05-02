@@ -1,0 +1,713 @@
+{
+  "virtual_defense": {
+    "panels": [
+      {
+        "specialist": "Statistics Expert",
+        "vote": "conditional",
+        "strengths": [
+          "Leakage-controlled nested CV design implemented.",
+          "Comprehensive 16-model benchmark with pairwise correction.",
+          "Calibration and DCA included beyond discrimination metrics.",
+          "Large cohort (n=2413 analytical) increases stability."
+        ],
+        "critiques": [
+          "Outer CV used 2 folds only; variance remains non-trivial.",
+          "Some clinically relevant biomarkers (AMH, inhibin B, RTT) unavailable or zero-information.",
+          "No external multi-center validation yet.",
+          "Confusion matrices not exported as machine-readable arrays."
+        ],
+        "specific_recommendations": [
+          "Add repeated nested CV (e.g., 5x2) for variance reduction.",
+          "Prospectively validate on chronologically newer and external cohorts.",
+          "Publish full fold-wise prediction files for reproducible secondary analysis.",
+          "Report uncertainty intervals for all metrics in final manuscript tables."
+        ]
+      },
+      {
+        "specialist": "AI/ML Expert",
+        "vote": "approve",
+        "strengths": [
+          "Corrected pipeline replaced inflated legacy results.",
+          "RandomizedSearchCV executed with 50 iterations per model in nested setup.",
+          "Tree ensembles consistently identified as strongest family.",
+          "Reproducibility metadata recorded (seed=42, versions documented)."
+        ],
+        "critiques": [
+          "Full hyperparameter search spaces are not serialized in final artifact bundle.",
+          "Dependence-plot full arrays are not exported, only summary/local SHAP cases.",
+          "Some feature unit harmonization issues remain (e.g., testosterone unit consistency in CDSS layer)."
+        ],
+        "specific_recommendations": [
+          "Archive full param_distributions JSON for each model family.",
+          "Store per-fold predictions/probabilities and SHAP matrices in compressed parquet.",
+          "Add model cards documenting intended use, contraindications, and failure modes."
+        ]
+      },
+      {
+        "specialist": "XAI+Clinical Expert",
+        "vote": "conditional",
+        "strengths": [
+          "SHAP global and local interpretation pipeline is present.",
+          "Calibration and DCA provide clinical-readiness evidence.",
+          "Preoperative feature set supports real-world counseling workflow.",
+          "Top predictors biologically plausible for endocrine/testicular function."
+        ],
+        "critiques": [
+          "A non-actionable partner-related covariate appeared in exploratory ranking and was removed from the final decision layer.",
+          "Pathology variables contribute minimally in preoperative feature framing.",
+          "No explicit subgroup fairness/performance audit across demographic groups."
+        ],
+        "specific_recommendations": [
+          "Keep the deployed CDSS restricted to biologically plausible and male-actionable predictors.",
+          "Run subgroup calibration and net-benefit audits by age strata and clinical subtypes.",
+          "Add clinician-facing explanation templates tied to SHAP thresholds."
+        ]
+      },
+      {
+        "specialist": "Software Engineering Expert",
+        "vote": "approve",
+        "strengths": [
+          "Pipeline outputs are modularized as JSON/CSV artifacts.",
+          "Reviewer-driven bug fixes were implemented (including pathology parser corrections).",
+          "Dashboard and manuscript updates synchronized with corrected results.",
+          "Traceability from raw cohort to final outputs is preserved."
+        ],
+        "critiques": [
+          "Some outputs exist only as figures, not machine-readable tables.",
+          "CDSS implementation contains hardcoded clinical weights not always model-derived.",
+          "Metadata fields from previous tooling required sanitization for publication-ready KB."
+        ],
+        "specific_recommendations": [
+          "Export all plot backends to numeric tables by default.",
+          "Version-lock deployment package and include automated regression tests.",
+          "Refactor CDSS scoring to strictly model-derived coefficients/features for production."
+        ]
+      }
+    ],
+    "reviewer_basis": {
+      "reviewer1_distilled": [
+        {
+          "id": "R1-CRIT-1",
+          "title": "SCO regex bug",
+          "records_affected": 221,
+          "desc": "Pattern overmatched, contaminating SCO label"
+        },
+        {
+          "id": "R1-CRIT-2",
+          "title": "Hypospermatogenesis OCR typos",
+          "records_affected": 165,
+          "desc": "OCR variants not normalized"
+        },
+        {
+          "id": "R1-CRIT-3",
+          "title": "MA hierarchy logic wipes valid data",
+          "records_affected": "250+",
+          "desc": "Maturation arrest hierarchy incorrectly clobbered records"
+        },
+        {
+          "id": "R1-CRIT-4",
+          "title": "is_Primary data leakage",
+          "desc": "Primary 29.2% vs Salvage 80.2% success, χ²=380, label leakage"
+        },
+        {
+          "id": "R1-CRIT-5",
+          "title": "NaN→0 conversion violates MNAR",
+          "records_affected": 1745,
+          "desc": "Missing not at random treated as zero"
+        }
+      ],
+      "reviewer2_distilled": {
+        "overall_score": "5.0/10 conditional accept",
+        "critical": [
+          "phase3 AUC 0.807 vs old phase4 AUC 0.985 = data leakage (scaling outside CV, TabNet using test set as eval_set, SMOTE outside CV)",
+          "CI upper bound 1.002 (impossible)"
+        ],
+        "missing": [
+          "Bonferroni correction (now added)",
+          "Elastic Net (now added)",
+          "Temporal validation (still skipped)",
+          "Primary/Salvage stratification",
+          "Calibration (now added)"
+        ]
+      },
+      "reviewer4_distilled": {
+        "overall_score": "7.5/10",
+        "issues": [
+          ".env credential leak",
+          "464 vs 234 figures hardcode mismatch",
+          "@ts-ignore present",
+          "synthetic data not disclosed"
+        ]
+      }
+    }
+  },
+  "post_defense_actions": [
+    "Re-ran full pipeline with proper nested cross-validation and leakage control.",
+    "Expanded corrected benchmark to 16 models (not 27 legacy variants).",
+    "Removed dependence on inflated legacy synthetic-data evaluations.",
+    "Added calibration curves and decision curve analysis artifacts.",
+    "Recomputed SHAP global/local interpretation from corrected best model.",
+    "Fixed pathology parsing regex issues and corrected 221 affected records in preprocessing phase logs.",
+    "Updated dashboard and manuscript content to corrected pipeline outputs.",
+    "Addressed reviewer comments with point-by-point methodological corrections."
+  ],
+  "novelty_comparison": {
+    "comparison_table": [
+      {
+        "study": "Zeadna et al.",
+        "year": 2020,
+        "sample_size": 119,
+        "models_used": "GBT vs Logistic Regression",
+        "best_auc": "0.807",
+        "key_limitations": "Conventional TESE, small cohort",
+        "how_this_study_addresses": "micro-TESE cohort n=2413 + 16-model nested-CV benchmark"
+      },
+      {
+        "study": "Bachelot et al.",
+        "year": 2023,
+        "sample_size": 201,
+        "models_used": "8-model comparison (RF best)",
+        "best_auc": "0.900",
+        "key_limitations": "Small prospective test set (n=26)",
+        "how_this_study_addresses": "Larger cohort and expanded algorithm family coverage with corrected leakage controls"
+      },
+      {
+        "study": "Kobayashi et al.",
+        "year": 2023,
+        "sample_size": "430+20",
+        "models_used": "AutoML ensemble",
+        "best_auc": "0.725",
+        "key_limitations": "Small external test, platform opacity",
+        "how_this_study_addresses": "Transparent model-by-model evaluation with reported nested-CV outputs"
+      },
+      {
+        "study": "Liu et al.",
+        "year": 2023,
+        "sample_size": 217,
+        "models_used": "Integrative logistic regression",
+        "best_auc": "0.781",
+        "key_limitations": "Single-model approach",
+        "how_this_study_addresses": "Broad 16-model comparison with calibration + DCA + SHAP"
+      },
+      {
+        "study": "Deng et al.",
+        "year": 2023,
+        "sample_size": 200,
+        "models_used": "Logistic regression",
+        "best_auc": "0.720",
+        "key_limitations": "Limited methodological breadth",
+        "how_this_study_addresses": "Comprehensive multi-model framework and post-defense corrections"
+      },
+      {
+        "study": "Present study",
+        "year": 2026,
+        "sample_size": 2413,
+        "models_used": "16 models; best LightGBM",
+        "best_auc": "0.7327 ± 0.0057",
+        "key_limitations": "No external multi-center validation yet",
+        "how_this_study_addresses": "Largest ML-focused NOA cohort with nested CV, XAI, calibration/DCA, and CDSS deployment plan"
+      }
+    ],
+    "highlighted_points": [
+      "Largest ML-focused NOA micro-TESE cohort in reviewed comparative modeling studies.",
+      "Most comprehensive corrected model comparison (16 models) with nested CV pipeline.",
+      "Leakage-corrected validation replacing inflated historical results.",
+      "Integrated SHAP, calibration, and DCA in one unified corrected workflow.",
+      "Direct translational CDSS plan with clinically backed feature governance."
+    ]
+  },
+  "references": {
+    "format": "APA",
+    "literature_review_15_papers": [
+      "Li et al. (2026). Translational Andrology and Urology. https://doi.org/10.21037/tau-2025-92",
+      "Verratti et al. (2024). Current Urology Reports. https://doi.org/10.1007/s11934-024-01239-z",
+      "Deng et al. (2023). Predictors of sperm retrieval for nonobstructive azoospermia. ResearchGate publication.",
+      "Liu et al. (2023). Reproductive and Developmental Medicine. https://doi.org/10.1097/RD9.0000000000000080",
+      "Ceyhan et al. (2025). Urology. https://doi.org/10.1016/j.urology.2024.09.023",
+      "Zeadna et al. (2020). Human Reproduction. https://doi.org/10.1093/humrep/deaa109",
+      "Lee, R., & Yafi, F. A. (2023). JMIR AI. https://doi.org/10.2196/49023",
+      "Ibañez Vazquez et al. (2026). Frontiers in Urology. https://doi.org/10.3389/fruro.2026.1719894",
+      "Bachelot et al. (2023). Journal of Medical Internet Research. https://doi.org/10.2196/44047",
+      "Goss et al. (2026). Fertility and Sterility. https://doi.org/10.1016/j.fertnstert.2026.04.017",
+      "Ory et al. (2022). World Journal of Men's Health. https://doi.org/10.5534/wjmh.210159",
+      "Xiao et al. (2025). Scientific Reports. https://doi.org/10.1038/s41598-025-88387-5",
+      "Kobayashi et al. (2023). BioMed Research International. https://doi.org/10.1155/2023/5693116",
+      "Kam et al. (2025). World Journal of Men's Health. https://doi.org/10.5534/wjmh.250367",
+      "Cao et al. (2024). BMC Medical Informatics and Decision Making. https://doi.org/10.1186/s12894-024-01537-1"
+    ],
+    "additional_project_references": [
+      "Jamalirad, H., et al. (2026). Paper1_revised.md (internal revised manuscript).",
+      "Jamalirad, H., et al. (2026). PaperB_revised.md (internal revised manuscript).",
+      "NOA ML Architecture – Phase 1 Project Documentation (Project_Documentation_EN.md).",
+      "NOA micro-TESE ML Pipeline Results Summary (pipeline_summary_report.md).",
+      "cdss_implementation_doc.json (implementation audit document)."
+    ]
+  },
+  "hardware_specs": {
+    "gpu": {
+      "name": "NVIDIA H100 80GB GPU",
+      "rationale": "Large-scale SHAP computation and model training acceleration for ensemble methods and repeated validation runs."
+    },
+    "ram": {
+      "name": "256GB DDR5 RAM @ 4800 MT/s FSB",
+      "rationale": "In-memory dataset handling and nested CV parallelization with large artifact retention."
+    },
+    "cpu": {
+      "name": "AMD EPYC 9654 96-core CPU",
+      "rationale": "Multi-threaded hyperparameter search and cross-validation orchestration across 16 models."
+    }
+  },
+  "cdss": {
+    "scoring_formula": {
+      "approach": "Weighted hybrid scoring approximating LightGBM",
+      "weight_blend": "0.70 × normalized FI + 0.30 × normalized global SHAP (8 selected features)",
+      "scoring_functions": [
+        "cdss_score_lower_better(value, soft_threshold, hard_threshold)",
+        "cdss_score_higher_better(value, soft_threshold, hard_threshold)",
+        "cdss_score_centered(value, low_optimal, high_optimal, hard_low, hard_high)"
+      ],
+      "hardcoded_contributions": {
+        "Inhibin_B": 0.12,
+        "T_E2_ratio": 0.08,
+        "Klinefelter": 0.09,
+        "mean_volume": 0.05,
+        "pathology_total": "variable, capped [-0.35,+0.30]"
+      },
+      "probability_conversion": "logit = log(0.367/0.633) + 2.4 × modelSignal; p = sigmoid(logit)",
+      "base_prevalence": 0.367,
+      "logit_scaling_factor": 2.4,
+      "risk_tiers": {
+        "Low Risk": "≥70% probability of successful sperm retrieval",
+        "Moderate Risk": "40–69% probability of successful sperm retrieval",
+        "High Risk": "<40% probability of successful sperm retrieval"
+      },
+      "critical_caveat": "Heuristic approximation, NOT direct LightGBM export. ~34% of signal comes from features with 0 importance or not in original model."
+    },
+    "features": [
+      {
+        "feature": "FSH",
+        "reference_range": "1.5-12.4 mIU/mL",
+        "validation_threshold_logic": {
+          "under_range": "red",
+          "mid_range": "teal",
+          "over_range": "orange"
+        },
+        "scoring_logic": "cdss_score_lower_better(fsh, 12.9, 25.0) — lower FSH is favorable"
+      },
+      {
+        "feature": "LH",
+        "reference_range": "1.7-8.6 mIU/mL",
+        "validation_threshold_logic": {
+          "under_range": "red",
+          "mid_range": "teal",
+          "over_range": "orange"
+        },
+        "scoring_logic": "cdss_score_lower_better(lh, 8.5, 18.0)"
+      },
+      {
+        "feature": "Testosterone",
+        "reference_range": "300-1000 ng/dL (unit-harmonization required versus source values)",
+        "validation_threshold_logic": {
+          "under_range": "red",
+          "mid_range": "teal",
+          "over_range": "orange"
+        },
+        "scoring_logic": "cdss_score_higher_better(testosterone, 280.0, 550.0)"
+      },
+      {
+        "feature": "E2",
+        "reference_range": "10-40 pg/mL",
+        "validation_threshold_logic": {
+          "under_range": "red",
+          "mid_range": "teal",
+          "over_range": "orange"
+        },
+        "scoring_logic": "cdss_score_centered(estradiol, 15.0, 35.0, 8.0, 60.0)"
+      },
+      {
+        "feature": "T/E2 ratio",
+        "reference_range": "Derived ratio threshold per literature/model recalibration",
+        "validation_threshold_logic": {
+          "under_range": "red",
+          "mid_range": "teal",
+          "over_range": "orange"
+        },
+        "scoring_logic": "testosterone / estradiol"
+      },
+      {
+        "feature": "Inhibin B",
+        "reference_range": "80-300 pg/mL",
+        "validation_threshold_logic": {
+          "under_range": "red",
+          "mid_range": "teal",
+          "over_range": "orange"
+        },
+        "scoring_logic": "cdss_score_higher_better(inhibinB, 35.0, 95.0) — hardcoded weight 0.12"
+      },
+      {
+        "feature": "Testicular Volume Left",
+        "reference_range": "Clinical volume interpretation per andrology standards",
+        "validation_threshold_logic": {
+          "under_range": "red",
+          "mid_range": "teal",
+          "over_range": "orange"
+        },
+        "scoring_logic": "Model-based monotonic mapping after retraining"
+      },
+      {
+        "feature": "Testicular Volume Right",
+        "reference_range": "Clinical volume interpretation per andrology standards",
+        "validation_threshold_logic": {
+          "under_range": "red",
+          "mid_range": "teal",
+          "over_range": "orange"
+        },
+        "scoring_logic": "Model-based monotonic mapping after retraining"
+      },
+      {
+        "feature": "Age",
+        "reference_range": "Adult reproductive age range per cohort (18-70)",
+        "validation_threshold_logic": {
+          "under_range": "red",
+          "mid_range": "teal",
+          "over_range": "orange"
+        },
+        "scoring_logic": "Model-derived contribution"
+      },
+      {
+        "feature": "Klinefelter",
+        "reference_range": "Binary genetic status (Yes/No)",
+        "validation_threshold_logic": {
+          "under_range": "red",
+          "mid_range": "teal",
+          "over_range": "orange"
+        },
+        "scoring_logic": "Model-derived contribution after retraining with genetic harmonization"
+      },
+      {
+        "feature": "Pathology indicators",
+        "reference_range": "Structured bilateral pathology percentages (SCO, MA stages, hypospermatogenesis, CSTH)",
+        "validation_threshold_logic": {
+          "under_range": "red",
+          "mid_range": "teal",
+          "over_range": "orange"
+        },
+        "scoring_logic": "Structured pathology encoding with hierarchical MA constraints"
+      }
+    ],
+    "dropped_feature": {
+      "feature": "Excluded partner-related covariate",
+      "note": "Partner Age was excluded from the final model as it lacks biological plausibility for predicting sperm retrieval success in NOA patients."
+    },
+    "reference_ranges": {
+      "FSH": {
+        "range": "1.5-12.4 mIU/mL",
+        "scoring": "cdss_score_lower_better(fsh, 12.9, 25.0)",
+        "status": "VALID — top FI feature",
+        "fi_rank": 1,
+        "shap_rank": 4
+      },
+      "LH": {
+        "range": "1.7-8.6 mIU/mL",
+        "scoring": "cdss_score_lower_better(lh, 8.5, 18.0)",
+        "status": "VALID",
+        "fi_rank": 4,
+        "shap_rank": 1
+      },
+      "Testosterone": {
+        "range": "300-1000 ng/dL",
+        "scoring": "cdss_score_higher_better(testosterone, 280.0, 550.0)",
+        "status": "VALID — UNIT MISMATCH WARNING (data may be in ng/mL)",
+        "fi_rank": 5,
+        "shap_rank": 5
+      },
+      "E2": {
+        "range": "10-40 pg/mL",
+        "scoring": "cdss_score_centered(estradiol, 15.0, 35.0, 8.0, 60.0)",
+        "status": "VALID, low importance",
+        "fi_rank": 15,
+        "shap_rank": 15
+      },
+      "Inhibin_B": {
+        "range": "80-300 pg/mL",
+        "scoring": "cdss_score_higher_better(inhibinB, 35.0, 95.0); hardcoded weight 0.12",
+        "status": "SUSPECT — 0 model importance",
+        "fi_rank": null
+      },
+      "Testicular_Volume_Left": {
+        "range": "andrology standards (cc)",
+        "scoring": "Model-based monotonic mapping",
+        "fi_rank": 10,
+        "shap_rank": 11,
+        "maps_to": "Testicular_volume_LT__Guess_"
+      },
+      "Testicular_Volume_Right": {
+        "range": "andrology standards (cc)",
+        "scoring": "Model-based monotonic mapping",
+        "fi_rank": 11,
+        "shap_rank": 13,
+        "maps_to": "Testicular_volume_RT__Guess_"
+      },
+      "Age": {
+        "range": "18-70 years",
+        "scoring": "Model-derived contribution",
+        "fi_rank": 2,
+        "shap_rank": 3
+      },
+      "Klinefelter": {
+        "range": "Binary (Yes/No)",
+        "scoring": "hardcoded -0.18 if Yes / +0.06 if No (weight 0.09)",
+        "status": "NOT directly in model — original Karyotype had 0 importance"
+      },
+      "Pathology": {
+        "range": "Bilateral structured percentages (SCO, MA stages, Hypospermatogenesis, CSTH)",
+        "scoring": "Hardcoded contributions per primary checkbox: SCO=-0.20, MA=-0.12, Hypo=+0.18, Fibrosis=-0.16; secondary -0.03 each (max -0.10); total cap [-0.35,+0.30]",
+        "status": "Pathology inputs are retained for clinician context; the final LightGBM model assigned near-zero importance."
+      }
+    },
+    "color_coded_validation_logic": {
+      "under_range": "red",
+      "mid_range": "teal",
+      "over_range": "orange",
+      "applies_to": "All numeric inputs (FSH, LH, Testosterone, E2, Inhibin B, Volumes L/R, Age)"
+    },
+    "implementation": {
+      "prediction_logic": {
+        "approach": "PHP-based weighted scoring system that approximates LightGBM behavior",
+        "description": "NOT a direct model export. The PHP code implements a heuristic scoring system that uses feature importance and SHAP values as weights, then applies clinical scoring functions to compute a pseudo-probability.",
+        "steps": [
+          "1. Load feature_importance.json, shap_summary.json, dca_data.json from filesystem",
+          "2. Compute hybrid weights: 70% normalized FI + 30% normalized global SHAP for 8 selected features",
+          "3. Score each feature using clinical scoring functions (lower_better, higher_better, centered)",
+          "4. Add hardcoded contributions for: Inhibin B (0.12), T/E2 ratio (0.08), pathology (variable), Klinefelter (0.09), mean volume (0.05)",
+          "5. Sum all weighted scores into a 'modelSignal' value",
+          "6. Convert to probability via: logit = log(0.367/0.633) + 2.4 * modelSignal → sigmoid(logit)",
+          "7. Classify: <40% = Low, 40-69.9% = Moderate, ≥70% = High"
+        ],
+        "base_prevalence": 0.367,
+        "logit_scaling_factor": 2.4,
+        "total_hardcoded_weight": "~0.34 (34%) of signal comes from features NOT in the original model or with 0 importance",
+        "critical_concern": "This is NOT the actual LightGBM model running predictions. It is a hand-crafted approximation that will produce DIFFERENT results than the real model. The CDSS should be understood as 'inspired by' the model, not a faithful reproduction."
+      },
+      "files_and_purposes": {
+        "cdss/index.php": "Main clinician input form with demographics, hormones, testicular/genetic inputs, pathology checkboxes, and clinical knowledge sidebar",
+        "cdss/predict.php": "POST handler — processes form, runs prediction engine, renders results dashboard with probability gauge, SHAP-like chart, DCA curve, recommendations, pros/cons, hormone interpretation, and input snapshot",
+        "cdss/styles.css": "UI styling including responsive layout, print styles, risk category badges",
+        "cdss/script.js": "Client-side T/E2 auto-calculation, form validation, Chart.js renderings (probability gauge, SHAP bar chart, DCA line chart)",
+        "cdss/includes/cdss_functions.php": "Core prediction engine, scoring functions, reference ranges, literature thresholds, clinical recommendations, similarity stats, pros/cons builder, hormone interpretation, DCA data preparation",
+        "cdss/cdss-intro.mp4": "Introduction video for clinicians",
+        "cdss/README.txt": "Deployment instructions for cPanel hosting"
+      },
+      "data_sources_used": {
+        "feature_importance.json": "LightGBM feature importance scores (split counts) for 44 features",
+        "shap_summary.json": "Global SHAP importance + 5 local sample case explanations",
+        "dca_data.json": "Decision Curve Analysis data (thresholds, net benefit curves)",
+        "calibration_data.json": "Calibration curve data (available but not directly used in CDSS)",
+        "best_model_info.json": "Model hyperparameters and rankings",
+        "pipeline_summary_report.md": "Full pipeline results narrative"
+      },
+      "visualizations_implemented": [
+        "Probability gauge (doughnut chart, 180° arc) — Chart.js",
+        "SHAP-like feature impact horizontal bar chart — Chart.js",
+        "Decision Curve Analysis line chart (Model vs Treat All vs Treat None) — Chart.js",
+        "Hormone interpretation table",
+        "Comparison with similar patients (text-based bins)",
+        "Clinical recommendations list",
+        "Pros and cons assessment"
+      ]
+    },
+    "files": {
+      "cdss_application": {
+        "root": "/home/ubuntu/shared/cdss/",
+        "files": [
+          "/home/ubuntu/shared/cdss/index.php",
+          "/home/ubuntu/shared/cdss/predict.php",
+          "/home/ubuntu/shared/cdss/styles.css",
+          "/home/ubuntu/shared/cdss/script.js",
+          "/home/ubuntu/shared/cdss/includes/cdss_functions.php",
+          "/home/ubuntu/shared/cdss/cdss-intro.mp4",
+          "/home/ubuntu/shared/cdss/README.txt"
+        ]
+      },
+      "study_data_files": {
+        "root": "/home/ubuntu/shared/",
+        "files": [
+          "/home/ubuntu/shared/feature_importance.json",
+          "/home/ubuntu/shared/shap_summary.json",
+          "/home/ubuntu/shared/dca_data.json",
+          "/home/ubuntu/shared/calibration_data.json",
+          "/home/ubuntu/shared/best_model_info.json",
+          "/home/ubuntu/shared/model_comparison_table.csv",
+          "/home/ubuntu/shared/pipeline_summary_report.md",
+          "/home/ubuntu/shared/literature_review_report.md"
+        ]
+      },
+      "deployment_package": "/home/ubuntu/shared/cdss-system.zip",
+      "git_repository": "/home/ubuntu/shared/.git/"
+    },
+    "known_issues": {
+      "critical": [
+        {
+          "id": "CRIT-01",
+          "title": "partner-related covariate biological implausibility",
+          "description": "Partner (female) age is the 2nd-3rd most important feature for predicting sperm retrieval from male testicle. This is biologically implausible and strongly suggests confounding, data leakage, or proxy behavior.",
+          "impact": "Model may be using partner-related covariate as a proxy for unmeasured variables. CDSS reliance on it is questionable.",
+          "action_needed": "Investigate correlation matrix, consider removal, retrain model"
+        },
+        {
+          "id": "CRIT-02",
+          "title": "Not the actual model — heuristic approximation",
+          "description": "The CDSS does NOT run the actual LightGBM model. It uses a hand-crafted PHP scoring system that approximates model behavior using feature weights. Predictions WILL differ from the real model.",
+          "impact": "Clinical predictions may not match validated model performance (AUC 0.7327)",
+          "action_needed": "Either: (a) export model to ONNX/PMML and run in PHP, (b) use a microservice API, or (c) clearly label as 'approximate'"
+        },
+        {
+          "id": "CRIT-03",
+          "title": "Testosterone unit mismatch",
+          "description": "CDSS expects ng/dL (reference 300-1000) but SHAP local cases show Testosterone values of 2.1, 2.78, 3.23 — suggesting original data uses ng/mL or nmol/L.",
+          "impact": "All testosterone-related scoring is potentially wrong. T/E2 ratio is also affected.",
+          "action_needed": "Verify original dataset units for Testosterone_levels"
+        },
+        {
+          "id": "CRIT-04",
+          "title": "34% of scoring from unvalidated features",
+          "description": "Inhibin B (12%), T/E2 ratio (8%), Klinefelter (9%), and Mean Volume (5%) contribute ~34% of the scoring signal but have ZERO importance in the actual model.",
+          "impact": "CDSS predictions are significantly influenced by features the model didn't use",
+          "action_needed": "Remove or drastically reduce weight of zero-importance features"
+        },
+        {
+          "id": "CRIT-05",
+          "title": "Missing top features",
+          "description": "BMI (rank 6), Body Weight (rank 8), Height (rank 9), RT/LT sonographic dimensions (rank 7,12), and Seminal plasma pH (rank 14) are all missing from the CDSS despite being important model features.",
+          "impact": "CDSS ignores significant predictive signal from the actual model",
+          "action_needed": "Add BMI, Weight, Height at minimum; consider sonographic dimensions"
+        }
+      ],
+      "high": [
+        {
+          "id": "HIGH-01",
+          "title": "Pathology encoding unknown",
+          "description": "Original data has Pathology_RT and Pathology_LT both with 0 importance. CDSS implements literature-derived pathology categories (SCO, MA, Hypospermatogenesis, Fibrosis) as checkboxes with hardcoded weights. We don't know how pathology was originally encoded.",
+          "action_needed": "Examine raw dataset to determine pathology encoding and actual categories"
+        },
+        {
+          "id": "HIGH-02",
+          "title": "Possible data leakage — Pathology from micro-TESE biopsy",
+          "description": "If pathology results come from the micro-TESE procedure itself, they are POST-operative findings and cannot be used as PRE-operative predictors. This would be data leakage.",
+          "action_needed": "Clarify whether pathology was from prior diagnostic biopsy or micro-TESE"
+        },
+        {
+          "id": "HIGH-03",
+          "title": "Overfitting gap of 0.17 AUC",
+          "description": "Train-test AUC gap of 0.17 suggests potential overfitting in the LightGBM model",
+          "action_needed": "Review regularization, consider simpler model or more aggressive pruning"
+        }
+      ],
+      "moderate": [
+        {
+          "id": "MOD-01",
+          "title": "Reference ranges not validated against study population",
+          "description": "Hormone reference ranges (FSH 1.5-12.4, LH 1.7-8.6, etc.) are standard clinical ranges but may not match the study population's distribution.",
+          "action_needed": "Check actual percentile distributions from training data"
+        },
+        {
+          "id": "MOD-02",
+          "title": "Scoring thresholds are arbitrary",
+          "description": "Thresholds in scoring functions (e.g., FSH good<12.9 poor>25, Testosterone poor<280 good>550) are hand-picked, not derived from model split points or data quantiles.",
+          "action_needed": "Use actual model split points or data-driven thresholds"
+        },
+        {
+          "id": "MOD-03",
+          "title": "Sakamoto volume formula not implemented",
+          "description": "Model uses both 'Guess' volumes and 'Sakamoto' calculated volumes. CDSS only captures generic volume, missing the formula-specific variant.",
+          "action_needed": "If collecting XYZ dimensions, compute Sakamoto = 0.7 × L × W × D"
+        },
+        {
+          "id": "MOD-04",
+          "title": "Logit scaling factor (2.4) is arbitrary",
+          "description": "The factor that converts modelSignal to logit space (2.4) is not derived from the model's actual calibration.",
+          "action_needed": "Calibrate this against known model outputs from calibration_data.json"
+        }
+      ]
+    },
+    "action_items": {
+      "features_to_add": [
+        {
+          "feature": "BMI",
+          "priority": "HIGH",
+          "reason": "Rank 6 in FI, easy to compute from weight/height"
+        },
+        {
+          "feature": "Body Weight (kg)",
+          "priority": "HIGH",
+          "reason": "Rank 8 in FI, rank 6 in SHAP"
+        },
+        {
+          "feature": "Height (cm)",
+          "priority": "HIGH",
+          "reason": "Rank 9 in FI, rank 9 in SHAP"
+        },
+        {
+          "feature": "Prolactin",
+          "priority": "LOW",
+          "reason": "Rank 13 in FI, low SHAP"
+        },
+        {
+          "feature": "Seminal plasma pH",
+          "priority": "MEDIUM",
+          "reason": "Rank 14 in FI, rank 12 in SHAP, high local SHAP impact"
+        },
+        {
+          "feature": "RT/LT sonographic dimensions",
+          "priority": "MEDIUM",
+          "reason": "Ranks 7 and 12 in FI, but may require specialized input format"
+        },
+        {
+          "feature": "Sakamoto volume calculation",
+          "priority": "LOW",
+          "reason": "Could auto-compute from XYZ dimensions if collected"
+        }
+      ],
+      "features_to_remove_or_flag": [
+        {
+          "feature": "Partner-related covariate",
+          "priority": "HIGH",
+          "action": "Flag for review, possibly remove. At minimum add clinical warning about biological implausibility."
+        },
+        {
+          "feature": "Inhibin B (as weighted predictor)",
+          "priority": "HIGH",
+          "action": "Keep as clinical reference display but remove from scoring (0 model importance). Or reduce to negligible weight."
+        },
+        {
+          "feature": "T/E2 Ratio (as scored feature)",
+          "priority": "MEDIUM",
+          "action": "Remove from scoring — not in model. Keep as informational display."
+        },
+        {
+          "feature": "Klinefelter (as scored feature)",
+          "priority": "MEDIUM",
+          "action": "0 model importance for Karyotype. Remove from scoring or reduce weight significantly."
+        }
+      ],
+      "ux_improvements": [
+        "Add BMI auto-calculation from weight and height",
+        "Fix testosterone unit labeling and validation (verify ng/dL vs ng/mL)",
+        "Add confidence interval or uncertainty indicator to probability display",
+        "Add tooltip explanations for each field referencing model importance rank",
+        "Add warning banner when >30% of scored features have 0 model importance",
+        "Consider making pathology section optional with informational note about 0 model importance",
+        "Add model limitations disclaimer more prominently",
+        "Add version number and last-validated date to footer"
+      ],
+      "validation_tests_to_run": [
+        "Test CDSS predictions against 5 SHAP local cases (known model outputs)",
+        "Verify calibration by comparing CDSS probability distribution against calibration_data.json",
+        "Run sensitivity analysis: what happens when each zero-importance feature is removed?",
+        "Test extreme input values for scoring boundary conditions",
+        "Compare CDSS output for base-case (all-median) inputs against base prevalence (36.7%)",
+        "Cross-validate pathology contribution directions against literature"
+      ]
+    }
+  }
+}

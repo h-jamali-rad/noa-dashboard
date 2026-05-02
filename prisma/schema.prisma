@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model AgentPhase {
+  id             Int      @id
+  slug           String   @unique
+  title          String
+  subtitle       String
+  description    String
+  objectivesJson String   @default("[]")
+  deliverablesJson String @default("[]")
+  iconKey        String   @default("sparkles")
+  accent         String   @default("#0f6d8b")
+  imageCount     Int      @default(0)
+  codeCount      Int      @default(0)
+  logCount       Int      @default(0)
+  contentJson    Json?
+  createdAt      DateTime @default(now())
+}
+
+model ImageAsset {
+  id         Int    @id @default(autoincrement())
+  agent      String
+  category   String @default("general")
+  modelTag   String?
+  filename   String
+  publicPath String @unique
+  altText    String
+  caption    String @default("")
+  width      Int    @default(1200)
+  height     Int    @default(800)
+  fileFormat String @default("png")
+  sortOrder  Int    @default(0)
+}
+
+model CodeFile {
+  id          Int    @id @default(autoincrement())
+  agent       String
+  filename    String
+  language    String @default("python")
+  description String @default("")
+  contentText String
+  size        Int    @default(0)
+  sortOrder   Int    @default(0)
+  uniqueKey   String @unique
+}
+
+model LogFile {
+  id          Int    @id @default(autoincrement())
+  agent       String
+  filename    String
+  contentText String
+  size        Int    @default(0)
+  sortOrder   Int    @default(0)
+  uniqueKey   String @unique
+}
