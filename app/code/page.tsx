@@ -4,8 +4,6 @@ import BreadcrumbNav from '@/components/breadcrumb-nav'
 import { Code2 } from 'lucide-react'
 import CodeLibrary from './code-library'
 
-export const dynamic = 'force-dynamic'
-
 async function getFiles() {
   try {
     const [code, logs] = await Promise.all([

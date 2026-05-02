@@ -7,8 +7,6 @@ import SiteShell from '@/components/site-shell'
 import RoadmapFab from '@/components/roadmap-fab'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-sans' })
 const jakartaSans = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-display' })
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' })

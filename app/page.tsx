@@ -5,8 +5,6 @@ import { StatCard } from '@/components/stat-card'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Users, Layers, Trophy, Images } from 'lucide-react'
 
-export const dynamic = 'force-dynamic'
-
 async function getPhases() {
   try {
     return await prisma.agentPhase.findMany({ orderBy: { id: 'asc' } })

@@ -7,8 +7,6 @@ import Link from 'next/link'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-export const dynamic = 'force-dynamic'
-
 export async function generateStaticParams() {
   return PHASE_ORDER.map((slug) => ({ slug }))
 }

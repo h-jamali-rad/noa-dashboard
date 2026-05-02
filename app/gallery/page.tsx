@@ -3,8 +3,6 @@ import ImageGallery, { GalleryImage } from '@/components/image-gallery'
 import BreadcrumbNav from '@/components/breadcrumb-nav'
 import { Images } from 'lucide-react'
 
-export const dynamic = 'force-dynamic'
-
 async function getImages(): Promise<GalleryImage[]> {
   try {
     const rows = await prisma.imageAsset.findMany({
