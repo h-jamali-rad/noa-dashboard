@@ -26,32 +26,29 @@ export default function CdssPage() {
               <div className="space-y-3 text-sm text-muted-foreground">
                 <p>
                   In the study dataset, pathology was recorded as percentage patterns in testicular tissue
-                  (e.g., SCO 45%, Maturation Arrest 30%). In this dashboard CDSS, pathology is entered as
-                  checkboxes for practical clinical workflow.
+                  (e.g., SCO 45%, Maturation Arrest 30%). The rebuilt CDSS keeps this structure by receiving
+                  right/left pathology percentage inputs directly.
                 </p>
                 <ol className="list-decimal pl-5 space-y-2">
                   <li>
-                    <strong>Baseline model context:</strong> The trained statistical model is based on preoperative
-                    data and counseling-stage variables.
+                    <strong>Baseline model context:</strong> The prediction score uses the final LightGBM top-14
+                    feature set and SHAP-ranked weighting.
                   </li>
                   <li>
-                    <strong>Feasibility scenario from thesis workflow:</strong> In real practice, pathology patterns can
-                    be clarified during the operative pathway. Therefore, checkbox inputs are used as a practical
-                    clinician interface that can support decision refinement when new pathology information becomes
-                    available.
+                    <strong>Pathology integration:</strong> RT and LT pathology percentages are entered as numeric
+                    values (0–100) and included as a small penalty term in the final logit.
                   </li>
                   <li>
-                    <strong>Preoperative data limitation:</strong> Before micro-TESE, exact percentage pathology values
-                    are often unavailable; clinicians usually have presence/absence information from prior reports.
+                    <strong>Validation color coding:</strong> Input fields are color coded using distribution anchors
+                    (RED below minimum, GREEN for Q1–Q3, TEAL/AMBER for Q3–max, ORANGE above maximum).
                   </li>
                   <li>
-                    <strong>Feature importance finding:</strong> In the final LightGBM analysis, pathology variables
-                    (SCO, Maturation Arrest, Hypospermatogenesis, Fibrosis) had near-zero feature importance.
+                    <strong>Placeholder guidance:</strong> Every main feature input shows the interquartile hint format
+                    <code> Q1 ≤ x ≤ Q3 </code> to support realistic entries.
                   </li>
                   <li>
-                    <strong>Why pathology is still kept in CDSS:</strong> They remain visible for clinical completeness
-                    and center-level documentation, because CDSS here is a heuristic bridge combining model evidence
-                    and clinical judgment.
+                    <strong>Clinical interpretation:</strong> Output remains probability-first, with calibrated risk
+                    tier interpretation for preoperative counseling.
                   </li>
                 </ol>
               </div>
@@ -65,14 +62,12 @@ export default function CdssPage() {
             <AccordionContent>
               <div className="space-y-2 text-sm text-muted-foreground">
                 <p className="font-medium text-foreground">
-                  Q: Why is pathology entered as checkbox in CDSS while the dataset stores pathology as percentages?
+                  Q: How is pathology handled in the rebuilt CDSS?
                 </p>
                 <p>
-                  A: The CDSS is designed for real-world clinical use where exact quantitative pathology percentages
-                  are not always available at first decision time. Clinicians more commonly know whether a pattern
-                  (e.g., SCO) is present. Also, the final LightGBM model assigned near-zero importance to pathology
-                  variables, so keeping checkbox-style pathology in CDSS serves documentation and clinical context,
-                  not dominant model signal.
+                  A: Pathology is entered as explicit RT and LT percentages (0–100), aligned with the source dataset.
+                  These values are integrated as a modest penalty adjustment in a LightGBM-informed probability model,
+                  while the primary predictive signal still comes from the top-14 biologically plausible features.
                 </p>
               </div>
             </AccordionContent>

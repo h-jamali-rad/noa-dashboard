@@ -4,59 +4,80 @@ import { useMemo, useState } from 'react'
 import { Info } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 type NumField = {
   key: string
   label: string
   min: number
+  q1: number
+  q3: number
   max: number
-  placeholder: string
+  weight: number
+  direction: 'higher_better' | 'lower_better' | 'centered'
 }
 
 type RiskTier = 'Low Risk' | 'Moderate Risk' | 'High Risk'
 
-const NUM_FIELDS: NumField[] = [
-  { key: 'fsh', label: 'FSH', min: 1.5, max: 12.4, placeholder: '1.5 ≤ FSH ≤ 12.4' },
-  { key: 'lh', label: 'LH', min: 1.7, max: 8.6, placeholder: '1.7 ≤ LH ≤ 8.6' },
-  { key: 'testosterone', label: 'Testosterone', min: 300, max: 1000, placeholder: '300 ≤ Testosterone ≤ 1000' },
-  { key: 'e2', label: 'E2', min: 10, max: 40, placeholder: '10 ≤ E2 ≤ 40' },
-  { key: 'inhibinB', label: 'Inhibin B', min: 80, max: 300, placeholder: '80 ≤ Inhibin B ≤ 300' },
-  { key: 'volumeLeft', label: 'Testicular Volume Left', min: 12, max: 25, placeholder: '12 ≤ Left Volume ≤ 25' },
-  { key: 'volumeRight', label: 'Testicular Volume Right', min: 12, max: 25, placeholder: '12 ≤ Right Volume ≤ 25' },
-  { key: 'age', label: 'Age', min: 18, max: 70, placeholder: '18 ≤ Age ≤ 70' },
+const FEATURE_FIELDS: NumField[] = [
+  { key: 'LH', label: 'LH', min: 0.1, q1: 5.54, q3: 15.68, max: 63.13, weight: 0.3170224435, direction: 'lower_better' },
+  { key: 'Age', label: 'Age', min: 16, q1: 35, q3: 44, max: 84, weight: 0.2701342618, direction: 'lower_better' },
+  { key: 'FSH', label: 'FSH', min: 0.1, q1: 9.3875, q3: 31.215, max: 166.1, weight: 0.2503208868, direction: 'lower_better' },
+  { key: 'Testosterone_levels', label: 'Testosterone_levels', min: 0.1, q1: 2.28, q3: 4.75, max: 26.8, weight: 0.2118162328, direction: 'higher_better' },
+  { key: 'Body_Weight', label: 'Body_Weight', min: 6, q1: 70, q3: 91, max: 175, weight: 0.1739827698, direction: 'centered' },
+  { key: 'Sakamoto_LT_mL', label: 'Sakamoto_LT/mL', min: 0, q1: 3.33984, q3: 10.9125225, max: 64.752, weight: 0.1705756237, direction: 'higher_better' },
+  { key: 'BMI', label: 'BMI', min: 0, q1: 22.31, q3: 29.04, max: 52.83, weight: 0.1690428005, direction: 'centered' },
+  { key: 'Height', label: 'Height', min: 145, q1: 170, q3: 180, max: 198, weight: 0.1662172247, direction: 'centered' },
+  { key: 'RT_XYZ_Sono', label: 'RT_XYZ_Sono', min: 181.5, q1: 4945.875, q3: 15016.125, max: 108000, weight: 0.1563766924, direction: 'higher_better' },
+  { key: 'Testicular_volume_LT', label: 'Testicular_volume_LT', min: 0.5, q1: 5, q3: 17, max: 35, weight: 0.1292453026, direction: 'higher_better' },
+  { key: 'Seminal_plasma_pH', label: 'Seminal_plasma_pH', min: 6, q1: 7.8, q3: 7.8, max: 8.4, weight: 0.1276707341, direction: 'centered' },
+  { key: 'Testicular_volume_RT', label: 'Testicular_volume_RT', min: 0.5, q1: 5, q3: 17, max: 35, weight: 0.1106535155, direction: 'higher_better' },
+  { key: 'LT_XYZ_Sono', label: 'LT_XYZ_Sono', min: 546, q1: 4950, q3: 15410.5, max: 91200, weight: 0.0848989118, direction: 'higher_better' },
+  { key: 'E2', label: 'E2', min: 5, q1: 25.3925, q3: 41.065, max: 108, weight: 0.0434829211, direction: 'centered' },
 ]
 
-const primaryPathology = ['SCO', 'Maturation Arrest', 'Hypospermatogenesis', 'Fibrosis']
-const secondaryPathology = ['Tubular hyalinization', 'Mixed atrophy', 'Inflammatory changes']
+const PATHOLOGY_FIELDS = [
+  { key: 'RT_Pathology_pct', label: 'Pathology_RT (%)' },
+  { key: 'LT_Pathology_pct', label: 'Pathology_LT (%)' },
+] as const
 
 const BRIER_EXPLANATION =
   "Brier Score: A metric measuring the accuracy of probabilistic predictions. Lower values (closer to 0) indicate better calibration. It's the mean squared difference between predicted probabilities and actual outcomes."
+
+const BASE_SUCCESS_RATE = 0.367
+const WEIGHT_SUM = FEATURE_FIELDS.reduce((acc, f) => acc + f.weight, 0)
 
 function sigmoid(x: number) {
   return 1 / (1 + Math.exp(-x))
 }
 
-function scoreLowerBetter(v: number, soft: number, hard: number) {
-  if (v <= soft) return 1
-  if (v >= hard) return -1
-  const r = (v - soft) / (hard - soft)
-  return 1 - 2 * r
-}
+function normalizeWithinBounds(value: number, field: NumField) {
+  const span = Math.max(field.max - field.min, 1e-6)
+  const qSpan = Math.max(field.q3 - field.q1, 1e-6)
 
-function scoreHigherBetter(v: number, hard: number, soft: number) {
-  if (v <= hard) return -1
-  if (v >= soft) return 1
-  const r = (v - hard) / (soft - hard)
-  return -1 + 2 * r
-}
+  if (field.direction === 'higher_better') {
+    if (value <= field.min) return -1
+    if (value >= field.max) return 1
+    if (value < field.q1) return -1 + ((value - field.min) / Math.max(field.q1 - field.min, 1e-6))
+    if (value <= field.q3) return (value - field.q1) / qSpan
+    return 1 - ((value - field.q3) / Math.max(field.max - field.q3, 1e-6)) * 0.4
+  }
 
-function scoreCentered(v: number, low: number, high: number, hardLow: number, hardHigh: number) {
-  if (v < hardLow || v > hardHigh) return -1
-  if (v >= low && v <= high) return 1
-  if (v < low) return -1 + ((v - hardLow) / (low - hardLow)) * 2
-  return 1 - ((v - high) / (hardHigh - high)) * 2
+  if (field.direction === 'lower_better') {
+    if (value <= field.min) return 1
+    if (value >= field.max) return -1
+    if (value < field.q1) return 1 - ((value - field.min) / Math.max(field.q1 - field.min, 1e-6)) * 0.5
+    if (value <= field.q3) return 0.5 - ((value - field.q1) / qSpan)
+    return -0.5 - ((value - field.q3) / Math.max(field.max - field.q3, 1e-6)) * 0.5
+  }
+
+  const center = (field.q1 + field.q3) / 2
+  const distance = Math.abs(value - center)
+  const tolerance = Math.max((field.q3 - field.q1) / 2, 1e-6)
+  const normalizedDistance = distance / tolerance
+  if (value < field.min || value > field.max) return -1
+  if (value >= field.q1 && value <= field.q3) return 1
+  return Math.max(-1, 1 - normalizedDistance)
 }
 
 function getRiskTier(probabilityPct: number): RiskTier {
@@ -82,116 +103,86 @@ function getRiskTooltipText(probabilityPct: number, tier: RiskTier): string {
   return `With a ${p}% probability of successful sperm retrieval, this patient is categorized as high risk for an unfavorable outcome. Threshold <40% suggests poor candidacy; alternatives should be considered before surgery.`
 }
 
+function getInputClass(value: string | undefined, field: Pick<NumField, 'min' | 'q1' | 'q3' | 'max'>) {
+  if (!value) return ''
+  const v = Number(value)
+  if (Number.isNaN(v)) return ''
+  if (v < field.min) return 'border-red-500 ring-1 ring-red-400' // RED
+  if (v > field.max) return 'border-orange-500 ring-1 ring-orange-400' // ORANGE
+  if (v >= field.q1 && v <= field.q3) return 'border-emerald-500 ring-1 ring-emerald-400' // GREEN
+  if (v > field.q3 && v <= field.max) {
+    const midpoint = field.q3 + (field.max - field.q3) / 2
+    return v <= midpoint
+      ? 'border-teal-500 ring-1 ring-teal-400' // TEAL
+      : 'border-amber-500 ring-1 ring-amber-400' // AMBER
+  }
+  return 'border-sky-500 ring-1 ring-sky-400'
+}
+
 export default function CdssForm() {
   const [vals, setVals] = useState<Record<string, string>>({})
-  const [klinefelter, setKlinefelter] = useState(false)
-  const [pathMain, setPathMain] = useState<Record<string, boolean>>({})
-  const [pathSec, setPathSec] = useState<Record<string, boolean>>({})
   const [result, setResult] = useState<{ p: number; tier: RiskTier } | null>(null)
 
-  const te2 = useMemo(() => {
-    const t = Number(vals.testosterone || 0)
-    const e2 = Number(vals.e2 || 0)
-    if (!t || !e2) return 0
-    return t / e2
-  }, [vals.testosterone, vals.e2])
-
-  const getInputClass = (key: string, min: number, max: number) => {
-    const v = Number(vals[key])
-    if (!vals[key]) return ''
-    if (v < min) return 'border-red-500 ring-1 ring-red-400'
-    if (v > max) return 'border-orange-500 ring-1 ring-orange-400'
-    return 'border-teal-500 ring-1 ring-teal-400'
-  }
+  const pathologyPenalty = useMemo(() => {
+    const rt = Number(vals.RT_Pathology_pct || 0)
+    const lt = Number(vals.LT_Pathology_pct || 0)
+    const meanPct = (Math.max(0, Math.min(100, rt)) + Math.max(0, Math.min(100, lt))) / 2
+    return -0.22 * (meanPct / 100)
+  }, [vals.LT_Pathology_pct, vals.RT_Pathology_pct])
 
   const onSubmit = () => {
-    const fsh = Number(vals.fsh || 0)
-    const lh = Number(vals.lh || 0)
-    const testosterone = Number(vals.testosterone || 0)
-    const e2 = Number(vals.e2 || 0)
-    const inhibinB = Number(vals.inhibinB || 0)
-    const volumeLeft = Number(vals.volumeLeft || 0)
-    const volumeRight = Number(vals.volumeRight || 0)
-    const age = Number(vals.age || 0)
+    const weightedSignal = FEATURE_FIELDS.reduce((acc, field) => {
+      const rawValue = Number(vals[field.key] ?? '')
+      if (!Number.isFinite(rawValue)) return acc
+      const featureScore = normalizeWithinBounds(rawValue, field)
+      return acc + field.weight * featureScore
+    }, 0)
 
-    const modelSignal =
-      0.16 * scoreLowerBetter(fsh, 12.9, 25.0) +
-      0.16 * scoreLowerBetter(lh, 8.5, 18.0) +
-      0.14 * scoreHigherBetter(testosterone, 280, 550) +
-      0.06 * scoreCentered(e2, 15, 35, 8, 60) +
-      0.10 * scoreHigherBetter(inhibinB, 35, 95) +
-      0.12 * scoreCentered((volumeLeft + volumeRight) / 2, 12, 25, 6, 35) +
-      0.10 * scoreCentered(age, 26, 45, 18, 70) +
-      0.08 * scoreCentered(te2, 10, 25, 5, 40) +
-      (klinefelter ? -0.18 : 0.06)
-
-    let pathology = 0
-    if (pathMain['SCO']) pathology -= 0.2
-    if (pathMain['Maturation Arrest']) pathology -= 0.12
-    if (pathMain['Hypospermatogenesis']) pathology += 0.18
-    if (pathMain['Fibrosis']) pathology -= 0.16
-    const secCount = secondaryPathology.filter((x) => pathSec[x]).length
-    pathology += -Math.min(0.1, secCount * 0.03)
-    pathology = Math.max(-0.35, Math.min(0.3, pathology))
-
-    const logit = Math.log(0.367 / 0.633) + 2.4 * (modelSignal + pathology)
-    const p = sigmoid(logit)
-    const pct = p * 100
-    const tier = getRiskTier(pct)
-    setResult({ p: pct, tier })
+    const normalizedSignal = weightedSignal / WEIGHT_SUM
+    const logit = Math.log(BASE_SUCCESS_RATE / (1 - BASE_SUCCESS_RATE)) + 2.25 * normalizedSignal + pathologyPenalty
+    const probability = sigmoid(logit)
+    const pct = probability * 100
+    setResult({ p: pct, tier: getRiskTier(pct) })
   }
 
   return (
     <TooltipProvider>
       <div className="space-y-4">
         <div className="rounded-lg border border-blue-300/40 bg-blue-50/40 p-3 text-xs text-muted-foreground" title={BRIER_EXPLANATION}>
-          Probability-focused interpretation is aligned with calibration principles (including Brier-based reliability checks): higher predicted sperm retrieval probability means lower clinical risk.
+          LightGBM-based CDSS approximation with SHAP-ranked top 14 predictors + RT/LT pathology percentages (calibration-aware probability output).
         </div>
 
         <div className="grid md:grid-cols-2 gap-3">
-          {NUM_FIELDS.map((f) => (
+          {FEATURE_FIELDS.map((f) => (
             <div key={f.key}>
               <label className="text-xs font-medium">{f.label}</label>
               <Input
                 value={vals[f.key] ?? ''}
                 onChange={(e) => setVals((p) => ({ ...p, [f.key]: e.target.value }))}
-                placeholder={f.placeholder}
-                className={getInputClass(f.key, f.min, f.max)}
+                placeholder={`${f.q1} ≤ x ≤ ${f.q3}`}
+                className={getInputClass(vals[f.key], f)}
                 type="number"
               />
+              <p className="mt-1 text-[10px] text-muted-foreground">Min: {f.min} • Q1: {f.q1} • Q3: {f.q3} • Max: {f.max}</p>
             </div>
           ))}
         </div>
 
-        <div>
-          <label className="text-xs font-medium">T/E2 ratio (auto-calculated)</label>
-          <Input value={te2 ? te2.toFixed(2) : ''} readOnly placeholder="auto-calculated" className="border-teal-500/50" />
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Checkbox checked={klinefelter} onCheckedChange={(v) => setKlinefelter(Boolean(v))} />
-          <span className="text-sm">Klinefelter syndrome</span>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm font-medium mb-2">Pathology indicators (primary)</p>
-            {primaryPathology.map((p) => (
-              <label key={p} className="flex items-center gap-2 text-sm mb-1">
-                <Checkbox checked={!!pathMain[p]} onCheckedChange={(v) => setPathMain((s) => ({ ...s, [p]: Boolean(v) }))} />
-                {p}
-              </label>
-            ))}
-          </div>
-          <div>
-            <p className="text-sm font-medium mb-2">Pathology indicators (secondary)</p>
-            {secondaryPathology.map((p) => (
-              <label key={p} className="flex items-center gap-2 text-sm mb-1">
-                <Checkbox checked={!!pathSec[p]} onCheckedChange={(v) => setPathSec((s) => ({ ...s, [p]: Boolean(v) }))} />
-                {p}
-              </label>
-            ))}
-          </div>
+        <div className="grid md:grid-cols-2 gap-3">
+          {PATHOLOGY_FIELDS.map((p) => (
+            <div key={p.key}>
+              <label className="text-xs font-medium">{p.label}</label>
+              <Input
+                value={vals[p.key] ?? ''}
+                onChange={(e) => setVals((prev) => ({ ...prev, [p.key]: e.target.value }))}
+                placeholder="0 ≤ x ≤ 100"
+                className={getInputClass(vals[p.key], { min: 0, q1: 25, q3: 75, max: 100 })}
+                type="number"
+                min={0}
+                max={100}
+              />
+            </div>
+          ))}
         </div>
 
         <Button onClick={onSubmit} className="w-full">Compute probability</Button>

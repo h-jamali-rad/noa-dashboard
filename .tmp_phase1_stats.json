@@ -1,0 +1,147 @@
+{
+  "resolved_feature_columns": {
+    "LH": "LH",
+    "Age": "Age",
+    "FSH": "FSH",
+    "Testosterone_levels": "Testosterone levels",
+    "Body_Weight": "Boby Weight",
+    "Sakamoto_LT": "Sakamoto-LT/mL",
+    "BMI": "BMI",
+    "Height": "Hieght",
+    "RT_XYZ_Sono": "RT-XYZ (Sono)",
+    "Testicular_volume_LT": "Testicular volume_LT (Guess)",
+    "Seminal_plasma_pH": "Seminal plasma pH",
+    "Testicular_volume_RT": "Testicular volume_RT (Guess)",
+    "LT_XYZ_Sono": "LT-XYZ (Sono)",
+    "E2": "E2"
+  },
+  "stats": [
+    {
+      "feature": "LH",
+      "column": "LH",
+      "min": 0.1,
+      "q1": 5.54,
+      "median": 9.17,
+      "q3": 15.68,
+      "max": 63.13
+    },
+    {
+      "feature": "Age",
+      "column": "Age",
+      "min": 16.0,
+      "q1": 35.0,
+      "median": 39.0,
+      "q3": 44.0,
+      "max": 84.0
+    },
+    {
+      "feature": "FSH",
+      "column": "FSH",
+      "min": 0.1,
+      "q1": 9.387500000000001,
+      "median": 18.975,
+      "q3": 31.215,
+      "max": 166.1
+    },
+    {
+      "feature": "Testosterone_levels",
+      "column": "Testosterone levels",
+      "min": 0.1,
+      "q1": 2.28,
+      "median": 3.21,
+      "q3": 4.75,
+      "max": 26.8
+    },
+    {
+      "feature": "Body_Weight",
+      "column": "Boby Weight",
+      "min": 6.0,
+      "q1": 70.0,
+      "median": 80.0,
+      "q3": 91.0,
+      "max": 175.0
+    },
+    {
+      "feature": "Sakamoto_LT",
+      "column": "Sakamoto-LT/mL",
+      "min": 0.0,
+      "q1": 3.3398399999999997,
+      "median": 6.879899999999999,
+      "q3": 10.9125225,
+      "max": 64.752
+    },
+    {
+      "feature": "BMI",
+      "column": "BMI",
+      "min": 0.0,
+      "q1": 22.31,
+      "median": 25.73,
+      "q3": 29.04,
+      "max": 52.83
+    },
+    {
+      "feature": "Height",
+      "column": "Hieght",
+      "min": 145.0,
+      "q1": 170.0,
+      "median": 175.0,
+      "q3": 180.0,
+      "max": 198.0
+    },
+    {
+      "feature": "RT_XYZ_Sono",
+      "column": "RT-XYZ (Sono)",
+      "min": 181.5,
+      "q1": 4945.875,
+      "median": 10027.0,
+      "q3": 15016.125,
+      "max": 108000.0
+    },
+    {
+      "feature": "Testicular_volume_LT",
+      "column": "Testicular volume_LT (Guess)",
+      "min": 0.5,
+      "q1": 5.0,
+      "median": 12.0,
+      "q3": 17.0,
+      "max": 35.0
+    },
+    {
+      "feature": "Seminal_plasma_pH",
+      "column": "Seminal plasma pH",
+      "min": 6.0,
+      "q1": 7.8,
+      "median": 7.8,
+      "q3": 7.8,
+      "max": 8.4
+    },
+    {
+      "feature": "Testicular_volume_RT",
+      "column": "Testicular volume_RT (Guess)",
+      "min": 0.5,
+      "q1": 5.0,
+      "median": 12.0,
+      "q3": 17.0,
+      "max": 35.0
+    },
+    {
+      "feature": "LT_XYZ_Sono",
+      "column": "LT-XYZ (Sono)",
+      "min": 546.0,
+      "q1": 4950.0,
+      "median": 9800.0,
+      "q3": 15410.5,
+      "max": 91200.0
+    },
+    {
+      "feature": "E2",
+      "column": "E2",
+      "min": 5.0,
+      "q1": 25.3925,
+      "median": 31.15,
+      "q3": 41.065,
+      "max": 108.0
+    }
+  ],
+  "pathology_pct_columns": []
+}

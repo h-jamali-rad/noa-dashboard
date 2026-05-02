@@ -1,0 +1,42 @@
+{
+  "raw_pathology_columns": [
+    "Pathology-RT",
+    "Pathology-LT"
+  ],
+  "derived_pathology_pct_columns": [
+    "RT_SCO_pct",
+    "LT_SCO_pct",
+    "RT_CSTH_pct",
+    "LT_CSTH_pct",
+    "RT_Hypospermatogenesis_pct",
+    "LT_Hypospermatogenesis_pct",
+    "RT_Severe_Hypospermatogenesis_pct",
+    "LT_Severe_Hypospermatogenesis_pct",
+    "RT_MA_Spermatogonial_pct",
+    "LT_MA_Spermatogonial_pct",
+    "RT_MA_Spermatocytic_pct",
+    "LT_MA_Spermatocytic_pct",
+    "RT_MA_ImmatureRound_pct",
+    "LT_MA_ImmatureRound_pct",
+    "RT_MA_Elongated_pct",
+    "LT_MA_Elongated_pct"
+  ],
+  "non_null_counts_hint_from_text_matches": {
+    "RT_SCO_pct": 1240,
+    "LT_SCO_pct": 864,
+    "RT_CSTH_pct": 688,
+    "LT_CSTH_pct": 464,
+    "RT_Hypospermatogenesis_pct": 254,
+    "LT_Hypospermatogenesis_pct": 136,
+    "RT_Severe_Hypospermatogenesis_pct": 208,
+    "LT_Severe_Hypospermatogenesis_pct": 116,
+    "RT_MA_Spermatogonial_pct": 164,
+    "LT_MA_Spermatogonial_pct": 97,
+    "RT_MA_Spermatocytic_pct": 680,
+    "LT_MA_Spermatocytic_pct": 417,
+    "RT_MA_ImmatureRound_pct": 266,
+    "LT_MA_ImmatureRound_pct": 149,
+    "RT_MA_Elongated_pct": 34,
+    "LT_MA_Elongated_pct": 15
+  }
+}
