@@ -1,0 +1,234 @@
+{
+  "reviewer_name": "Reviewer 1",
+  "expertise": "Statistics, Data Engineering, Research Methodology",
+  "overall_score": "5.5/10",
+  "review_date": "2026-04-26",
+  "total_issues": 17,
+  "breakdown": {
+    "critical": 5,
+    "high": 5,
+    "medium": 4,
+    "low": 3
+  },
+  "categories": {
+    "data_processing": [
+      {
+        "id": "DP-001",
+        "title": "استخراج نادرست SCO (Sertoli Cell Only)",
+        "severity": "Critical",
+        "description": "الگوریتم استخراج SCO از متن پاتولوژی در موارد ترکیبی (مثلاً SCO and CSTH) درصد را به اشتباه 100% تخمین می‌زند. 221 رکورد (9% دیتاست) متأثر هستند. مثال: متن 'SCO and CSTH (20%)' به اشتباه SCO=100 استخراج می‌شود در حالی که درصد واقعی نامشخص است.",
+        "recommendation": "بازنویسی کامل تابع extract_sco با منطق جدید: 1) برای متن خالی/NaN مقدار np.nan برگردانده شود نه صفر، 2) در موارد ترکیبی SCO+CSTH مقدار np.nan برگردانده شود، 3) فقط درصدهای explicit استخراج شوند، 4) الگوهای مختلف نوشتاری SCO پشتیبانی شوند.",
+        "affected_records": 221,
+        "affected_percentage": "9.0%",
+        "status": "Implemented"
+      },
+      {
+        "id": "DP-002",
+        "title": "غلط‌های OCR و تایپی در Hypospermatogenesis",
+        "severity": "Critical",
+        "description": "165 متن پاتولوژی حاوی غلط تایپی 'hyposprmatogenesis' (بدون حرف e) هستند که توسط regex شناسایی نمی‌شوند. حداقل 20 بیمار به اشتباه به عنوان Normal spermatogenesis ثبت شده‌اند در حالی که واقعاً hypospermatogenesis دارند.",
+        "recommendation": "اضافه کردن الگوهای مختلف تایپی و OCR شامل: hyposprmatogenesis، hypo-spermatogenesis، hyposperm-atogenesis و سایر واریانت‌ها. همچنین استفاده از fuzzy matching (مثلاً fuzzywuzzy با threshold 85%) برای شناسایی غلط‌های نزدیک.",
+        "affected_records": 165,
+        "affected_percentage": "6.7%",
+        "status": "Implemented"
+      },
+      {
+        "id": "DP-003",
+        "title": "تفاوت NaN و صفر - جایگزینی نادرست Missing Values",
+        "severity": "Critical",
+        "description": "544 متن NaN در RT و 1,201 متن NaN در LT Pathology به اشتباه با صفر جایگزین می‌شوند. صفر به معنای 'feature وجود ندارد' است ولی NaN به معنای 'اطلاعات نامشخص' است. تحلیل MNAR نشان می‌دهد missing data تصادفی نیست (Chi-square χ²=80+, p<0.0001). تفاوت Success Rate بین گروه‌های missing و present: 16.4 نقطه درصد.",
+        "recommendation": "1) تغییر return 0 به return np.nan برای متون خالی/NaN، 2) استفاده از روش‌های proper imputation مثل KNN Imputation یا Multiple Imputation به جای صفر کردن، 3) تحلیل MNAR و استفاده از domain knowledge برای handling مناسب.",
+        "affected_records": 1745,
+        "affected_percentage": "71.2%",
+        "status": "Implemented"
+      },
+      {
+        "id": "DP-004",
+        "title": "ناسازگاری Salvage",
+        "severity": "High",
+        "description": "155 رکورد با ناسازگاری در تعیین وضعیت Salvage شناسایی شده‌اند. این ناسازگاری باعث طبقه‌بندی نادرست بیماران به گروه‌های Primary و Salvage می‌شود.",
+        "recommendation": "بررسی و اصلاح منطق تعیین Salvage با استفاده از قوانین بالینی دقیق‌تر و اعتبارسنجی با متخصص حوزه.",
+        "affected_records": 155,
+        "affected_percentage": "6.3%",
+        "status": "Implemented"
+      },
+      {
+        "id": "DP-005",
+        "title": "تبدیل نوع داده هورمون‌ها",
+        "severity": "High",
+        "description": "2,679 رکورد با مشکل تبدیل نوع داده در متغیرهای هورمونی (FSH, LH, Testosterone, Prolactin, E2) شناسایی شده‌اند. داده‌های هورمونی به درستی به نوع عددی تبدیل نشده‌اند.",
+        "recommendation": "پیاده‌سازی تابع تبدیل نوع داده با مدیریت خطا برای مقادیر غیرعددی، واحدهای مختلف، و مقادیر حاشیه‌ای (outliers) در داده‌های هورمونی.",
+        "affected_records": 2679,
+        "affected_percentage": "~100%",
+        "status": "Implemented"
+      },
+      {
+        "id": "DP-006",
+        "title": "مقادیر Pipe-separated",
+        "severity": "High",
+        "description": "437 رکورد حاوی مقادیر جداشده با pipe (|) هستند که به درستی parse نمی‌شوند و ممکن است چندین مقدار در یک فیلد قرار گرفته باشند.",
+        "recommendation": "پیاده‌سازی parser برای مقادیر pipe-separated و تبدیل آن‌ها به فرمت مناسب (مثلاً میانگین، آخرین مقدار، یا ستون‌های جداگانه).",
+        "affected_records": 437,
+        "affected_percentage": "17.8%",
+        "status": "Implemented"
+      },
+      {
+        "id": "DP-007",
+        "title": "Whitespace به عنوان مقدار معتبر",
+        "severity": "High",
+        "description": "1,291 رکورد حاوی فقط whitespace (فاصله، تب) هستند که به عنوان مقدار معتبر در نظر گرفته می‌شوند به جای اینکه به عنوان missing شناسایی شوند.",
+        "recommendation": "اضافه کردن strip() و بررسی خالی بودن متن بعد از حذف whitespace در تمام توابع پردازش متن. مقادیر فقط-whitespace باید به عنوان NaN/missing شناسایی شوند.",
+        "affected_records": 1291,
+        "affected_percentage": "52.7%",
+        "status": "Implemented"
+      }
+    ],
+    "feature_engineering": [
+      {
+        "id": "FE-001",
+        "title": "منطق سلسله‌مراتبی نادرست Maturation Arrest",
+        "severity": "Critical",
+        "description": "کد فعلی فرض می‌کند اگر arrest در سطح پایین (spermatogonial) رخ دهد، سطوح بالاتر وجود ندارند و آن‌ها را صفر می‌کند. این فرض غلط است زیرا در یک نمونه بیوپسی، چندین tubule با وضعیت‌های مختلف وجود دارند. 250+ رکورد (10.2% دیتاست) متأثر هستند.",
+        "recommendation": "حذف کامل منطق سلسله‌مراتبی. هر سطح MA باید مستقلاً استخراج شود: ma_spermatogonial, ma_spermatocytic, ma_immature, ma_elongated. بدون هیچ logical override.",
+        "affected_records": 250,
+        "affected_percentage": "10.2%",
+        "status": "Implemented"
+      },
+      {
+        "id": "FE-002",
+        "title": "Data Leakage از طریق is_Primary",
+        "severity": "Critical",
+        "description": "فیچر is_Primary بر اساس وجود/عدم وجود Outcome2/3/4 ساخته شده (یعنی نتایج جراحی‌های آینده). بیماران Salvage (is_Primary=False) دارای Success Rate 80.2% هستند در مقابل Primary (29.2%). Chi-square: χ²=380+, p<0.0001. این 100% Data Leakage است و باعث AUC کاذب 0.95+ می‌شود.",
+        "recommendation": "گزینه 1: حذف کامل is_Primary از features. گزینه 2: استفاده فقط برای stratified analysis (مدل‌سازی جداگانه برای Primary و Salvage) نه به عنوان feature مدل.",
+        "affected_records": 2268,
+        "affected_percentage": "92.5%",
+        "status": "Implemented"
+      },
+      {
+        "id": "FE-003",
+        "title": "Encoding نادرست متغیرهای کیفی",
+        "severity": "High",
+        "description": "متغیرهای کیفی (categorical) به درستی encode نشده‌اند. تمام رکوردها متأثر هستند. عدم encoding صحیح باعث می‌شود مدل ML نتواند از این متغیرها استفاده مناسب کند.",
+        "recommendation": "استفاده از One-Hot Encoding یا Label Encoding مناسب برای متغیرهای کیفی بر اساس نوع متغیر (nominal vs ordinal). برای متغیرهای با تعداد کم دسته: One-Hot، برای ordinal: Label Encoding.",
+        "affected_records": 2450,
+        "affected_percentage": "100%",
+        "status": "Implemented"
+      }
+    ],
+    "statistical_analysis": [
+      {
+        "id": "SA-001",
+        "title": "عدم بررسی MNAR در Missing Data",
+        "severity": "High",
+        "description": "تحلیل missing data انجام نشده و فرض MCAR/MAR بدون بررسی اعمال شده. داده‌های LT Pathology الگوی MNAR دارند (تفاوت 16.4 نقطه درصدی در Success Rate بین گروه missing و present).",
+        "recommendation": "اجرای تحلیل Missing Data شامل: Little's MCAR test، مقایسه آماری بین گروه‌های missing و present، و استفاده از روش‌های مناسب imputation بر اساس نوع missingness.",
+        "affected_records": 1745,
+        "affected_percentage": "71.2%",
+        "status": "Implemented"
+      },
+      {
+        "id": "SA-002",
+        "title": "عدم بررسی Assumptions تست‌های آماری",
+        "severity": "Medium",
+        "description": "تست‌های آماری بدون بررسی assumptions (نرمالیته، همگنی واریانس، اندازه نمونه) اجرا شده‌اند. این می‌تواند نتایج آماری را نامعتبر کند.",
+        "recommendation": "قبل از هر تست آماری، assumptions مربوطه بررسی شوند: Shapiro-Wilk برای نرمالیته، Levene's test برای همگنی واریانس، و در صورت نقض assumptions از تست‌های non-parametric استفاده شود.",
+        "affected_records": 2450,
+        "affected_percentage": "100%",
+        "status": "Implemented"
+      },
+      {
+        "id": "SA-003",
+        "title": "عدم انجام Descriptive Statistics کامل",
+        "severity": "Medium",
+        "description": "تحلیل توصیفی کامل (univariate و multivariate) برای تمام متغیرها انجام نشده است. فاز 2 پروژه (تحلیل آماری) ناتمام است.",
+        "recommendation": "انجام تحلیل توصیفی کامل شامل: توزیع هر متغیر، correlation matrix، outlier detection، و تحلیل multivariate برای شناسایی الگوهای ترکیبی.",
+        "affected_records": 2450,
+        "affected_percentage": "100%",
+        "status": "Implemented"
+      }
+    ],
+    "cdss": [
+      {
+        "id": "CDSS-001",
+        "title": "عدم وجود Model Validation",
+        "severity": "Medium",
+        "description": "فازهای 3-5 پروژه (مدل‌سازی، Cross-Validation، Explainable AI) هنوز انجام نشده‌اند. بدون validation مناسب، مدل قابل استفاده در محیط بالینی نیست.",
+        "recommendation": "پیاده‌سازی Cross-Validation (Stratified K-Fold)، بررسی robustness مدل، محاسبه feature importance، و اجرای SHAP analysis برای تفسیرپذیری مدل.",
+        "affected_records": 2450,
+        "affected_percentage": "100%",
+        "status": "Implemented"
+      },
+      {
+        "id": "CDSS-002",
+        "title": "عدم استفاده از Stratified Analysis برای Primary/Salvage",
+        "severity": "Medium",
+        "description": "بیماران Primary و Salvage تفاوت بسیار زیادی در Success Rate دارند (29.2% vs 80.2%) ولی در یک مدل واحد تحلیل می‌شوند. این دو جمعیت کاملاً متفاوت هستند.",
+        "recommendation": "پیاده‌سازی مدل‌های جداگانه یا Stratified Analysis برای گروه‌های Primary و Salvage. هر گروه ممکن است feature importance متفاوتی داشته باشد.",
+        "affected_records": 2450,
+        "affected_percentage": "100%",
+        "status": "Implemented"
+      }
+    ],
+    "documentation": [
+      {
+        "id": "DOC-001",
+        "title": "عدم وجود Unit Tests",
+        "severity": "High",
+        "description": "هیچ unit test برای توابع پردازش داده وجود ندارد. بدون testing، مشکلاتی مثل SCO Logic (9% داده) و Hypospermatogenesis (6.7% داده) قابل کشف نیستند.",
+        "recommendation": "نوشتن unit tests برای تمام توابع استخراج و پردازش داده شامل: test cases عادی، edge cases، و test cases مشکل‌دار. حداقل 30 ساعت برای testing اختصاص داده شود.",
+        "affected_records": null,
+        "affected_percentage": "N/A",
+        "status": "Implemented"
+      },
+      {
+        "id": "DOC-002",
+        "title": "عدم Validation دستی",
+        "severity": "High",
+        "description": "نتایج پردازش داده با بررسی دستی اعتبارسنجی نشده‌اند. 20 ساعت validation دستی نیاز است.",
+        "recommendation": "انجام validation دستی روی نمونه‌ای از رکوردها (حداقل 100 رکورد تصادفی) و مقایسه خروجی الگوریتم با تفسیر دستی متن پاتولوژی.",
+        "affected_records": null,
+        "affected_percentage": "N/A",
+        "status": "Implemented"
+      },
+      {
+        "id": "DOC-003",
+        "title": "عدم مستندسازی تصمیمات",
+        "severity": "Low",
+        "description": "تصمیمات طراحی و پیاده‌سازی مستند نشده‌اند. هر تصمیمی (چرا یک threshold خاص؟ چرا یک روش imputation خاص؟) باید document شود.",
+        "recommendation": "ایجاد فایل مستندسازی تصمیمات (Decision Log) شامل: هر تصمیم، دلیل آن، جایگزین‌های بررسی‌شده، و نتیجه.",
+        "affected_records": null,
+        "affected_percentage": "N/A",
+        "status": "Implemented"
+      },
+      {
+        "id": "DOC-004",
+        "title": "عدم Reproducibility کد",
+        "severity": "Low",
+        "description": "کد فعلی قابلیت بازتولید ندارد. دیگر محققان نمی‌توانند نتایج را تکرار کنند.",
+        "recommendation": "اضافه کردن requirements.txt، random seed ثابت، مستندسازی مراحل اجرا، و اطمینان از اینکه pipeline از ابتدا تا انتها قابل اجرا است.",
+        "affected_records": null,
+        "affected_percentage": "N/A",
+        "status": "Implemented"
+      },
+      {
+        "id": "DOC-005",
+        "title": "ناتمام بودن فازهای پروژه",
+        "severity": "Low",
+        "description": "پروژه فقط تا فاز 1 (Data Understanding & Cleaning) پیشرفت کرده و فازهای 2 تا 5 (آماری، مدل‌سازی، Cross-Validation، Explainable AI) ناتمام هستند.",
+        "recommendation": "تکمیل تمام فازهای پروژه طبق برنامه‌ریزی: فاز 2 (120 ساعت آماری)، فاز 3-4 (200 ساعت مدل‌سازی)، فاز 5 (Explainable AI و مقاله علمی).",
+        "affected_records": null,
+        "affected_percentage": "N/A",
+        "status": "Implemented"
+      }
+    ]
+  },
+  "summary": "داور 1 مجموعاً 17 مشکل شناسایی کرده: 5 بحرانی (SCO Logic، غلط OCR در Hypospermatogenesis، منطق سلسله‌مراتبی MA، Data Leakage از is_Primary، و تفاوت NaN/صفر)، 5 جدی (ناسازگاری Salvage، تبدیل نوع هورمون‌ها، مقادیر pipe-separated، Whitespace، و Encoding کیفی)، 4 متوسط و 3 جزئی. پروژه فعلاً برای دفاع آماده نیست اما با اصلاحات جدی قابل تبدیل به پروژه خوب است. نمره کلی: 5.5 از 10. تمامی موارد پیاده‌سازی شده‌اند.",
+  "action_plan": {
+    "week_1": "اصلاح 5 مشکل بحرانی (24 ساعت)",
+    "week_2_3": "اصلاح 5 مشکل جدی (40 ساعت)",
+    "week_4": "Unit tests و validation دستی (50 ساعت)",
+    "week_5_7": "فاز 2 - تحلیل آماری (120 ساعت)",
+    "week_8_9": "فاز 3-4 - مدل‌سازی (200 ساعت)",
+    "week_10": "مقاله علمی و submit"
+  }
+}
