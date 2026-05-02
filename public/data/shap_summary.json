@@ -1,0 +1,273 @@
+{
+  "global": {
+    "global_shap_importance": {
+      "LH": 0.3170224435045276,
+      "Partner_Age": 0.3010514725887122,
+      "Age": 0.27013426179481914,
+      "FSH": 0.25032088680111114,
+      "Testosterone_levels": 0.21181623281879083,
+      "Boby_Weight": 0.17398276979950172,
+      "Sakamoto_LT_mL": 0.1705756237327989,
+      "BMI": 0.16904280050038387,
+      "Hieght": 0.16621722472910835,
+      "RT_XYZ__Sono_": 0.1563766924285414,
+      "Testicular_volume_LT__Guess_": 0.12924530261153439,
+      "Seminal_plasma_pH": 0.1276707340617794,
+      "Testicular_volume_RT__Guess_": 0.11065351552322782,
+      "LT_XYZ__Sono_": 0.0848989118246516,
+      "E2": 0.043482921114626136,
+      "Sakamoto_RT_mL": 0.039331704904066886,
+      "Prolactin": 0.020155893403189084,
+      "Pathology_RT": 0.0,
+      "Pathology_LT": 0.0,
+      "Race": 0.0,
+      "infertile_family_members": 0.0,
+      "Habits": 0.0,
+      "Occupation__Exposure_to_toxic_substances_": 0.0,
+      "Diabetes": 0.0,
+      "Hypertension": 0.0,
+      "Surgery_trauma_s_": 0.0,
+      "Varicocele": 0.0,
+      "T_BX": 0.0,
+      "Inguinal_hernia": 0.0,
+      "Torsion_of_spermatic_cord": 0.0
+    }
+  },
+  "local_sample_cases": [
+    {
+      "case_index": 765,
+      "prediction": 0.2836424001283011,
+      "actual": 0,
+      "top_features": {
+        "Age": {
+          "shap_value": -0.3202565010457098,
+          "feature_value": 40.0
+        },
+        "Partner_Age": {
+          "shap_value": -0.12012402228483622,
+          "feature_value": 42.0
+        },
+        "Hieght": {
+          "shap_value": -0.11162368764166046,
+          "feature_value": 175.0
+        },
+        "Seminal_plasma_pH": {
+          "shap_value": 0.09873485714063786,
+          "feature_value": 7.8
+        },
+        "Testicular_volume_LT__Guess_": {
+          "shap_value": 0.07677246280345713,
+          "feature_value": 12.0
+        },
+        "LH": {
+          "shap_value": 0.06838818529211581,
+          "feature_value": 9.17
+        },
+        "Sakamoto_LT_mL": {
+          "shap_value": 0.059159279556532815,
+          "feature_value": 6.906525
+        },
+        "Testosterone_levels": {
+          "shap_value": 0.056947619819269386,
+          "feature_value": 3.23
+        },
+        "Testicular_volume_RT__Guess_": {
+          "shap_value": 0.023737860619294122,
+          "feature_value": 12.0
+        },
+        "LT_XYZ__Sono_": {
+          "shap_value": 0.020665194520273843,
+          "feature_value": 9834.25
+        }
+      }
+    },
+    {
+      "case_index": 2387,
+      "prediction": 0.42992695684471427,
+      "actual": 1,
+      "top_features": {
+        "Seminal_plasma_pH": {
+          "shap_value": -0.7210149616040202,
+          "feature_value": 8.0
+        },
+        "Age": {
+          "shap_value": 0.6301735418436094,
+          "feature_value": 50.0
+        },
+        "Partner_Age": {
+          "shap_value": 0.3521189637470074,
+          "feature_value": 41.0
+        },
+        "Hieght": {
+          "shap_value": -0.08937835264903725,
+          "feature_value": 175.0
+        },
+        "LH": {
+          "shap_value": 0.08657291541679564,
+          "feature_value": 9.17
+        },
+        "Boby_Weight": {
+          "shap_value": 0.07857207663459141,
+          "feature_value": 80.0
+        },
+        "Testicular_volume_LT__Guess_": {
+          "shap_value": 0.072965451612887,
+          "feature_value": 12.0
+        },
+        "Testosterone_levels": {
+          "shap_value": 0.07129671433214571,
+          "feature_value": 3.23
+        },
+        "FSH": {
+          "shap_value": -0.05789183849698077,
+          "feature_value": 18.95
+        },
+        "Sakamoto_LT_mL": {
+          "shap_value": 0.05577484165219025,
+          "feature_value": 6.906525
+        }
+      }
+    },
+    {
+      "case_index": 2162,
+      "prediction": 0.7822201471039142,
+      "actual": 1,
+      "top_features": {
+        "Partner_Age": {
+          "shap_value": 0.6592236680155522,
+          "feature_value": 41.0
+        },
+        "Age": {
+          "shap_value": 0.5675406593848741,
+          "feature_value": 56.0
+        },
+        "FSH": {
+          "shap_value": 0.41115016062132104,
+          "feature_value": 10.8
+        },
+        "LH": {
+          "shap_value": 0.18097955480622271,
+          "feature_value": 9.17
+        },
+        "Seminal_plasma_pH": {
+          "shap_value": 0.09923540195635581,
+          "feature_value": 7.8
+        },
+        "Boby_Weight": {
+          "shap_value": 0.0878744461575432,
+          "feature_value": 80.0
+        },
+        "Testosterone_levels": {
+          "shap_value": -0.08631889189358723,
+          "feature_value": 2.1
+        },
+        "Testicular_volume_LT__Guess_": {
+          "shap_value": 0.07153257943574937,
+          "feature_value": 12.0
+        },
+        "Sakamoto_LT_mL": {
+          "shap_value": 0.06653304778102803,
+          "feature_value": 6.906525
+        },
+        "Hieght": {
+          "shap_value": -0.06017264441547542,
+          "feature_value": 175.0
+        }
+      }
+    },
+    {
+      "case_index": 1833,
+      "prediction": 0.8836010194348939,
+      "actual": 1,
+      "top_features": {
+        "RT_XYZ__Sono_": {
+          "shap_value": 2.0602543205510004,
+          "feature_value": 2223.0
+        },
+        "Sakamoto_LT_mL": {
+          "shap_value": -0.6508248901811717,
+          "feature_value": 2.01285
+        },
+        "LT_XYZ__Sono_": {
+          "shap_value": 0.4940670633260545,
+          "feature_value": 2835.0
+        },
+        "Partner_Age": {
+          "shap_value": 0.4270575568345939,
+          "feature_value": 30.0
+        },
+        "Sakamoto_RT_mL": {
+          "shap_value": 0.3725639737754111,
+          "feature_value": 1.5783299999999998
+        },
+        "LH": {
+          "shap_value": -0.3609036252983013,
+          "feature_value": 38.41
+        },
+        "Age": {
+          "shap_value": -0.3325331307765908,
+          "feature_value": 50.0
+        },
+        "Testicular_volume_RT__Guess_": {
+          "shap_value": 0.23148343319650813,
+          "feature_value": 2.0
+        },
+        "BMI": {
+          "shap_value": 0.17563840187708527,
+          "feature_value": 24.11
+        },
+        "Hieght": {
+          "shap_value": 0.12750670724271607,
+          "feature_value": 174.0
+        }
+      }
+    },
+    {
+      "case_index": 1814,
+      "prediction": 0.7830355925709184,
+      "actual": 1,
+      "top_features": {
+        "RT_XYZ__Sono_": {
+          "shap_value": 0.7716039486507908,
+          "feature_value": 14586.0
+        },
+        "E2": {
+          "shap_value": -0.6801963229974566,
+          "feature_value": 27.0
+        },
+        "Partner_Age": {
+          "shap_value": 0.6208439718586658,
+          "feature_value": 38.0
+        },
+        "BMI": {
+          "shap_value": 0.6197368597341861,
+          "feature_value": 27.77
+        },
+        "Testosterone_levels": {
+          "shap_value": 0.47182670236356167,
+          "feature_value": 2.78
+        },
+        "LH": {
+          "shap_value": 0.3635162913025084,
+          "feature_value": 7.58
+        },
+        "Age": {
+          "shap_value": -0.27167950548619313,
+          "feature_value": 38.0
+        },
+        "Testicular_volume_RT__Guess_": {
+          "shap_value": -0.2037507339701273,
+          "feature_value": 20.0
+        },
+        "FSH": {
+          "shap_value": -0.19449457141739684,
+          "feature_value": 21.37
+        },
+        "LT_XYZ__Sono_": {
+          "shap_value": 0.17771850947604018,
+          "feature_value": 9410.5
+        }
+      }
+    }
+  ]
+}
