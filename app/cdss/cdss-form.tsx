@@ -1,9 +1,16 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Info } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 type NumField = {
@@ -36,9 +43,20 @@ const FEATURE_FIELDS: NumField[] = [
   { key: 'E2', label: 'E2', min: 5, q1: 25.3925, q3: 41.065, max: 108, weight: 0.0434829211, direction: 'centered' },
 ]
 
+const PATHOLOGY_OPTIONS = [
+  { value: 'normal', label: 'Normal' },
+  { value: 'sco', label: 'SCO (Sertoli Cell-Only Syndrome) — 846 cases (35%)' },
+  { value: 'sco_csth', label: 'SCO + CSTH — 194 cases (8%)' },
+  { value: 'ma_spermatocytic', label: 'MA up to Spermatocytic — 235 cases (10%)' },
+  { value: 'csth', label: 'CSTH — 81 cases (3.4%)' },
+  { value: 'hypospermatogenesis', label: 'Hypospermatogenesis — 38 cases (1.6%)' },
+  { value: 'severe_hypospermatogenesis', label: 'Severe Hypospermatogenesis — 13 cases' },
+  { value: 'leydig_hyperplasia', label: 'Leydig Cell Hyperplasia — 55 cases' },
+] as const
+
 const PATHOLOGY_FIELDS = [
-  { key: 'RT_Pathology_pct', label: 'Pathology_RT (%)' },
-  { key: 'LT_Pathology_pct', label: 'Pathology_LT (%)' },
+  { key: 'RT_Pathology', label: 'Pathology RT' },
+  { key: 'LT_Pathology', label: 'Pathology LT' },
 ] as const
 
 const BRIER_EXPLANATION =
@@ -123,13 +141,6 @@ export default function CdssForm() {
   const [vals, setVals] = useState<Record<string, string>>({})
   const [result, setResult] = useState<{ p: number; tier: RiskTier } | null>(null)
 
-  const pathologyPenalty = useMemo(() => {
-    const rt = Number(vals.RT_Pathology_pct || 0)
-    const lt = Number(vals.LT_Pathology_pct || 0)
-    const meanPct = (Math.max(0, Math.min(100, rt)) + Math.max(0, Math.min(100, lt))) / 2
-    return -0.22 * (meanPct / 100)
-  }, [vals.LT_Pathology_pct, vals.RT_Pathology_pct])
-
   const onSubmit = () => {
     const weightedSignal = FEATURE_FIELDS.reduce((acc, field) => {
       const rawValue = Number(vals[field.key] ?? '')
@@ -138,8 +149,12 @@ export default function CdssForm() {
       return acc + field.weight * featureScore
     }, 0)
 
+    // Note: Histopathology selections (RT_Pathology, LT_Pathology) are intentionally
+    // excluded from the prediction signal. Per our LightGBM analysis, histopathological
+    // patterns showed zero feature importance — the model relies on hormonal markers
+    // and anthropometric features. The dropdowns are retained for clinical context only.
     const normalizedSignal = weightedSignal / WEIGHT_SUM
-    const logit = Math.log(BASE_SUCCESS_RATE / (1 - BASE_SUCCESS_RATE)) + 2.25 * normalizedSignal + pathologyPenalty
+    const logit = Math.log(BASE_SUCCESS_RATE / (1 - BASE_SUCCESS_RATE)) + 2.25 * normalizedSignal
     const probability = sigmoid(logit)
     const pct = probability * 100
     setResult({ p: pct, tier: getRiskTier(pct) })
@@ -149,7 +164,7 @@ export default function CdssForm() {
     <TooltipProvider>
       <div className="space-y-4">
         <div className="rounded-lg border border-blue-300/40 bg-blue-50/40 p-3 text-xs text-muted-foreground" title={BRIER_EXPLANATION}>
-          LightGBM-based CDSS approximation with SHAP-ranked top 14 predictors + RT/LT pathology percentages (calibration-aware probability output).
+          LightGBM-based CDSS approximation with SHAP-ranked top 14 predictors (calibration-aware probability output). Histopathology shown for clinical context only — see note below.
         </div>
 
         <div className="grid md:grid-cols-2 gap-3">
@@ -168,21 +183,33 @@ export default function CdssForm() {
           ))}
         </div>
 
-        <div className="grid md:grid-cols-2 gap-3">
-          {PATHOLOGY_FIELDS.map((p) => (
-            <div key={p.key}>
-              <label className="text-xs font-medium">{p.label}</label>
-              <Input
-                value={vals[p.key] ?? ''}
-                onChange={(e) => setVals((prev) => ({ ...prev, [p.key]: e.target.value }))}
-                placeholder="0 ≤ x ≤ 100"
-                className={getInputClass(vals[p.key], { min: 0, q1: 25, q3: 75, max: 100 })}
-                type="number"
-                min={0}
-                max={100}
-              />
-            </div>
-          ))}
+        <div className="space-y-3">
+          <div className="grid md:grid-cols-2 gap-3">
+            {PATHOLOGY_FIELDS.map((p) => (
+              <div key={p.key}>
+                <label className="text-xs font-medium">{p.label}</label>
+                <Select
+                  value={vals[p.key] ?? ''}
+                  onValueChange={(value) => setVals((prev) => ({ ...prev, [p.key]: value }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select histopathology pattern" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PATHOLOGY_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ))}
+          </div>
+
+          <div className="rounded-lg border border-amber-300/40 bg-amber-50/40 p-3 text-xs text-muted-foreground dark:bg-amber-950/20">
+            <strong>Note:</strong> In our LightGBM model, histopathological patterns showed zero feature importance. The model relies primarily on hormonal markers (LH, FSH, Testosterone) and anthropometric features (Age, BMI, Body Weight, Height) for prediction.
+          </div>
         </div>
 
         <Button onClick={onSubmit} className="w-full">Compute probability</Button>

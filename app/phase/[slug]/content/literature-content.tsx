@@ -38,7 +38,7 @@ export default function LiteratureContent({ data, accent }: { data: any; accent:
             <li key={i} className="flex items-start gap-3">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[11px] font-mono font-semibold text-white" style={{ backgroundColor: accent }}>{g?.id}</span>
               <div>
-                <p className="text-sm leading-relaxed">{g?.gap_en ?? g?.gap_fa_en?.split('\n')?.[1] ?? g?.gap_fa_en}</p>
+                <p className="text-sm leading-relaxed">{g?.gap ?? g?.gap_en}</p>
                 {g?.addressed_by && <p className="text-xs text-muted-foreground mt-1"><span className="font-mono uppercase tracking-wider">Addressed by:</span> {g.addressed_by}</p>}
               </div>
             </li>

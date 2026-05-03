@@ -193,7 +193,7 @@ export default function RoadmapGraph() {
       <div className="mx-auto w-full max-w-[1400px] space-y-5">
         <div className="space-y-2 text-center">
           <h1 className="font-display text-2xl font-bold tracking-tight md:text-4xl">
-            نقشه‌ راه سه‌بعدی پروژه | 3D Project Roadmap
+            3D Project Roadmap
           </h1>
           <p className="mx-auto max-w-3xl text-sm text-slate-300 md:text-base">
             Hover each node for 3D tilt, click to focus and navigate. The roadmap follows the full project journey from preprocessing to repository artifacts.

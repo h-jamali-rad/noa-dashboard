@@ -333,38 +333,38 @@
     "research_gaps": [
       {
         "id": 1,
-        "gap_fa_en": "هیچ یک از فاکتورهای پیش بینی کننده (کلینیکی/هورمونی/هیستوپاتولوژیک/ژنتیکی) به تنهایی یا ترکیبی، اطالعات قطعی در مورد شانس استخراج اسپرم در مردان مبتال به NOA ارائه نمی دهند — No single predictor (clinical / hormonal / histopathologic / genetic) or combination thereof provides definitive information regarding sperm retrieval chance in NOA patients.",
-        "addressed_by": "Project develops integrated multi-modal ML model combining clinical, hormonal, histopathologic features (no single predictor relied upon)."
+        "addressed_by": "Project develops integrated multi-modal ML model combining clinical, hormonal, histopathologic features (no single predictor relied upon).",
+        "gap": "No single predictor (clinical / hormonal / histopathologic / genetic) or combination thereof provides definitive information regarding sperm retrieval chance in NOA patients."
       },
       {
         "id": 2,
-        "gap_fa_en": "نتیجه گیری در مورد پیش بینی کننده های پیش از عمل میکروتسه (سن، حجم بیضه، FSH، LH، AMH، Inhibin B، تستوسترون، …) همچنان قابل بحث است — Conclusions about pre-microTESE predictors remain debatable and inconsistent across studies.",
-        "addressed_by": "Pre-microTESE predictors systematically evaluated via SHAP/LIME XAI; clinical nomogram derived to settle debate empirically on Iranian cohort."
+        "addressed_by": "Pre-microTESE predictors systematically evaluated via SHAP/LIME XAI; clinical nomogram derived to settle debate empirically on Iranian cohort.",
+        "gap": "Conclusions about pre-microTESE predictors remain debatable and inconsistent across studies."
       },
       {
         "id": 3,
-        "gap_fa_en": "حجم زیاد داده های بالینی نیاز به پردازش به موقع و دقیق دارد که از توانایی انسان خارج است؛ ابزارهای CDSS مبتنی بر AI کم‌توسعه‌اند — Manual analysis of large clinical datasets is infeasible without AI; AI-driven CDSS for NOA/microTESE remain underdeveloped.",
-        "addressed_by": "Develops AI-driven CDSS web platform for NOA/microTESE specifically tackling underdevelopment in this domain."
+        "addressed_by": "Develops AI-driven CDSS web platform for NOA/microTESE specifically tackling underdevelopment in this domain.",
+        "gap": "Manual analysis of large clinical datasets is infeasible without AI; AI-driven CDSS for NOA/microTESE remain underdeveloped."
       },
       {
         "id": 4,
-        "gap_fa_en": "نتایج مطالعات مرور شده (به‌ویژه Zeadna et al. 2020) نیاز به اعتبارسنجی با مطالعات بزرگ‌تر و آینده‌نگر دارد — Existing ML models (e.g., Zeadna 2020) require validation with larger and prospective cohorts.",
-        "addressed_by": "Provides validation of Zeadna-type GBT models on a separate Iranian cohort with internal validation, calibration (Platt scaling), and decision curve analysis."
+        "addressed_by": "Provides validation of Zeadna-type GBT models on a separate Iranian cohort with internal validation, calibration (Platt scaling), and decision curve analysis.",
+        "gap": "Existing ML models (e.g., Zeadna 2020) require validation with larger and prospective cohorts."
       },
       {
         "id": 5,
-        "gap_fa_en": "فقدان یک پلتفرم تحت وب یکپارچه برای ثبت داده های NOA و ارائه پیش بینی موفقیت میکروتسه به پزشکان — Absence of an integrated web-based CDSS platform for NOA data registration and microTESE success prediction in real clinical settings, especially in Iran.",
-        "addressed_by": "Builds full web-based CDSS platform (Next.js + Prisma) enabling NOA data registration and real-time microTESE success prediction in Iranian clinical settings."
+        "addressed_by": "Builds full web-based CDSS platform (Next.js + Prisma) enabling NOA data registration and real-time microTESE success prediction in Iranian clinical settings.",
+        "gap": "Absence of an integrated web-based CDSS platform for NOA data registration and microTESE success prediction in real clinical settings, especially in Iran."
       },
       {
         "id": 6,
-        "gap_fa_en": "هزینه باال و عوارض جراحی میکروتسه و فقدان روشی برای شخصی سازی درمان از طریق پیش بینی هوشمند — High microTESE surgical costs and complications without an AI-based personalization mechanism.",
-        "addressed_by": "Enables personalized risk stratification & counterfactual explanations to reduce unnecessary surgeries and personalize patient counselling."
+        "addressed_by": "Enables personalized risk stratification & counterfactual explanations to reduce unnecessary surgeries and personalize patient counselling.",
+        "gap": "High microTESE surgical costs and complications without an AI-based personalization mechanism."
       },
       {
         "id": 7,
-        "gap_fa_en": "شکاف در پژوهش های کاربردی ایرانی هم‌راستا با سیاست های جوانی جمعیت و سالمت باروری — Gap in applied Iranian research aligned with national 'youthful population / reproductive health' policy.",
-        "addressed_by": "Aligns with Iranian 'youthful population / reproductive health' policy by producing applied Iranian-cohort research with deployable CDSS."
+        "addressed_by": "Aligns with Iranian 'youthful population / reproductive health' policy by producing applied Iranian-cohort research with deployable CDSS.",
+        "gap": "Gap in applied Iranian research aligned with national 'youthful population / reproductive health' policy."
       }
     ],
     "theoretical_frameworks": [
@@ -493,8 +493,8 @@
     ],
     "sections": [
       {
-        "title": "مشکل و ضرورت (Problem Statement and Necessity)",
-        "content": "ناباروری به ناتوانی زوجین در رسیدن به بارداری پس از حداقل یک سال رابطه جنسی منظم و محافظت نشده تلقی می گردد. ناباروری یک مشکل جدی بهداشتی در سراسر جهان است... میزان شیوع جهانی ناباروری بر اساس گزارش سازمان بهداشت جهانی در فاصله سالهای ۱۹۹۰ تا ۲۰۲۱ حدود ۱۷.۵ درصد از جمعیت بزرگسال - تقریبًا یک در شش نفر در سراسر جهان می باشد. بر اساس مطالعات انجام شده در ایران میزان شیوع ناباروری حدود ۱۲.۸ درصد از کل جمعیت را شامل می شود... علل ناباروری در حدود ۳۲ درصد علت مردانه، ۴۳ درصد علت زنانه، ۱۲ درصد هر دو جنس و ۱۳ درصد ناشناخته است. درمان های ناباروری در کشورهایی با درآمد کم یا متوسط از میانگین درآمد ساالنه آنها می تواند باالتر باشد. هزینه های گزاف درمان ناباروری در صورت تکرار درمان و عدم پوشش بیمه ای به ۲۸.۳ درصد ترک درمان منجر می شود. شکست در درمان ناباروری می تواند آسیب پذیری روانی برای زوجین به همراه داشته باشد.",
+        "title": "Problem Statement and Necessity",
+        "content": "Infertility is the inability of couples to conceive after at least one year of regular unprotected intercourse. According to the WHO, the global prevalence of infertility between 1990 and 2021 is approximately 17.5% of the adult population — about one in six people worldwide. In Iran, infertility prevalence is around 12.8% of the total population. Etiologies include approximately 32% male factor, 43% female factor, 12% both, and 13% unknown. Infertility treatment costs in low- and middle-income countries can exceed average annual income; lack of insurance coverage causes about 28.3% of patients to drop out of treatment. Treatment failure can also produce significant psychological vulnerability for couples.",
         "key_points": [
           "Infertility = inability of couples to conceive after at least one year of regular unprotected intercourse",
           "WHO global prevalence 1990–2021: ~17.5% of adults (≈1 in 6 worldwide)",
@@ -518,8 +518,8 @@
         ]
       },
       {
-        "title": "علل ناباروری مردان و آزواسپرمی (Causes of Male Infertility and Azoospermia)",
-        "content": "از جمله این عوامل، آنتی بادی ضد اسپرم، تحویل ناقص اسپرم، انسداد مجرای منی، کاهش تولید اسپرم، عملکرد غیر طبیعی اسپرم، انسداد در عبور اسپرم و اختالل نعوظ می توانند در ناباروری مردان نقش داشته باشند. در این میان، آزواسپرمی به عنوان عدم وجود اسپرم در انزال، به عنوان شدیدترین و اصلی ترین علت ناباروری در مردان مطرح می شود. بر اساس وجود یا عدم وجود انسداد مجاری یا واس دفران، عنوان آزواسپرمی انسدادی (OA) یا آزواسپرمی غیر انسدادی (NOA) طبقه بندی می شود. پاتولوژی دقیق آزواسپرمی غیر انسدادی همیشه مشخص نیست، و می تواند بر اساس دالیلی مانند عدم حساسیت به آندروژن، شیمی درمانی، Sertoli cell-only syndrome، قرار گرفتن در معرض فلزات سنگین، هایپرپروالکتینمی، هیپوگنادیسم مانند سندرم کالمن، اختالل در تولید اسپرم به دلیل ناهنجاری های کروموزومی مانند سندرم کالین فلتر و ریزحذف های کروموزوم Y در مناطق فرعی AZFa، AZFb، یا AZFc، عفونت هایی مانند اوریون و اورکیت، پرتودرمانی، پیچ خوردگی بیضه، انتقال یا وارونگی کریپتورکیدیسم عامل آزواسپرمی و واریکوسل نام برد.",
+        "title": "Causes of Male Infertility and Azoospermia",
+        "content": "Contributing factors to male infertility include anti-sperm antibodies, incomplete sperm delivery, ejaculatory duct obstruction, reduced sperm production, abnormal sperm function, sperm transport obstruction, and erectile dysfunction. Azoospermia — the absence of sperm in the ejaculate — is the most severe and principal cause of male infertility, classified as Obstructive Azoospermia (OA) or Non-Obstructive Azoospermia (NOA) based on the presence or absence of ductal obstruction. The exact pathology of NOA is not always clear and may be due to androgen insensitivity, chemotherapy, Sertoli Cell-Only syndrome, heavy-metal exposure, hyperprolactinemia, hypogonadism (e.g., Kallmann syndrome), chromosomal abnormalities such as Klinefelter syndrome and Y-chromosome microdeletions in AZFa, AZFb, or AZFc subregions, infections such as mumps and orchitis, radiotherapy, testicular torsion, cryptorchidism, and varicocele.",
         "key_points": [
           "Male infertility causes: anti-sperm antibodies, incomplete sperm delivery, ductal obstruction, reduced sperm production, abnormal sperm function, erectile dysfunction",
           "Azoospermia = absence of sperm in ejaculate; most severe cause of male infertility",
@@ -533,8 +533,8 @@
         ]
       },
       {
-        "title": "روش های درمانی استخراج اسپرم و میکروتسه (Sperm Retrieval Techniques and microTESE)",
-        "content": "روش های درمانی مختلفی برای استخراج اسپرم در آزواسپرمی غیر انسدادی است: آسپیراسیون با سوزن ظریف (TESA) تحت هدایت اولتراسوند، استخراج معمولی اسپرم از بیضه (c-TESE) و میکرودیسکشن (micro TESE). میکروتسه برای شناسایی و استخراج لوله‌های اسپرم ساز به یک میکروسکوپ عامل و تکنیک میکروسرجری متکی است. در این روش بافت کمتری برداشته می شود، احتمال هماتوم، فیبروز و آتروفی بیضه کمتر است. موفقیت استخراج اسپرم در روش میکروتسه ۵۰ تا ۶۰ درصد در مقابل ۲۰ تا ۴۵ درصد در روش cTESE می باشد. میکروتسه به عنوان یک استاندارد طالیی برای استخراج اسپرم از طریق جراحی در نظر گرفته شده است، اما این تکنیک به تخصص بیشتر، زمان طوالنی تر و هزینه باالتری نیاز دارد.",
+        "title": "Sperm Retrieval Techniques and microTESE",
+        "content": "Several techniques are used for sperm retrieval in non-obstructive azoospermia: ultrasound-guided fine-needle aspiration (TESA), conventional testicular sperm extraction (c-TESE), and microdissection TESE (micro-TESE). Micro-TESE relies on an operating microscope and microsurgical technique to identify and extract seminiferous tubules. It removes less tissue and carries lower risks of hematoma, fibrosis, and testicular atrophy. The sperm retrieval success rate of micro-TESE is 50–60% versus 20–45% for c-TESE. Micro-TESE is considered the gold standard for surgical sperm retrieval, but it requires more expertise, longer operating time, and higher cost.",
         "key_points": [
           "ART techniques: TESA (ultrasound-guided fine-needle aspiration), c-TESE (conventional), micro-TESE (microdissection)",
           "TESA/cTESE: random sampling, risk of vascular damage",
@@ -555,8 +555,8 @@
         ]
       },
       {
-        "title": "فاکتورهای پیش بینی کننده موفقیت میکروتسه (Predictive Factors for microTESE Success)",
-        "content": "بر اساس مطالعات مختلف رنج وسیعی از ویژگی ها مانند ویژگی های کلینیکی(سن/شاخص توده بدن/استعمال دخانیات/مصرف الکل/سوابق درمانی)، ویژگی های هورمونی (FSH/LH/Testosterone)، متغیرهای هیستوپاتولوژی (SCO/Focal SCO/Hypo Spermatogenesis) و متغیرهای کرموزومی (Karyotype/Y Chromosome microdeletion AZFx) به عنوان ویژگی پیش بینی کننده معرفی شده اند. ولی هیچ یک از پیش بینی کننده ها به تنهایی یا ترکیبی، اطالعات قطعی در مورد شانس استخراج اسپرم در مردان مبتال به آزواسپرمی غیرانسدادی ارائه نمی دهند.",
+        "title": "Predictive Factors for microTESE Success",
+        "content": "Studies have proposed a wide range of predictive features, including clinical features (age, BMI, smoking, alcohol use, treatment history), hormonal features (FSH, LH, Testosterone), histopathological variables (SCO, Focal SCO, Hypospermatogenesis), and chromosomal variables (karyotype, Y-chromosome microdeletions in AZFa/b/c). However, no single predictor or combination of predictors provides definitive information about the chance of sperm retrieval in men with non-obstructive azoospermia.",
         "key_points": [
           "Clinical features: age, BMI, smoking, alcohol, medical history",
           "Hormonal variables: FSH, LH, Testosterone, AMH, Inhibin B (INHB)",
@@ -578,8 +578,8 @@
         ]
       },
       {
-        "title": "هوش مصنوعی و یادگیری ماشین در پزشکی (Artificial Intelligence and Machine Learning in Medicine)",
-        "content": "هوش مصنوعی شاخه ای از علوم کامپیوتر است که برای کمک به تجزیه و تحلیل داده ها به کار گرفته شده است و می تواند الگوهای بین متغیرهای پیچیده را تشخیص دهد و پیش بینی را از طریق الگوریتم ها فرموله کند. یکی از مهم ترین کاربردهای هوش مصنوعی در پزشکی، پیش بینی می باشد. یادگیری ماشین، یک تکنیکی از هوش مصنوعی است که به الگوریتم ها یاد می‌دهد که از داده های گذشته بیاموزند. در زمینه ناباروری مردان از الگوریتم های مختلف هوش مصنوعی استفاده شده است: پرسپترون های چند الیه و ماشین بردار پشتیبان برای تمرکز و حرکت اسپرم، درخت تصمیم در رویکرد نمایشی، شبکه های عصبی مصنوعی برای آنالیز پروفایل مایع منی.",
+        "title": "Artificial Intelligence and Machine Learning in Medicine",
+        "content": "Artificial intelligence is a branch of computer science used to assist in data analysis; it can detect patterns among complex variables and formulate predictions through algorithms. One of the most important medical applications of AI is prediction. Machine learning is an AI technique that teaches algorithms to learn from past data. In the field of male infertility, several AI algorithms have been used: multilayer perceptrons and support vector machines for sperm concentration and motility, decision trees for representational approaches, and artificial neural networks for semen-profile analysis.",
         "key_points": [
           "AI = computer science branch enabling data analysis and pattern recognition",
           "Most important medical AI application = prediction",
@@ -596,8 +596,8 @@
         ]
       },
       {
-        "title": "نشانگرهای زیستی (Biomarkers)",
-        "content": "نشانگرهای زیستی یک مشاهده بیولوژیکی است که جایگزین و به طور ایده آل یک نقطه پایانی مرتبط بالینی یا نتیجه میانی را که مشاهده آن دشوارتر است، پیش بینی می کند. استفاده از نشانگرهای زیستی بالینی آسانتر و کم هزینه تر از اندازه گیری مستقیم نقطه پایانی بالینی است. آنها را می توان در غربالگری بیماری، تشخیص، شناسایی، نظارت، شاخص های پیش آگهی، توسعه مداخالت درمانی فردی، پیش بینی و درمان عوارض جانبی دارو، شناسایی انواع سلول و مطالعات فارماکودینامیک و دوز-پاسخ استفاده کرد.",
+        "title": "Biomarkers",
+        "content": "A biomarker is a biological observation that ideally substitutes for and predicts a clinically relevant endpoint or intermediate outcome that is harder to observe. Using clinical biomarkers is easier and less costly than directly measuring the clinical endpoint. They can be used in disease screening, diagnosis, identification, monitoring, prognostic indices, development of individualized therapies, prediction and management of drug side effects, identification of cell types, and pharmacodynamic and dose-response studies.",
         "key_points": [
           "Biomarker = biological observation predicting clinical endpoints",
           "Easier and cheaper than direct endpoint measurement, shorter timeframe",
@@ -611,8 +611,8 @@
         ]
       },
       {
-        "title": "سیستم پشتیبان تصمیم بالینی (CDSS – Clinical Decision Support Systems)",
-        "content": "هوش مصنوعی در پزشکی، قابلیت فراهم کردن سیستم‌های پشتیبانی تصمیم‌گیری بالینی (CDSS) را دارد. در یک سیستم پشتیبان تصمیم بالینی، ویژگی های هر بیمار با یک پایگاه دانش بالینی کامپیوتری مطابقت داده می شود و ارزیابی ها یا توصیه های خاص برای تصمیم گیری به پزشک ارائه می شود. پزشک باید دانش خود را با اطالعات یا پیشنهادات ارائه شده توسط CDSS ترکیب کند. استفاده از این سیستم منجر به حذف آزمایش های غیر ضروری، افزایش ایمنی بیمار و اجتناب از عوارض بالقوه خطرناک و پرهزینه می گردد. پایگاه های دانش بالینی عموما از اطالعات مکتوب در گایدالین ها و یا دانش استخراج شده از داده ها توسط مدل های هوش مصنوعی تغذیه می گردند.",
+        "title": "CDSS – Clinical Decision Support Systems",
+        "content": "Artificial intelligence in medicine enables Clinical Decision Support Systems (CDSS). In a CDSS, the features of each patient are matched against a computerized clinical knowledge base, and specific evaluations or recommendations are provided to support the physician's decision making. The clinician must combine personal knowledge with the information or suggestions provided by the CDSS. Use of such systems eliminates unnecessary testing, improves patient safety, and helps avoid potentially dangerous and costly complications. Clinical knowledge bases are typically populated from written guidelines or knowledge extracted from data using AI models.",
         "key_points": [
           "CDSS = Clinical Decision Support System, helps clinicians with diagnosis and treatment decisions",
           "Matches patient features against computerized clinical knowledge base",
@@ -626,7 +626,7 @@
         ]
       },
       {
-        "title": "مروری بر مطالعات گذشته (Review of Previous Studies)",
+        "title": "Review of Previous Studies",
         "content": "Five recent key studies were reviewed: Bachelot et al. (2023), GhoshRoy et al. (2022), Lantsberg et al. (2022), Aljubran et al. (2022), and Zeadna et al. (2020).",
         "key_points": [
           "Bachelot et al. 2023 — 175 NOA patients, 16 hormonal+genetic parameters, 8 ML models compared; Decision-Tree-based ensembled model best; basis for advanced CDSS in azoospermia",
@@ -646,7 +646,7 @@
     ],
     "citation_map": {
       "by_section": {
-        "مشکل و ضرورت (Problem Statement and Necessity)": [
+        "Problem Statement and Necessity": [
           "1",
           "2",
           "3",
@@ -657,12 +657,12 @@
           "8",
           "9"
         ],
-        "علل ناباروری مردان و آزواسپرمی (Causes of Male Infertility and Azoospermia)": [
+        "Causes of Male Infertility and Azoospermia": [
           "10",
           "11",
           "12"
         ],
-        "روش های درمانی استخراج اسپرم و میکروتسه (Sperm Retrieval Techniques and microTESE)": [
+        "Sperm Retrieval Techniques and microTESE": [
           "13",
           "14",
           "15",
@@ -672,7 +672,7 @@
           "19",
           "20"
         ],
-        "فاکتورهای پیش بینی کننده موفقیت میکروتسه (Predictive Factors for microTESE Success)": [
+        "Predictive Factors for microTESE Success": [
           "14",
           "16",
           "21",
@@ -683,7 +683,7 @@
           "34",
           "35"
         ],
-        "هوش مصنوعی و یادگیری ماشین در پزشکی (Artificial Intelligence and Machine Learning in Medicine)": [
+        "Artificial Intelligence and Machine Learning in Medicine": [
           "14",
           "25",
           "29",
@@ -691,17 +691,17 @@
           "31",
           "32"
         ],
-        "نشانگرهای زیستی (Biomarkers)": [
+        "Biomarkers": [
           "26",
           "27",
           "28"
         ],
-        "سیستم پشتیبان تصمیم بالینی (CDSS – Clinical Decision Support Systems)": [
+        "CDSS – Clinical Decision Support Systems": [
           "29",
           "36",
           "37"
         ],
-        "مروری بر مطالعات گذشته (Review of Previous Studies)": [
+        "Review of Previous Studies": [
           "38",
           "39",
           "40",

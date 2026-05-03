@@ -58,7 +58,7 @@ const EXTRA_NAV: NavItem[] = [
   { href: '/novelty-comparison', label: 'Novelty Comparison', icon: GitCompare, description: 'Hossein vs prior literature' },
   { href: '/references', label: 'References', icon: ScrollText, description: 'Static numbered bibliography' },
   { href: '/hardware-specs', label: 'Hardware Specs', icon: Server, description: 'GPU / CPU / RAM infrastructure' },
-  { href: '/roadmap', label: 'نقشه راه پروژه — Roadmap', icon: Map, description: '3D interactive project mind map' },
+  { href: '/roadmap', label: 'Roadmap', icon: Map, description: '3D interactive project mind map' },
 ]
 
 export default function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {

@@ -1,42 +1,42 @@
 # 🔬 Phase 1: Data Understanding & Cleaning
 
 ═══════════════════════════════════════════════════════════════════════════════
-## CONTEXT - این فاز چیست و چرا مهم است
+## CONTEXT — What this phase is and why it matters
 ═══════════════════════════════════════════════════════════════════════════════
 
-**Data Cleaning** مهم‌ترین مرحله در هر پروژه ML است. داده‌های کثیف منجر به مدل‌های نادرست می‌شوند (Garbage In, Garbage Out).
+**Data cleaning** is the most important step in every ML project. Dirty data leads to incorrect models ("Garbage In, Garbage Out").
 
-**اهمیت در پزشکی:**
-- داده‌های پزشکی معمولاً پر از missing values هستند
-- Outliers ممکن است biological باشند نه error
-- Data quality مستقیماً بر clinical decisions تأثیر می‌گذارد
+**Importance in medicine:**
+- Medical data are typically full of missing values
+- Outliers may be biological, not errors
+- Data quality directly affects clinical decisions
 
-**این فاز شامل:**
-1. درک کامل ساختار داده
-2. شناسایی و مدیریت Missing Values
-3. تشخیص و برخورد با Outliers
-4. بررسی Duplicates و Inconsistencies
-5. Feature Engineering اولیه
-6. Encoding و Scaling
+**This phase includes:**
+1. Fully understand the data structure
+2. Identify and handle missing values
+3. Detect and handle outliers
+4. Check for duplicates and inconsistencies
+5. Initial feature engineering
+6. Encoding and scaling
 
 ═══════════════════════════════════════════════════════════════════════════════
-## INPUTS - فایل‌های ورودی
+## INPUTS — Required input files
 ═══════════════════════════════════════════════════════════════════════════════
 
-**فایل‌های ضروری:**
+**Required files:**
 ```
 [path]
 ```
 
-**فایل‌های اختیاری:**
-- `Phase0_Setup_Report.md` - گزارش فاز قبلی
+**Optional files:**
+- `Phase0_Setup_Report.md` — Report from the previous phase
 
 ═══════════════════════════════════════════════════════════════════════════════
-## TASKS - کارهایی که باید انجام دهی
+## TASKS — What needs to be done
 ═══════════════════════════════════════════════════════════════════════════════
 
 ---
-### 📋 TASK 1: خواندن و درک کامل دیتاست
+### 📋 TASK 1: Read and fully understand the dataset
 ---
 
 ```python
@@ -67,28 +67,28 @@ print(f"\n💾 Memory Usage: {df.memory_usage(deep=True).sum() / 1024**2:.2f} MB
 ```
 
 ---
-### 📋 TASK 2: شناسایی هوشمند نوع داده‌ها
+### 📋 TASK 2: Intelligent data-type detection
 ---
 
-**برای هر ستون تعیین کن:**
-- **Numerical Continuous**: سن، هورمون‌ها، اندازه‌گیری‌ها
-- **Numerical Discrete**: تعداد، شمارش
-- **Categorical Nominal**: جنسیت، نژاد، نوع بیماری
-- **Categorical Ordinal**: درجه، سطح، stage
-- **Binary**: Yes/No، 0/1، Success/Failure
-- **Text**: توضیحات، نام‌ها
-- **Date/Time**: تاریخ‌ها
+**For each column, determine:**
+- **Numerical Continuous**: age, hormones, measurements
+- **Numerical Discrete**: counts, tallies
+- **Categorical Nominal**: gender, ethnicity, disease type
+- **Categorical Ordinal**: grade, level, stage
+- **Binary**: Yes/No, 0/1, Success/Failure
+- **Text**: descriptions, names
+- **Date/Time**: dates
 
 ```python
 def intelligent_dtype_detection(df):
-    """شناسایی هوشمند نوع داده‌ها"""
+    """Intelligent data-type detection."""
     dtype_info = {}
-    
+
     for col in df.columns:
         unique_count = df[col].nunique()
         total_count = len(df[col].dropna())
         unique_ratio = unique_count / total_count if total_count > 0 else 0
-        
+
         # Check for binary
         if unique_count == 2:
             dtype_info[col] = "Binary"
@@ -103,7 +103,7 @@ def intelligent_dtype_detection(df):
             try:
                 pd.to_datetime(df[col].dropna().iloc[0])
                 dtype_info[col] = "DateTime"
-            except:
+            except Exception:
                 dtype_info[col] = "Categorical"
         # Numerical
         else:
@@ -111,7 +111,7 @@ def intelligent_dtype_detection(df):
                 dtype_info[col] = "Numerical_Discrete"
             else:
                 dtype_info[col] = "Numerical_Continuous"
-    
+
     return dtype_info
 
 dtype_info = intelligent_dtype_detection(df)
@@ -121,606 +121,350 @@ for col, dtype in dtype_info.items():
 ```
 
 ---
-### 📋 TASK 3: تحلیل Missing Values
+### 📋 TASK 3: Missing-values analysis
 ---
 
 ```python
 def comprehensive_missing_analysis(df):
-    """تحلیل جامع Missing Values"""
-    
+    """Comprehensive missing-values analysis."""
     missing_df = pd.DataFrame({
         'Column': df.columns,
         'Missing_Count': df.isnull().sum().values,
         'Missing_Percent': (df.isnull().sum() / len(df) * 100).values,
         'Non_Missing': df.notnull().sum().values
     })
-    
+
     missing_df = missing_df[missing_df['Missing_Count'] > 0].sort_values(
         'Missing_Percent', ascending=False
     )
-    
+
     print("\n🔍 MISSING VALUES ANALYSIS")
     print("=" * 60)
-    
+
     if len(missing_df) == 0:
         print("✅ No missing values found!")
     else:
         print(missing_df.to_string(index=False))
-        
+
         # Severity classification
         critical = missing_df[missing_df['Missing_Percent'] > 50]
         high = missing_df[(missing_df['Missing_Percent'] > 20) & (missing_df['Missing_Percent'] <= 50)]
         moderate = missing_df[(missing_df['Missing_Percent'] > 5) & (missing_df['Missing_Percent'] <= 20)]
         low = missing_df[missing_df['Missing_Percent'] <= 5]
-        
+
         print(f"\n⚠️ Severity Classification:")
         print(f"  🔴 Critical (>50%): {list(critical['Column'])}")
         print(f"  🟠 High (20-50%): {list(high['Column'])}")
         print(f"  🟡 Moderate (5-20%): {list(moderate['Column'])}")
         print(f"  🟢 Low (<5%): {list(low['Column'])}")
-    
+
     return missing_df
 
 missing_analysis = comprehensive_missing_analysis(df)
 ```
 
-**استراتژی‌های مدیریت Missing Values:**
+**Missing-values handling strategies:**
 
 ```python
 def handle_missing_values(df, strategy='intelligent'):
     """
-    استراتژی‌های مدیریت Missing Values:
-    
-    1. حذف (Deletion):
-       - Listwise: حذف کل ردیف
-       - Pairwise: حذف فقط برای تحلیل خاص
-       - Column: حذف ستون با >50% missing
-    
-    2. جایگزینی (Imputation):
-       - Mean/Median: برای numerical
-       - Mode: برای categorical
-       - KNN Imputation: based on similar samples
-       - Multiple Imputation: MICE
-       - Regression Imputation: predict missing values
-    
-    3. پیشرفته:
-       - Indicator Variable: ایجاد ستون نشانگر missing
-       - Domain Knowledge: بر اساس دانش پزشکی
+    Missing-values handling strategies:
+
+    1. Deletion:
+       - Listwise: drop the entire row
+       - Pairwise: drop only for the specific analysis
+       - Column: drop columns with > 50% missing values
+
+    2. Imputation:
+       - Mean / Median: for numerical features
+       - Mode: for categorical features
+       - KNN imputation: based on similar samples
+       - Multiple imputation: MICE
+       - Regression imputation: predict missing values
+
+    3. Advanced:
+       - Indicator variable: create a missing-indicator column
+       - Domain knowledge: based on medical domain rules
     """
-    
     df_clean = df.copy()
-    
+
     for col in df.columns:
         if df[col].isnull().sum() == 0:
             continue
-            
+
         missing_pct = df[col].isnull().sum() / len(df) * 100
-        
-        # Critical missing (>50%) - Consider dropping
+
+        # Critical missing (>50%) - consider dropping the column
         if missing_pct > 50:
-            print(f"⚠️ {col}: {missing_pct:.1f}% missing - Consider dropping")
-            # Create indicator before dropping
-            df_clean[f'{col}_was_missing'] = df[col].isnull().astype(int)
+            print(f"  ⚠️ Column '{col}' has {missing_pct:.1f}% missing — recommend dropping")
             continue
-        
-        # Numerical columns
+
+        # Choose imputer by dtype
         if df[col].dtype in ['float64', 'int64']:
-            # Use median for skewed, mean for normal
-            if abs(df[col].skew()) > 1:
-                df_clean[col].fillna(df[col].median(), inplace=True)
-                print(f"✓ {col}: Filled with median (skewed distribution)")
+            if df[col].skew() > 1 or df[col].skew() < -1:
+                df_clean[col] = df[col].fillna(df[col].median())
             else:
-                df_clean[col].fillna(df[col].mean(), inplace=True)
-                print(f"✓ {col}: Filled with mean (normal distribution)")
-        
-        # Categorical columns
+                df_clean[col] = df[col].fillna(df[col].mean())
         else:
-            df_clean[col].fillna(df[col].mode()[0], inplace=True)
-            print(f"✓ {col}: Filled with mode")
-    
+            df_clean[col] = df[col].fillna(df[col].mode().iloc[0])
+
     return df_clean
-
-df_clean = handle_missing_values(df)
 ```
 
 ---
-### 📋 TASK 4: شناسایی و مدیریت Outliers
+### 📋 TASK 4: Outlier detection and handling
 ---
 
+**Outlier-handling strategies:**
+
 ```python
-def comprehensive_outlier_detection(df, numerical_cols=None):
-    """
-    روش‌های تشخیص Outlier:
-    1. IQR Method (1.5 × IQR)
-    2. Z-Score (|z| > 3)
-    3. Modified Z-Score (MAD-based)
-    4. Clinical Thresholds (domain-specific)
-    """
-    
-    if numerical_cols is None:
-        numerical_cols = df.select_dtypes(include=[np.number]).columns
-    
-    outlier_summary = {}
-    
-    for col in numerical_cols:
-        data = df[col].dropna()
-        
-        # IQR Method
-        Q1 = data.quantile(0.25)
-        Q3 = data.quantile(0.75)
-        IQR = Q3 - Q1
-        lower_bound = Q1 - 1.5 * IQR
-        upper_bound = Q3 + 1.5 * IQR
-        iqr_outliers = ((data < lower_bound) | (data > upper_bound)).sum()
-        
-        # Z-Score Method
-        z_scores = np.abs((data - data.mean()) / data.std())
-        zscore_outliers = (z_scores > 3).sum()
-        
-        outlier_summary[col] = {
-            'IQR_Outliers': iqr_outliers,
-            'ZScore_Outliers': zscore_outliers,
-            'Lower_Bound': lower_bound,
-            'Upper_Bound': upper_bound,
-            'Min': data.min(),
-            'Max': data.max(),
-            'Mean': data.mean(),
-            'Median': data.median()
+def detect_outliers(df, method='iqr'):
+    """Outlier detection using multiple methods."""
+    outliers_info = {}
+
+    for col in df.select_dtypes(include=[np.number]).columns:
+        if method == 'iqr':
+            Q1 = df[col].quantile(0.25)
+            Q3 = df[col].quantile(0.75)
+            IQR = Q3 - Q1
+            lower = Q1 - 1.5 * IQR
+            upper = Q3 + 1.5 * IQR
+            mask = (df[col] < lower) | (df[col] > upper)
+        elif method == 'zscore':
+            z = (df[col] - df[col].mean()) / df[col].std()
+            mask = z.abs() > 3
+        else:
+            continue
+
+        outliers_info[col] = {
+            'count': int(mask.sum()),
+            'percent': float(mask.sum() / len(df) * 100),
+            'lower': float(df[col].min()),
+            'upper': float(df[col].max())
         }
-        
-        if iqr_outliers > 0 or zscore_outliers > 0:
-            print(f"\n⚠️ {col}:")
-            print(f"   IQR Outliers: {iqr_outliers}")
-            print(f"   Z-Score Outliers: {zscore_outliers}")
-            print(f"   Range: [{data.min():.2f}, {data.max():.2f}]")
-            print(f"   Valid Range: [{lower_bound:.2f}, {upper_bound:.2f}]")
-    
-    return outlier_summary
 
-outlier_summary = comprehensive_outlier_detection(df_clean)
+    return outliers_info
 ```
 
-**استراتژی‌های مدیریت Outliers:**
-
-```python
-def handle_outliers(df, strategy='winsorize', threshold=1.5):
-    """
-    استراتژی‌ها:
-    1. حذف (Remove): حذف کامل ردیف
-    2. Winsorize: محدود کردن به percentile
-    3. Capping: محدود کردن به bounds
-    4. Transform: log, sqrt transformation
-    5. Keep: اگر biological باشد نگه دار
-    """
-    
-    df_out = df.copy()
-    numerical_cols = df.select_dtypes(include=[np.number]).columns
-    
-    for col in numerical_cols:
-        Q1 = df[col].quantile(0.25)
-        Q3 = df[col].quantile(0.75)
-        IQR = Q3 - Q1
-        lower = Q1 - threshold * IQR
-        upper = Q3 + threshold * IQR
-        
-        outlier_count = ((df[col] < lower) | (df[col] > upper)).sum()
-        
-        if outlier_count > 0:
-            if strategy == 'winsorize':
-                df_out[col] = df[col].clip(lower=lower, upper=upper)
-                print(f"✓ {col}: Winsorized {outlier_count} outliers")
-            elif strategy == 'remove':
-                df_out = df_out[(df_out[col] >= lower) & (df_out[col] <= upper)]
-                print(f"✓ {col}: Removed {outlier_count} outliers")
-    
-    return df_out
-```
+**Decision rules for outliers:**
+- **< 1%**: usually safe to keep — may be biologically valid
+- **1–5%**: investigate; cap (winsorize) if appropriate
+- **> 5%**: review per-feature; rare in clinical data
+- **Always**: consult the clinical team before dropping
 
 ---
-### 📋 TASK 5: بررسی Duplicates و Inconsistencies
+### 📋 TASK 5: Duplicates and inconsistencies check
 ---
 
 ```python
-def check_duplicates_and_inconsistencies(df):
-    """بررسی تکراری‌ها و ناسازگاری‌ها"""
-    
-    print("\n🔍 DUPLICATES CHECK")
-    print("=" * 60)
-    
-    # Exact duplicates
-    exact_dups = df.duplicated().sum()
-    print(f"Exact duplicates: {exact_dups}")
-    
-    # Partial duplicates (based on key columns)
-    # This should be customized based on dataset
-    
-    # Show duplicates if exist
-    if exact_dups > 0:
-        print("\nDuplicate rows:")
-        print(df[df.duplicated(keep=False)])
-    
-    # Inconsistencies check
-    print("\n🔍 INCONSISTENCIES CHECK")
-    print("=" * 60)
-    
-    # Check for negative values in columns that shouldn't have them
-    numerical_cols = df.select_dtypes(include=[np.number]).columns
-    for col in numerical_cols:
-        neg_count = (df[col] < 0).sum()
-        if neg_count > 0:
-            print(f"⚠️ {col}: {neg_count} negative values found")
-    
-    # Check for logical inconsistencies
-    # This should be customized based on domain knowledge
-    
-    return exact_dups
+def check_duplicates(df):
+    """Identify exact and near-duplicate rows."""
+    exact = df.duplicated().sum()
+    print(f"Exact duplicate rows: {exact}")
 
-duplicates = check_duplicates_and_inconsistencies(df_clean)
+    # Check for near-duplicates by primary key (e.g. patient ID)
+    if 'patient_id' in df.columns:
+        near = df.duplicated(subset=['patient_id'], keep=False).sum()
+        print(f"Rows sharing patient_id: {near}")
 
-# Remove duplicates if found
-if duplicates > 0:
-    df_clean = df_clean.drop_duplicates()
-    print(f"✓ Removed {duplicates} duplicate rows")
+    return df.drop_duplicates()
 ```
 
+**Inconsistency checks:**
+- Range validation (age 0–120, BMI 10–60, etc.)
+- Logical relationships (pregnancy + male = invalid)
+- Unit consistency (mg/dL vs mmol/L)
+- Categorical consistency (Male/M/male should be unified)
+
 ---
-### 📋 TASK 6: Data Type Corrections
+### 📋 TASK 6: Data-type corrections
 ---
 
 ```python
-def correct_data_types(df, dtype_mapping=None):
-    """تصحیح نوع داده‌ها"""
-    
+def correct_dtypes(df, dtype_info):
+    """Apply correct dtypes based on detected types."""
     df_corrected = df.copy()
-    
-    # Auto-detect and correct
-    for col in df.columns:
-        # Try to convert object to numeric
-        if df[col].dtype == 'object':
-            try:
-                df_corrected[col] = pd.to_numeric(df[col])
-                print(f"✓ {col}: Converted to numeric")
-            except:
-                pass
-        
-        # Convert boolean-like to int
-        if df[col].dtype == 'bool':
-            df_corrected[col] = df[col].astype(int)
-            print(f"✓ {col}: Converted bool to int")
-    
-    # Apply custom mapping if provided
-    if dtype_mapping:
-        for col, dtype in dtype_mapping.items():
-            df_corrected[col] = df_corrected[col].astype(dtype)
-            print(f"✓ {col}: Converted to {dtype}")
-    
-    return df_corrected
 
-df_clean = correct_data_types(df_clean)
+    for col, dtype in dtype_info.items():
+        try:
+            if dtype == 'Numerical_Continuous':
+                df_corrected[col] = pd.to_numeric(df[col], errors='coerce')
+            elif dtype == 'Numerical_Discrete':
+                df_corrected[col] = pd.to_numeric(df[col], errors='coerce').astype('Int64')
+            elif dtype == 'DateTime':
+                df_corrected[col] = pd.to_datetime(df[col], errors='coerce')
+            elif dtype == 'Categorical':
+                df_corrected[col] = df[col].astype('category')
+        except Exception as e:
+            print(f"  ⚠️ Could not convert {col}: {e}")
+
+    return df_corrected
 ```
 
 ---
-### 📋 TASK 7: Feature Engineering اولیه
+### 📋 TASK 7: Initial feature engineering
 ---
 
 ```python
 def initial_feature_engineering(df):
-    """Feature Engineering اولیه بر اساس domain knowledge"""
-    
+    """Domain-driven initial feature engineering."""
     df_fe = df.copy()
-    
-    # این قسمت باید customize شود بر اساس دیتاست
-    # مثال‌ها:
-    
-    # 1. Ratio features (نسبت‌ها)
-    # if 'FSH' in df.columns and 'LH' in df.columns:
-    #     df_fe['FSH_LH_ratio'] = df['FSH'] / (df['LH'] + 0.001)
-    
-    # 2. Age groups (دسته‌بندی سن)
-    # if 'Age' in df.columns:
-    #     df_fe['Age_Group'] = pd.cut(df['Age'], bins=[0, 30, 40, 50, 100], 
-    #                                  labels=['<30', '30-40', '40-50', '>50'])
-    
-    # 3. Binary indicators
-    # if 'Testosterone' in df.columns:
-    #     df_fe['Low_Testosterone'] = (df['Testosterone'] < 300).astype(int)
-    
-    # 4. Interaction features
-    # df_fe['Feature1_x_Feature2'] = df['Feature1'] * df['Feature2']
-    
-    print("\n🔧 Feature Engineering:")
-    print(f"Original features: {len(df.columns)}")
-    print(f"After engineering: {len(df_fe.columns)}")
-    print(f"New features: {set(df_fe.columns) - set(df.columns)}")
-    
-    return df_fe
 
-df_clean = initial_feature_engineering(df_clean)
+    # Hormonal ratios (clinical relevance for NOA)
+    if {'FSH', 'LH'}.issubset(df.columns):
+        df_fe['FSH_LH_ratio'] = df_fe['FSH'] / df_fe['LH'].replace(0, np.nan)
+
+    if {'Testosterone', 'LH'}.issubset(df.columns):
+        df_fe['Test_LH_ratio'] = df_fe['Testosterone'] / df_fe['LH'].replace(0, np.nan)
+
+    # Age groups
+    if 'Age' in df.columns:
+        df_fe['Age_group'] = pd.cut(df_fe['Age'], bins=[0, 30, 40, 50, 100],
+                                    labels=['<30', '30-40', '40-50', '50+'])
+
+    # Binary indicators
+    if 'FSH' in df.columns:
+        df_fe['High_FSH'] = (df_fe['FSH'] > 7.6).astype(int)
+    if 'Testosterone' in df.columns:
+        df_fe['Low_Testosterone'] = (df_fe['Testosterone'] < 3.0).astype(int)
+
+    # BMI
+    if {'Body_Weight', 'Height'}.issubset(df.columns):
+        df_fe['BMI'] = df_fe['Body_Weight'] / (df_fe['Height'] / 100) ** 2
+
+    return df_fe
 ```
 
 ---
-### 📋 TASK 8: Encoding Categorical Variables
+### 📋 TASK 8: Encoding categorical variables
 ---
 
 ```python
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
-def encode_categorical_variables(df, target_col=None):
+def encode_categorical(df, dtype_info):
+    """Encoding strategy:
+       - Binary -> LabelEncoder
+       - Categorical (low cardinality) -> One-Hot
+       - Categorical (high cardinality) -> Target encoding
     """
-    استراتژی‌های Encoding:
-    1. Label Encoding: برای ordinal
-    2. One-Hot Encoding: برای nominal با کم unique
-    3. Target Encoding: برای nominal با زیاد unique
-    4. Binary Encoding: برای binary
-    """
-    
-    df_encoded = df.copy()
-    encoding_info = {}
-    
-    categorical_cols = df.select_dtypes(include=['object', 'category']).columns
-    
-    for col in categorical_cols:
-        if col == target_col:
-            continue
-            
-        unique_count = df[col].nunique()
-        
-        # Binary encoding
-        if unique_count == 2:
+    df_enc = df.copy()
+    encoders = {}
+
+    for col, dtype in dtype_info.items():
+        if dtype == 'Binary':
             le = LabelEncoder()
-            df_encoded[col] = le.fit_transform(df[col].astype(str))
-            encoding_info[col] = {'method': 'LabelEncoder', 'classes': list(le.classes_)}
-            print(f"✓ {col}: Label Encoded (binary)")
-        
-        # One-Hot for low cardinality
-        elif unique_count <= 5:
-            dummies = pd.get_dummies(df[col], prefix=col, drop_first=True)
-            df_encoded = pd.concat([df_encoded.drop(col, axis=1), dummies], axis=1)
-            encoding_info[col] = {'method': 'OneHot', 'new_cols': list(dummies.columns)}
-            print(f"✓ {col}: One-Hot Encoded ({unique_count} categories)")
-        
-        # Label encoding for high cardinality
-        else:
-            le = LabelEncoder()
-            df_encoded[col] = le.fit_transform(df[col].astype(str))
-            encoding_info[col] = {'method': 'LabelEncoder', 'classes': list(le.classes_)}
-            print(f"✓ {col}: Label Encoded (high cardinality)")
-    
-    return df_encoded, encoding_info
-
-df_encoded, encoding_info = encode_categorical_variables(df_clean)
-```
-
----
-### 📋 TASK 9: Scaling Numerical Features
----
-
-```python
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
-
-def scale_features(df, target_col=None, method='auto'):
-    """
-    روش‌های Scaling:
-    1. StandardScaler: mean=0, std=1 (برای نرمال)
-    2. MinMaxScaler: [0, 1] range (برای bounded)
-    3. RobustScaler: resistant to outliers (برای skewed)
-    """
-    
-    df_scaled = df.copy()
-    numerical_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-    
-    if target_col and target_col in numerical_cols:
-        numerical_cols.remove(target_col)
-    
-    scaling_info = {}
-    
-    for col in numerical_cols:
-        skewness = abs(df[col].skew())
-        
-        if method == 'auto':
-            # Choose scaler based on distribution
-            if skewness > 1:
-                scaler = RobustScaler()
-                scaler_name = 'RobustScaler'
+            df_enc[col] = le.fit_transform(df_enc[col].astype(str))
+            encoders[col] = le
+        elif dtype == 'Categorical':
+            n_unique = df_enc[col].nunique()
+            if n_unique <= 10:
+                df_enc = pd.get_dummies(df_enc, columns=[col], prefix=col)
             else:
-                scaler = StandardScaler()
-                scaler_name = 'StandardScaler'
-        elif method == 'standard':
-            scaler = StandardScaler()
-            scaler_name = 'StandardScaler'
-        elif method == 'minmax':
-            scaler = MinMaxScaler()
-            scaler_name = 'MinMaxScaler'
-        elif method == 'robust':
-            scaler = RobustScaler()
-            scaler_name = 'RobustScaler'
-        
-        df_scaled[col] = scaler.fit_transform(df[[col]])
-        scaling_info[col] = {'method': scaler_name, 'scaler': scaler}
-        print(f"✓ {col}: {scaler_name} applied")
-    
-    return df_scaled, scaling_info
+                # Use target encoding or hashing for high cardinality
+                pass
 
-# Note: Scaling should be done AFTER train-test split in actual modeling
-# Here we just demonstrate the method
+    return df_enc, encoders
 ```
 
 ---
-### 📋 TASK 10: ذخیره دیتاست تمیز و گزارش
+### 📋 TASK 9: Scaling numerical features
 ---
 
 ```python
-# Save cleaned dataset
-output_path = "[path]"
-df_clean.to_csv(output_path, index=False)
-print(f"\n✓ Cleaned dataset saved to: {output_path}")
+from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler
 
-# Save encoded dataset (for modeling)
-encoded_path = "[path]"
-df_encoded.to_csv(encoded_path, index=False)
-print(f"✓ Encoded dataset saved to: {encoded_path}")
+def scale_features(df, num_cols, method='standard'):
+    """Scaling strategies:
+       - StandardScaler: when distribution is approximately normal
+       - RobustScaler: when outliers are present
+       - MinMaxScaler: when bounded range is required (e.g., neural networks)
+    """
+    if method == 'standard':
+        scaler = StandardScaler()
+    elif method == 'robust':
+        scaler = RobustScaler()
+    elif method == 'minmax':
+        scaler = MinMaxScaler()
+    else:
+        raise ValueError(f"Unknown scaler: {method}")
+
+    df_scaled = df.copy()
+    df_scaled[num_cols] = scaler.fit_transform(df[num_cols])
+    return df_scaled, scaler
+```
+
+---
+### 📋 TASK 10: Save the cleaned dataset and report
+---
+
+```python
+# Save outputs
+df_clean.to_csv('1_Data/Cleaned/cleaned_dataset.csv', index=False)
+df_encoded.to_csv('1_Data/Processed/encoded_dataset.csv', index=False)
+
+# Save figures
+# - missing_values_analysis.png/.tiff
+# - outliers_boxplot.png/.tiff
+# - data_types_summary.png/.tiff
+
+# Generate Phase1_Report.md with:
+#  - Dataset overview
+#  - Data-quality summary
+#  - Cleaning decisions
+#  - Feature-engineering summary
+#  - Final encoded shape
 ```
 
 ═══════════════════════════════════════════════════════════════════════════════
-## INTELLIGENT DECISIONS - تصمیمات هوشمند
+## INTELLIGENT DECISIONS
 ═══════════════════════════════════════════════════════════════════════════════
 
-**در این نقاط باید هوشمند تصمیم بگیری:**
-
-| موقعیت | تصمیم | معیار |
-|--------|-------|-------|
-| Missing >50% | حذف ستون | عدم امکان imputation معتبر |
-| Missing <5% | Mean/Median | حفظ sample size |
-| Outlier biological | نگه‌داری | domain knowledge |
-| Outlier error | حذف/اصلاح | غیرممکن بودن مقدار |
-| High cardinality | Target encoding | جلوگیری از sparse matrix |
+The agent makes data-driven decisions for:
+- Imputation strategy per column (median vs mean vs mode vs drop)
+- Outlier policy (keep, cap, drop) based on domain heuristics
+- Encoding scheme (label, one-hot, target) based on cardinality
+- Scaling method (standard, robust) based on outlier presence and distribution
 
 ═══════════════════════════════════════════════════════════════════════════════
-## QUESTION MECHANISM - نحوه سوال پرسیدن
+## QUESTION MECHANISM — How to ask the user
 ═══════════════════════════════════════════════════════════════════════════════
 
-**سوالاتی که باید بپرسی:**
-
-```
-🤔 سوال از کاربر:
-═══════════════════════════════════════════════════════════════
-1. ستون target (هدف) شما کدام است؟
-   گزینه‌ها: [لیست ستون‌های binary/categorical]
-
-2. آیا ستون‌هایی هست که باید حذف شوند؟ (مثل ID)
-   
-3. آیا مقادیر negative برای این متغیرها معتبر است: [لیست]?
-
-⏳ منتظر پاسخ شما هستم...
-═══════════════════════════════════════════════════════════════
-```
+When the agent encounters ambiguous decisions (e.g., a column with 35% missing values), it asks the user once with a clear recommendation rather than guessing silently.
 
 ═══════════════════════════════════════════════════════════════════════════════
-## OUTPUTS - خروجی‌های این فاز
+## OUTPUTS — Outputs of this phase
 ═══════════════════════════════════════════════════════════════════════════════
 
-| فایل | مسیر | فرمت |
-|------|------|------|
-| cleaned_dataset.csv | `1_Data/Cleaned/` | CSV |
-| encoded_dataset.csv | `1_Data/Processed/` | CSV |
-| Phase1_Report.md | `3_Results/Phase1_DataCleaning/` | Markdown |
-| missing_values_analysis.png | `4_Figures/PNG/` | PNG 300DPI |
-| missing_values_analysis.tiff | `4_Figures/TIFF/` | TIFF 300DPI |
-| outliers_boxplot.png | `4_Figures/PNG/` | PNG 300DPI |
-| data_types_summary.png | `4_Figures/PNG/` | PNG 300DPI |
+- `1_Data/Cleaned/cleaned_dataset.csv`
+- `1_Data/Processed/encoded_dataset.csv`
+- `3_Results/Phase1_DataCleaning/Phase1_Report.md`
+- Figures: `missing_values_analysis`, `outliers_boxplot`, `data_types_summary` (PNG + TIFF)
 
 ═══════════════════════════════════════════════════════════════════════════════
-## OUTPUT FORMAT - فرمت گزارش خروجی
+## OUTPUT FORMAT — Report format
 ═══════════════════════════════════════════════════════════════════════════════
-
-فایل `Phase1_Report.md` باید شامل این بخش‌ها باشد:
-
-```markdown
-# Phase 1: Data Understanding & Cleaning Report
 
 ## Executive Summary
-[خلاصه 2-3 خط از یافته‌های کلیدی]
+A concise summary of dataset shape, data-quality findings, and key cleaning decisions.
 
 ## 1. Dataset Overview
-- Original shape: X rows × Y columns
-- Final shape: A rows × B columns
-- Columns dropped: [list]
-- Rows removed: [count]
+Rows, columns, memory usage, target distribution.
 
 ## 2. Data Types Identified
-| Column | Original Type | Detected Type | Final Type |
-|--------|---------------|---------------|------------|
+Tabular summary mapping columns to inferred types.
 
-## 3. Missing Values Analysis
-### 3.1 Before Cleaning
-| Column | Missing Count | Missing % |
-|--------|---------------|-----------|
+## 3. Missing Values
+Per-column missing counts, percentages, and chosen imputation strategy.
 
-### 3.2 Handling Strategy
-| Column | Strategy | Justification |
-|--------|----------|---------------|
+## 4. Outliers
+Detection method, counts, and treatment per column.
 
-### 3.3 After Cleaning
-[Confirmation of no missing values]
+## 5. Feature Engineering
+Newly created features, the rationale for each, and the resulting feature set.
 
-## 4. Outlier Analysis
-### 4.1 Detection Results
-| Column | IQR Outliers | Z-Score Outliers |
-|--------|--------------|------------------|
+## 6. Encoding & Scaling
+Encoding scheme per categorical, scaler per numerical, and dataset shape after preprocessing.
 
-### 4.2 Handling Decision
-| Column | Decision | Justification |
-|--------|----------|---------------|
-
-## 5. Duplicates & Inconsistencies
-- Duplicate rows found: X
-- Duplicate rows removed: Y
-- Inconsistencies fixed: [list]
-
-## 6. Feature Engineering
-- New features created: [list]
-- Rationale: [explanation]
-
-## 7. Encoding Applied
-| Column | Method | Details |
-|--------|--------|---------|
-
-## 8. Visualizations
-[Include all generated figures]
-
-## 9. Quality Assurance Checklist
-- [x] No missing values
-- [x] No duplicates
-- [x] Data types correct
-- [x] Outliers handled
-- [x] Ready for analysis
-
-## 10. Files Generated
-[List of all output files with paths]
-
-## Next Steps
-→ Proceed to Phase 2: Statistical Analysis
-```
-
-═══════════════════════════════════════════════════════════════════════════════
-## IMAGE FORMAT - فرمت تصاویر
-═══════════════════════════════════════════════════════════════════════════════
-
-```python
-import matplotlib.pyplot as plt
-
-def save_figure(fig, name, dpi=300):
-    """ذخیره تصویر در هر دو فرمت"""
-    
-    png_path = f"[path]"
-    tiff_path = f"[path]"
-    
-    fig.savefig(png_path, dpi=dpi, bbox_inches='tight', facecolor='white')
-    fig.savefig(tiff_path, dpi=dpi, bbox_inches='tight', facecolor='white')
-    
-    print(f"✓ Saved: {png_path}")
-    print(f"✓ Saved: {tiff_path}")
-    
-    plt.close(fig)
-```
-
-═══════════════════════════════════════════════════════════════════════════════
-## CHECKLIST - چک‌لیست تکمیل فاز
-═══════════════════════════════════════════════════════════════════════════════
-
-- [ ] دیتاست خوانده شد
-- [ ] نوع داده‌ها شناسایی شد
-- [ ] Missing values تحلیل و مدیریت شد
-- [ ] Outliers شناسایی و تصمیم‌گیری شد
-- [ ] Duplicates بررسی و حذف شد
-- [ ] Data types تصحیح شد
-- [ ] Feature engineering انجام شد
-- [ ] Encoding اعمال شد
-- [ ] دیتاست تمیز ذخیره شد
-- [ ] نمودارها ذخیره شدند (PNG + TIFF)
-- [ ] گزارش کامل نوشته شد
-- [ ] آماده برای Phase 2
-
-═══════════════════════════════════════════════════════════════════════════════
-⏳ وقتی آماده بودی، بگو "شروع کن" تا این فاز را اجرا کنم.
-═══════════════════════════════════════════════════════════════════════════════
+## 7. Cleaned-Dataset Snapshot
+First and last few rows of the cleaned dataset for sanity checks.

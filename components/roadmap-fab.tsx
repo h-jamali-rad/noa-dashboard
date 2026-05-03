@@ -19,10 +19,10 @@ export default function RoadmapFab() {
         transition-all duration-300 ease-out
         animate-pulse-slow
         group"
-      title="نقشه راه پروژه — Project Roadmap"
+      title="Project Roadmap"
     >
       <span className="text-lg">🗺️</span>
-      <span className="hidden sm:inline">نقشه پروژه</span>
+      <span className="hidden sm:inline">Project Roadmap</span>
       <span className="sm:hidden">Roadmap</span>
 
       {/* Glow ring */}

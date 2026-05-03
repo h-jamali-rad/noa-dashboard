@@ -1,172 +1,172 @@
-# فاز ۴: خلاصه اعتبارسنجی مدل‌ها
-## تحلیل جامع اعتبارسنجی و استحکام مدل‌های یادگیری ماشین
+# Phase 4: Model Validation Summary
+## Comprehensive Validation and Robustness Analysis of Machine Learning Models
 
-**تاریخ:** ۲۳ اسفند ۱۴۰۴  
-**پروژه:** سیستم پیش‌بینی NOA با یادگیری ماشین
-
----
-
-## خلاصه اجرایی
-
-فاز ۴ شامل اعتبارسنجی جامع ۱۵ مدل یادگیری ماشین از طریق ۱۰ روش مختلف اعتبارسنجی بود. هدف اصلی این فاز، اطمینان از قابلیت اطمینان، تکرارپذیری و استحکام مدل‌ها برای استفاده بالینی است.
+**Date:** March 13, 2026
+**Project:** NOA Prediction System with Machine Learning
 
 ---
 
-## یافته‌های کلیدی
+## Executive Summary
 
-### بهترین مدل: SVM (ماشین بردار پشتیبان)
-
-| معیار | نتیجه |
-|-------|-------|
-| **بهترین AUC** | ۰.۹۸۴ |
-| **فاصله اطمینان ۹۵٪** | [۰.۹۷۶ - ۰.۹۹۱] |
-| **پایداری** | بالا (CV: ۰.۰۸٪) |
-| **مقاومت در برابر نویز** | بالا (-۰.۰۲٪) |
+Phase 4 included comprehensive validation of 15 machine learning models through 10 different validation methods. The main goal of this phase is to ensure the reliability, reproducibility, and robustness of the models for clinical use.
 
 ---
 
-## روش‌های اعتبارسنجی
+## Key Findings
 
-### ۱. اعتبارسنجی متقاطع K-Fold
-- ۵ و ۱۰ بخش
-- SVM با AUC ۰.۹۸۵ بهترین عملکرد
+### Best Model: SVM (Support Vector Machine)
 
-### ۲. تحلیل طبقه‌بندی شده
-- ضریب تغییرات (CV) برای همه مدل‌ها محاسبه شد
-- ۱۵/۱۵ مدل پایداری بالا نشان دادند
-
-### ۳. LOOCV (تقریب ۵۰ بخشی)
-- تأیید نتایج K-Fold
-- توافق بالا بین روش‌ها
-
-### ۴. K-Fold تکراری (۱۰×۱۰)
-- ۱۰۰ ارزیابی برای هر مدل
-- فاصله اطمینان باریک‌تر
-
-### ۵. اعتبارسنجی Bootstrap
-- ۵۰-۱۰۰ تکرار برای هر مدل
-- فاصله اطمینان ۹۵٪ محاسبه شد
-
-### ۶. اعتبارسنجی متقاطع تودرتو
-- جداسازی تنظیم پارامتر از ارزیابی
-- بدون تورش خوش‌بینانه
-
-### ۷. تشخیص بیش‌برازش
-- ۱۲ مدل نیاز به تنظیم منظم‌سازی
-- DecisionTree: بیش‌برازش شدید (۲۸.۳۵٪)
-
-### ۸. منحنی‌های یادگیری
-- تحلیل تعادل تورش-واریانس
-- شناسایی مدل‌های بهینه
-
-### ۹. تحلیل پایداری (۱۰ دانه تصادفی)
-- همه مدل‌ها: CV < ۲٪
-- SVM: پایدارترین (CV: ۰.۰۸٪)
-
-### ۱۰. آزمون استحکام (تزریق نویز)
-- سطوح نویز: ۱٪، ۵٪، ۱۰٪
-- ۱۳/۱۵ مدل: استحکام بالا
+| Metric | Result |
+|--------|--------|
+| **Best AUC** | 0.984 |
+| **95% Confidence Interval** | [0.976 – 0.991] |
+| **Stability** | High (CV: 0.08%) |
+| **Noise Robustness** | High (-0.02%) |
 
 ---
 
-## رتبه‌بندی مدل‌ها
+## Validation Methods
 
-| رتبه | مدل | AUC | فاصله اطمینان |
-|------|-----|-----|---------------|
-| ۱ | SVM | ۰.۹۸۴ | [۰.۹۷۶, ۰.۹۹۱] |
-| ۲ | MLP | ۰.۹۷۶ | [۰.۹۶۳, ۰.۹۸۵] |
-| ۳ | TabNet | ۰.۹۷۵ | [۰.۹۶۳, ۰.۹۸۵] |
-| ۴ | CatBoost | ۰.۹۷۰ | [۰.۹۶۱, ۰.۹۸۰] |
-| ۵ | StackingEnsemble | ۰.۹۶۸ | [۰.۹۵۶, ۰.۹۷۸] |
+### 1. K-Fold Cross-Validation
+- 5 and 10 folds
+- SVM showed the best performance with AUC 0.985
 
----
+### 2. Stratified Analysis
+- Coefficient of Variation (CV) computed for all models
+- 15/15 models demonstrated high stability
 
-## نتایج کلیدی
+### 3. LOOCV (50-fold approximation)
+- Confirmed K-Fold results
+- High agreement between methods
 
-### پایداری مدل‌ها
-- **همه ۱۵ مدل**: پایداری بالا (CV < ۲٪)
-- **SVM**: پایدارترین با CV ۰.۰۸٪
-- **DecisionTree**: متغیرترین با CV ۱.۲۵٪
+### 4. Repeated K-Fold (10×10)
+- 100 evaluations per model
+- Tighter confidence intervals
 
-### استحکام در برابر نویز
-- **نویز ۱٪**: همه مدل‌ها مقاوم
-- **نویز ۵٪**: ۱۴/۱۵ مدل مقاوم
-- **نویز ۱۰٪**: ۱۳/۱۵ مدل مقاوم
+### 5. Bootstrap Validation
+- 50–100 iterations per model
+- 95% confidence intervals computed
 
-### بیش‌برازش
-- **بدون بیش‌برازش**: SVM, LogisticRegression, NaiveBayes
-- **نیاز به تنظیم**: ۱۲ مدل دیگر
+### 6. Nested Cross-Validation
+- Separates hyperparameter tuning from evaluation
+- Eliminates optimistic bias
 
----
+### 7. Overfitting Detection
+- 12 models needed regularization tuning
+- DecisionTree: severe overfitting (28.35%)
 
-## توصیه‌های بالینی
+### 8. Learning Curves
+- Bias-variance trade-off analysis
+- Identification of optimal models
 
-### توصیه اصلی
-**استفاده از SVM به عنوان مدل اصلی:**
-- بهترین عملکرد تمایزی (AUC: ۰.۹۸۴)
-- پایداری استثنایی
-- مقاومت بالا در برابر نویز
-- بدون بیش‌برازش
+### 9. Stability Analysis (10 random seeds)
+- All models: CV < 2%
+- SVM: most stable (CV: 0.08%)
 
-### توصیه‌های ثانویه
-1. **MLP**: برای شرایط با نویز بالا
-2. **CatBoost**: برای روش‌های تقویت گرادیان
-3. **TabNet**: برای نیاز به تفسیرپذیری
+### 10. Robustness Test (noise injection)
+- Noise levels: 1%, 5%, 10%
+- 13/15 models: high robustness
 
 ---
 
-## مراحل بعدی: فاز ۵
+## Model Ranking
 
-### هوش مصنوعی قابل تفسیر (XAI)
-
-فاز ۵ شامل موارد زیر خواهد بود:
-
-1. **تحلیل اهمیت ویژگی‌ها**
-   - شناسایی عوامل پیش‌بینی‌کننده کلیدی
-   
-2. **تحلیل SHAP**
-   - توضیح پیش‌بینی‌ها در سطح جهانی و محلی
-   
-3. **نمودارهای وابستگی جزئی (PDP)**
-   - تأثیر هر متغیر بر پیش‌بینی
-   
-4. **توضیحات LIME**
-   - تفسیر محلی مدل‌ها
-   
-5. **تفسیر بالینی**
-   - ترجمه یافته‌ها برای پزشکان
+| Rank | Model | AUC | Confidence Interval |
+|------|-------|-----|---------------------|
+| 1 | SVM | 0.984 | [0.976, 0.991] |
+| 2 | MLP | 0.976 | [0.963, 0.985] |
+| 3 | TabNet | 0.975 | [0.963, 0.985] |
+| 4 | CatBoost | 0.970 | [0.961, 0.980] |
+| 5 | StackingEnsemble | 0.968 | [0.956, 0.978] |
 
 ---
 
-## فایل‌های مورد نیاز برای فاز بعدی
+## Key Results
 
-### فایل‌های نتایج
+### Model Stability
+- **All 15 models**: high stability (CV < 2%)
+- **SVM**: most stable with CV 0.08%
+- **DecisionTree**: most variable with CV 1.25%
+
+### Noise Robustness
+- **1% noise**: all models robust
+- **5% noise**: 14/15 models robust
+- **10% noise**: 13/15 models robust
+
+### Overfitting
+- **No overfitting**: SVM, LogisticRegression, NaiveBayes
+- **Tuning required**: the other 12 models
+
+---
+
+## Clinical Recommendations
+
+### Primary Recommendation
+**Use SVM as the primary model:**
+- Best discriminative performance (AUC: 0.984)
+- Exceptional stability
+- High noise robustness
+- No overfitting
+
+### Secondary Recommendations
+1. **MLP**: for high-noise conditions
+2. **CatBoost**: for gradient-boosting approaches
+3. **TabNet**: when interpretability is needed
+
+---
+
+## Next Steps: Phase 5
+
+### Explainable Artificial Intelligence (XAI)
+
+Phase 5 will include:
+
+1. **Feature Importance Analysis**
+   - Identification of key predictive factors
+
+2. **SHAP Analysis**
+   - Global- and local-level prediction explanations
+
+3. **Partial Dependence Plots (PDP)**
+   - Effect of each variable on the prediction
+
+4. **LIME Explanations**
+   - Local model interpretation
+
+5. **Clinical Interpretation**
+   - Translation of findings for clinicians
+
+---
+
+## Files Required for the Next Phase
+
+### Result Files
 - `Phase4_Final_Results.json`
 - `kfold_cv_results.csv`
 - `bootstrap_validation_results.csv`
 - `stability_seeds_analysis.csv`
 - `robustness_noise_results.csv`
 
-### فایل‌های مدل
-- تمام فایل‌های `*.joblib` در `/6_Models/Saved/`
+### Model Files
+- All `*.joblib` files in `/6_Models/Saved/`
 
-### فایل‌های داده
+### Data Files
 - `encoded_dataset.csv`
 
 ---
 
-## نتیجه‌گیری
+## Conclusion
 
-فاز ۴ با موفقیت تکمیل شد. اعتبارسنجی جامع نشان داد که:
+Phase 4 was completed successfully. The comprehensive validation showed that:
 
-✅ SVM بهترین مدل با AUC ۰.۹۸۴ است  
-✅ همه مدل‌ها پایداری بالایی دارند  
-✅ ۱۳ مدل در برابر نویز مقاوم هستند  
-✅ ۱۲ مدل برای بهبود تعمیم‌پذیری تنظیم شدند  
+- SVM is the best model, with AUC 0.984
+- All models exhibit high stability
+- 13 models are robust to noise
+- 12 models were tuned to improve generalization
 
-مدل‌ها آماده ورود به فاز تفسیرپذیری (فاز ۵) هستند.
+The models are ready to proceed to the Explainable AI phase (Phase 5).
 
 ---
 
-*گزارش تهیه شده: اسفند ۱۴۰۴*  
-*تیم تحقیقاتی NOA ML*
+*Report prepared: March 2026*
+*NOA ML research team*
