@@ -1,17 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Info } from 'lucide-react'
+import { ChevronDown, Info } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
 
 type NumField = {
   key: string
@@ -139,7 +135,31 @@ function getInputClass(value: string | undefined, field: Pick<NumField, 'min' | 
 
 export default function CdssForm() {
   const [vals, setVals] = useState<Record<string, string>>({})
+  const [pathology, setPathology] = useState<Record<string, string[]>>({
+    RT_Pathology: [],
+    LT_Pathology: [],
+  })
   const [result, setResult] = useState<{ p: number; tier: RiskTier } | null>(null)
+
+  const togglePathology = (fieldKey: string, value: string) => {
+    setPathology((prev) => {
+      const current = prev[fieldKey] ?? []
+      const next = current.includes(value)
+        ? current.filter((v) => v !== value)
+        : [...current, value]
+      return { ...prev, [fieldKey]: next }
+    })
+  }
+
+  const formatSelected = (selected: string[]) => {
+    if (!selected || selected.length === 0) return ''
+    return selected
+      .map((v) => {
+        const opt = PATHOLOGY_OPTIONS.find((o) => o.value === v)
+        return opt ? opt.label.split(' — ')[0] : v
+      })
+      .join(', ')
+  }
 
   const onSubmit = () => {
     const weightedSignal = FEATURE_FIELDS.reduce((acc, field) => {
@@ -185,30 +205,115 @@ export default function CdssForm() {
 
         <div className="space-y-3">
           <div className="grid md:grid-cols-2 gap-3">
-            {PATHOLOGY_FIELDS.map((p) => (
-              <div key={p.key}>
-                <label className="text-xs font-medium">{p.label}</label>
-                <Select
-                  value={vals[p.key] ?? ''}
-                  onValueChange={(value) => setVals((prev) => ({ ...prev, [p.key]: value }))}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select histopathology pattern" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PATHOLOGY_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            ))}
+            {PATHOLOGY_FIELDS.map((p) => {
+              const selected = pathology[p.key] ?? []
+              const summary = formatSelected(selected)
+              return (
+                <div key={p.key}>
+                  <label className="text-xs font-medium">
+                    {p.label}
+                    <span className="ml-1 text-[10px] font-normal text-muted-foreground">
+                      (multi-select)
+                    </span>
+                  </label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className={cn(
+                          'flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background',
+                          'placeholder:text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                          'disabled:cursor-not-allowed disabled:opacity-50',
+                          selected.length === 0 && 'text-muted-foreground',
+                        )}
+                        aria-haspopup="listbox"
+                        aria-expanded={selected.length > 0}
+                      >
+                        <span className="truncate text-left">
+                          {selected.length === 0
+                            ? 'Select histopathology patterns'
+                            : `${selected.length} selected · ${summary}`}
+                        </span>
+                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      align="start"
+                      className="w-[var(--radix-popover-trigger-width)] min-w-[16rem] p-2"
+                    >
+                      <div className="flex items-center justify-between px-2 py-1">
+                        <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                          {selected.length} selected
+                        </p>
+                        {selected.length > 0 && (
+                          <button
+                            type="button"
+                            className="text-[11px] text-muted-foreground hover:text-foreground"
+                            onClick={() =>
+                              setPathology((prev) => ({ ...prev, [p.key]: [] }))
+                            }
+                          >
+                            Clear
+                          </button>
+                        )}
+                      </div>
+                      <ul className="max-h-72 overflow-y-auto" role="listbox" aria-multiselectable>
+                        {PATHOLOGY_OPTIONS.map((opt) => {
+                          const isChecked = selected.includes(opt.value)
+                          return (
+                            <li key={opt.value}>
+                              <label
+                                className={cn(
+                                  'flex cursor-pointer items-start gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground',
+                                  isChecked && 'bg-accent/40',
+                                )}
+                              >
+                                <Checkbox
+                                  checked={isChecked}
+                                  onCheckedChange={() => togglePathology(p.key, opt.value)}
+                                  className="mt-0.5"
+                                  aria-label={opt.label}
+                                />
+                                <span className="leading-snug">{opt.label}</span>
+                              </label>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    </PopoverContent>
+                  </Popover>
+
+                  {selected.length > 0 && (
+                    <div className="mt-1.5 flex flex-wrap gap-1">
+                      {selected.map((v) => {
+                        const opt = PATHOLOGY_OPTIONS.find((o) => o.value === v)
+                        const shortLabel = opt ? opt.label.split(' — ')[0] : v
+                        return (
+                          <span
+                            key={v}
+                            className="inline-flex items-center gap-1 rounded-full border bg-secondary/60 px-2 py-0.5 text-[10px] font-medium"
+                          >
+                            {shortLabel}
+                            <button
+                              type="button"
+                              className="text-muted-foreground hover:text-foreground"
+                              onClick={() => togglePathology(p.key, v)}
+                              aria-label={`Remove ${shortLabel}`}
+                            >
+                              ×
+                            </button>
+                          </span>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
 
           <div className="rounded-lg border border-amber-300/40 bg-amber-50/40 p-3 text-xs text-muted-foreground dark:bg-amber-950/20">
-            <strong>Note:</strong> In our LightGBM model, histopathological patterns showed zero feature importance. The model relies primarily on hormonal markers (LH, FSH, Testosterone) and anthropometric features (Age, BMI, Body Weight, Height) for prediction.
+            <strong>Note:</strong> In our LightGBM model, histopathological patterns showed zero feature importance. The model relies primarily on hormonal markers (LH, FSH, Testosterone) and anthropometric features (Age, BMI, Body Weight, Height) for prediction. Patients may exhibit multiple patterns simultaneously — select all that apply.
           </div>
         </div>
 

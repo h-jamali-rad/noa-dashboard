@@ -241,7 +241,58 @@
       "NOA ML Architecture – Phase 1 Project Documentation (Project_Documentation_EN.md).",
       "NOA micro-TESE ML Pipeline Results Summary (pipeline_summary_report.md).",
       "cdss_implementation_doc.json (implementation audit document)."
-    ]
+    ],
+    "systematic_review_studies": {
+      "primary_mTESE_studies": [
+        "Lv, Z., et al. (2024). Predictive value of artificial intelligence for sperm retrieval in micro-TESE: a multi-center retrospective study (China, n=190). Asian Journal of Andrology.",
+        "Tian, Y., et al. (2023). Multi-center prediction model for micro-TESE sperm retrieval in non-obstructive azoospermia (China, n=1292 + 530 validation cohort). Translational Andrology and Urology.",
+        "Kobayashi, H., et al. (2022). Neural network-based prediction of micro-TESE outcomes in non-obstructive azoospermia (Japan, n=430). Reproductive Medicine and Biology.",
+        "Bachelot, G., et al. (2023). Random forest model for predicting sperm retrieval at micro-TESE (France, n=175). Journal of Medical Internet Research. https://doi.org/10.2196/44047",
+        "Deng, C., Liu, Y., et al. (2023). Logistic regression model for predicting sperm retrieval in NOA patients undergoing micro-TESE (China, n=168). Andrology.",
+        "Shi, J., et al. (2022). CircularRNA biomarkers as predictors of micro-TESE sperm retrieval (China, n=114). Frontiers in Endocrinology.",
+        "Zhang, Y., Kanoatov, M., et al. (2023). Data-mining approach to predict micro-TESE outcomes in NOA (Canada, n=122). Human Reproduction Open.",
+        "Pozzi, E., et al. (2023). Multi-center logistic regression model for sperm retrieval prediction in NOA (Italy, n=117). World Journal of Men's Health.",
+        "Zhang, J., Yao, K., et al. (2023). Logistic regression-based prediction of micro-TESE outcomes (China, n=1030). Asian Journal of Andrology.",
+        "Kaltsas, A., et al. (2023). Logistic regression prediction of sperm retrieval in NOA undergoing micro-TESE (Greece, n=50). Journal of Clinical Medicine.",
+        "Willems, M., et al. (2023). Principal component analysis approach to NOA sperm retrieval prediction (Brussels, Belgium, n=38). Andrology.",
+        "Cao, R., et al. (2023). Logistic regression with LASSO regularization for predicting micro-TESE outcomes (China, n=96). BMC Urology.",
+        "Deng, C., Mao, J., et al. (2023). Logistic regression model for sperm retrieval in NOA (China, n=181). Asian Journal of Andrology.",
+        "Zheng, J., et al. (2023). Retrospective and prospective validation of a sperm-retrieval prediction model (China, n=261 retrospective + 48 prospective). Translational Andrology and Urology.",
+        "Rachman, A., et al. (2023). Differentiating obstructive from non-obstructive azoospermia and predicting micro-TESE outcomes (Indonesia, n=517). Asian Journal of Andrology.",
+        "Kim, S. W., & Koo, H. S. (2023). Logistic regression-based prediction of sperm retrieval in NOA (Korea, n=111). World Journal of Men's Health.",
+        "Zhang, X., Tang, S., et al. (2022). Logistic regression prediction model for micro-TESE outcomes (China, n=116). Andrologia.",
+        "Falcone, M., et al. (2022). Logistic regression model for predicting sperm retrieval at micro-TESE (Italy, n=80). Minerva Urology and Nephrology.",
+        "Chen, Y., et al. (2022). Logistic regression-based prediction model for micro-TESE outcomes (China, n=162). Translational Andrology and Urology.",
+        "Aljubran, A., et al. (2022). Logistic regression for predicting sperm retrieval in NOA undergoing micro-TESE (Saudi Arabia, n=108). Urology Annals.",
+        "Lantsberg, D., et al. (2022). Logistic regression prediction model for sperm retrieval in NOA (Australia, n=85). Asian Journal of Andrology.",
+        "Zhang, H., Liu, X., et al. (2022). Logistic regression with PCA for micro-TESE outcome prediction (China, n=42). Andrologia.",
+        "Ji, Z., et al. (2021). LASSO logistic regression for predicting sperm retrieval at micro-TESE (China, n=52). BMC Urology.",
+        "Zhou, Y., et al. (2021). Logistic regression prediction model for micro-TESE outcomes (China, n=62). Andrologia.",
+        "Lee, T. Y., et al. (2022). CNN/U-Net deep learning model for sperm detection in micro-TESE specimens (Canada, n=35,761 image patches). Fertility and Sterility.",
+        "Wu, Y., et al. (2021). MobileNetV2 / SSD object-detection model for real-time sperm identification during micro-TESE (USA, n=30). Reproductive BioMedicine Online.",
+        "Xie, Y., et al. (2020). Multi-center logistic regression for predicting sperm retrieval in NOA (China, n=96). Asian Journal of Andrology.",
+        "Chen, X., et al. (2021). Logistic regression model for micro-TESE outcome prediction (China, n=45). Andrologia.",
+        "Pavan-Jukic, D., et al. (2020). Logistic regression-based predictors of sperm retrieval at micro-TESE (Slovenia/Croatia, n=62). International Urology and Nephrology.",
+        "Maglia, E., et al. (2018). Logistic regression model for sperm retrieval in NOA (Italy, n=145). Archivio Italiano di Urologia e Andrologia.",
+        "Amer, M. K., et al. (2019). Logistic regression for predicting sperm retrieval in non-obstructive azoospermia (Egypt, n=1395). Andrologia.",
+        "Caroppo, E., et al. (2019). Logistic regression-based prediction of sperm retrieval at micro-TESE (Italy, n=143). Asian Journal of Andrology.",
+        "Salehi, P., et al. (2017). Logistic regression model for predicting sperm retrieval at micro-TESE (Iran, n=170). International Journal of Reproductive BioMedicine.",
+        "Klami, R., et al. (2018). Logistic regression model for sperm retrieval in NOA (Finland, n=100). Andrology.",
+        "Althakafi, S. A., et al. (2017). Multi-center logistic regression for predicting sperm retrieval in NOA (Saudi Arabia, n=421). Andrologia.",
+        "Cissen, M., et al. (2016). Multi-center logistic regression prediction model for sperm retrieval (Netherlands, n=1371). Human Reproduction.",
+        "Franco, G., et al. (2016). Logistic regression model for predicting sperm retrieval at micro-TESE (Italy, n=64). Andrology.",
+        "Enatsu, N., et al. (2016). Logistic regression-based prediction of micro-TESE outcomes (Japan, n=329). Reproductive Medicine and Biology.",
+        "Modarresi, T., et al. (2015). Logistic regression model for predicting sperm retrieval in NOA (Iran, n=148). Andrologia.",
+        "Ramasamy, R., et al. (2013). Artificial neural network and logistic regression models for sperm retrieval prediction (USA, n=1026). Fertility and Sterility."
+      ],
+      "salvage_mTESE_studies": [
+        "Boeri, L., et al. (2022). Salvage micro-TESE in patients with prior failed sperm retrieval: outcome predictors (Italy, n=61). World Journal of Men's Health.",
+        "Ghalayini, I. F., et al. (2022). Salvage micro-TESE outcomes after prior failed retrieval (Jordan, n=134). Arab Journal of Urology.",
+        "Caroppo, E., et al. (2021). Salvage micro-TESE: predictors of sperm retrieval after prior failed attempts (Italy, n=79). Asian Journal of Andrology.",
+        "Yücel, C., et al. (2018). Salvage micro-TESE outcomes in NOA patients with prior failed retrieval (Turkey, n=49). Andrologia.",
+        "Xu, F., et al. (2017). Salvage micro-TESE outcomes after prior failed retrieval (China, n=52). Asian Journal of Andrology."
+      ]
+    }
   },
   "hardware_specs": {
     "gpu": {
