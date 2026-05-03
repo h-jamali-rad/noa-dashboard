@@ -88,7 +88,82 @@
   },
   "table3": {
     "title": "Table 3: NOA patients Biomarkers driven from studies for success prediction in m-TESE treatment using AI methods",
-    "description": "Large table with columns: #, Author(s) and Year, Clinical variables, Hormonal variables, Genetics/micro-RNA/Proteins, Histopathology, Importance variable. Contains detailed biomarker data for 8 studies.",
-    "note": "Table 3 is very large with nested multi-line cells. Render it as a responsive scrollable HTML table."
+    "description": "Cross-study biomarker matrix grouping clinical, hormonal, genetic, histopathological, and importance variables across 8 studies.",
+    "note": "Cells with no reported value are marked as \"Not Mentioned\". Compiled from the source studies included in the scoping review.",
+    "columns": ["#", "Author(s) and Year", "Clinical", "Hormonal", "Genetics / micro-RNA / Proteins", "Histopathology", "Importance variable"],
+    "rows": [
+      [
+        "1",
+        "Lv et al., 2024",
+        "Age, TV, BMI",
+        "FSH, LH, T, E2",
+        "hsa_circ series",
+        "Not Mentioned",
+        "hsa_circ series"
+      ],
+      [
+        "2",
+        "Tian et al., 2023",
+        "Age, TV, Etiology (Mumps orchitis, Cryptorchidism), Varicocele, Surgical history of sperm retrieval",
+        "FSH, LH, T, E2, AMH, PRL, InhB",
+        "Etiology (Y microdeletion AZFc, KS)",
+        "Not Mentioned",
+        "Etiology, AMH, surgical history, TV, FSH, LH, Age"
+      ],
+      [
+        "3",
+        "Kobayashi et al., 2022",
+        "Age, height, body weight, BMI, Lt varicocele, Cryptorchidism, Inguinal hernia",
+        "LH, FSH, PRL, tT, E2, T/E2",
+        "G-band, XXY46 mosaicism, AZFc",
+        "Not Mentioned",
+        "T/E2"
+      ],
+      [
+        "4",
+        "Bachelot et al., 2023",
+        "Age, BMI, Smoking, Cryptorchidism, Infection, Trauma, Gonadotropic therapy, Urogenital surgery, Varicocele, Torsion, Orchitis, Cancer treatment, Spinal injury, Spina bifida, Rt testis size, Antisperm antibody, Rt and Lt testis",
+        "LH, FSH, T, InhB, PRL",
+        "Normal karyotype, Y microdeletion AZFc",
+        "Not Mentioned",
+        "FSH, InhB, LH, PRL, Age, BMI, Smoking, Y-chromosome microdeletion, Cryptorchidism, Varicocele"
+      ],
+      [
+        "5",
+        "Deng, Liu et al., 2023",
+        "Age, TV",
+        "FSH, LH, T, PRL, E2, AMH, INHB, INHB/AMH",
+        "Not Mentioned",
+        "Not Mentioned",
+        "INHB/AMH"
+      ],
+      [
+        "6",
+        "Shi et al., 2022",
+        "Age, BMI, TV",
+        "LH, FSH, T",
+        "CircularRNAs (circ_MGLL)",
+        "MA, SCOS, HS",
+        "circ_MGLL, HS"
+      ],
+      [
+        "7",
+        "Zhang, Kanoatov et al., 2023",
+        "Not Mentioned",
+        "Not Mentioned",
+        "germ cell-specific proteins",
+        "Not Mentioned",
+        "AKAP4+/ASPX+/Hoechst+ assay"
+      ],
+      [
+        "8",
+        "Pozzi et al., 2023",
+        "Age, Partner age, BMI, Birthweight, Smoking",
+        "FSH, LH, tT, SHBG, Albumin",
+        "Not Mentioned",
+        "No germ cells, MA, JS, Normal parenchyma",
+        "AMH"
+      ]
+    ]
   }
 }

@@ -23,25 +23,14 @@ type Table3Data = {
   title: string
   description: string
   note: string
-  columns?: string[]
-  rows?: string[][]
+  columns: string[]
+  rows: string[][]
 }
 
 const article = data.article
 const table1 = data.table1 as TableData
 const table2 = data.table2 as TableData
 const table3 = data.table3 as Table3Data
-
-// Columns for Table 3 (parsed from the description in JSON)
-const TABLE3_COLUMNS = [
-  '#',
-  'Author(s) and Year',
-  'Clinical variables',
-  'Hormonal variables',
-  'Genetics / micro-RNA / Proteins',
-  'Histopathology',
-  'Importance variable',
-]
 
 function MetaRow({
   icon: Icon,
@@ -358,64 +347,13 @@ export default function PublicationsPage() {
       />
 
       {/* Table 3 — biomarker matrix */}
-      <section className="rounded-xl border bg-card overflow-hidden">
-        <header className="flex items-start gap-3 px-5 py-4 border-b border-border/60 bg-card/60">
-          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-tertiary/10 text-tertiary">
-            <ScrollText className="h-4 w-4" />
-          </div>
-          <div className="min-w-0">
-            <h2 className="font-display font-semibold text-base sm:text-lg leading-snug tracking-tight">
-              {table3.title}
-            </h2>
-            <p className="mt-1 text-[12px] text-muted-foreground leading-snug">
-              Cross-study biomarker matrix grouping clinical, hormonal, genetic, histopathological,
-              and importance variables.
-            </p>
-          </div>
-        </header>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm border-separate border-spacing-0">
-            <thead>
-              <tr className="bg-muted/40">
-                {TABLE3_COLUMNS.map((col, i) => (
-                  <th
-                    key={i}
-                    scope="col"
-                    className="text-left px-3 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/60 whitespace-nowrap first:pl-5 last:pr-5"
-                  >
-                    {col}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td
-                  colSpan={TABLE3_COLUMNS.length}
-                  className="px-5 py-6 text-[13px] text-foreground/85 leading-relaxed border-b border-border/40"
-                >
-                  <p className="mb-2">{table3.description}</p>
-                  <p className="text-muted-foreground italic">{table3.note}</p>
-                  <p className="mt-3">
-                    The complete biomarker matrix (with per-study clinical, hormonal,
-                    genetic / micro-RNA / protein, histopathological, and importance variables) is
-                    available in the published article on Oxford Academic:{' '}
-                    <Link
-                      href={article.doi}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline font-mono text-[12px]"
-                    >
-                      {article.doi}
-                    </Link>
-                  </p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+      <ResearchTable
+        title={table3.title}
+        columns={table3.columns}
+        rows={table3.rows}
+        caption={`${table3.rows.length} studies — ${table3.description} ${table3.note}`}
+        accent="tertiary"
+      />
 
       {/* Citation block */}
       <section className="rounded-xl border bg-muted/30 p-5">
