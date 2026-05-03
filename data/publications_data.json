@@ -1,0 +1,94 @@
+{
+  "article": {
+    "title": "AI predictive models and advancements in microdissection testicular sperm extraction for non-obstructive azoospermia: a systematic scoping review",
+    "authors": "Hossein Jamalirad, Mahdie Jajroudi, Bahareh Khajehpour, Mohammad Ali Sadighi Gilani, Saeid Eslami, Marjan Sabbaghian, Hassan Vakili Arki",
+    "journal": "Human Reproduction Open",
+    "year": 2025,
+    "volume": "2025(1)",
+    "article_id": "hoae070",
+    "doi": "https://doi.org/10.1093/hropen/hoae070",
+    "publisher": "Oxford University Press",
+    "type": "Systematic Scoping Review",
+    "received": "July 15, 2024",
+    "revised": "October 03, 2024",
+    "accepted": "November 14, 2024",
+    "published": "November 21, 2024",
+    "license": "Creative Commons Attribution License (CC BY 4.0)",
+    "affiliations": [
+      "Department of Medical Informatics, Faculty of Medicine, Mashhad University of Medical Sciences, Mashhad, Iran",
+      "Pharmaceutical Research Center, Mashhad University of Medical Sciences, Mashhad, Iran",
+      "Midwifery Department, Faculty of Nursing and Midwifery, Mashhad University of Medical Sciences, Mashhad, Iran",
+      "Department of Andrology, Reproductive Biomedicine Research Center, Royan Institute for Reproductive Biomedicine, ACECR, Tehran, Iran",
+      "Department of Urology, Shariati Hospital, Tehran University of Medical Sciences, Tehran, Iran"
+    ],
+    "keywords": ["male infertility", "microdissection testicular sperm extraction", "non-obstructive azoospermia", "artificial intelligence", "successful sperm retrieval"],
+    "abstract": {
+      "study_question": "How accurately can artificial intelligence (AI) models predict sperm retrieval in non-obstructive azoospermia (NOA) patients undergoing micro-testicular sperm extraction (m-TESE) surgery?",
+      "summary_answer": "AI predictive models hold significant promise in predicting successful sperm retrieval in NOA patients undergoing m-TESE, although limitations regarding variability of study designs, small sample sizes, and a lack of validation studies restrict the overall generalizability of studies in this area.",
+      "main_results": "Out of 427 screened articles, 45 met the inclusion criteria, with most using logistic regression and machine learning to predict m-TESE outcomes. AI-based models demonstrated strong potential by integrating clinical, hormonal, and biological factors. However, limitations of the studies included small sample sizes, legal barriers, and challenges in generalizability and validation.",
+      "study_design": "A comprehensive literature search was conducted following PRISMA-ScR guidelines, covering PubMed and Scopus databases from 2013 to 15 May 2024."
+    }
+  },
+  "table1": {
+    "title": "Table 1: Studies which utilized AI techniques to predict success in m-TESE for patients with NOA",
+    "columns": ["#", "Author(s) and Year", "Country", "No. Center", "Sample Size", "Success Rate", "AUC_best_model", "Machine Learning Method"],
+    "rows": [
+      ["1", "Lv et al., 2024", "China", "Single Center", "190", "SSR:84/190, SRF:96/190", "AUC_LR=0.997", "Logistic Regression"],
+      ["2", "Tian et al., 2023", "China", "Multi center", "Training:1292, Ex. validation: 530", "SSR:492/1292, SRF:800/1292, SSR:257/530, SRF:273/530", "AUC_RF=0.75", "Logistic Regression, Lasso, Random Forest, XG-boost"],
+      ["3", "Kobayashi et al., 2022", "Japan", "Single Center", "430", "SSR:151/430, SRF:279/430", "AUC_ANN=0.7246", "Gradient-boosting tree and ANN"],
+      ["4", "Bachelot et al., 2023", "France", "Single Center", "175", "SSR:104/175, SRF:71/175", "AUC_RF=0.9", "LR, DT, RF, SVM, ANN, gradient boosting, extreme gradient boosting, DNN"],
+      ["5", "Deng, Liu, et al., 2023", "China", "Single Center", "168", "SSR:51/168, SRF:117/168", "AUC_LR=0.76", "Logistic Regression"],
+      ["6", "Shi et al., 2022", "China", "Single Center", "114", "SSR:47/114, SRF:67/114", "AUC_LR=0.83", "Logistic Regression"],
+      ["7", "Zhang, Kanoatov, et al., 2023", "Canada", "Multi Center", "122", "Not Mentioned", "1-0.87", "Data Mining"],
+      ["8", "Pozzi et al., 2023", "Italy", "Multi Center", "117", "SSR:57/117, SRF:60/117", "AUC_LR=0.703", "Logistic Regression"],
+      ["9", "Zhang, Yao, et al., 2023", "China", "Single Center", "1030", "SSR:238/1030, SRF:792/1030", "AUC_LR=0.628", "Logistic Regression"],
+      ["10", "Kaltsas et al., 2023", "Greece", "Single Center", "50", "SSR:22/50, SRF:28/50", "AUC_LR=0.216", "Logistic Regression"],
+      ["11", "Willems et al., 2023", "Brussels", "Single Center", "38", "SSR:8/38, SRF:30/38", "Not Mentioned", "PCA"],
+      ["12", "Cao et al., 2023", "China", "Single Center", "96", "SSR:64/96, SRF:32/96", "AUC_LR=0.81", "Logistic Regression, LASSO"],
+      ["13", "Deng, Mao, et al., 2023", "China", "Single Center", "181 (m-TESE:116)", "SSRm:74/116, SRFm:42/116", "Not Mentioned", "Logistic Regression"],
+      ["14", "Zheng et al., 2023", "China", "Single Center", "Retrospective: 261, Prospective: 48", "SSR RA:191/261, SRF RA:70/261, SSR PA:11/48, SRF PA:36/48", "0.81", "Logistic Regression"],
+      ["15", "Rachman et al., 2023", "Indonesia", "Single Center", "517 (OA:164, NOA:353)", "SSR:83/353, SRF:271/353", "Not Mentioned", "Logistic Regression"],
+      ["16", "Kim and Koo, 2023", "Korea", "Single Center", "111", "SSR:68/111, SRF:43/111", "Not Mentioned", "Logistic Regression"],
+      ["17", "Zhang, Tang, et al., 2022", "China", "Single Center", "116", "SSR:48/116, SRF:68/116", "AUC_LR=0.927", "Logistic Regression"],
+      ["18", "Falcone et al., 2022", "Italy", "Single Center", "80", "SSR:22/80, SRF:68/80", "Not Mentioned", "Logistic Regression"],
+      ["19", "Chen et al., 2022", "China", "Single Center", "162", "SSR:78/162, SRF:84/162", "AUC_LR=0.907", "Logistic Regression"],
+      ["20", "Aljubran et al., 2022", "Saudi Arabia", "Single Center", "108", "SSR:51/108, SRF:57/108", "Not Mentioned", "Logistic Regression"],
+      ["21", "Lantsberg et al., 2022", "Australia", "Single Center", "85", "SSR:52/85, SRF:33/85", "Not Mentioned", "Logistic Regression"],
+      ["22", "Zhang, Liu, et al., 2022", "China", "Single Center", "42 (30 NOA)", "SSR:12/30, SRF:18/30", "AUC_LR=0.954", "Logistic Regression, PCA"],
+      ["23", "Ji et al., 2021", "China", "Single Center", "52", "SSR:20/52, SRF:32/52", "AUC_LR=0.958", "Least absolute shrinkage and selection operator (LASSO) logistic regression"],
+      ["24", "Zhou et al., 2021", "China", "Single Center", "62", "Not Mentioned", "AUC_LR=0.786", "Logistic Regression"],
+      ["25", "Lee et al., 2022", "Canada", "Single Center", "35,761 image Patches", "Not Mentioned", "Not Mentioned", "CNN based on U-Net"],
+      ["26", "Wu et al., 2021", "USA", "Single Center", "30", "Not Mentioned", "Not Mentioned", "MobileNetV2, SSD"],
+      ["27", "Xie et al., 2020", "China", "Multi Center", "96", "SSR:64/96, SRF:32/96", "AUC_LR=0.986", "Logistic Regression"],
+      ["28", "Chen et al., 2021", "China", "Single Center", "45", "SSR:24/45, SRF:21/45", "AUC_LR=0.82", "Logistic Regression"],
+      ["29", "Pavan-Jukic et al., 2020", "Slovenia and Croatia", "Single Center", "62", "SSR:31/62, SRF:31/62", "Not Mentioned", "Logistic Regression"],
+      ["30", "Maglia et al., 2018", "Italy", "Single Center", "145 (m-TESE:49)", "SSR:24/49, SRF:25/49", "Not Mentioned", "Logistic Regression"],
+      ["31", "Amer et al., 2019", "Egypt", "Single Center", "1395", "SSR:450/1395, SRF:945/1395", "AUC_LR=0.682", "Logistic Regression"],
+      ["32", "Caroppo et al., 2019", "Italy", "Single Center", "143", "SSR:79/143, SRF:64/143", "AUC_LR=0.93", "Logistic Regression"],
+      ["33", "Salehi et al., 2017", "Iran", "Single Center", "170", "SSR:83/170, SRF:87/170", "Not Mentioned", "Logistic Regression"],
+      ["34", "Klami et al., 2018", "Finland", "Not Mentioned", "100", "SSR:42/100, SRF:58/100", "Not Mentioned", "Logistic Regression"],
+      ["35", "Althakafi et al., 2017", "Saudi Arabia", "Multi Center", "421", "SRR:166/421, SRF:255/421", "Not Mentioned", "Logistic Regression"],
+      ["36", "Cissen et al., 2016", "Netherland", "Multi Center", "1371", "SSR:599/1371, SRF:772/1371", "AUC_LR=0.65", "Logistic Regression"],
+      ["37", "Franco et al., 2016", "Italy", "Single Center", "64", "SSR:18/64, SRF:46/64", "Not Mentioned", "Logistic Regression"],
+      ["38", "Enatsu et al., 2016", "Japan", "Single Center", "329", "SSR:97/329, SRF:232/329", "Not Mentioned", "Logistic Regression"],
+      ["39", "Modarresi et al., 2015", "Iran", "Single Center", "148", "SSR:35/148, SRF:113/148", "AUC_LR=0.68", "Logistic Regression"],
+      ["40", "Ramasamy et al., 2013", "USA", "Single Center", "1026", "Not Mentioned", "AUC_ANN=0.59", "ANN, Logistic Regression"]
+    ]
+  },
+  "table2": {
+    "title": "Table 2: Studies employed AI techniques to predict success in salvage m-TESE patients with NOA",
+    "columns": ["#", "Author(s) and Year", "Country", "No. Center", "Sample Size", "Success Rate", "AUC_best", "Machine Learning Method"],
+    "rows": [
+      ["1", "Boeri et al., 2022", "Italy", "Single Center", "61", "SSR:30/61, SRF:31/61", "Not Mentioned", "Logistic Regression"],
+      ["2", "Ghalayini et al., 2022", "Jordan", "Single Center", "134 (88+61+40 men, 2-4 retrievals)", "SSR2:65/88, SRF2:23/88, SSR3:53/61, SRF3:8/61, SSR4:37/40, SRF4:3/40", "Not Mentioned", "Logistic Regression"],
+      ["3", "Caroppo et al., 2021", "Italy", "Single Center", "79", "SSR:30/79, SRF:49/79", "AUC_LR=0.8104", "Logistic Regression"],
+      ["4", "Yücel et al., 2018", "Turkey", "Single Center", "49", "SSR:21/49, SRF:28/49", "Not Mentioned", "Logistic Regression"],
+      ["5", "Xu et al., 2017", "China", "Single Center", "52", "SSR:20/52, SRF:32/52", "Not Mentioned", "Logistic Regression"]
+    ]
+  },
+  "table3": {
+    "title": "Table 3: NOA patients Biomarkers driven from studies for success prediction in m-TESE treatment using AI methods",
+    "description": "Large table with columns: #, Author(s) and Year, Clinical variables, Hormonal variables, Genetics/micro-RNA/Proteins, Histopathology, Importance variable. Contains detailed biomarker data for 8 studies.",
+    "note": "Table 3 is very large with nested multi-line cells. Render it as a responsive scrollable HTML table."
+  }
+}

@@ -10,6 +10,7 @@ export default function Footer() {
           <Link href="/phase/validation" className="hover:text-primary">Validation</Link>
           <Link href="/phase/xai" className="hover:text-primary">XAI</Link>
           <Link href="/cdss" className="hover:text-primary">CDSS</Link>
+          <Link href="/publications" className="hover:text-primary">Publications</Link>
           <Link href="/references" className="hover:text-primary">References</Link>
         </div>
         <p className="text-xs">Developed by Hossein Jamalirad, PhD Candidate of Medical Informatics in Medical University @ MUMS-2026</p>
