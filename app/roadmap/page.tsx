@@ -7,11 +7,13 @@ const RoadmapGraph = dynamic(() => import('./roadmap-graph'), { ssr: false })
 
 export default function RoadmapPage() {
   return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen bg-[#0a0a0a] text-white">
-        <p>Loading mind map…</p>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
+          <p className="text-sm">Loading roadmap…</p>
+        </div>
+      }
+    >
       <RoadmapGraph />
     </Suspense>
   )
