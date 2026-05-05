@@ -1,0 +1,816 @@
+{
+  "title": "Impact of Histopathological Feature Encoding on Machine Learning Prediction of Sperm Retrieval in Micro-TESE for Non-Obstructive Azoospermia: A Comparative Analysis of 16 Encoding Strategies",
+  "authors": "Hossein Jamalirad, Marjan Sabbaghian, Hassan Vakili Arki",
+  "abstract": "Background: Non-obstructive azoospermia (NOA) affects approximately 10% of infertile men and represents the most severe form of male infertility. Microsurgical testicular sperm extraction (micro-TESE) is the gold standard for sperm retrieval, yet success rates vary widely (40-60%). While machine learning (ML) approaches have shown promise in predicting micro-TESE outcomes, the impact of histopathological feature encoding strategies on model performance has not been systematically investigated. Methods: We performed a retrospective analysis of 2,413 NOA patients who underwent micro-TESE at Royan Institute, Tehran, Iran. Sixteen encoding strategies for bilateral testicular biopsy histopathological features were designed and evaluated across five ML classifiers using 5×5 nested cross-validation with 50-iteration randomized hyperparameter search per fold. Results: The ordinal_detailed_plus_raw encoding strategy, which combines per-testis ordinal severity scores with 16 raw histopathological percentage features, achieved optimal performance. CatBoost attained the highest AUC of 0.8306 (bootstrap 95% CI: 0.813–0.846), with sensitivity of 0.678, specificity of 0.822, and F1 of 0.658. SHAP analysis revealed that 17 of 25 top features were pathology-derived, with right testicular severe hypospermatogenesis percentage being the single most influential predictor. Conclusion: Systematic encoding of histopathological features substantially impacts ML-based prediction of sperm retrieval in micro-TESE. The proposed ordinal encoding with raw feature preservation achieves state-of-the-art prediction performance and provides clinically interpretable feature attributions.",
+  "key_results_summary": "The ordinal_detailed_plus_raw encoding strategy achieved the best CatBoost AUC of 0.8306 (95% CI: 0.813–0.846), significantly outperforming other encoding approaches. SHAP analysis showed 17 of 25 top features were pathology-derived, with right testicular severe hypospermatogenesis being most influential. Clinical-only baseline achieved near-chance AUC (0.5642), confirming the critical importance of histopathological features.",
+  "tables": [
+    {
+      "table_name": "Table 1. Baseline Patient Characteristics (n=2,413)",
+      "headers": [
+        "Variable",
+        "Value"
+      ],
+      "rows": [
+        [
+          "Demographics",
+          ""
+        ],
+        [
+          "Total patients, n",
+          "2,413"
+        ],
+        [
+          "Age, years (missing data acknowledged)",
+          "Available for subset"
+        ],
+        [
+          "Partner age, years (8.6% missing)",
+          "Available for subset"
+        ],
+        [
+          "BMI, kg/m² (64.1% missing)",
+          "Available for subset"
+        ],
+        [
+          "Hormonal Profile",
+          ""
+        ],
+        [
+          "FSH, mIU/mL (22.2% missing)",
+          "Available for imputed analysis"
+        ],
+        [
+          "LH, mIU/mL (25.1% missing)",
+          "Available for imputed analysis"
+        ],
+        [
+          "Testosterone, ng/dL (22.6% missing)",
+          "Available for imputed analysis"
+        ],
+        [
+          "Prolactin, ng/mL (40.4% missing)",
+          "Available for imputed analysis"
+        ],
+        [
+          "E2, pg/mL (41.6% missing)",
+          "Available for imputed analysis"
+        ],
+        [
+          "Genetic Factors",
+          ""
+        ],
+        [
+          "Karyotype available, n (%)",
+          "923 (38.3%)"
+        ],
+        [
+          "Y-microdeletion tested, n (%)",
+          "922 (38.2%)"
+        ],
+        [
+          "Histopathological Patterns (RT)",
+          ""
+        ],
+        [
+          "SCO present, n (%)",
+          "1,233 (51.1%)"
+        ],
+        [
+          "CSTH present, n (%)",
+          "675 (28.0%)"
+        ],
+        [
+          "MA (any stage) present, n (%)",
+          "985 (40.8%)"
+        ],
+        [
+          "Hypospermatogenesis present, n (%)",
+          "102 (4.2%)"
+        ],
+        [
+          "Severe hypospermatogenesis present, n (%)",
+          "257 (10.6%)"
+        ],
+        [
+          "Surgical History",
+          ""
+        ],
+        [
+          "Primary micro-TESE, n (%)",
+          "2,203 (91.3%)"
+        ],
+        [
+          "Salvage micro-TESE, n (%)",
+          "210 (8.7%)"
+        ],
+        [
+          "Outcome",
+          ""
+        ],
+        [
+          "Successful sperm retrieval, n (%)",
+          "886 (36.7%)"
+        ],
+        [
+          "Unsuccessful sperm retrieval, n (%)",
+          "1,527 (63.3%)"
+        ]
+      ]
+    },
+    {
+      "table_name": "Table 2. Comparison of 16 Encoding Strategies (CatBoost AUC)",
+      "headers": [
+        "Rank",
+        "Encoding Strategy",
+        "# Features",
+        "CatBoost AUC"
+      ],
+      "rows": [
+        [
+          "1",
+          "ordinal_detailed_plus_raw",
+          "18",
+          "0.8208"
+        ],
+        [
+          "2",
+          "raw_pct_minmax",
+          "16",
+          "0.8194"
+        ],
+        [
+          "3",
+          "raw_pct_robust",
+          "16",
+          "0.8194"
+        ],
+        [
+          "4",
+          "raw_pct_avg",
+          "8",
+          "0.8179"
+        ],
+        [
+          "5",
+          "binary_presence_avg",
+          "8",
+          "0.8163"
+        ],
+        [
+          "6",
+          "grouped_avg",
+          "4",
+          "0.8073"
+        ],
+        [
+          "7",
+          "binary_presence",
+          "16",
+          "0.8041"
+        ],
+        [
+          "8",
+          "grouped",
+          "8",
+          "0.8041"
+        ],
+        [
+          "9",
+          "raw_pct_worst",
+          "8",
+          "0.7920"
+        ],
+        [
+          "10",
+          "binary_presence_worst",
+          "8",
+          "0.7797"
+        ],
+        [
+          "11",
+          "grouped_worst",
+          "4",
+          "0.7772"
+        ],
+        [
+          "12",
+          "ordinal_simplified",
+          "2",
+          "0.7502"
+        ],
+        [
+          "13",
+          "ordinal_detailed",
+          "2",
+          "0.7382"
+        ],
+        [
+          "14",
+          "ordinal_detailed_worst",
+          "1",
+          "0.7218"
+        ],
+        [
+          "15",
+          "dominant_pattern",
+          "18",
+          "0.7346"
+        ],
+        [
+          "16",
+          "ordinal_detailed_avg",
+          "1",
+          "0.7129"
+        ]
+      ]
+    },
+    {
+      "table_name": "Table 3. Model Performance Comparison (5×5 Nested CV, ordinal_detailed_plus_raw Encoding)",
+      "headers": [
+        "Model",
+        "AUC (95% CI)",
+        "Accuracy",
+        "Sensitivity",
+        "Specificity",
+        "F1",
+        "MCC"
+      ],
+      "rows": [
+        [
+          "CatBoost",
+          "0.8306 (0.813–0.846)",
+          "0.7696",
+          "0.6783",
+          "0.8225",
+          "0.6838",
+          "0.5040"
+        ],
+        [
+          "XGBoost",
+          "0.8214 (0.814–0.835)",
+          "0.7580",
+          "0.6693",
+          "0.8094",
+          "0.6689",
+          "0.4801"
+        ],
+        [
+          "LightGBM",
+          "0.8213 (0.809–0.836)",
+          "0.7551",
+          "0.6806",
+          "0.7984",
+          "0.6709",
+          "0.4790"
+        ],
+        [
+          "Random Forest",
+          "0.8157 (0.809–0.829)",
+          "0.7472",
+          "0.6941",
+          "0.7780",
+          "0.6685",
+          "0.4660"
+        ],
+        [
+          "Logistic Regression",
+          "0.7926 (0.777–0.804)",
+          "0.7348",
+          "0.6592",
+          "0.7787",
+          "0.6458",
+          "0.4356"
+        ]
+      ]
+    },
+    {
+      "table_name": "Table 4. Top 25 Features by Mean |SHAP| Value (CatBoost)",
+      "headers": [
+        "Rank",
+        "Feature",
+        "Mean |SHAP|",
+        "Category"
+      ],
+      "rows": [
+        [
+          "1",
+          "RT_Severe_Hypospermatogenesis_pct",
+          "0.3958",
+          "Pathology"
+        ],
+        [
+          "2",
+          "RT_Hypospermatogenesis_pct",
+          "0.2007",
+          "Pathology"
+        ],
+        [
+          "3",
+          "LT_Severe_Hypospermatogenesis_pct",
+          "0.1590",
+          "Pathology"
+        ],
+        [
+          "4",
+          "RT_MA_Spermatocytic_pct",
+          "0.1473",
+          "Pathology"
+        ],
+        [
+          "5",
+          "LT_severity",
+          "0.1308",
+          "Pathology (engineered)"
+        ],
+        [
+          "6",
+          "LT_SCO_pct",
+          "0.1099",
+          "Pathology"
+        ],
+        [
+          "7",
+          "RT_SCO_pct",
+          "0.0898",
+          "Pathology"
+        ],
+        [
+          "8",
+          "RT_severity",
+          "0.0855",
+          "Pathology (engineered)"
+        ],
+        [
+          "9",
+          "RT_MA_Elongated_pct",
+          "0.0672",
+          "Pathology"
+        ],
+        [
+          "10",
+          "Habits_(blank)",
+          "0.0663",
+          "Lifestyle"
+        ],
+        [
+          "11",
+          "Karyotype_Klinefelter",
+          "0.0612",
+          "Genetic"
+        ],
+        [
+          "12",
+          "LT_MA_Spermatocytic_pct",
+          "0.0606",
+          "Pathology"
+        ],
+        [
+          "13",
+          "LT_Hypospermatogenesis_pct",
+          "0.0565",
+          "Pathology"
+        ],
+        [
+          "14",
+          "Seminal plasma pH",
+          "0.0550",
+          "Semen"
+        ],
+        [
+          "15",
+          "RT_TestisSize_Sono_Vol",
+          "0.0501",
+          "Testicular"
+        ],
+        [
+          "16",
+          "RT_CSTH_pct",
+          "0.0308",
+          "Pathology"
+        ],
+        [
+          "17",
+          "Sakamoto-RT/mL",
+          "0.0268",
+          "Testicular"
+        ],
+        [
+          "18",
+          "LT_TestisSize_Sono_Vol",
+          "0.0205",
+          "Testicular"
+        ],
+        [
+          "19",
+          "RT_MA_Spermatogonial_pct",
+          "0.0188",
+          "Pathology"
+        ],
+        [
+          "20",
+          "FSH",
+          "0.0180",
+          "Hormonal"
+        ],
+        [
+          "21",
+          "LT_MA_Spermatogonial_pct",
+          "0.0173",
+          "Pathology"
+        ],
+        [
+          "22",
+          "Sakamoto-LT/mL",
+          "0.0172",
+          "Testicular"
+        ],
+        [
+          "23",
+          "Prolactin",
+          "0.0164",
+          "Hormonal"
+        ],
+        [
+          "24",
+          "Partner Age",
+          "0.0161",
+          "Demographic"
+        ],
+        [
+          "25",
+          "LT_Volume_Unified",
+          "0.0152",
+          "Testicular"
+        ]
+      ]
+    }
+  ],
+  "tripod_ai_checklist": {
+    "items": [
+      {
+        "section": "1",
+        "item": "1",
+        "description": "Title identifies as prediction model study",
+        "status": "Yes",
+        "location": "Title page"
+      },
+      {
+        "section": "2",
+        "item": "2",
+        "description": "Structured abstract",
+        "status": "Yes",
+        "location": "Abstract"
+      },
+      {
+        "section": "3a",
+        "item": "3a",
+        "description": "Background and rationale",
+        "status": "Yes",
+        "location": "Introduction"
+      },
+      {
+        "section": "3b",
+        "item": "3b",
+        "description": "Objectives",
+        "status": "Yes",
+        "location": "Introduction"
+      },
+      {
+        "section": "4a",
+        "item": "4a",
+        "description": "Source of data",
+        "status": "Yes",
+        "location": "Methods 2.1"
+      },
+      {
+        "section": "4b",
+        "item": "4b",
+        "description": "Key dates",
+        "status": "Yes",
+        "location": "Methods 2.1"
+      },
+      {
+        "section": "5a",
+        "item": "5a",
+        "description": "Study population",
+        "status": "Yes",
+        "location": "Methods 2.2"
+      },
+      {
+        "section": "5b",
+        "item": "5b",
+        "description": "Eligibility criteria",
+        "status": "Yes",
+        "location": "Methods 2.2"
+      },
+      {
+        "section": "6a",
+        "item": "6a",
+        "description": "Outcome definition",
+        "status": "Yes",
+        "location": "Methods 2.3"
+      },
+      {
+        "section": "6b",
+        "item": "6b",
+        "description": "Predictors definition",
+        "status": "Yes",
+        "location": "Methods 2.3–2.4"
+      },
+      {
+        "section": "7a",
+        "item": "7a",
+        "description": "Sample size",
+        "status": "Yes",
+        "location": "Methods 2.2, Results 3.1"
+      },
+      {
+        "section": "7b",
+        "item": "7b",
+        "description": "Missing data handling",
+        "status": "Yes",
+        "location": "Methods 2.5"
+      },
+      {
+        "section": "8",
+        "item": "8",
+        "description": "Model development",
+        "status": "Yes",
+        "location": "Methods 2.6–2.7"
+      },
+      {
+        "section": "9",
+        "item": "9",
+        "description": "Model specification",
+        "status": "Yes",
+        "location": "Methods 2.6, Results 3.3"
+      },
+      {
+        "section": "10a",
+        "item": "10a",
+        "description": "Internal validation",
+        "status": "Yes",
+        "location": "Methods 2.7"
+      },
+      {
+        "section": "10b",
+        "item": "10b",
+        "description": "External validation",
+        "status": "N/A",
+        "location": "Limitations"
+      },
+      {
+        "section": "11",
+        "item": "11",
+        "description": "Performance measures with CI",
+        "status": "Yes",
+        "location": "Results 3.3"
+      },
+      {
+        "section": "12",
+        "item": "12",
+        "description": "Model updating",
+        "status": "N/A",
+        "location": "Not applicable"
+      },
+      {
+        "section": "13",
+        "item": "13",
+        "description": "Interpretability/explainability",
+        "status": "Yes",
+        "location": "Methods 2.9, Results 3.6"
+      },
+      {
+        "section": "14a",
+        "item": "14a",
+        "description": "Risk of bias assessment",
+        "status": "Yes",
+        "location": "Methods 2.12"
+      },
+      {
+        "section": "14b",
+        "item": "14b",
+        "description": "Reporting guideline adherence",
+        "status": "Yes",
+        "location": "Methods 2.11"
+      },
+      {
+        "section": "15",
+        "item": "15",
+        "description": "Limitations",
+        "status": "Yes",
+        "location": "Discussion"
+      },
+      {
+        "section": "16",
+        "item": "16",
+        "description": "Implications",
+        "status": "Yes",
+        "location": "Discussion"
+      },
+      {
+        "section": "17",
+        "item": "17",
+        "description": "Data and code availability",
+        "status": "Yes",
+        "location": "Data Availability"
+      },
+      {
+        "section": "18",
+        "item": "18",
+        "description": "Supplementary information",
+        "status": "Yes",
+        "location": "Supplementary"
+      },
+      {
+        "section": "19",
+        "item": "19",
+        "description": "Funding statement",
+        "status": "Yes",
+        "location": "Conflict of Interest"
+      },
+      {
+        "section": "20",
+        "item": "20",
+        "description": "AI-specific: model type described",
+        "status": "Yes",
+        "location": "Methods 2.6"
+      },
+      {
+        "section": "21",
+        "item": "21",
+        "description": "AI-specific: hyperparameter tuning",
+        "status": "Yes",
+        "location": "Methods 2.7"
+      },
+      {
+        "section": "22",
+        "item": "22",
+        "description": "AI-specific: software/packages",
+        "status": "Yes",
+        "location": "Methods 2.10"
+      },
+      {
+        "section": "23",
+        "item": "23",
+        "description": "AI-specific: feature importance",
+        "status": "Yes",
+        "location": "Results 3.6"
+      },
+      {
+        "section": "24",
+        "item": "24",
+        "description": "AI-specific: fairness considerations",
+        "status": "Yes",
+        "location": "Methods 2.6"
+      },
+      {
+        "section": "25",
+        "item": "25",
+        "description": "AI-specific: calibration",
+        "status": "Yes",
+        "location": "Discussion"
+      },
+      {
+        "section": "26",
+        "item": "26",
+        "description": "AI-specific: decision curve analysis",
+        "status": "Yes",
+        "location": "Discussion"
+      },
+      {
+        "section": "27",
+        "item": "27",
+        "description": "AI-specific: reproducibility",
+        "status": "Yes",
+        "location": "Results 3.7"
+      }
+    ]
+  },
+  "probast_assessment": {
+    "domains": [
+      {
+        "domain": "1. Participants",
+        "signaling_question": "Appropriate data source?",
+        "risk_of_bias": "Low risk",
+        "justification": "Consecutive cohort at tertiary center"
+      },
+      {
+        "domain": "",
+        "signaling_question": "Appropriate inclusion/exclusion?",
+        "risk_of_bias": "Low risk",
+        "justification": "Clear NOA criteria, minimal exclusions (1.5%)"
+      },
+      {
+        "domain": "",
+        "signaling_question": "Adequate study population?",
+        "risk_of_bias": "Low risk",
+        "justification": "n=2,413; adequate for model complexity"
+      },
+      {
+        "domain": "2. Predictors",
+        "signaling_question": "Defined clearly?",
+        "risk_of_bias": "Low risk",
+        "justification": "Standardized clinical measurements"
+      },
+      {
+        "domain": "",
+        "signaling_question": "Assessed without outcome knowledge?",
+        "risk_of_bias": "Low risk",
+        "justification": "Retrospective; predictors precede surgery"
+      },
+      {
+        "domain": "",
+        "signaling_question": "Available at intended time?",
+        "risk_of_bias": "Low risk",
+        "justification": "All preoperative features"
+      },
+      {
+        "domain": "",
+        "signaling_question": "Handled appropriately?",
+        "risk_of_bias": "Low risk",
+        "justification": "Systematic NLP extraction, 16 strategies"
+      },
+      {
+        "domain": "3. Outcome",
+        "signaling_question": "Defined clearly?",
+        "risk_of_bias": "Low risk",
+        "justification": "Binary sperm retrieval (objective)"
+      },
+      {
+        "domain": "",
+        "signaling_question": "Assessed without predictor knowledge?",
+        "risk_of_bias": "Low risk",
+        "justification": "Surgical outcome independent of pre-op data"
+      },
+      {
+        "domain": "",
+        "signaling_question": "Appropriate time interval?",
+        "risk_of_bias": "Low risk",
+        "justification": "Immediate intraoperative assessment"
+      },
+      {
+        "domain": "4. Analysis",
+        "signaling_question": "Adequate sample size?",
+        "risk_of_bias": "Low risk",
+        "justification": "EPV > 10; adequate for nested CV"
+      },
+      {
+        "domain": "",
+        "signaling_question": "Appropriate handling of missing data?",
+        "risk_of_bias": "Low–moderate",
+        "justification": "KNN imputation; MAR assumption untested"
+      },
+      {
+        "domain": "",
+        "signaling_question": "Appropriate feature selection?",
+        "risk_of_bias": "Low risk",
+        "justification": "Domain-informed; 16 encodings compared"
+      },
+      {
+        "domain": "",
+        "signaling_question": "Model evaluation appropriate?",
+        "risk_of_bias": "Low risk",
+        "justification": "5×5 nested CV; bootstrap CIs"
+      },
+      {
+        "domain": "",
+        "signaling_question": "Accounting for model complexity?",
+        "risk_of_bias": "Low risk",
+        "justification": "Regularization; Bayesian hyperparameter search"
+      },
+      {
+        "domain": "",
+        "signaling_question": "Overfitting addressed?",
+        "risk_of_bias": "Low risk",
+        "justification": "Nested CV prevents information leakage"
+      },
+      {
+        "domain": "Overall",
+        "signaling_question": "",
+        "risk_of_bias": "Low–moderate",
+        "justification": "Single-center; no external validation"
+      }
+    ],
+    "overall_risk": "Low",
+    "overall_applicability": "Low (single-center; requires external validation)"
+  },
+  "figures": [
+    {
+      "figure_name": "Figure 1",
+      "description": "Encoding strategy comparison showing AUC performance of 16 encoding strategies across CatBoost. Ordinal_detailed_plus_raw achieves highest AUC (0.8208 in screening)."
+    },
+    {
+      "figure_name": "Figure 2",
+      "description": "Model performance comparison across 5 classifiers using the optimal ordinal_detailed_plus_raw encoding."
+    },
+    {
+      "figure_name": "Figure 3",
+      "description": "SHAP summary plot showing top 25 features by mean absolute SHAP value for CatBoost, with pathology features dominating."
+    },
+    {
+      "figure_name": "Figure 4",
+      "description": "Pipeline v1 vs v2 performance comparison showing AUC improvement from 0.7327 to 0.8306 after quality assurance corrections."
+    }
+  ]
+}

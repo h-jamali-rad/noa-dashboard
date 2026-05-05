@@ -23,7 +23,7 @@ import {
   ScrollText,
   Server,
   Map,
-  FileText,
+  Newspaper,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -56,11 +56,11 @@ const EXTRA_NAV: NavItem[] = [
   { href: '/virtual-defense', label: 'Virtual Defense', icon: Presentation, description: '4 expert panels with votes and critiques' },
   { href: '/post-defense-actions', label: 'Post-Defense Actions', icon: ClipboardList, description: 'Corrective actions log' },
   { href: '/cdss', label: 'CDSS', icon: Stethoscope, description: 'Video + client-side prediction form' },
-  { href: '/publications', label: 'Publications', icon: FileText, description: 'Oxford article + scoping review tables' },
+  { href: '/articles', label: 'Articles', icon: Newspaper, description: 'Published & in-preparation manuscripts' },
   { href: '/novelty-comparison', label: 'Novelty Comparison', icon: GitCompare, description: 'Hossein vs prior literature' },
   { href: '/references', label: 'References', icon: ScrollText, description: 'Static numbered bibliography' },
   { href: '/hardware-specs', label: 'Hardware Specs', icon: Server, description: 'GPU / CPU / RAM infrastructure' },
-  { href: '/roadmap', label: 'Roadmap', icon: Map, description: '3D interactive project mind map' },
+  { href: '/roadmap', label: 'نقشه راه پروژه — Roadmap', icon: Map, description: '3D interactive project mind map' },
 ]
 
 export default function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {

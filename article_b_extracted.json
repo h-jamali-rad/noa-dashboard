@@ -1,0 +1,705 @@
+{
+  "title": "Development and Internal Validation of an Explainable Clinical Decision Support System for Predicting Micro-TESE Outcomes in Non-Obstructive Azoospermia: A Multi-Agent AI-Assisted Approach",
+  "authors": "Hossein Jamalirad, Marjan Sabbaghian, Hassan Vakili Arki",
+  "abstract": "Background: Non-obstructive azoospermia (NOA) affects approximately 1% of men worldwide and represents the most severe form of male infertility. Microsurgical testicular sperm extraction (micro-TESE) is the treatment of choice, yet success rates remain unpredictable. Clinical decision support systems (CDSSs) could improve clinical decision-making, but existing ML models lack systematic quality assurance. Methods: We conducted a retrospective cohort study of 2,413 patients with confirmed NOA who underwent micro-TESE at Royan Institute, Tehran, Iran. A total of 18 histopathological features were engineered from bilateral testicular biopsy reports. Five ML models were evaluated using 5×5 nested cross-validation. A novel multi-agent AI verification pipeline was employed for quality assurance. Results: CatBoost achieved the highest discriminative performance with a mean outer-fold AUC of 0.8306 (bootstrap 95% CI: 0.8130–0.8462), sensitivity of 0.6784, specificity of 0.8220, and F1 score of 0.6582. The multi-agent verification pipeline identified and corrected 9 critical bugs in the initial pipeline, improving AUC by 0.098 points. Conclusion: We developed and internally validated an explainable CDSS for predicting micro-TESE outcomes in NOA, supported by the largest ML-focused cohort reported to date and a novel multi-agent verification approach.",
+  "key_results_summary": "CatBoost achieved AUC 0.8306 (95% CI: 0.8130–0.8462) in the largest ML-focused NOA cohort (n=2,413). The multi-agent verification pipeline identified 9 critical bugs improving AUC by 0.098 points. An explainable CDSS prototype was developed as a stateless web application with SHAP-based explanations for clinical use.",
+  "tables": [
+    {
+      "table_name": "Table 1. Patient Demographics and Clinical Characteristics (N=2,413)",
+      "headers": [
+        "Characteristic",
+        "Value"
+      ],
+      "rows": [
+        [
+          "Total patients",
+          "2,413"
+        ],
+        [
+          "Successful sperm retrieval, n (%)",
+          "886 (36.7%)"
+        ],
+        [
+          "Unsuccessful sperm retrieval, n (%)",
+          "1,527 (63.3%)"
+        ],
+        [
+          "Prevalence of successful retrieval",
+          "0.367"
+        ],
+        [
+          "Class imbalance ratio (failure:success)",
+          "1.72:1"
+        ],
+        [
+          "Primary micro-TESE, n (%)",
+          "2,203 (91.2%)"
+        ],
+        [
+          "Success rate",
+          "32.5%"
+        ],
+        [
+          "Salvage micro-TESE, n (%)",
+          "210 (8.8%)"
+        ],
+        [
+          "Success rate",
+          "80.5%"
+        ],
+        [
+          "Ethnicity: Iranian, n (%)",
+          "2,100 (87.0%)"
+        ],
+        [
+          "Ethnicity: Afghan, n (%)",
+          "251 (10.4%)"
+        ],
+        [
+          "Ethnicity: Iraqi, n (%)",
+          "48 (2.0%)"
+        ],
+        [
+          "FSH — missing",
+          "22.2%"
+        ],
+        [
+          "LH — missing",
+          "25.1%"
+        ],
+        [
+          "Testosterone — missing",
+          "22.6%"
+        ],
+        [
+          "Prolactin — missing",
+          "40.4%"
+        ],
+        [
+          "Estradiol — missing",
+          "41.6%"
+        ],
+        [
+          "Karyotype — missing",
+          "62.3%"
+        ],
+        [
+          "Y chromosome microdeletion — missing",
+          "62.4%"
+        ],
+        [
+          "BMI — missing",
+          "64.1%"
+        ],
+        [
+          "Total features (original)",
+          "55"
+        ],
+        [
+          "Engineered pathology features",
+          "18"
+        ],
+        [
+          "Total features after engineering",
+          "73"
+        ],
+        [
+          "Features in final model",
+          "45"
+        ]
+      ]
+    },
+    {
+      "table_name": "Table 2. Model Performance Comparison Using 5×5 Nested Cross-Validation",
+      "headers": [
+        "Model",
+        "AUC (95% CI)",
+        "Accuracy",
+        "Sensitivity",
+        "Specificity",
+        "F1",
+        "PPV",
+        "NPV",
+        "MCC"
+      ],
+      "rows": [
+        [
+          "CatBoost*",
+          "0.8306 (0.8130–0.8462)",
+          "0.7693",
+          "0.6784",
+          "0.8220",
+          "0.6832",
+          "0.6883",
+          "0.8152",
+          "0.5019"
+        ],
+        [
+          "XGBoost",
+          "0.8214 (0.8139–0.8345)",
+          "0.7580",
+          "0.6693",
+          "0.8094",
+          "0.6689",
+          "—",
+          "—",
+          "0.4801"
+        ],
+        [
+          "LightGBM",
+          "0.8213 (0.8094–0.8363)",
+          "0.7551",
+          "0.6806",
+          "0.7984",
+          "0.6709",
+          "—",
+          "—",
+          "0.4790"
+        ],
+        [
+          "RandomForest",
+          "0.8157 (0.8086–0.8286)",
+          "0.7472",
+          "0.6941",
+          "0.7780",
+          "0.6685",
+          "—",
+          "—",
+          "0.4660"
+        ],
+        [
+          "Logistic Reg.",
+          "0.7926 (0.7771–0.8041)",
+          "0.7348",
+          "0.6592",
+          "0.7787",
+          "0.6458",
+          "—",
+          "—",
+          "0.4356"
+        ]
+      ]
+    },
+    {
+      "table_name": "Table 3. Calibration Assessment: 10-Bin Quantile Calibration of CatBoost",
+      "headers": [
+        "Bin",
+        "Mean Predicted Probability",
+        "Observed Fraction Positive",
+        "|Deviation|"
+      ],
+      "rows": [
+        [
+          "1",
+          "0.104",
+          "0.058",
+          "0.046"
+        ],
+        [
+          "2",
+          "0.181",
+          "0.100",
+          "0.081"
+        ],
+        [
+          "3",
+          "0.249",
+          "0.154",
+          "0.095"
+        ],
+        [
+          "4",
+          "0.298",
+          "0.174",
+          "0.124"
+        ],
+        [
+          "5",
+          "0.346",
+          "0.264",
+          "0.082"
+        ],
+        [
+          "6",
+          "0.407",
+          "0.320",
+          "0.087"
+        ],
+        [
+          "7",
+          "0.483",
+          "0.336",
+          "0.147"
+        ],
+        [
+          "8",
+          "0.580",
+          "0.560",
+          "0.020"
+        ],
+        [
+          "9",
+          "0.786",
+          "0.780",
+          "0.006"
+        ],
+        [
+          "10",
+          "0.904",
+          "0.926",
+          "0.022"
+        ],
+        [
+          "",
+          "",
+          "Mean |deviation|",
+          "0.071"
+        ]
+      ]
+    },
+    {
+      "table_name": "Table 4. Top 15 Predictive Features Ranked by Mean Absolute SHAP Value",
+      "headers": [
+        "Rank",
+        "Feature",
+        "Mean |SHAP|",
+        "Category",
+        "Direction"
+      ],
+      "rows": [
+        [
+          "1",
+          "RT Severe Hypospermatogenesis %",
+          "0.3958",
+          "Pathology",
+          "Higher → ↑ retrieval"
+        ],
+        [
+          "2",
+          "RT Hypospermatogenesis %",
+          "0.2007",
+          "Pathology",
+          "Higher → ↑ retrieval"
+        ],
+        [
+          "3",
+          "LT Severe Hypospermatogenesis %",
+          "0.1590",
+          "Pathology",
+          "Higher → ↑ retrieval"
+        ],
+        [
+          "4",
+          "RT MA Spermatocytic %",
+          "0.1473",
+          "Pathology",
+          "Context-dependent"
+        ],
+        [
+          "5",
+          "LT Severity Score",
+          "0.1308",
+          "Pathology (ordinal)",
+          "Higher → ↑ retrieval"
+        ],
+        [
+          "6",
+          "LT SCO %",
+          "0.1099",
+          "Pathology",
+          "Higher → ↓ retrieval"
+        ],
+        [
+          "7",
+          "RT SCO %",
+          "0.0898",
+          "Pathology",
+          "Higher → ↓ retrieval"
+        ],
+        [
+          "8",
+          "RT Severity Score",
+          "0.0855",
+          "Pathology (ordinal)",
+          "Higher → ↑ retrieval"
+        ],
+        [
+          "9",
+          "RT MA Elongated %",
+          "0.0672",
+          "Pathology",
+          "Higher → ↑ retrieval"
+        ],
+        [
+          "10",
+          "Habits",
+          "0.0663",
+          "Lifestyle",
+          "Context-dependent"
+        ],
+        [
+          "11",
+          "Klinefelter Status",
+          "0.0612",
+          "Genetic",
+          "Present → ↓ retrieval"
+        ],
+        [
+          "12",
+          "LT MA Spermatocytic %",
+          "0.0606",
+          "Pathology",
+          "Context-dependent"
+        ],
+        [
+          "13",
+          "LT Hypospermatogenesis %",
+          "0.0565",
+          "Pathology",
+          "Higher → ↑ retrieval"
+        ],
+        [
+          "14",
+          "Seminal Plasma pH",
+          "0.0550",
+          "Semen",
+          "Context-dependent"
+        ],
+        [
+          "15",
+          "RT Testis Volume (Sono)",
+          "0.0501",
+          "Testicular",
+          "Higher → ↑ retrieval"
+        ]
+      ]
+    },
+    {
+      "table_name": "Table 5. Multi-Agent Verification Audit: Critical Bugs Identified and Corrected",
+      "headers": [
+        "#",
+        "Bug Description (v1)",
+        "Correction Applied (v2)",
+        "Severity"
+      ],
+      "rows": [
+        [
+          "1",
+          "IQR clipper collapsed all 16 pathology features to constant 0 (IQR=0)",
+          "IQR clipper removed; raw pathology percentages + severity scores retained",
+          "Critical"
+        ],
+        [
+          "2",
+          "Nested CV = 2×2 with 2 iterations (4 fits/fold; underpowered)",
+          "5×5 nested CV with 50 iterations (250 fits/fold)",
+          "Critical"
+        ],
+        [
+          "3",
+          "Representative params selected by argmax of outer-test AUC (data leakage)",
+          "Selected by median of inner-CV best score across folds",
+          "Critical"
+        ],
+        [
+          "4",
+          "Height & Weight included alongside BMI (collinearity)",
+          "Height & Weight dropped; BMI retained",
+          "High"
+        ],
+        [
+          "5",
+          "Hormone columns not coerced to numeric before pipeline",
+          "pd.to_numeric(errors=“coerce”) applied immediately after loading",
+          "High"
+        ],
+        [
+          "6",
+          "Preprocessing: KNNImputer → IQR clipper → StandardScaler",
+          "StandardScaler → KNNImputer (no IQR clipper)",
+          "High"
+        ],
+        [
+          "7",
+          "Hard-coded decision threshold of 0.5",
+          "Youden’s J on inner-CV out-of-fold predictions",
+          "High"
+        ],
+        [
+          "8",
+          "Fairness analysis on resubstitution predictions",
+          "Fairness computed on out-of-fold predictions only",
+          "High"
+        ],
+        [
+          "9",
+          "Race included as model feature",
+          "Race excluded; used only as protected attribute for fairness",
+          "High"
+        ]
+      ]
+    }
+  ],
+  "tripod_ai_checklist": {
+    "items": [
+      {
+        "section": "Title — Identify as prediction model study",
+        "item": "Title — Identify as prediction model study",
+        "description": "Title — Identify as prediction model study",
+        "status": "Reported",
+        "location": "Title Page"
+      },
+      {
+        "section": "Abstract — Structured with key elements",
+        "item": "Abstract — Structured with key elements",
+        "description": "Abstract — Structured with key elements",
+        "status": "Reported",
+        "location": "Abstract"
+      },
+      {
+        "section": "Background and objectives stated",
+        "item": "Background and objectives stated",
+        "description": "Background and objectives stated",
+        "status": "Reported",
+        "location": "Introduction"
+      },
+      {
+        "section": "Source of data described",
+        "item": "Source of data described",
+        "description": "Source of data described",
+        "status": "Reported",
+        "location": "Methods 4.1"
+      },
+      {
+        "section": "Participants — eligibility criteria",
+        "item": "Participants — eligibility criteria",
+        "description": "Participants — eligibility criteria",
+        "status": "Reported",
+        "location": "Methods 4.1"
+      },
+      {
+        "section": "Outcome definition and measurement",
+        "item": "Outcome definition and measurement",
+        "description": "Outcome definition and measurement",
+        "status": "Reported",
+        "location": "Methods 4.1"
+      },
+      {
+        "section": "Predictors — all candidate predictors described",
+        "item": "Predictors — all candidate predictors described",
+        "description": "Predictors — all candidate predictors described",
+        "status": "Reported",
+        "location": "Methods 4.2"
+      },
+      {
+        "section": "Sample size justification",
+        "item": "Sample size justification",
+        "description": "Sample size justification",
+        "status": "Reported (n=2,413)",
+        "location": "Methods 4.1"
+      },
+      {
+        "section": "Missing data handling described",
+        "item": "Missing data handling described",
+        "description": "Missing data handling described",
+        "status": "Reported (KNN imputation)",
+        "location": "Methods 4.4"
+      },
+      {
+        "section": "Statistical analysis / modeling methods",
+        "item": "Statistical analysis / modeling methods",
+        "description": "Statistical analysis / modeling methods",
+        "status": "Reported",
+        "location": "Methods 4.4"
+      },
+      {
+        "section": "AI-specific: model architecture described",
+        "item": "AI-specific: model architecture described",
+        "description": "AI-specific: model architecture described",
+        "status": "Reported (CatBoost)",
+        "location": "Methods 4.4"
+      },
+      {
+        "section": "AI-specific: hyperparameter tuning",
+        "item": "AI-specific: hyperparameter tuning",
+        "description": "AI-specific: hyperparameter tuning",
+        "status": "Reported (nested CV)",
+        "location": "Methods 4.4"
+      },
+      {
+        "section": "AI-specific: explainability method",
+        "item": "AI-specific: explainability method",
+        "description": "AI-specific: explainability method",
+        "status": "Reported (SHAP)",
+        "location": "Methods 4.7"
+      },
+      {
+        "section": "Model performance measures reported",
+        "item": "Model performance measures reported",
+        "description": "Model performance measures reported",
+        "status": "Reported",
+        "location": "Results 5.2"
+      },
+      {
+        "section": "Calibration assessment",
+        "item": "Calibration assessment",
+        "description": "Calibration assessment",
+        "status": "Reported",
+        "location": "Results 5.3"
+      },
+      {
+        "section": "Clinical utility (DCA)",
+        "item": "Clinical utility (DCA)",
+        "description": "Clinical utility (DCA)",
+        "status": "Reported",
+        "location": "Results 5.4"
+      },
+      {
+        "section": "Model interpretation / feature importance",
+        "item": "Model interpretation / feature importance",
+        "description": "Model interpretation / feature importance",
+        "status": "Reported",
+        "location": "Results 5.5"
+      },
+      {
+        "section": "Limitations discussed",
+        "item": "Limitations discussed",
+        "description": "Limitations discussed",
+        "status": "Reported",
+        "location": "Discussion"
+      },
+      {
+        "section": "Implications for clinical practice",
+        "item": "Implications for clinical practice",
+        "description": "Implications for clinical practice",
+        "status": "Reported",
+        "location": "Discussion"
+      },
+      {
+        "section": "Registration or protocol availability",
+        "item": "Registration or protocol availability",
+        "description": "Registration or protocol availability",
+        "status": "Not applicable",
+        "location": "N/A"
+      },
+      {
+        "section": "Code / data availability",
+        "item": "Code / data availability",
+        "description": "Code / data availability",
+        "status": "Reported",
+        "location": "Declarations"
+      },
+      {
+        "section": "AI-specific: multi-agent verification",
+        "item": "AI-specific: multi-agent verification",
+        "description": "AI-specific: multi-agent verification",
+        "status": "Reported",
+        "location": "Methods 4.8, Results 5.6"
+      }
+    ]
+  },
+  "probast_assessment": {
+    "domains": [
+      {
+        "domain": "Participants",
+        "signaling_question": "Were appropriate inclusion/exclusion criteria used?",
+        "v1_judgment": "Low risk",
+        "v2_judgment": "Low risk"
+      },
+      {
+        "domain": "Participants",
+        "signaling_question": "Were participants representative?",
+        "v1_judgment": "Low risk",
+        "v2_judgment": "Low risk"
+      },
+      {
+        "domain": "Predictors",
+        "signaling_question": "Were predictors defined and assessed appropriately?",
+        "v1_judgment": "High risk*",
+        "v2_judgment": "Low risk"
+      },
+      {
+        "domain": "Predictors",
+        "signaling_question": "Were all predictors available at time of intended use?",
+        "v1_judgment": "Low risk",
+        "v2_judgment": "Low risk"
+      },
+      {
+        "domain": "Outcome",
+        "signaling_question": "Was the outcome defined and measured appropriately?",
+        "v1_judgment": "Low risk",
+        "v2_judgment": "Low risk"
+      },
+      {
+        "domain": "Outcome",
+        "signaling_question": "Was the outcome determined without knowledge of predictors?",
+        "v1_judgment": "Low risk",
+        "v2_judgment": "Low risk"
+      },
+      {
+        "domain": "Analysis",
+        "signaling_question": "Was sample size adequate?",
+        "v1_judgment": "Low risk",
+        "v2_judgment": "Low risk"
+      },
+      {
+        "domain": "Analysis",
+        "signaling_question": "Were appropriate statistical methods used?",
+        "v1_judgment": "High risk†",
+        "v2_judgment": "Low risk"
+      },
+      {
+        "domain": "Analysis",
+        "signaling_question": "Were model-building steps appropriate?",
+        "v1_judgment": "High risk‡",
+        "v2_judgment": "Low risk"
+      },
+      {
+        "domain": "Analysis",
+        "signaling_question": "Was model performance evaluated appropriately?",
+        "v1_judgment": "High risk§",
+        "v2_judgment": "Low risk"
+      },
+      {
+        "domain": "Overall",
+        "signaling_question": "Overall risk of bias",
+        "v1_judgment": "High",
+        "v2_judgment": "Low"
+      },
+      {
+        "domain": "Applicability",
+        "signaling_question": "Applicability concern",
+        "v1_judgment": "Moderate‖",
+        "v2_judgment": "Moderate‖"
+      }
+    ],
+    "overall_risk": "Low (v2)",
+    "overall_applicability": "Low (single-center; requires external validation)"
+  },
+  "figures": [
+    {
+      "figure_name": "Figure 1",
+      "description": "CDSS system architecture showing the stateless web application with PHP 8.0 backend, CatBoost model inference, and SHAP-based explainability output."
+    },
+    {
+      "figure_name": "Figure 2",
+      "description": "Model performance comparison across 5 classifiers (CatBoost, XGBoost, LightGBM, Random Forest, Logistic Regression) showing AUC with 95% CI."
+    },
+    {
+      "figure_name": "Figure 3",
+      "description": "SHAP summary plot showing top predictive features with beeswarm visualization of feature contributions."
+    },
+    {
+      "figure_name": "Figure 4",
+      "description": "Calibration plot showing 10-bin quantile calibration of CatBoost with systematic SMOTE overestimation in low-mid probability bins."
+    },
+    {
+      "figure_name": "Figure 5",
+      "description": "Decision curve analysis showing CatBoost net benefit exceeding treat-all and treat-none strategies across threshold probabilities 0.05-0.60."
+    },
+    {
+      "figure_name": "Figure 6",
+      "description": "Multi-agent verification pipeline architecture and bug discovery timeline showing v1 to v2 improvement."
+    }
+  ]
+}
