@@ -24,6 +24,7 @@ import {
   Server,
   Map,
   Newspaper,
+  Network,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -53,6 +54,7 @@ const PHASE_NAV: NavItem[] = [
 ]
 
 const EXTRA_NAV: NavItem[] = [
+  { href: '/architecture', label: 'AI Agent Architecture', icon: Network, description: 'Interactive multi-agent DAG system' },
   { href: '/virtual-defense', label: 'Virtual Defense', icon: Presentation, description: '4 expert panels with votes and critiques' },
   { href: '/post-defense-actions', label: 'Post-Defense Actions', icon: ClipboardList, description: 'Corrective actions log' },
   { href: '/cdss', label: 'CDSS', icon: Stethoscope, description: 'Video + client-side prediction form' },

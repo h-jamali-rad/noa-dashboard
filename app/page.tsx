@@ -4,6 +4,7 @@ import { getIcon } from '@/lib/phases'
 import { StatCard } from '@/components/stat-card'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Users, Layers, Trophy, Images } from 'lucide-react'
+import { ArchitectureBanner } from '@/components/architecture/architecture-banner'
 
 async function getPhases() {
   try {
@@ -45,6 +46,9 @@ export default async function HomePage() {
         <StatCard label="Best Model" value="LightGBM" hint="AUC 0.7327 ± 0.0057" icon={Trophy} accent="#4f46e5" />
         <StatCard label="Figures" value={String(counts.imgs)} hint="Updated curated visuals" icon={Images} accent="#c026d3" />
       </section>
+
+      {/* Architecture Banner */}
+      <ArchitectureBanner />
 
       <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {phases.map((p) => {
