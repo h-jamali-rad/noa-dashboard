@@ -39,14 +39,14 @@ type NavItem = {
 
 const MAIN_NAV: NavItem[] = [
   { href: '/', label: 'Overview', icon: Home, description: 'Pipeline summary & key results' },
-  { href: '/gallery', label: 'Image Gallery', icon: Images, badge: '464', description: 'All visualisations across phases' },
-  { href: '/code', label: 'Code Library', icon: Code2, badge: '33', description: 'All Python scripts and reports' },
+  { href: '/gallery', label: 'Image Gallery', icon: Images, description: 'All visualisations across phases' },
+  { href: '/code', label: 'Code Library', icon: Code2, description: 'All Python scripts and reports' },
   { href: '/about', label: 'About', icon: Info, description: 'Project context & institutions' },
 ]
 
 const PHASE_NAV: NavItem[] = [
-  { href: '/phase/preprocessing', label: 'Agent 1 — Preprocessing', icon: Database, description: '2,450 screened → 2,413 analytical' },
-  { href: '/phase/training', label: 'Agent 2 — Training', icon: Cpu, description: '16 models • best LightGBM AUC 0.7327' },
+  { href: '/phase/preprocessing', label: 'Agent 1 — Preprocessing', icon: Database, description: '2,413 patients • 45 features • 18 pathology features' },
+  { href: '/phase/training', label: 'Agent 2 — Training', icon: Cpu, description: '16 models tested → 5 finalized • best CatBoost AUC 0.8306' },
   { href: '/phase/validation', label: 'Agent 3 — Validation', icon: ShieldCheck, description: 'Calibration + DCA + corrected benchmark' },
   { href: '/phase/xai', label: 'Agent 4 — Explainable AI', icon: BrainCircuit, description: 'SHAP + feature-importance synthesis' },
   { href: '/phase/literature', label: 'Agent 5 — Literature', icon: BookOpen, description: 'Novelty and evidence synthesis' },

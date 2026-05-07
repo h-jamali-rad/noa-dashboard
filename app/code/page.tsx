@@ -46,7 +46,7 @@ export default async function CodeIndexPage() {
         <div>
           <h1 className="font-display font-bold text-3xl tracking-tight">Code & report library</h1>
           <p className="text-sm text-muted-foreground max-w-2xl mt-1">
-            Every Python script and Markdown report produced by the 6 research agents. Use the search and filter
+            Every Python script and Markdown report produced by the pipeline agents. Use the search and filter
             controls to drill down by phase or filename, and expand any block to see syntax-highlighted source.
           </p>
         </div>

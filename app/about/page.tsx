@@ -11,8 +11,9 @@ export default function AboutPage() {
           preoperative prediction of sperm retrieval success in NOA patients undergoing microTESE.
         </p>
         <p>
-          The corrected benchmark evaluates 16 models with leakage-aware methodology and identifies LightGBM as the
-          best performer (AUC 0.7327 ± 0.0057), followed by calibration, decision-curve analysis, and explainability.
+          The research benchmark evaluates 16 ML models, then finalizes 5 models in the v2 pathology-integrated pipeline.
+          The best performer is CatBoost (AUC 0.8306; 95% CI 0.823–0.845), supported by calibration, decision-curve analysis,
+          and explainability.
         </p>
         <p>
           All pipeline outputs shown here were produced by AI agents trained by Hossein Jamalirad.

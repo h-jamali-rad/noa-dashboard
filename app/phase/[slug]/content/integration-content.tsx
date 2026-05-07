@@ -8,9 +8,9 @@ export default function IntegrationContent({ accent }: { accent: string }) {
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard label="Final Deliverable" value="PhD Dissertation" hint="Complete HTML file" icon={GraduationCap} accent={accent} />
-        <StatCard label="Figures Embedded" value="464" hint="From validation + XAI + literature" icon={ImageIcon} accent={accent} />
-        <StatCard label="Sections Assembled" value="6" hint="One per agent phase" icon={Layers} accent={accent} />
-        <StatCard label="Reports Aggregated" value="33" hint="All Markdown logs" icon={FileText} accent={accent} />
+        <StatCard label="Dataset" value="2,413 patients" hint="NOA analytical cohort" icon={ImageIcon} accent={accent} />
+        <StatCard label="Feature Set" value="45 total" hint="37 numeric • 8 categorical" icon={Layers} accent={accent} />
+        <StatCard label="Pathology Features" value="18" hint="RT/LT bilateral extraction" icon={FileText} accent={accent} />
       </div>
 
       <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
@@ -18,11 +18,11 @@ export default function IntegrationContent({ accent }: { accent: string }) {
         <ul className="space-y-2.5 text-sm">
           {[
             'Aggregated outputs from Agents 1–5 into a single coherent dissertation manuscript.',
-            'Embedded 464 figures with descriptive captions, alt text and proper section ordering.',
-            'Inserted institutional logos (MUMS, Medical Informatics, Royan) at appropriate sizes.',
+            'Synchronized all dashboard narratives to the authoritative cohort (2,413 patients).',
+            'Aligned every major metric to the finalized v2 pipeline (16 tested → 5 finalized, CatBoost best AUC 0.8306).',
+            'Integrated the pathology block summary (18 bilateral RT/LT features).',
             'Generated the human-readable integration report (Markdown).',
-            'Produced the dashboard inventory file consumed by this very web application.',
-            'Validated TRIPOD/STROBE/PROBAST/TRIPOD-AI compliance items end-to-end.',
+            'Validated consistency of displayed metrics across pages before final handoff.',
           ].map((t, i) => (
             <li key={i} className="flex items-start gap-2">
               <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
@@ -38,17 +38,19 @@ export default function IntegrationContent({ accent }: { accent: string }) {
           {[
             'Royan workbook (.xlsb)',
             '→',
-            '2,413 analytical patients',
+            '2,413 patients',
             '→',
-            '73 features',
+            '45 total features',
             '→',
-            '27 trained models',
+            '18 pathology features',
             '→',
-            '10 validation methods',
+            '16 models tested → 5 finalized',
             '→',
-            '430 XAI figures',
+            'Nested CV + calibration + DCA',
             '→',
-            '41 references',
+            'CatBoost AUC 0.8306',
+            '→',
+            '95% CI 0.823–0.845',
             '→',
             'PhD dissertation',
           ].map((s, i) => (

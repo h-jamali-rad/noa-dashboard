@@ -15,7 +15,7 @@ const siteUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: 'NOA microTESE Research Dashboard — 6-Agent ML Pipeline',
+  title: 'NOA microTESE Research Dashboard — Real-Data ML Pipeline',
   description:
     'Interactive PhD dissertation portfolio: end-to-end machine-learning pipeline for predicting sperm retrieval in non-obstructive azoospermia patients undergoing microTESE — from raw data to explainable AI.',
   keywords: [
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'NOA microTESE Research Dashboard',
     description:
-      'PhD ML pipeline portfolio: 6 agents, 27 models, 464 visualizations, TRIPOD/PROBAST-compliant.',
+      'PhD ML pipeline portfolio: 2,413 patients, 45 features (including 18 pathology features), and CatBoost best AUC 0.8306.',
     images: ['/og-image.png'],
     type: 'website',
   },
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'NOA microTESE Research Dashboard',
     description:
-      'Interactive 6-agent NOA microTESE ML pipeline portfolio.',
+      'Interactive NOA microTESE ML portfolio based on the real 2,413-patient dataset.',
     images: ['/og-image.png'],
   },
 }

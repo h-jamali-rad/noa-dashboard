@@ -13,10 +13,10 @@ export default function ValidationContent({ data, accent }: { data: any; accent:
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="Validation Design" value="2x5 Nested CV" hint="Outer×inner folds" icon={ShieldCheck} accent={accent} />
-        <StatCard label="Bootstrap" value={String(data?.bootstrap ?? '20 iterations')} hint="Top models" icon={Activity} accent={accent} />
+        <StatCard label="Validation Design" value="Nested CV" hint="Stratified split + bootstrap" icon={ShieldCheck} accent={accent} />
+        <StatCard label="Bootstrap" value={String(data?.bootstrap ?? '1000 iterations')} hint="Top models" icon={Activity} accent={accent} />
         <StatCard label="Clinical Utility" value="DCA" hint="Treat-all/none compared" icon={Layers} accent={accent} />
-        <StatCard label="Top Calibrated" value="LightGBM" hint={`Brier ${Number(brier?.LightGBM ?? 0.2006).toFixed(4)}`} icon={Trophy} accent={accent} />
+        <StatCard label="Best Calibration" value="Brier ≈ 0.20" hint={`CatBoost ${Number(brier?.CatBoost ?? 0.20).toFixed(4)}`} icon={Trophy} accent={accent} />
       </div>
 
       <div className="rounded-lg border border-border bg-card p-5 shadow-sm">

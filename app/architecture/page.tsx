@@ -7,14 +7,9 @@ import { cn } from '@/lib/utils'
 import {
   OrchestratorIcon,
   DataPreprocessingIcon,
-  PathologyEncodingIcon,
   ModelTrainingIcon,
   ValidationIcon,
-  XaiIcon,
-  LiteratureIcon,
   CdssIcon,
-  JudgeIcon,
-  EmbeddingIcon,
   LlmFarmsIcon,
 } from '@/components/architecture/agent-icons'
 import { ORCHESTRATOR, AGENTS, LLM_FARMS, type AgentNode } from '@/components/architecture/agent-data'
@@ -22,15 +17,10 @@ import { ORCHESTRATOR, AGENTS, LLM_FARMS, type AgentNode } from '@/components/ar
 /* ---- Icon map ---- */
 const ICON_MAP: Record<string, React.FC<{ size?: number }>> = {
   orchestrator: OrchestratorIcon,
-  preprocessing: DataPreprocessingIcon,
-  encoding: PathologyEncodingIcon,
-  training: ModelTrainingIcon,
-  validation: ValidationIcon,
-  xai: XaiIcon,
-  literature: LiteratureIcon,
-  cdss: CdssIcon,
-  judge: JudgeIcon,
-  embedding: EmbeddingIcon,
+  researcher: DataPreprocessingIcon,
+  verifier: ValidationIcon,
+  'ml-expert': ModelTrainingIcon,
+  'dashboard-builder': CdssIcon,
   'llm-farms': LlmFarmsIcon,
 }
 
@@ -362,9 +352,9 @@ export default function ArchitecturePage() {
     else agentRefs.current.delete(id)
   }, [])
 
-  // Agent rows: top row (5) and bottom row (4)
-  const topRow = AGENTS.slice(0, 5)
-  const bottomRow = AGENTS.slice(5)
+  // Agent rows: top row (2) and bottom row (2)
+  const topRow = AGENTS.slice(0, 2)
+  const bottomRow = AGENTS.slice(2)
 
   return (
     <div className="px-4 sm:px-6 lg:px-10 py-8 max-w-screen-2xl mx-auto space-y-6">
@@ -380,8 +370,8 @@ export default function ArchitecturePage() {
         </h1>
         <p className="text-muted-foreground mt-2 max-w-3xl text-sm sm:text-base">
           Interactive visualization of HJR&apos;s Deep Agent system — a DAG-based multi-agent pipeline
-          orchestrating 9 specialized AI agents for the NOA microTESE research workflow.
-          Hover for details, click for full specifications.
+          orchestrating 5 specialized agents (Orchestrator, Researcher, Verifier, ML Expert, Dashboard Builder)
+          for the NOA microTESE research workflow. Hover for details, click for full specifications.
         </p>
         <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
           <ChevronDown className="h-4 w-4 animate-bounce" />
@@ -454,7 +444,7 @@ export default function ArchitecturePage() {
                         HJR&apos;s Deep Agent
                       </p>
                       <p className="text-xs text-muted-foreground">Master Orchestrator</p>
-                      <p className="text-[10px] text-muted-foreground/70 mt-0.5">DAG Controller • 9 Agents</p>
+                      <p className="text-[10px] text-muted-foreground/70 mt-0.5">DAG Controller • 5 Specialized Agents</p>
                     </div>
                   </div>
                 </motion.div>

@@ -1,188 +1,101 @@
 {
   "preprocessing": {
     "dataset_info": {
-      "patient_count": 2450,
+      "patient_count": 2413,
       "cohort_size_analytical": 2413,
       "training_set_size": 1930,
       "test_set_size": 483,
-      "n_columns_original": 55,
-      "n_columns_after_engineering": 73,
-      "site": "Royan Institute",
+      "n_columns_original": 45,
+      "n_columns_after_engineering": 45,
+      "pathology_feature_count": 18,
+      "site": "Royan Institute Andrology Clinic, MUMS",
       "overall_success_rate_text": "36.7%",
-      "class_imbalance_ratio": "1.72 : 1 (failure : success)",
-      "per_variable_missingness": {
-        "Age": "0%",
-        "Race": "0%",
-        "FSH": "22.2%",
-        "LH": "25.1%",
-        "Testosterone": "22.6%",
-        "Prolactin": "40.4%",
-        "Estradiol_E2": "41.6%",
-        "Pathology_RT": "22.2%",
-        "Pathology_LT": "49.0%",
-        "Height_Weight_BMI": "64-67%",
-        "Karyotype": "62.3%",
-        "Y_microdeletion": "62.4%",
-        "Testis_size_sono": "82-83%",
-        "Diabetes": "99.1%",
-        "Hypertension": "99.8%"
-      }
+      "class_imbalance_ratio": "1.72:1 (failure:success)"
     },
     "cleaning_steps": [
       {
         "step": 1,
-        "name": "Ingest raw .xlsb workbook",
-        "details": "Loaded 'Final Sheet' from Book_11.17.2025_Dr. Rad_Final ID.xlsb using pyxlsb; converted into raw CSV with shape 2450 x 55."
+        "name": "Cohort confirmation",
+        "details": "Analytical cohort confirmed at n=2,413 NOA patients from Royan Institute Andrology Clinic (MUMS)."
       },
       {
         "step": 2,
-        "name": "Original column inventory (55 columns)",
-        "details": "Captured all 55 original columns: ID, Roy-ID, Age, Pathology-RT, Pathology-LT, Race, infertile family members, Habits, Hieght, Boby Weight, BMI, Occupation (Exposure to toxic substances), Diabetes, Hypertension, Surgery trauma(s), Varicocele, T.BX, Inguinal hernia, Torsion of spermatic cord, Cancer Type, Cancer Treatment, Orchiopexy, Infertility length, Testis Size right (Sono), RT Size (Orchidometer), RT-XYZ (Sono), Testis Size left (Sono), LT Size (Orchidometer), LT-XYZ (Sono), Sakamoto-RT/mL, Sakamoto-LT/mL, Testicular volume_RT (Guess), Testicular volume_LT (Guess), Seminal plasma pH, Testosterone levels, LH, FSH, Prolactin, TSH, E2, Sex Hormone-Binding Globulin, inhibin B, AMH, Karyotype, Y chromosome microdeletion (AZFa, AZFb, AZFc), Surgery Therapeutic, Successful Sperm Retrieval-1, Outcome1, Successful Sperm Retrieval-2, Outcome2, Successful Sperm Retrieval-3, Outcome3, Successful Sperm Retrieval-4, Outcome4."
+        "name": "Outcome integrity check",
+        "details": "Outcome prevalence confirmed: 886 positive (36.7%) and 1,527 negative (63.3%)."
       },
       {
         "step": 3,
-        "name": "Quantify missingness across all 55 columns",
-        "details": "Computed per-column missing-rate. 9 columns were 100% missing; 40 columns exceeded 50% missingness; baseline demographics (Age, Race) had 0% missing.",
-        "per_variable_missingness": {
-          "Age": "0%",
-          "Race": "0%",
-          "FSH": "22.2%",
-          "LH": "25.1%",
-          "Testosterone": "22.6%",
-          "Prolactin": "40.4%",
-          "Estradiol_E2": "41.6%",
-          "Pathology_RT": "22.2%",
-          "Pathology_LT": "49.0%",
-          "Height_Weight_BMI": "64-67%",
-          "Karyotype": "62.3%",
-          "Y_microdeletion": "62.4%",
-          "Testis_size_sono": "82-83%",
-          "Diabetes": "99.1%",
-          "Hypertension": "99.8%"
-        }
+        "name": "Feature-space alignment",
+        "details": "Final feature matrix aligned to 45 features (37 numeric + 8 categorical)."
       },
       {
         "step": 4,
-        "name": "Drop columns with 100% missingness (9 variables)",
-        "details": "Excluded 9 columns that contained zero observed values across the 2450 rows.",
-        "columns_100pct_missing": [
-          "Cancer Type",
-          "Torsion of spermatic cord",
-          "Cancer Treatment",
-          "Surgery Therapeutic",
-          "Sex Hormone-Binding Globulin",
-          "TSH",
-          "inhibin B",
-          "AMH",
-          "Infertility length"
-        ]
+        "name": "Pathology extraction QA",
+        "details": "18 bilateral pathology features extracted from free-text reports with RT_/LT_ split."
       },
       {
         "step": 5,
-        "name": "High-missingness columns (>50%) flagged",
-        "details": "40 columns exceeded the 50% missingness threshold; retained when clinically meaningful (e.g., Karyotype, Y microdeletion, Testis size sono) but flagged with missingness indicators."
+        "name": "Imputation & scaling",
+        "details": "kNN imputation with missingness indicators and Z-score standardization on continuous variables."
       },
       {
         "step": 6,
-        "name": "Missing value handling strategies",
-        "strategies": {
-          "Paper1_strategy": "Missingness-indicator features were created for variables with non-trivial missing rates and validated as informative by SHAP (i.e., the fact that a measurement is missing carries clinical signal).",
-          "PaperB_strategy": "k-Nearest Neighbors (kNN) imputation was applied across continuous predictors after removing 100%-missing columns.",
-          "categorical": "Mode imputation / explicit 'Unknown' category for categorical variables when used.",
-          "outcome_handling": "Records with missing Outcome1 were excluded from the analytical cohort (2450 -> 2413 after dropping 37 rows with missing Outcome1)."
-        }
+        "name": "Imbalance handling",
+        "details": "SMOTE applied on training folds only."
       },
       {
         "step": 7,
-        "name": "Outcome integrity & cohort definition",
-        "details": "Defined analytical cohort = rows with non-missing Outcome1 (n=2413). Outcome1 distribution: failure_0 = 1527, success_1 = 886, success rate = 36.7%."
-      },
-      {
-        "step": 8,
-        "name": "Primary vs Salvage mTESE classification",
-        "details": "Engineered is_Primary and Salvage_Count flags from Successful Sperm Retrieval-1..4 / Outcome1..4 columns. Primary mTESE = 2234 (91.2%), Salvage mTESE = 216 (8.8%)."
-      },
-      {
-        "step": 9,
-        "name": "Free-text pathology parsing (NLP)",
-        "details": "Custom regex/NLP pipeline parsed free-text bilateral pathology reports (Pathology-RT and Pathology-LT) into 22 quantitative features (per-side percentages, binary indicators, missingness flags) covering SCO, CSTH, Maturation Arrest stages 1-4, and Hypospermatogenesis. Percentage handling: regex extracts explicit % when present, else assigns 100 if the pattern is found. MA hierarchy enforced: if arrested at an earlier phase, later phases set to 0 (Spermatogonial → Spermatocytic → ImmatureRound → Elongated)."
-      },
-      {
-        "step": 10,
-        "name": "Data quality checks performed",
-        "checks": [
-          "Row-count integrity vs source xlsb (2450 rows confirmed)",
-          "Column-name normalization (typos preserved e.g. 'Hieght', 'Boby Weight')",
-          "Per-column dtype inference and coercion of numeric strings",
-          "Detection of 100%-missing columns",
-          "Detection of >50%-missing columns (n=40)",
-          "Outlier scan on continuous hormonal and anthropometric variables",
-          "Cross-field consistency: Outcome1 vs Successful Sperm Retrieval-1",
-          "Bilateral consistency between Pathology-RT and Pathology-LT extracted features",
-          "Maturation Arrest hierarchy enforcement (no later-phase MA without earlier resolved)",
-          "Stratified Outcome1 distribution check across Primary/Salvage subgroups"
-        ]
+        "name": "Validation protocol lock",
+        "details": "Nested CV with stratified splitting and bootstrap confidence intervals (1000 iterations)."
       }
     ],
     "feature_engineering": {
-      "sixteen_pathology_indicators": {
-        "description": "16 newly engineered pathology indicators derived from free-text Pathology-RT / Pathology-LT reports (8 per testis side).",
+      "eighteen_pathology_features": {
+        "description": "18 pathology features extracted bilaterally from free-text reports.",
         "right_testis_RT": [
-          "SCO_RT (Sertoli Cell Only - Right)",
-          "CSTH_RT (Complete Spermatogenesis - Right)",
-          "MA_Spermatogonial_RT (Maturation Arrest at Spermatogonial phase - Right)",
-          "MA_Spermatocytic_RT (Maturation Arrest at Spermatocytic phase - Right)",
-          "MA_ImmatureRound_RT (Maturation Arrest at Immature Round Spermatid phase - Right)",
-          "MA_Elongated_RT (Maturation Arrest at Elongated Spermatid phase - Right)",
-          "Hypospermatogenesis_RT (Right)",
-          "Severe_Hypospermatogenesis_RT (Right)"
+          "RT_severity",
+          "RT_SCO_pct",
+          "RT_Hypospermatogenesis_pct",
+          "RT_Severe_Hypospermatogenesis_pct",
+          "RT_MA_Spermatogonial_pct",
+          "RT_MA_Spermatocytic_pct",
+          "RT_MA_ImmatureRound_pct",
+          "RT_MA_Elongated_pct",
+          "RT_CSTH_pct"
         ],
         "left_testis_LT": [
-          "SCO_LT (Sertoli Cell Only - Left)",
-          "CSTH_LT (Complete Spermatogenesis - Left)",
-          "MA_Spermatogonial_LT (Maturation Arrest at Spermatogonial phase - Left)",
-          "MA_Spermatocytic_LT (Maturation Arrest at Spermatocytic phase - Left)",
-          "MA_ImmatureRound_LT (Maturation Arrest at Immature Round Spermatid phase - Left)",
-          "MA_Elongated_LT (Maturation Arrest at Elongated Spermatid phase - Left)",
-          "Hypospermatogenesis_LT (Left)",
-          "Severe_Hypospermatogenesis_LT (Left)"
-        ],
-        "ma_hierarchy_rule": "If arrested at earlier phase, later phases set to 0 (Spermatogonial → Spermatocytic → ImmatureRound → Elongated)",
-        "percentage_handling": "Regex extracts explicit % when present, else 100 if pattern found",
-        "additional_aggregated_pathology_features_used_downstream": "Per-side mean and binary aggregates (SCO mean/binary; CSTH mean/binary) and Pathology availability RT/LT flags bring the total histopathology feature block to 22 features in the modeling matrix."
+          "LT_severity",
+          "LT_SCO_pct",
+          "LT_Hypospermatogenesis_pct",
+          "LT_Severe_Hypospermatogenesis_pct",
+          "LT_MA_Spermatogonial_pct",
+          "LT_MA_Spermatocytic_pct",
+          "LT_MA_ImmatureRound_pct",
+          "LT_MA_Elongated_pct",
+          "LT_CSTH_pct"
+        ]
       }
     },
     "transformations": [
       {
+        "name": "Nested cross-validation",
+        "method": "Leakage-safe nested CV protocol for model development and verification."
+      },
+      {
+        "name": "kNN imputation + missingness encoding",
+        "method": "Missing values imputed with kNN while preserving missingness signals."
+      },
+      {
         "name": "Standardization",
-        "method": "Z-score standardization (mean=0, std=1) applied to continuous features prior to model input",
-        "scope": "All continuous predictors: Age, BMI, Height, Weight, FSH, LH, Testosterone, Prolactin, E2, testicular volume measurements, Sakamoto volumes, Seminal plasma pH",
-        "fitting": "Scaler fit on training set ONLY, then applied to test set (no leakage)"
-      },
-      {
-        "name": "Categorical encoding",
-        "method": "One-hot / label encoding for categorical variables (Race, Habits, Karyotype categories, Y-microdeletion AZFa/AZFb/AZFc, Occupation exposure)",
-        "binary_flags": "Comorbidities and surgical history kept as 0/1 binary indicators"
-      },
-      {
-        "name": "Missingness indicator encoding (Paper1)",
-        "method": "For each variable with non-trivial missingness, an auxiliary binary feature was added flagging missing-vs-observed; SHAP confirmed informativeness."
-      },
-      {
-        "name": "kNN imputation (PaperB)",
-        "method": "k-Nearest Neighbors imputation on continuous predictors after standardization scaffolding"
-      },
-      {
-        "name": "Pathology percentage normalization",
-        "method": "Free-text percentages parsed via regex; explicit % values used directly, else default 100 when pattern detected; MA stage hierarchy enforced (zero out later stages if earlier-stage arrest)"
+        "method": "Z-score standardization on continuous predictors."
       },
       {
         "name": "Class imbalance handling",
-        "method": "SMOTE (Synthetic Minority Over-sampling Technique) applied ONLY to the training set after the train/test split, never to the test set"
+        "method": "SMOTE applied only on training data."
       },
       {
-        "name": "Train/test split",
-        "method": "Stratified 80/20 split on Outcome1, random_state=42; alternative split (≈70/30, n_train=1689, n_test=724) used for calibration analyses"
+        "name": "Calibration",
+        "method": "Isotonic + Platt scaling with Brier monitoring."
       }
     ],
     "outcome_analysis": {

@@ -124,8 +124,8 @@ export function ArchitectureBanner() {
               Explore HJR&apos;s Multi-Agent AI Architecture
             </h3>
             <p className="text-sm text-muted-foreground mt-1 max-w-xl">
-              Interactive DAG visualization of 9 specialized AI agents orchestrated for microTESE research — 
-              from data preprocessing to clinical decision support.
+              Interactive DAG visualization of 5 specialized agents (Orchestrator, Researcher, Verifier, ML Expert, Dashboard Builder)
+              orchestrated for the microTESE research workflow.
             </p>
           </div>
 

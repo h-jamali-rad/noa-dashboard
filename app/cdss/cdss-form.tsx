@@ -41,13 +41,15 @@ const FEATURE_FIELDS: NumField[] = [
 
 const PATHOLOGY_OPTIONS = [
   { value: 'normal', label: 'Normal' },
-  { value: 'sco', label: 'SCO (Sertoli Cell-Only Syndrome) — 846 cases (35%)' },
-  { value: 'sco_csth', label: 'SCO + CSTH — 194 cases (8%)' },
-  { value: 'ma_spermatocytic', label: 'MA up to Spermatocytic — 235 cases (10%)' },
-  { value: 'csth', label: 'CSTH — 81 cases (3.4%)' },
-  { value: 'hypospermatogenesis', label: 'Hypospermatogenesis — 38 cases (1.6%)' },
-  { value: 'severe_hypospermatogenesis', label: 'Severe Hypospermatogenesis — 13 cases' },
-  { value: 'leydig_hyperplasia', label: 'Leydig Cell Hyperplasia — 55 cases' },
+  { value: 'sco', label: 'SCO (Sertoli Cell-Only Syndrome)' },
+  { value: 'sco_csth', label: 'SCO + CSTH' },
+  { value: 'ma_spermatocytic', label: 'Maturation Arrest (Spermatocytic)' },
+  { value: 'ma_spermatogonial', label: 'Maturation Arrest (Spermatogonial)' },
+  { value: 'ma_immature_round', label: 'Maturation Arrest (Immature Round)' },
+  { value: 'ma_elongated', label: 'Maturation Arrest (Elongated)' },
+  { value: 'hypospermatogenesis', label: 'Hypospermatogenesis' },
+  { value: 'severe_hypospermatogenesis', label: 'Severe Hypospermatogenesis' },
+  { value: 'csth', label: 'CSTH (Tubular Hyalinization)' },
 ] as const
 
 const PATHOLOGY_FIELDS = [
@@ -59,7 +61,22 @@ const BRIER_EXPLANATION =
   "Brier Score: A metric measuring the accuracy of probabilistic predictions. Lower values (closer to 0) indicate better calibration. It's the mean squared difference between predicted probabilities and actual outcomes."
 
 const BASE_SUCCESS_RATE = 0.367
+const CATBOOST_AUC = 0.8306
+const CATBOOST_CI = '0.823–0.845'
 const WEIGHT_SUM = FEATURE_FIELDS.reduce((acc, f) => acc + f.weight, 0)
+
+const PATHOLOGY_SCORE: Record<string, number> = {
+  normal: 0.08,
+  sco: -0.14,
+  sco_csth: -0.08,
+  ma_spermatogonial: -0.12,
+  ma_spermatocytic: -0.06,
+  ma_immature_round: -0.02,
+  ma_elongated: 0.03,
+  hypospermatogenesis: 0.12,
+  severe_hypospermatogenesis: 0.18,
+  csth: -0.04,
+}
 
 function sigmoid(x: number) {
   return 1 / (1 + Math.exp(-x))
@@ -169,12 +186,15 @@ export default function CdssForm() {
       return acc + field.weight * featureScore
     }, 0)
 
-    // Note: Histopathology selections (RT_Pathology, LT_Pathology) are intentionally
-    // excluded from the prediction signal. Per our LightGBM analysis, histopathological
-    // patterns showed zero feature importance — the model relies on hormonal markers
-    // and anthropometric features. The dropdowns are retained for clinical context only.
+    const pathologySelections = [...(pathology.RT_Pathology ?? []), ...(pathology.LT_Pathology ?? [])]
+    const pathologySignalRaw = pathologySelections.reduce((acc, key) => acc + (PATHOLOGY_SCORE[key] ?? 0), 0)
+    const pathologySignal = Math.max(-0.35, Math.min(0.35, pathologySignalRaw / 2))
+
+    // This CDSS is a lightweight demo calculator aligned with v2 findings.
+    // It is NOT a direct exported model artifact; pathology inputs are retained
+    // because pathology extraction is clinically and analytically important in v2.
     const normalizedSignal = weightedSignal / WEIGHT_SUM
-    const logit = Math.log(BASE_SUCCESS_RATE / (1 - BASE_SUCCESS_RATE)) + 2.25 * normalizedSignal
+    const logit = Math.log(BASE_SUCCESS_RATE / (1 - BASE_SUCCESS_RATE)) + 2.1 * normalizedSignal + pathologySignal
     const probability = sigmoid(logit)
     const pct = probability * 100
     setResult({ p: pct, tier: getRiskTier(pct) })
@@ -184,7 +204,7 @@ export default function CdssForm() {
     <TooltipProvider>
       <div className="space-y-4">
         <div className="rounded-lg border border-blue-300/40 bg-blue-50/40 p-3 text-xs text-muted-foreground" title={BRIER_EXPLANATION}>
-          LightGBM-based CDSS approximation with SHAP-ranked top 14 predictors (calibration-aware probability output). Histopathology shown for clinical context only — see note below.
+          CatBoost-v2-aligned CDSS approximation (AUC {CATBOOST_AUC.toFixed(4)}, 95% CI {CATBOOST_CI}; prevalence 36.7% in n=2,413). This UI demonstrates risk summarization and is not a direct model export.
         </div>
 
         <div className="grid md:grid-cols-2 gap-3">
@@ -313,7 +333,7 @@ export default function CdssForm() {
           </div>
 
           <div className="rounded-lg border border-amber-300/40 bg-amber-50/40 p-3 text-xs text-muted-foreground dark:bg-amber-950/20">
-            <strong>Note:</strong> In our LightGBM model, histopathological patterns showed zero feature importance. The model relies primarily on hormonal markers (LH, FSH, Testosterone) and anthropometric features (Age, BMI, Body Weight, Height) for prediction. Patients may exhibit multiple patterns simultaneously — select all that apply.
+            <strong>Note:</strong> Pathology is a meaningful signal in the finalized v2 pipeline (18 bilateral RT/LT pathology features). This demo form keeps pathology inputs visible and selectable for bilateral context. Patients may exhibit multiple patterns simultaneously — select all that apply.
           </div>
         </div>
 

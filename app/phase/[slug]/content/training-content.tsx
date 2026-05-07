@@ -17,16 +17,16 @@ const HEADER_TIPS: Record<string, string> = {
 export default function TrainingContent({ data, accent }: { data: any; accent: string }) {
   const models = data?.models ?? []
   const table = data?.model_comparison_table ?? []
-  const best = data?.best_model ?? 'LightGBM'
-  const bestAuc = data?.best_auc ?? '0.7327 ± 0.0057'
+  const best = data?.best_model ?? 'CatBoost'
+  const bestAuc = data?.best_auc ?? '0.8306 (95% CI 0.823–0.845)'
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="Models Evaluated" value={String(data?.n_models ?? 16)} hint="Corrected benchmark" icon={GitBranch} accent={accent} />
-        <StatCard label="Best Model" value={best} hint="Nested-CV winner" icon={Trophy} accent={accent} />
-        <StatCard label="Best AUC" value={String(bestAuc)} hint="Mean ± std" icon={Cpu} accent={accent} />
-        <StatCard label="Search Budget" value="50 / model" hint="RandomizedSearchCV" icon={FlaskConical} accent={accent} />
+        <StatCard label="Models Tested" value={String(data?.n_models ?? 16)} hint="Paper 1 benchmark" icon={GitBranch} accent={accent} />
+        <StatCard label="Finalized in v2" value={String(data?.n_final_models ?? 5)} hint="Pathology-integrated pipeline" icon={FlaskConical} accent={accent} />
+        <StatCard label="Best Model" value={best} hint="v2 final comparison" icon={Trophy} accent={accent} />
+        <StatCard label="Best AUC" value={String(bestAuc)} hint="CatBoost performance" icon={Cpu} accent={accent} />
       </div>
 
       <div className="rounded-lg border border-border bg-card p-5 shadow-sm">

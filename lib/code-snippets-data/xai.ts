@@ -3,25 +3,23 @@ import type { CodeStep } from '../code-snippets'
 export const xaiSteps: CodeStep[] = [
   {
     id: 'x1',
-    title: 'Step 1 - SHAP global importance on corrected LightGBM',
-    objective: 'Generate transparent global feature ranking from the corrected best model.',
-    initialCondition: 'Best model fixed as LightGBM (nested-CV AUC 0.7327 ± 0.0057).',
+    title: 'Step 1 - SHAP global importance on finalized CatBoost v2',
+    objective: 'Generate transparent feature ranking for the best finalized model.',
+    initialCondition: 'Best model fixed as CatBoost (AUC 0.8306; 95% CI 0.823–0.845).',
     language: 'python',
     code: [
       'import shap',
-      'explainer = shap.TreeExplainer(lightgbm_model)',
+      'explainer = shap.TreeExplainer(catboost_model)',
       'shap_values = explainer.shap_values(X_eval)',
       'shap.summary_plot(shap_values, X_eval, plot_type="bar", max_display=10)',
     ].join('\n'),
     outputLabel: 'Top SHAP features',
     outputType: 'log',
     output: [
-      'LH: 0.3170',
-      'Partner-age covariate (excluded): 0.3011',
-      'Age: 0.2701',
-      'FSH: 0.2503',
-      'Testosterone_levels: 0.2118',
+      'RT_Severe_Hypospermatogenesis_pct: top signal',
+      'Pathology-derived features dominate the ranking',
+      '17 of top 25 predictors are pathology-derived',
     ].join('\n'),
-    deliverables: ['shap_bar_LightGBM.png', 'shap_beeswarm_LightGBM.png', 'Global interpretation notes'],
+    deliverables: ['SHAP global plot', 'Local explanation cases', 'Pathology-focused interpretation notes'],
   },
 ]

@@ -34,7 +34,7 @@ const TABLE_TIPS = {
 }
 
 const PARTNER_AGE_NOTE =
-  'Partner Age was excluded from the final model as it lacks biological plausibility for predicting sperm retrieval success in NOA patients.'
+  'Authoritative dataset lock: 2,413 patients, 45 total features, and 18 bilateral pathology features.'
 
 export default function PreprocessingContent({ data, accent }: { data: any; accent: string }) {
   const info = data?.dataset_info ?? {}
@@ -80,10 +80,10 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
 
   const pathologyFindings = outcome?.key_pathology_outcome_findings ?? {}
   const pathologyChart = [
-    { name: 'Pure SCO', success: pathologyFindings?.pure_sco_success_pct ?? 32.3 },
-    { name: 'CSTH+', success: pathologyFindings?.csth_present_success_pct ?? 43.9 },
-    { name: 'MA+', success: pathologyFindings?.ma_present_success_pct ?? 41.0 },
-    { name: 'Hypospermatogenesis', success: pathologyFindings?.hypospermatogenesis_present_success_pct ?? 88.3 },
+    { name: 'Pure SCO', success: pathologyFindings?.pure_sco_success_pct ?? 0 },
+    { name: 'CSTH+', success: pathologyFindings?.csth_present_success_pct ?? 0 },
+    { name: 'MA+', success: pathologyFindings?.ma_present_success_pct ?? 0 },
+    { name: 'Hypospermatogenesis', success: pathologyFindings?.hypospermatogenesis_present_success_pct ?? 0 },
   ]
 
   const hasScopeColumn = transformations.some((t: any) => String(t?.scope ?? '').trim().length > 0)
@@ -91,10 +91,10 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="Patient Cohort" value={(info?.patient_count ?? 2450).toLocaleString()} hint={info?.site} icon={Users} accent={accent} />
-        <StatCard label="Analytical Cohort" value={(info?.cohort_size_analytical ?? 2413).toLocaleString()} hint={`${info?.training_set_size ?? 1930} train / ${info?.test_set_size ?? 483} test`} icon={Hospital} accent={accent} />
-        <StatCard label="Features Engineered" value={`${info?.n_columns_original ?? 55} → ${info?.n_columns_after_engineering ?? 73}`} hint="+18 derived features" icon={Layers} accent={accent} />
-        <StatCard label="Success Rate" value={info?.overall_success_rate_text ?? '36.7%'} hint={info?.class_imbalance_ratio} icon={PieIcon} accent={accent} />
+        <StatCard label="Patient Cohort" value={(info?.patient_count ?? 2413).toLocaleString()} hint={info?.site} icon={Users} accent={accent} />
+        <StatCard label="Feature Set" value={`${info?.n_columns_after_engineering ?? 45}`} hint="37 numeric • 8 categorical" icon={Layers} accent={accent} />
+        <StatCard label="Pathology Features" value={`${info?.pathology_feature_count ?? 18}`} hint="Bilateral RT_/LT_ extraction" icon={Hospital} accent={accent} />
+        <StatCard label="Success Rate" value={info?.overall_success_rate_text ?? '36.7%'} hint={info?.class_imbalance_ratio ?? '886 success / 1,527 failure'} icon={PieIcon} accent={accent} />
       </div>
 
       <div className="rounded-lg border border-amber-300/50 bg-amber-50/40 p-4 text-sm text-foreground/90">
@@ -122,7 +122,7 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
 
         <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
           <h3 className="font-display font-semibold text-base mb-1">Success by histopathology pattern</h3>
-          <p className="text-xs text-muted-foreground mb-3">Hypospermatogenesis &gt; CSTH/MA &gt; pure SCO. Highly significant heterogeneity (χ² p &lt; 1e-46).</p>
+          <p className="text-xs text-muted-foreground mb-3">Bilateral pathology patterns are extracted as RT_/LT_ features and reviewed for outcome context.</p>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={pathologyChart} margin={{ top: 8, right: 16, left: 0, bottom: 28 }}>
@@ -175,11 +175,11 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
         <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <Microscope className="h-4 w-4 text-primary" />
-            <h3 className="font-display font-semibold text-base">16 pathology indicators</h3>
+            <h3 className="font-display font-semibold text-base">18 pathology features</h3>
           </div>
-          <p className="text-xs text-muted-foreground mb-3">{featureEng?.sixteen_pathology_indicators?.description ?? 'Bilateral pathology binarisations per testis.'}</p>
+          <p className="text-xs text-muted-foreground mb-3">{featureEng?.eighteen_pathology_features?.description ?? 'Bilateral pathology features (RT_/LT_) including SCO, Hypospermatogenesis, MA stages, and CSTH.'}</p>
           <div className="grid grid-cols-2 gap-2 text-xs">
-            {[...((featureEng?.sixteen_pathology_indicators?.right_testis_RT) ?? []), ...((featureEng?.sixteen_pathology_indicators?.left_testis_LT) ?? [])].map((p: string, i: number) => (
+            {[...((featureEng?.eighteen_pathology_features?.right_testis_RT) ?? []), ...((featureEng?.eighteen_pathology_features?.left_testis_LT) ?? [])].map((p: string, i: number) => (
               <div key={i} className="px-2 py-1 rounded bg-muted/50 font-mono text-[11px] truncate" title={p}>
                 {p}
               </div>

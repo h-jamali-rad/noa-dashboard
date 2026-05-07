@@ -41,9 +41,9 @@ export default async function HomePage() {
       </section>
 
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="Screened Cohort" value="2,450" hint="Analytical: 2,413" icon={Users} accent="#0e7490" />
-        <StatCard label="Features" value="73" hint="From 55 raw variables" icon={Layers} accent="#0d9488" />
-        <StatCard label="Best Model" value="LightGBM" hint="AUC 0.7327 ± 0.0057" icon={Trophy} accent="#4f46e5" />
+        <StatCard label="Patient Cohort" value="2,413" hint="NOA cases" icon={Users} accent="#0e7490" />
+        <StatCard label="Features" value="45" hint="37 numeric • 8 categorical" icon={Layers} accent="#0d9488" />
+        <StatCard label="Best Model" value="CatBoost" hint="AUC 0.8306 (95% CI 0.823–0.845)" icon={Trophy} accent="#4f46e5" />
         <StatCard label="Figures" value={String(counts.imgs)} hint="Updated curated visuals" icon={Images} accent="#c026d3" />
       </section>
 

@@ -4,20 +4,20 @@ import { StatCard } from '@/components/stat-card'
 import { BrainCircuit, Layers, Target, Sparkles } from 'lucide-react'
 
 const PARTNER_AGE_NOTE =
-  'Partner Age was excluded from the final model as it lacks biological plausibility for predicting sperm retrieval success in NOA patients.'
+  'Final v2 explainability focuses on pathology-aware signals, with 18 bilateral pathology features integrated into interpretation.'
 
 export default function XaiContent({ data, accent }: { data: any; accent: string }) {
   const top5 = data?.top5_features ?? []
   const shapTop10 = data?.global_shap_top10 ?? {}
-  const fiTop10 = data?.feature_importance_top10_lightgbm ?? {}
+  const fiTop10 = data?.feature_importance_top10_catboost ?? {}
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard label="XAI Method" value="SHAP" hint={data?.method ?? 'TreeExplainer'} icon={BrainCircuit} accent={accent} />
-        <StatCard label="Best Model" value="LightGBM" hint="Corrected pipeline" icon={Target} accent={accent} />
-        <StatCard label="Local Cases" value={String(data?.n_local_cases ?? 5)} hint="Case-level interpretation" icon={Sparkles} accent={accent} />
-        <StatCard label="Top Predictors" value={String(top5.length)} hint="Global ranking" icon={Layers} accent={accent} />
+        <StatCard label="Best Model" value="CatBoost" hint="AUC 0.8306 (v2)" icon={Target} accent={accent} />
+        <StatCard label="Pathology Features" value="18" hint="Bilateral RT_/LT_ extraction" icon={Sparkles} accent={accent} />
+        <StatCard label="Top Predictors" value={String(top5.length)} hint="Pathology-dominant ranking" icon={Layers} accent={accent} />
       </div>
 
       <div className="rounded-lg border border-amber-300/50 bg-amber-50/40 p-4 text-sm text-foreground/90">
@@ -45,7 +45,7 @@ export default function XaiContent({ data, accent }: { data: any; accent: string
         </div>
 
         <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
-          <h3 className="font-display font-semibold text-base mb-3">LightGBM feature-importance top-10</h3>
+          <h3 className="font-display font-semibold text-base mb-3">CatBoost feature-importance top-10</h3>
           <ul className="space-y-1.5 text-sm">
             {Object.entries(fiTop10).slice(0, 10).map(([k, v]) => (
               <li key={k} className="flex justify-between gap-3"><span>{k}</span><span className="font-mono text-xs">{v as number}</span></li>

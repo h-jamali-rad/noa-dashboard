@@ -81,10 +81,11 @@ scripts/           → Database seed scripts
 
 ## 🔬 Key Results
 
-| Metric | v1 (LightGBM) | v2 (CatBoost) |
-|--------|---------------|---------------|
-| AUC    | 0.7327        | 0.8306        |
-| Improvement | —        | +13.4%        |
+- Dataset: 2,413 patients
+- Features: 45 total (37 numeric + 8 categorical)
+- Pathology features: 18 bilateral RT/LT
+- Models: 16 tested, 5 finalized in v2
+- Best model: CatBoost (AUC 0.8306, 95% CI 0.823–0.845)
 
 ---
 

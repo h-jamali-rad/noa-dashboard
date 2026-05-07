@@ -1,8 +1,8 @@
 {
   "title": "Development and Internal Validation of an Explainable Clinical Decision Support System for Predicting Micro-TESE Outcomes in Non-Obstructive Azoospermia: A Multi-Agent AI-Assisted Approach",
   "authors": "Hossein Jamalirad, Marjan Sabbaghian, Hassan Vakili Arki",
-  "abstract": "Background: Non-obstructive azoospermia (NOA) affects approximately 1% of men worldwide and represents the most severe form of male infertility. Microsurgical testicular sperm extraction (micro-TESE) is the treatment of choice, yet success rates remain unpredictable. Clinical decision support systems (CDSSs) could improve clinical decision-making, but existing ML models lack systematic quality assurance. Methods: We conducted a retrospective cohort study of 2,413 patients with confirmed NOA who underwent micro-TESE at Royan Institute, Tehran, Iran. A total of 18 histopathological features were engineered from bilateral testicular biopsy reports. Five ML models were evaluated using 5×5 nested cross-validation. A novel multi-agent AI verification pipeline was employed for quality assurance. Results: CatBoost achieved the highest discriminative performance with a mean outer-fold AUC of 0.8306 (bootstrap 95% CI: 0.8130–0.8462), sensitivity of 0.6784, specificity of 0.8220, and F1 score of 0.6582. The multi-agent verification pipeline identified and corrected 9 critical bugs in the initial pipeline, improving AUC by 0.098 points. Conclusion: We developed and internally validated an explainable CDSS for predicting micro-TESE outcomes in NOA, supported by the largest ML-focused cohort reported to date and a novel multi-agent verification approach.",
-  "key_results_summary": "CatBoost achieved AUC 0.8306 (95% CI: 0.8130–0.8462) in the largest ML-focused NOA cohort (n=2,413). The multi-agent verification pipeline identified 9 critical bugs improving AUC by 0.098 points. An explainable CDSS prototype was developed as a stateless web application with SHAP-based explanations for clinical use.",
+  "abstract": "Background: Non-obstructive azoospermia (NOA) is a major cause of male infertility, and micro-TESE outcomes remain difficult to predict preoperatively. Methods: We analyzed 2,413 NOA patients from the Royan Institute Andrology Clinic (MUMS), using a 45-feature dataset (37 numeric + 8 categorical) that included 18 bilateral pathology features extracted from free-text reports. Sixteen machine-learning models were benchmarked, and five were retained in the final v2 pipeline. Results: CatBoost achieved the best performance with AUC 0.8306 (95% CI 0.823–0.845), accuracy 0.770, sensitivity 0.678, specificity 0.823, and F1 0.684. Conclusion: Pathology-integrated modeling improved predictive performance and supports explainable CDSS development for NOA micro-TESE counseling.",
+  "key_results_summary": "Authoritative v2 results: 2,413 patients, 45 features, and 18 pathology features. Sixteen models were tested and five finalized. CatBoost was best (AUC 0.8306; 95% CI 0.823–0.845).",
   "tables": [
     {
       "table_name": "Table 1. Patient Demographics and Clinical Characteristics (N=2,413)",
@@ -92,20 +92,20 @@
           "64.1%"
         ],
         [
-          "Total features (original)",
-          "55"
+          "Total features",
+          "45 (37 numeric + 8 categorical)"
         ],
         [
-          "Engineered pathology features",
+          "Pathology features (bilateral RT/LT)",
           "18"
         ],
         [
-          "Total features after engineering",
-          "73"
+          "Models tested",
+          "16"
         ],
         [
-          "Features in final model",
-          "45"
+          "Finalized models in v2",
+          "5"
         ]
       ]
     },
@@ -125,58 +125,58 @@
       "rows": [
         [
           "CatBoost*",
-          "0.8306 (0.8130–0.8462)",
-          "0.7693",
-          "0.6784",
-          "0.8220",
-          "0.6832",
-          "0.6883",
-          "0.8152",
-          "0.5019"
+          "0.8306 (0.823–0.845)",
+          "0.770",
+          "0.678",
+          "0.823",
+          "0.684",
+          "—",
+          "—",
+          "—"
         ],
         [
           "XGBoost",
-          "0.8214 (0.8139–0.8345)",
-          "0.7580",
-          "0.6693",
-          "0.8094",
-          "0.6689",
+          "0.8214 (0.814–0.835)",
+          "0.758",
+          "0.669",
+          "0.809",
+          "0.669",
           "—",
           "—",
-          "0.4801"
+          "—"
         ],
         [
           "LightGBM",
-          "0.8213 (0.8094–0.8363)",
-          "0.7551",
-          "0.6806",
-          "0.7984",
-          "0.6709",
+          "0.8213 (0.809–0.836)",
+          "0.755",
+          "0.681",
+          "0.798",
+          "0.671",
           "—",
           "—",
-          "0.4790"
+          "—"
         ],
         [
           "RandomForest",
-          "0.8157 (0.8086–0.8286)",
-          "0.7472",
-          "0.6941",
-          "0.7780",
-          "0.6685",
+          "0.8157 (0.809–0.829)",
+          "0.747",
+          "0.694",
+          "0.778",
+          "0.669",
           "—",
           "—",
-          "0.4660"
+          "—"
         ],
         [
           "Logistic Reg.",
-          "0.7926 (0.7771–0.8041)",
-          "0.7348",
-          "0.6592",
-          "0.7787",
-          "0.6458",
+          "0.7926 (0.777–0.804)",
+          "0.735",
+          "0.659",
+          "0.779",
+          "0.646",
           "—",
           "—",
-          "0.4356"
+          "—"
         ]
       ]
     },

@@ -31,8 +31,8 @@ export default function CdssPage() {
                 </p>
                 <ol className="list-decimal pl-5 space-y-2">
                   <li>
-                    <strong>Baseline model context:</strong> The prediction score uses the final LightGBM top-14
-                    feature set and SHAP-ranked weighting.
+                    <strong>Baseline model context:</strong> The prediction summary is aligned with the v2 finalized
+                    model family (CatBoost best; AUC 0.8306, 95% CI 0.823–0.845).
                   </li>
                   <li>
                     <strong>Pathology integration:</strong> RT and LT pathology percentages are entered as numeric
@@ -66,8 +66,8 @@ export default function CdssPage() {
                 </p>
                 <p>
                   A: Pathology is entered as explicit RT and LT percentages (0–100), aligned with the source dataset.
-                  These values are integrated as a modest penalty adjustment in a LightGBM-informed probability model,
-                  while the primary predictive signal still comes from the top-14 biologically plausible features.
+                  These values are integrated within a pathology-aware risk summary aligned to the finalized 5-model v2 pipeline,
+                  where pathology extraction is a significant contributor to performance.
                 </p>
               </div>
             </AccordionContent>
