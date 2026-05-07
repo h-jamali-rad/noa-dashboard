@@ -102,7 +102,41 @@
       "primary_outcome": {
         "failure_0": 1527,
         "success_1": 886
-      }
+      },
+      "pathology_shap_importance": [
+        {
+          "name": "RT_Severe_Hypospermatogenesis",
+          "shap": 0.396
+        },
+        {
+          "name": "RT_Hypospermatogenesis",
+          "shap": 0.201
+        },
+        {
+          "name": "LT_Severe_Hypospermatogenesis",
+          "shap": 0.159
+        },
+        {
+          "name": "RT_MA_Spermatocytic",
+          "shap": 0.147
+        },
+        {
+          "name": "LT_severity",
+          "shap": 0.131
+        },
+        {
+          "name": "LT_SCO",
+          "shap": 0.11
+        },
+        {
+          "name": "RT_SCO",
+          "shap": 0.09
+        },
+        {
+          "name": "RT_severity",
+          "shap": 0.085
+        }
+      ]
     },
     "figure_references": [
       "/images/preprocessing/learning_curve.png"

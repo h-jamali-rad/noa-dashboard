@@ -78,12 +78,15 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
     { name: 'Success', value: outcome?.primary_outcome?.success_1 ?? 886, fill: '#0f8a4f' },
   ]
 
-  const pathologyFindings = outcome?.key_pathology_outcome_findings ?? {}
-  const pathologyChart = [
-    { name: 'Pure SCO', success: pathologyFindings?.pure_sco_success_pct ?? 0 },
-    { name: 'CSTH+', success: pathologyFindings?.csth_present_success_pct ?? 0 },
-    { name: 'MA+', success: pathologyFindings?.ma_present_success_pct ?? 0 },
-    { name: 'Hypospermatogenesis', success: pathologyFindings?.hypospermatogenesis_present_success_pct ?? 0 },
+  const pathologyShap = outcome?.pathology_shap_importance ?? [
+    { name: 'RT_Severe_Hypospermatogenesis', shap: 0.396 },
+    { name: 'RT_Hypospermatogenesis', shap: 0.201 },
+    { name: 'LT_Severe_Hypospermatogenesis', shap: 0.159 },
+    { name: 'RT_MA_Spermatocytic', shap: 0.147 },
+    { name: 'LT_severity', shap: 0.131 },
+    { name: 'LT_SCO', shap: 0.110 },
+    { name: 'RT_SCO', shap: 0.090 },
+    { name: 'RT_severity', shap: 0.085 },
   ]
 
   const hasScopeColumn = transformations.some((t: any) => String(t?.scope ?? '').trim().length > 0)
@@ -121,16 +124,16 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
         </div>
 
         <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
-          <h3 className="font-display font-semibold text-base mb-1">Success by histopathology pattern</h3>
-          <p className="text-xs text-muted-foreground mb-3">Bilateral pathology patterns are extracted as RT_/LT_ features and reviewed for outcome context.</p>
+          <h3 className="font-display font-semibold text-base mb-1">Pathology feature importance (SHAP)</h3>
+          <p className="text-xs text-muted-foreground mb-3">Mean |SHAP| values for pathology features — higher values indicate greater influence on CatBoost v2 predictions.</p>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={pathologyChart} margin={{ top: 8, right: 16, left: 0, bottom: 28 }}>
-                <XAxis dataKey="name" tickLine={false} tick={{ fontSize: 10 }} angle={-15} textAnchor="end" height={40} interval={0} />
-                <YAxis tickLine={false} tick={{ fontSize: 10 }} domain={[0, 100]} unit="%" />
+              <BarChart data={pathologyShap} layout="vertical" margin={{ top: 4, right: 30, left: 10, bottom: 4 }}>
+                <XAxis type="number" tickLine={false} tick={{ fontSize: 10 }} />
+                <YAxis dataKey="name" type="category" tick={{ fontSize: 9 }} tickLine={false} width={160} />
                 <RTooltip wrapperStyle={{ fontSize: 11 }} />
-                <Bar dataKey="success" fill={accent} radius={[4, 4, 0, 0]}>
-                  <LabelList dataKey="success" position="top" style={{ fontSize: 10 }} formatter={(v: number) => `${v}%`} />
+                <Bar dataKey="shap" fill={accent} radius={[0, 4, 4, 0]}>
+                  <LabelList dataKey="shap" position="right" style={{ fontSize: 9 }} />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
