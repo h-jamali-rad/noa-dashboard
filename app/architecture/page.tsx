@@ -541,6 +541,71 @@ export default function ArchitecturePage() {
         )}
       </AnimatePresence>
 
+      {/* Complexity & Pipeline Details */}
+      <motion.section
+        className="rounded-xl border bg-card p-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.4 }}
+      >
+        <h2 className="font-display font-semibold text-lg tracking-tight mb-4">Pipeline Complexity & Data Flow</h2>
+        <p className="text-sm text-muted-foreground mb-4">
+          The architecture operates as a multi-stage retrieval-augmented pipeline with embedding-based context injection and cross-verification gates.
+        </p>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          <div className="rounded-lg border border-border/60 bg-muted/20 p-4">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-1">Embedding + Retrieval</p>
+            <p className="text-sm">Knowledge base vectors indexed for semantic retrieval. Each agent query is embedded and matched against relevant KB chunks before execution.</p>
+          </div>
+          <div className="rounded-lg border border-border/60 bg-muted/20 p-4">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-1">Reranker</p>
+            <p className="text-sm">Cross-encoder reranking on retrieved KB passages to maximize factual grounding and reduce hallucination risk in agent outputs.</p>
+          </div>
+          <div className="rounded-lg border border-border/60 bg-muted/20 p-4">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-1">Cross-Verification</p>
+            <p className="text-sm">Verifier Agent independently validates every claim and metric before aggregation. 2 full cross-verification rounds were executed.</p>
+          </div>
+        </div>
+        <div className="rounded-lg border border-border/60 bg-muted/20 p-4">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">End-to-End Architecture Flow</p>
+          <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-foreground/80">
+            <span className="px-2 py-1 rounded bg-primary/10 text-primary font-semibold">User Request</span>
+            <ArrowRight className="h-3 w-3 text-muted-foreground" />
+            <span className="px-2 py-1 rounded bg-muted">Orchestrator</span>
+            <ArrowRight className="h-3 w-3 text-muted-foreground" />
+            <span className="px-2 py-1 rounded bg-muted">Task Decomposition</span>
+            <ArrowRight className="h-3 w-3 text-muted-foreground" />
+            <span className="px-2 py-1 rounded bg-muted">Agent Assignment</span>
+            <ArrowRight className="h-3 w-3 text-muted-foreground" />
+            <span className="px-2 py-1 rounded bg-cyan-500/10 text-cyan-600">Embedding + Retrieval (KB)</span>
+            <ArrowRight className="h-3 w-3 text-muted-foreground" />
+            <span className="px-2 py-1 rounded bg-violet-500/10 text-violet-600">Reranker</span>
+            <ArrowRight className="h-3 w-3 text-muted-foreground" />
+            <span className="px-2 py-1 rounded bg-muted">Agent Execution</span>
+            <ArrowRight className="h-3 w-3 text-muted-foreground" />
+            <span className="px-2 py-1 rounded bg-emerald-500/10 text-emerald-600">Cross-Verification</span>
+            <ArrowRight className="h-3 w-3 text-muted-foreground" />
+            <span className="px-2 py-1 rounded bg-muted">Result Aggregation</span>
+            <ArrowRight className="h-3 w-3 text-muted-foreground" />
+            <span className="px-2 py-1 rounded bg-primary/10 text-primary font-semibold">User Review</span>
+          </div>
+        </div>
+        <div className="grid sm:grid-cols-3 gap-3 mt-4">
+          <div className="rounded-lg bg-muted/40 p-3 text-center">
+            <p className="text-[11px] uppercase font-mono text-muted-foreground">Total Agent Interactions</p>
+            <p className="font-display font-bold text-2xl">87</p>
+          </div>
+          <div className="rounded-lg bg-muted/40 p-3 text-center">
+            <p className="text-[11px] uppercase font-mono text-muted-foreground">Tasks Executed</p>
+            <p className="font-display font-bold text-2xl">36</p>
+          </div>
+          <div className="rounded-lg bg-muted/40 p-3 text-center">
+            <p className="text-[11px] uppercase font-mono text-muted-foreground">Cross-Verification Rounds</p>
+            <p className="font-display font-bold text-2xl">2</p>
+          </div>
+        </div>
+      </motion.section>
+
       {/* Legend / Info Section */}
       <motion.section
         className="rounded-xl border bg-card p-6"

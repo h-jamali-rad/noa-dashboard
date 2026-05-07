@@ -28,17 +28,33 @@ export default function NoveltyComparisonPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {rows.map((r, i) => (
-              <tr key={i}>
-                <td className="py-2 pr-3">{r.study} ({r.year})</td>
-                <td className="py-2 pr-3">{r.sample_size}</td>
-                <td className="py-2 pr-3">{r.models_used}</td>
-                <td className="py-2 pr-3">{r.best_auc}</td>
-                <td className="py-2 pr-3">{r.how_this_study_addresses}</td>
-              </tr>
-            ))}
+            {rows.map((r, i) => {
+              const isOurs = r.study === 'Present study'
+              return (
+                <tr key={i} className={isOurs ? 'bg-primary/5 border-l-4 border-l-primary' : ''}>
+                  <td className={`py-2 pr-3 ${isOurs ? 'font-bold text-primary' : ''}`}>{r.study} ({r.year})</td>
+                  <td className={`py-2 pr-3 ${isOurs ? 'font-bold' : ''}`}>{isOurs ? <>{String(r.sample_size)}</> : r.sample_size}</td>
+                  <td className={`py-2 pr-3 ${isOurs ? 'font-bold' : ''}`}>{r.models_used}</td>
+                  <td className={`py-2 pr-3 ${isOurs ? 'font-bold text-primary' : ''}`}>{r.best_auc}</td>
+                  <td className={`py-2 pr-3 ${isOurs ? 'font-semibold' : ''}`}>{r.how_this_study_addresses}</td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
+      </div>
+
+      {/* Highlighted points */}
+      <div className="rounded-xl border bg-card p-5 shadow-sm">
+        <h2 className="font-display font-semibold text-base mb-3">Key Differentiators</h2>
+        <ul className="space-y-2">
+          {data.novelty_comparison.highlighted_points.map((p, i) => (
+            <li key={i} className="flex items-start gap-2 text-sm">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-mono font-semibold text-white shrink-0 mt-0.5">{i + 1}</span>
+              <span>{p}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   )
