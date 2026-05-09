@@ -199,23 +199,25 @@ export default function ArticlePreviewClient({
     return blocks
   }, [articleData])
 
-  async function loadComments() {
+  function getStorageKey() {
+    return `noa-comments-${articleId}`
+  }
+
+  function loadComments() {
     setIsLoading(true)
     setError(null)
-
     try {
-      const response = await fetch(`/api/comments?articleId=${encodeURIComponent(articleId)}`)
-      if (!response.ok) throw new Error('Failed to load comments.')
-      const payload = (await response.json()) as { comments?: ArticleComment[] }
-      setComments(payload.comments ?? [])
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load comments.')
+      const raw = typeof window !== 'undefined' ? localStorage.getItem(getStorageKey()) : null
+      const stored: ArticleComment[] = raw ? JSON.parse(raw) : []
+      setComments(stored)
+    } catch {
+      setError('Failed to load comments from local storage.')
     } finally {
       setIsLoading(false)
     }
   }
 
-  async function saveComment() {
+  function saveComment() {
     if (!draft) return
 
     const trimmedName = authorName.trim()
@@ -228,41 +230,35 @@ export default function ArticlePreviewClient({
 
     setError(null)
 
-    const response = await fetch('/api/comments', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    try {
+      const newComment: ArticleComment = {
+        id: Date.now(),
         articleId,
         paragraphId: draft.paragraphId,
         selectedText: draft.selectedText,
         commentText: trimmedComment,
         authorName: trimmedName,
-      }),
-    })
+        createdAt: new Date().toISOString(),
+      }
 
-    if (!response.ok) {
-      const payload = (await response.json().catch(() => ({}))) as { error?: string }
-      setError(payload.error ?? 'Failed to save comment.')
-      return
-    }
+      const raw = typeof window !== 'undefined' ? localStorage.getItem(getStorageKey()) : null
+      const existing: ArticleComment[] = raw ? JSON.parse(raw) : []
+      existing.push(newComment)
+      localStorage.setItem(getStorageKey(), JSON.stringify(existing))
 
-    setCommentText('')
-    setDraft(null)
-    if (typeof window !== 'undefined') {
-      window.getSelection()?.removeAllRanges()
+      setCommentText('')
+      setDraft(null)
+      if (typeof window !== 'undefined') {
+        window.getSelection()?.removeAllRanges()
+      }
+      loadComments()
+    } catch {
+      setError('Failed to save comment.')
     }
-    await loadComments()
   }
 
-  async function exportCommentsAsJson() {
-    const response = await fetch(`/api/comments?articleId=${encodeURIComponent(articleId)}`)
-    if (!response.ok) {
-      setError('Unable to export comments.')
-      return
-    }
-
-    const payload = (await response.json()) as { comments?: ArticleComment[] }
-    const blob = new Blob([JSON.stringify(payload.comments ?? [], null, 2)], {
+  function exportCommentsAsJson() {
+    const blob = new Blob([JSON.stringify(comments, null, 2)], {
       type: 'application/json',
     })
 
@@ -309,7 +305,7 @@ export default function ArticlePreviewClient({
   }
 
   useEffect(() => {
-    void loadComments()
+    loadComments()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [articleId])
 
