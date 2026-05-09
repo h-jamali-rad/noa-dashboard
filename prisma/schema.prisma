@@ -60,3 +60,16 @@ model LogFile {
   sortOrder   Int    @default(0)
   uniqueKey   String @unique
 }
+
+model Comment {
+  id           Int      @id @default(autoincrement())
+  articleId    String
+  paragraphId  String
+  selectedText String
+  commentText  String
+  authorName   String
+  createdAt    DateTime @default(now())
+
+  @@index([articleId])
+  @@index([articleId, paragraphId])
+}

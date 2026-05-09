@@ -1,5 +1,6 @@
 import BreadcrumbNav from '@/components/breadcrumb-nav'
 import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 import {
   Accordion,
   AccordionContent,
@@ -347,6 +348,7 @@ export default function ArticlesPage() {
         targetJournal="Fertility & Sterility"
         downloadHref="/downloads/article_a_pathology_encoding.docx"
         downloadLabel="Download DOCX (Article A)"
+        readFullArticleHref="/articles/article-a"
         data={articleA}
       />
 
@@ -358,6 +360,7 @@ export default function ArticlesPage() {
         targetJournal="JMIR Medical Informatics"
         downloadHref="/downloads/article_b_cdss_multiagent.docx"
         downloadLabel="Download DOCX (Article B)"
+        readFullArticleHref="/articles/article-b"
         data={articleB}
       />
     </div>
@@ -384,12 +387,14 @@ function ArticleInPrepCard({
   targetJournal,
   downloadHref,
   downloadLabel,
+  readFullArticleHref,
   data,
 }: {
   cardLabel: string
   targetJournal: string
   downloadHref: string
   downloadLabel: string
+  readFullArticleHref: string
   data: ArticleData
 }) {
   const tripodItems = data.tripod_ai_checklist?.items ?? []
@@ -558,6 +563,9 @@ function ArticleInPrepCard({
               <Download className="mr-1 h-4 w-4" />
               {downloadLabel}
             </a>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href={readFullArticleHref}>Read Full Article</Link>
           </Button>
           <span className="text-xs text-muted-foreground">
             Manuscript draft (.docx) — formatted for {targetJournal}.
