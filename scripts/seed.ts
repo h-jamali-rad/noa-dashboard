@@ -58,7 +58,7 @@ function loadDataFiles(subdir: 'code' | 'logs'): FileRecord[] {
   const dir = path.join(DATA_DIR, subdir)
   if (!fs.existsSync(dir)) return []
   return fs.readdirSync(dir)
-    .filter((filename) => !filename.startsWith('.'))
+    .filter((filename) => !filename.startsWith('.') && !filename.endsWith('.docx'))
     .map((filename) => {
       const fullPath = path.join(dir, filename)
       const [agent] = filename.split('__')
