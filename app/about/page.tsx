@@ -1,11 +1,26 @@
 import BreadcrumbNav from '@/components/breadcrumb-nav'
+import TeamStanding from '@/components/about/team-standing'
 
 export default function AboutPage() {
   return (
-    <div className="px-4 sm:px-6 lg:px-10 py-8 max-w-screen-2xl mx-auto space-y-6">
+    <div className="px-4 sm:px-6 lg:px-10 py-8 max-w-screen-2xl mx-auto space-y-8">
       <BreadcrumbNav items={[{ label: 'About' }]} />
-      <h1 className="font-display font-bold text-3xl tracking-tight">About this project</h1>
+
+      <div className="text-center space-y-2">
+        <h1 className="font-display font-bold text-3xl tracking-tight">Research Team</h1>
+        <p className="text-sm text-muted-foreground">
+          Click on a team member to view their profile — hover for a quick preview
+        </p>
+      </div>
+
+      {/* Interactive team standing picture */}
+      <div className="rounded-xl border bg-gradient-to-b from-card via-card to-background p-4 sm:p-8 overflow-hidden">
+        <TeamStanding />
+      </div>
+
+      {/* Project description */}
       <div className="rounded-lg border bg-card p-5 text-sm text-muted-foreground space-y-3">
+        <h2 className="font-display font-semibold text-lg text-foreground">About This Project</h2>
         <p>
           This dashboard supports Hossein Jamalirad&apos;s PhD research in Medical Informatics at MUMS, focused on
           preoperative prediction of sperm retrieval success in NOA patients undergoing microTESE.
