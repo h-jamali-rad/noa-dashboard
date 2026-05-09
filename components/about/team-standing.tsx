@@ -12,6 +12,7 @@ interface TeamMember {
   affiliation: string
   image: string
   activeImage: string
+  institutionLogo: string
   height: number
   row: number
   position: number
@@ -28,6 +29,7 @@ const teamMembers: TeamMember[] = [
     affiliation: 'MUMS',
     image: '/images/team/char_jamalirad.png',
     activeImage: '/images/team/char_jamalirad_active.png',
+    institutionLogo: '/images/team/mums_logo.jpeg',
     height: 186,
     row: 0,
     position: 0,
@@ -42,6 +44,7 @@ const teamMembers: TeamMember[] = [
     affiliation: 'Royan Institute',
     image: '/images/team/char_sabbaghian.png',
     activeImage: '/images/team/char_sabbaghian_active.png',
+    institutionLogo: '/images/team/royan_logo.png',
     height: 175,
     row: 1,
     position: 0.8,
@@ -56,6 +59,7 @@ const teamMembers: TeamMember[] = [
     affiliation: 'Royan Institute',
     image: '/images/team/char_gilani.png',
     activeImage: '/images/team/char_gilani_active.png',
+    institutionLogo: '/images/team/royan_logo.png',
     height: 175,
     row: 1,
     position: 1.6,
@@ -70,6 +74,7 @@ const teamMembers: TeamMember[] = [
     affiliation: 'MUMS',
     image: '/images/team/char_vakili.png',
     activeImage: '/images/team/char_vakili_active.png',
+    institutionLogo: '/images/team/mums_logo.jpeg',
     height: 175,
     row: 1,
     position: -0.8,
@@ -84,6 +89,7 @@ const teamMembers: TeamMember[] = [
     affiliation: 'MUMS & University of Amsterdam',
     image: '/images/team/char_eslami.png',
     activeImage: '/images/team/char_eslami_active.png',
+    institutionLogo: '/images/team/medical_informatics_logo.png',
     height: 175,
     row: 1,
     position: -1.6,
@@ -143,7 +149,7 @@ export default function TeamStanding() {
                 isFaded={hoveredId !== null && hoveredId !== member.id}
                 onClick={() => handleClick(member.id)}
                 onHover={(h) => setHoveredId(h ? member.id : null)}
-                scale={0.85}
+                scale={0.88}
               />
             ))}
         </div>
@@ -161,7 +167,7 @@ export default function TeamStanding() {
                 isFaded={hoveredId !== null && hoveredId !== member.id}
                 onClick={() => handleClick(member.id)}
                 onHover={(h) => setHoveredId(h ? member.id : null)}
-                scale={1.05}
+                scale={1.1}
               />
             ))}
         </div>
@@ -187,18 +193,12 @@ export default function TeamStanding() {
 
       {/* Info card */}
       {selected && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm z-50 animate-in fade-in slide-in-from-bottom-6 duration-400">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm z-50 animate-in fade-in slide-in-from-bottom-6 duration-400 pointer-events-auto">
           <div className="rounded-2xl border border-primary/30 bg-card/85 backdrop-blur-2xl p-6 shadow-2xl shadow-primary/30 ring-1 ring-white/10 overflow-hidden relative">
             {/* Institution Highlight Banner */}
             <div className="absolute top-0 right-0 w-24 h-24 opacity-10 -mr-6 -mt-6 pointer-events-none">
               <Image
-                src={
-                  selected.affiliation.includes('Royan')
-                    ? '/images/team/royan_logo.png'
-                    : selected.affiliation.includes('Amsterdam')
-                      ? '/images/team/medical_informatics_logo.png'
-                      : '/images/team/mums_logo.jpeg'
-                }
+                src={selected.institutionLogo}
                 alt="Institution"
                 fill
                 className="object-contain"
@@ -206,13 +206,12 @@ export default function TeamStanding() {
             </div>
 
             <div className="flex items-center gap-4 mb-4 relative">
-              <div className="h-16 w-16 rounded-full overflow-hidden border-2 border-primary/40 flex-shrink-0 bg-primary/10 shadow-[0_0_15px_rgba(var(--primary),0.3)]">
+              <div className="h-16 w-16 relative rounded-full overflow-hidden border-2 border-primary/40 flex-shrink-0 bg-primary/10 shadow-[0_0_15px_rgba(var(--primary),0.3)]">
                 <Image
                   src={selected.activeImage}
                   alt={selected.name}
-                  width={64}
-                  height={64}
-                  className="object-cover object-top w-full h-full scale-110"
+                  fill
+                  className="object-cover object-top scale-[1.5] origin-top translate-y-1"
                 />
               </div>
               <div>
@@ -252,7 +251,10 @@ export default function TeamStanding() {
             </div>
 
             <button
-              onClick={() => setSelectedId(null)}
+              onClick={(e) => {
+                e.stopPropagation()
+                setSelectedId(null)
+              }}
               className="mt-6 w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-black uppercase tracking-[0.2em] shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
             >
               System Return
@@ -263,81 +265,36 @@ export default function TeamStanding() {
 
       <style jsx>{`
         @keyframes idle-breathe {
-          0%,
-          100% {
-            transform: translateY(0px) scale(var(--char-scale));
-          }
-          50% {
-            transform: translateY(-4px) scale(var(--char-scale));
-          }
+          0%, 100% { transform: translateY(0px) scale(var(--char-scale)); }
+          50% { transform: translateY(-4px) scale(var(--char-scale)); }
         }
         @keyframes idle-sway-right {
-          0%,
-          100% {
-            transform: translateX(0px) rotate(0deg) scale(var(--char-scale));
-          }
-          50% {
-            transform: translateX(3px) rotate(0.2deg) scale(var(--char-scale));
-          }
+          0%, 100% { transform: translateX(0px) rotate(0deg) scale(var(--char-scale)); }
+          50% { transform: translateX(3px) rotate(0.2deg) scale(var(--char-scale)); }
         }
         @keyframes idle-sway-left {
-          0%,
-          100% {
-            transform: translateX(0px) rotate(0deg) scale(var(--char-scale));
-          }
-          50% {
-            transform: translateX(-3px) rotate(-0.2deg) scale(var(--char-scale));
-          }
+          0%, 100% { transform: translateX(0px) rotate(0deg) scale(var(--char-scale)); }
+          50% { transform: translateX(-3px) rotate(-0.2deg) scale(var(--char-scale)); }
         }
         @keyframes idle-shift {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg) scale(var(--char-scale));
-          }
-          33% {
-            transform: translateY(-3px) rotate(0.4deg) scale(var(--char-scale));
-          }
-          66% {
-            transform: translateY(0px) rotate(-0.4deg) scale(var(--char-scale));
-          }
+          0%, 100% { transform: translateY(0px) rotate(0deg) scale(var(--char-scale)); }
+          33% { transform: translateY(-3px) rotate(0.4deg) scale(var(--char-scale)); }
+          66% { transform: translateY(0px) rotate(-0.4deg) scale(var(--char-scale)); }
         }
         @keyframes idle-breathe-slow {
-          0%,
-          100% {
-            transform: translateY(0px) scale(var(--char-scale));
-          }
-          50% {
-            transform: translateY(-2px) scale(calc(var(--char-scale) * 1.008));
-          }
+          0%, 100% { transform: translateY(0px) scale(var(--char-scale)); }
+          50% { transform: translateY(-2px) scale(calc(var(--char-scale) * 1.008)); }
         }
         @keyframes hologram-particle {
-          0% {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          50% {
-            opacity: 1;
-          }
-          100% {
-            opacity: 0;
-            transform: translateY(-40px);
-          }
+          0% { opacity: 0; transform: translateY(20px); }
+          50% { opacity: 1; }
+          100% { opacity: 0; transform: translateY(-40px); }
         }
         @keyframes scanner-line {
-          0% {
-            transform: translateY(-100%);
-            opacity: 0;
-          }
-          20% {
-            opacity: 0.5;
-          }
-          80% {
-            opacity: 0.5;
-          }
-          100% {
-            transform: translateY(200%);
-            opacity: 0;
-          }
+          0% { transform: translateY(-100%); opacity: 0; }
+          20% { opacity: 0.5; }
+          80% { opacity: 0.5; }
+          100% { transform: translateY(200%); opacity: 0; }
         }
       `}</style>
     </div>
@@ -361,7 +318,7 @@ function CharacterCard({
   onHover: (h: boolean) => void
   scale: number
 }) {
-  const currentScale = isHovered ? scale * 1.15 : scale
+  const currentScale = isHovered ? scale * 1.12 : scale
   const heightPx = (member.height / 186) * 320 * currentScale
 
   return (
@@ -374,17 +331,15 @@ function CharacterCard({
         {
           '--char-scale': currentScale,
           opacity: isFaded ? 0.3 : 1,
-          zIndex: isHovered ? 60 : isSelected ? 55 : member.row === 0 ? 40 : 20,
+          zIndex: isHovered ? 60 : (isSelected ? 55 : (member.row === 0 ? 40 : 20)),
           filter: isFaded
             ? 'grayscale(0.9) blur(2px)'
             : isHovered
-              ? 'brightness(1.15) drop-shadow(0 0 40px rgba(var(--primary), 0.7))'
-              : 'drop-shadow(0 0 15px rgba(var(--primary), 0.2))',
-          animation: isHovered
-            ? 'none'
-            : `${member.idleAnimation} ${4 + Math.random() * 3}s ease-in-out infinite`,
+              ? 'brightness(1.1) drop-shadow(0 0 35px rgba(var(--primary), 0.6))'
+              : 'drop-shadow(0 0 10px rgba(var(--primary), 0.15))',
+          animation: isHovered ? 'none' : `${member.idleAnimation} ${4 + Math.random() * 3}s ease-in-out infinite`,
           transform: isHovered
-            ? `translateY(${-25 * scale}px)`
+            ? `translateY(${-40 * scale}px)`
             : `translateX(${member.position * 45 * scale}px)`,
           cursor: 'pointer',
         } as React.CSSProperties
@@ -394,13 +349,24 @@ function CharacterCard({
         style={{ height: `${heightPx}px`, width: `${heightPx * 0.65}px` }}
         className="relative transition-all duration-500"
       >
+        {/* Base Pose */}
         <Image
-          src={isHovered ? member.activeImage : member.image}
+          src={member.image}
           alt={member.name}
           fill
-          className="object-contain object-bottom drop-shadow-2xl transition-opacity duration-300"
-          sizes="400px"
+          className={`object-contain object-bottom transition-all duration-500 ${isHovered ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
+          sizes="500px"
           priority
+        />
+        
+        {/* Active Pose */}
+        <Image
+          src={member.activeImage}
+          alt={`${member.name} active`}
+          fill
+          className={`object-contain object-bottom transition-all duration-500 ${isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+          sizes="500px"
+          priority={isHovered}
         />
 
         {/* Hologram Scanner Loop on Hover */}
@@ -410,7 +376,7 @@ function CharacterCard({
               className="absolute top-0 left-0 w-full h-1 bg-primary/40 shadow-[0_0_15px_rgba(var(--primary),0.8)] z-10"
               style={{ animation: 'scanner-line 2s linear infinite' }}
             />
-            <div className="absolute inset-0 bg-primary/5 mix-blend-overlay animate-pulse" />
+            <div className="absolute inset-0 bg-primary/5 animate-pulse" />
           </div>
         )}
       </div>
