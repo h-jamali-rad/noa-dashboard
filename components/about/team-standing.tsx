@@ -4,7 +4,6 @@ import { useState } from 'react'
 import Image from 'next/image'
 
 interface TeamMember {
-interface TeamMember {
   id: string
   name: string
   title: string
