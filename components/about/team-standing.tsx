@@ -89,6 +89,8 @@ const teamMembers: TeamMember[] = [
     position: -1.6,
     idleAnimation: 'idle-breathe-slow',
   },
+]
+
 export default function TeamStanding() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
