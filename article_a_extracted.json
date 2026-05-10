@@ -1,7 +1,9 @@
 {
   "title": "Impact of Histopathological Feature Encoding on Machine Learning Prediction of Sperm Retrieval in Micro-TESE for Non-Obstructive Azoospermia: A Comparative Analysis of 16 Encoding Strategies",
   "authors": "Hossein Jamalirad, Marjan Sabbaghian, Hassan Vakili Arki",
-  "abstract": "Background: Non-obstructive azoospermia (NOA) affects approximately 10% of infertile men and represents the most severe form of male infertility. Microsurgical testicular sperm extraction (micro-TESE) is the gold standard for sperm retrieval, yet success rates vary widely (40-60%). While machine learning (ML) approaches have shown promise in predicting micro-TESE outcomes, the impact of histopathological feature encoding strategies on model performance has not been systematically investigated. Methods: We performed a retrospective analysis of 2,413 NOA patients who underwent micro-TESE at Royan Institute, Tehran, Iran. Sixteen encoding strategies for bilateral testicular biopsy histopathological features were designed and evaluated across five ML classifiers using 5×5 nested cross-validation with 50-iteration randomized hyperparameter search per fold. Results: The ordinal_detailed_plus_raw encoding strategy, which combines per-testis ordinal severity scores with 16 raw histopathological percentage features, achieved optimal performance. CatBoost attained the highest AUC of 0.8306 (bootstrap 95% CI: 0.823–0.845), with sensitivity of 0.678, specificity of 0.822, and F1 of 0.658. SHAP analysis revealed that 17 of 25 top features were pathology-derived, with right testicular severe hypospermatogenesis percentage being the single most influential predictor. Conclusion: Systematic encoding of histopathological features substantially impacts ML-based prediction of sperm retrieval in micro-TESE. The proposed ordinal encoding with raw feature preservation achieves state-of-the-art prediction performance and provides clinically interpretable feature attributions.",
+  "abstract": [
+    "Background and Objective Non-obstructive azoospermia (NOA) is the most severe form of male infertility, and microdissection testicular sperm extraction (micro-TESE) is the gold-standard surgical intervention. However, success rates vary widely (30–60%), and no reliable preoperative prediction tool exists. We developed and validated machine learning models to predict sperm retrieval success using comprehensive clinical, hormonal, genetic, and histopathological data. Methods A retrospective cohort of 2450 NOA patients (2413 with valid outcomes) who underwent micro-TESE at a single tertiary center was analyzed. Fifty-five clinical features were collected; after preprocessing, 51 features were retained for modeling. Nine machine learning classifiers were trained with Optuna-optimized hyperparameters on SMOTE-balanced training data (80/20 split). Model performance was evaluated using AUC-ROC, bootstrap validation (500 iterations), SHAP analysis, and decision curve analysis (DCA). Key Findings and Limitations Logistic regression achieved the highest test-set AUC-ROC of 0.834. SHAP analysis revealed that 9 of the 10 most important predictive features were histopathology-derived, with pathology-only models (22 features) achieving equivalent discrimination (AUC = 0.742). Subgroup analysis demonstrated markedly different success rates by histological pattern: hypospermatogenesis 89.5%, maturation arrest 43.0%, and Sertoli cell-only syndrome 22.6% (p = 1.96 × 10⁻⁴⁷). DCA confirmed net clinical benefit across threshold probabilities of 1–82%. Platt scaling successfully recalibrated the model (Hosmer-Lemeshow p = 0.616), yielding excellent calibration while preserving discrimination. Limitations include the retrospective single-center design and the inclusion of intraoperative pathology data. Conclusions and Clinical Implications A logistic regression model using clinical and histopathological features provides clinically useful discrimination for predicting micro-TESE outcomes in NOA patients. Post-hoc Platt scaling achieved excellent calibration, enabling reliable probability estimation. Testicular histopathology is the dominant predictor, and subgroup-specific counseling based on histological pattern should be integrated into clinical decision-making. Advancing Practice What does the study add? This study, comprising 2450 patients, is among the largest machine learning analyses for predicting micro-TESE success in NOA. It demonstrates that testicular histopathology is the overwhelmingly dominant predictor, with clinical and hormonal features adding negligible incremental value. The validated model and subgroup-specific success rates provide evidence-based tools for preoperative patient counseling. Patient Summary We used computer-based methods to predict whether surgery to find sperm in the testes would succeed for men with severe infertility. We found that the tissue type in the testes is the strongest predictor of success. Men whose tissue shows some remaining sperm production have the best chances (about 90%), while those with Sertoli cell-only tissue have lower chances (about 23%). Take Home Message In a cohort of 2450 NOA patients, logistic regression achieved an AUC of 0.834 for predicting micro-TESE success. Platt scaling recalibration achieved excellent calibration (Hosmer-Lemeshow p = 0.616) while preserving discrimination. Testicular histopathology dominated prediction; clinical features added negligible value beyond pathology alone."
+  ],
   "key_results_summary": "The ordinal_detailed_plus_raw encoding strategy achieved the best CatBoost AUC of 0.8306 (95% CI: 0.823–0.845), significantly outperforming other encoding approaches. SHAP analysis showed 17 of 25 top features were pathology-derived, with right testicular severe hypospermatogenesis being most influential. Clinical-only baseline achieved near-chance AUC (0.5642), confirming the critical importance of histopathological features.",
   "tables": [
     {
@@ -798,19 +800,299 @@
   "figures": [
     {
       "figure_name": "Figure 1",
-      "description": "Encoding strategy comparison showing AUC performance of 16 encoding strategies across CatBoost. Ordinal_detailed_plus_raw achieves highest AUC (0.8208 in screening)."
+      "caption": "STROBE flow diagram of patient selection. Of 2450 patients screened, 37 were excluded for missing primary outcome data, yielding an analytical cohort of 2413 patients (886 successful sperm retrieval, 1527 unsuccessful).",
+      "description": "STROBE flow diagram of patient selection. Of 2450 patients screened, 37 were excluded for missing primary outcome data, yielding an analytical cohort of 2413 patients (886 successful sperm retrieval, 1527 unsuccessful)."
     },
     {
       "figure_name": "Figure 2",
-      "description": "Model performance comparison across 5 classifiers using the optimal ordinal_detailed_plus_raw encoding."
+      "caption": "SHAP summary plot showing the top 20 features ranked by mean absolute SHAP value. Nine of the top 10 features are histopathology-derived. Color indicates feature value (red = high, blue = low); position on the x-axis indicates the impact on model prediction.",
+      "description": "SHAP summary plot showing the top 20 features ranked by mean absolute SHAP value. Nine of the top 10 features are histopathology-derived. Color indicates feature value (red = high, blue = low); position on the x-axis indicates the impact on model prediction."
     },
     {
       "figure_name": "Figure 3",
-      "description": "SHAP summary plot showing top 25 features by mean absolute SHAP value for CatBoost, with pathology features dominating."
+      "caption": "Decision curve analysis comparing the logistic regression model against “treat all” and “treat none” strategies. The model provides net clinical benefit across threshold probabilities of 1–82%.",
+      "description": "Decision curve analysis comparing the logistic regression model against “treat all” and “treat none” strategies. The model provides net clinical benefit across threshold probabilities of 1–82%."
     },
     {
       "figure_name": "Figure 4",
-      "description": "Pipeline v1 vs v2 performance comparison showing AUC improvement from 0.7327 to 0.8306 after quality assurance corrections."
+      "caption": "Sperm retrieval success rates stratified by dominant histopathological pattern. Error bars represent 95% confidence intervals. *** p < 0.001 (chi-square test).",
+      "description": "Sperm retrieval success rates stratified by dominant histopathological pattern. Error bars represent 95% confidence intervals. *** p < 0.001 (chi-square test)."
+    },
+    {
+      "figure_name": "Figure 5",
+      "caption": "Calibration plots before and after Platt scaling. (A) Original logistic regression model showing suboptimal calibration (Hosmer-Lemeshow p = 0.003). (B) Platt-scaled model demonstrating excellent calibration (Hosmer-Lemeshow p = 0.616). The diagonal dashed line represents perfect calibration. Discrimination (AUC = 0.834) was fully preserved after recalibration.",
+      "description": "Calibration plots before and after Platt scaling. (A) Original logistic regression model showing suboptimal calibration (Hosmer-Lemeshow p = 0.003). (B) Platt-scaled model demonstrating excellent calibration (Hosmer-Lemeshow p = 0.616). The diagonal dashed line represents perfect calibration. Discrimination (AUC = 0.834) was fully preserved after recalibration."
+    },
+    {
+      "figure_name": "Figure 6",
+      "caption": "Comprehensive calibration dashboard. Four-panel visualization showing: (A) calibration curve before Platt scaling, (B) calibration curve after Platt scaling, (C) overlay comparison of both calibration curves, and (D) predicted probability distributions before and after recalibration.",
+      "description": "Comprehensive calibration dashboard. Four-panel visualization showing: (A) calibration curve before Platt scaling, (B) calibration curve after Platt scaling, (C) overlay comparison of both calibration curves, and (D) predicted probability distributions before and after recalibration."
     }
-  ]
+  ],
+  "introduction": [
+    "Non-obstructive azoospermia (NOA) is the most severe form of male infertility, affecting approximately 1% of all men and accounting for 60% of azoospermia cases [1,2]. NOA is characterized by impaired spermatogenesis within the testes, resulting in the complete absence of spermatozoa in the ejaculate. Etiologies are diverse, encompassing genetic causes such as Klinefelter syndrome and Y chromosome microdeletions, acquired causes including cryptorchidism and gonadotoxic exposures, and idiopathic testicular failure [3]. Microdissection testicular sperm extraction (micro-TESE) is the gold-standard surgical intervention for sperm retrieval in NOA, enabling identification of dilated seminiferous tubules harboring focal spermatogenesis under operative microscopy [4,5]. Reported success rates range from 30% to 60%, depending on underlying histopathology and patient characteristics [6]. The unpredictability of outcomes imposes significant physical, emotional, and financial burdens on patients and their partners. Several preoperative predictors have been investigated, including patient age, testicular volume, follicle-stimulating hormone (FSH), luteinizing hormone (LH), testosterone, anti-Müllerian hormone, inhibin B, and genetic markers [7–10]. However, no single biomarker or combination has achieved sufficient predictive accuracy for routine clinical application. Machine learning methods offer the potential to integrate complex, high-dimensional clinical data and identify non-linear relationships that conventional statistical approaches may overlook [11,12]. Prior machine learning studies in this domain have been limited by small sample sizes (typically <500 patients), restricted feature sets, and a lack of comprehensive model validation and clinical utility assessment [13]. Moreover, few studies have employed explainable artificial intelligence (XAI) techniques to elucidate model predictions, which is essential for clinical adoption [14]. We aimed to develop and validate machine learning models for predicting sperm retrieval success in a large single-center cohort of NOA patients undergoing micro-TESE, with comprehensive feature engineering, rigorous bootstrap validation, SHAP-based interpretability analysis, and decision curve analysis to assess clinical utility."
+  ],
+  "methods": {
+    "title": "Materials and Methods",
+    "content": [],
+    "subsections": [
+      {
+        "title": "Ethics Statement",
+        "content": [
+          "This study was approved by the Institutional Review Board of Mashhad University of Medical Sciences (Grant ID: 4020802). The study was conducted in accordance with the Declaration of Helsinki. Given the retrospective observational design using de-identified data, the requirement for individual informed consent was waived by the ethics committee."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Study Design and Patient Population",
+        "content": [
+          "This retrospective cohort study included 2450 consecutive NOA patients who underwent micro-TESE at the Royan Institute for Reproductive Biomedicine, Tehran, Iran. Inclusion criteria were: (1) confirmed diagnosis of NOA based on at least two semen analyses showing azoospermia and hormonal/clinical evaluation excluding obstructive causes; (2) undergoing primary micro-TESE. Patients with obstructive azoospermia, prior testicular sperm extraction attempts, or missing primary outcome data were excluded. After exclusion of 37 patients with missing outcome data, 2413 patients comprised the analytical cohort (Fig. 1)."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Data Collection and Feature Engineering",
+        "content": [
+          "Fifty-five clinical variables were extracted from electronic medical records, spanning six categories: demographics (age, partner age, race), anthropometrics (height, weight, BMI), hormonal profile (FSH, LH, testosterone, estradiol, prolactin), testicular measurements (bilateral sonographic dimensions, orchidometer volumes, Sakamoto-estimated volumes), surgical and urological history (varicocele, orchiopexy, inguinal hernia, surgical trauma), comorbidities (diabetes, hypertension), lifestyle factors (habits, occupational exposures, family history of infertility), genetic factors (karyotype, Y chromosome microdeletion status), semen parameters (seminal plasma pH), and testicular histopathology (bilateral pathology reports). Histopathological data were recorded as free-text pathology reports. A structured extraction pipeline was developed to parse these reports into 22 quantitative features representing four major histological patterns: Sertoli cell-only syndrome (SCO), complete seminiferous tubular hyalinization (CSTH), maturation arrest (four stages), and hypospermatogenesis. Percentage values, binary indicators, and missingness flags were extracted for each pattern bilaterally. After excluding identifier columns, all-null variables, and the nine columns excluded for complete missingness, 51 features were retained for modeling."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Outcome Definition",
+        "content": [
+          "The primary outcome was successful sperm retrieval at the first micro-TESE procedure, defined as the identification of at least one spermatozoon suitable for intracytoplasmic sperm injection (ICSI). The overall sperm retrieval rate was 36.7% (886/2413)."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Statistical Analysis and Machine Learning Pipeline",
+        "content": [
+          "The dataset was split into training (80%, n = 1930) and test (20%, n = 483) sets using stratified random sampling. Feature selection employed a three-stage pipeline: (1) Mann-Whitney U test (p < 0.05); (2) mutual information ranking; and (3) recursive feature elimination with random forest. The union of features across all three methods yielded the final 51-feature set. Class imbalance (1.72:1 failure-to-success ratio) was addressed using Synthetic Minority Over-sampling Technique (SMOTE) applied exclusively to the training set [15]. Nine classifiers were trained: logistic regression, random forest, XGBoost, LightGBM, gradient boosting, support vector machine (SVM), k-nearest neighbors (KNN), AdaBoost, and multilayer perceptron (MLP). Hyperparameters were optimized using Optuna with Tree-structured Parzen Estimator over 30–50 trials, maximizing 5-fold cross-validated AUC-ROC [16]. Model discrimination was assessed by AUC-ROC, sensitivity, specificity, positive predictive value (PPV), negative predictive value (NPV), and Matthews correlation coefficient (MCC). Bootstrap validation (500 iterations with replacement) generated 95% confidence intervals. Initial calibration was assessed via Hosmer-Lemeshow goodness-of-fit test, Brier score, and calibration slope analysis [17]. Clinical utility was quantified using decision curve analysis (DCA) [18]. Feature importance was determined using SHapley Additive exPlanations (SHAP) [19]. Sensitivity analyses compared full-model, pathology-only, clinical-only, and no-pathology models. All analyses were performed in Python 3.11 using scikit-learn 1.3, XGBoost 2.0, LightGBM 4.1, and SHAP 0.43."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Model Calibration",
+        "content": [
+          "Following initial evaluation, calibration of the best-performing logistic regression model was assessed and subsequently improved using Platt scaling [39]. Platt scaling fits a sigmoid function to map predicted probabilities to calibrated probabilities, effectively learning a secondary logistic regression on the model’s raw outputs. This was implemented using scikit-learn’s CalibratedClassifierCV with method=‘sigmoid’ and 5-fold stratified cross-validation on the training set to avoid overfitting the calibration mapping [39]. The calibrated model was then evaluated on the held-out test set. Calibration performance was comprehensively evaluated using five complementary metrics: (1) the Hosmer-Lemeshow goodness-of-fit test (χ² statistic and p-value), where p > 0.05 indicates acceptable calibration [17]; (2) Brier score, representing the mean squared difference between predicted probabilities and observed binary outcomes (range 0–1, lower is better); (3) the Integrated Calibration Index (ICI), defined as the weighted average absolute difference between predicted and observed probabilities across the probability range [25]; (4) E50, the median absolute calibration error; and (5) E90, the 90th percentile absolute calibration error. Preservation of discrimination (AUC-ROC) after calibration was confirmed to ensure that the recalibration procedure did not compromise the model’s ranking ability."
+        ],
+        "subsections": []
+      }
+    ]
+  },
+  "results": {
+    "title": "Results",
+    "content": [],
+    "subsections": [
+      {
+        "title": "Patient Characteristics",
+        "content": [
+          "Of 2450 patients screened, 2413 met inclusion criteria (Fig. 1). The overall sperm retrieval rate was 36.7% (886/2413). Missing data were present across multiple features (range: 0–99.8%), with the highest missingness in comorbidity variables (diabetes 99.1%, hypertension 99.8%) and the lowest in demographics (age 0%, race 0%). Hormonal profiles were available for 75–78% of patients. Testicular histopathology reports were available for the right testis in 77.8% and the left testis in 51.0% of patients."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Model Performance Comparison",
+        "content": [
+          "Table 1 presents the performance of all nine classifiers on the held-out test set. Logistic regression achieved the highest AUC-ROC (0.740; 95% CI: 0.690–0.783), followed by AdaBoost (0.729) and gradient boosting (0.726). All models demonstrated moderate discriminative ability (AUC range: 0.675–0.740). Bootstrap validation across 500 iterations confirmed the stability of the logistic regression model, with a narrow 95% CI width of 0.093. Table 1. Performance comparison of nine machine learning classifiers on the held-out test set (n = 483)."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Feature Importance Analysis",
+        "content": [
+          "SHAP analysis identified testicular histopathology as the dominant category of predictive features (Fig. 2). The top 10 features by mean absolute SHAP value were: (1) availability of left testicular pathology (mean |SHAP| = 0.163), (2) presence of hypospermatogenesis (0.141), (3) mean CSTH percentage (0.122), (4) presence of SCO (0.108), (5) availability of right testicular pathology (0.102), (6) mean SCO percentage (0.094), (7) left testicular CSTH (0.092), (8) left testicular SCO (0.083), (9) karyotype (0.083), and (10) right testicular CSTH (0.083). Nine of the ten most important features were pathology-derived; only karyotype (rank 9) was a genetic variable."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Sensitivity Analysis: Pathology Dominance",
+        "content": [
+          "Table 2 presents the results of feature ablation experiments. A model trained exclusively on 22 pathology-derived features achieved AUC = 0.742 (95% CI: 0.694–0.786), marginally exceeding the full 51-feature model (AUC = 0.740). In contrast, removing all pathology features reduced AUC to 0.551 (95% CI: 0.502–0.611), representing a loss of 0.189 AUC points. Clinical features alone (demographics, hormones, testicular volumes, genetics) achieved only AUC = 0.624. Table 2. Sensitivity analysis: AUC-ROC by feature subset (logistic regression, 500 bootstrap iterations)."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Subgroup Analysis by Dominant Histopathology",
+        "content": [
+          "Stratification by dominant histological pattern revealed markedly different sperm retrieval rates (Table 3). Hypospermatogenesis was associated with the highest success rate (89.5%), followed by maturation arrest (43.0%), mixed/other patterns (37.1%), and SCO-dominant histology (22.6%). The difference across subgroups was highly significant (χ² = 220.05, df = 3, p = 1.96 × 10⁻⁴⁷). Table 3. Sperm retrieval success rates stratified by dominant testicular histopathology."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Decision Curve Analysis",
+        "content": [
+          "DCA demonstrated that the logistic regression model provided net clinical benefit superior to both the “treat all” and “treat none” strategies across threshold probabilities ranging from 1% to 82% (Fig. 3). The maximum net benefit was 0.360 at a threshold of 1%. This low optimal threshold reflects the clinical reality that the consequence of missing a potentially successful sperm retrieval (no biological offspring) far exceeds the risk of an unsuccessful surgical attempt."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Model Calibration",
+        "content": [
+          "Initial assessment of the logistic regression model revealed suboptimal calibration (Hosmer-Lemeshow χ² = 23.41, df = 8, p = 0.003; Brier score = 0.164; ICI = 0.168; E50 = 0.151; E90 = 0.332). While discrimination was strong, predicted probabilities did not reliably match observed event frequencies, limiting the model’s utility for generating absolute risk estimates. Application of Platt scaling via CalibratedClassifierCV with 5-fold cross-validation substantially improved all calibration metrics (Table 4). The Hosmer-Lemeshow test became non-significant (χ² = 6.28, df = 8, p = 0.616), indicating excellent goodness-of-fit. The Brier score decreased from 0.164 to 0.158 (3.6% improvement), ICI decreased from 0.168 to 0.145 (13.8% improvement), E50 decreased from 0.151 to 0.129 (14.5% improvement), and E90 decreased from 0.332 to 0.276 (16.9% improvement). Critically, discrimination was fully preserved, with AUC-ROC remaining stable at 0.834 before and after calibration (Fig. 5). Table 4. Calibration metrics before and after Platt scaling (test set, n = 490)."
+        ],
+        "subsections": []
+      }
+    ]
+  },
+  "discussion": [
+    "In this large retrospective cohort of 2413 NOA patients, we developed, validated, and calibrated a machine learning prediction model for micro-TESE sperm retrieval success. Logistic regression achieved the best discriminative performance (AUC = 0.834), outperforming more complex ensemble and neural network models. The most striking finding was the overwhelming dominance of testicular histopathology as the predictive driver: a model using only 22 pathology-derived features matched the full 51-feature model, while removing pathology reduced AUC by 0.189 points. Importantly, Platt scaling successfully recalibrated the model, achieving excellent goodness-of-fit (Hosmer-Lemeshow p = 0.616) while preserving discrimination. Our AUC of 0.740 is consistent with the range reported in comparable studies. Deng et al. [20] reported AUC = 0.720 (95% CI: 0.645–0.794) in a cohort of 200 patients using a multivariable predictive model, while Ramasamy et al. [21] compared several models for predicting sperm retrieval before micro-TESE in men with NOA. Our study benefits from a substantially larger single-center cohort (n = 2413), a broader feature set (51 vs. typically 5–15 features), comprehensive bootstrap validation, and XAI-based interpretation. The dominance of histopathology aligns with the well-established clinical understanding that testicular tissue architecture is the most direct indicator of residual spermatogenic potential [5,22]. Hypospermatogenesis, indicating quantitatively reduced but present spermatogenesis, was associated with the highest success rate (89.5%), consistent with prior reports [23]. SCO-dominant histology, reflecting absence of germ cells, carried the poorest prognosis (22.6%), though success was not zero owing to focal spermatogenesis in some patients [24]. Importantly, the finding that clinical features (age, hormones, testicular volumes, genetics) added negligible incremental predictive value beyond histopathology has significant implications. It suggests that the commonly investigated preoperative predictors—FSH, testosterone, testicular volume—while correlated with outcome, are largely surrogates for the underlying histological pattern and do not provide independent prognostic information once pathology is known [7–10]. The model demonstrated favorable clinical utility on DCA, outperforming default strategies across a broad range of clinically relevant thresholds (1–82%). The very low optimal threshold (1%) reflects the asymmetric clinical consequences: the cost of a missed retrieval opportunity (permanent loss of biological parenthood) vastly exceeds the risk of an unsuccessful micro-TESE attempt. Calibration is a frequently underreported yet critical property of clinical prediction models [25]. Initial assessment of our logistic regression model revealed suboptimal calibration (Hosmer-Lemeshow p = 0.003), a common finding in machine learning-based clinical models. We addressed this systematically using Platt scaling with internal 5-fold cross-validation, which transformed the Hosmer-Lemeshow result to p = 0.616—indicating excellent goodness-of-fit—while fully preserving discrimination (AUC = 0.834). All supplementary calibration metrics (Brier score, ICI, E50, E90) demonstrated meaningful improvements of 3.6–16.9%. This recalibration step is essential for clinical deployment, as it ensures that predicted probabilities can be reliably communicated to patients as genuine risk estimates rather than mere relative rankings [39]. Our study has several limitations. First, the retrospective single-center design limits generalizability, and external validation in independent populations is warranted. Second, histopathological data were obtained intraoperatively during micro-TESE, creating an inherent look-ahead bias when these features are used for preoperative prediction. Future work should develop separate preoperative (without pathology) and intraoperative (with pathology) prediction models. Third, the substantial proportion of missing data across clinical variables (up to 99.8% for some comorbidities) may have attenuated the apparent contribution of non-pathological features. Fourth, despite being one of the largest cohorts in this field, the moderate AUC suggests inherent biological variability in micro-TESE outcomes that may not be fully captured by available clinical measurements. Strengths include the large sample size (n = 2413), comprehensive feature engineering with structured extraction from free-text pathology reports, systematic comparison of nine classifiers, rigorous bootstrap validation, SHAP-based interpretability, decision curve analysis, and—critically—successful post-hoc recalibration using Platt scaling that yielded a model with both good discrimination and excellent calibration, rendering it suitable for generating reliable absolute probability estimates for clinical counseling."
+  ],
+  "conclusions": [
+    "In this large single-center retrospective cohort, logistic regression provided the best discrimination for predicting micro-TESE sperm retrieval success in NOA patients (AUC = 0.834). Testicular histopathology was the overwhelmingly dominant predictor, with clinical and hormonal features contributing negligible incremental value. Platt scaling successfully recalibrated the model (Hosmer-Lemeshow p = 0.616), yielding a prediction tool with both good discrimination and excellent calibration suitable for clinical probability estimation. Subgroup-specific success rates—ranging from 89.5% for hypospermatogenesis to 22.6% for SCO-dominant patterns—provide an evidence-based framework for patient counseling. External validation in multicenter prospective cohorts is needed before clinical implementation."
+  ],
+  "references": [
+    "[1] Tournaye H, Krausz C, Oates RD. Novel concepts in the aetiology of male reproductive impairment. Lancet Diabetes Endocrinol 2017;5:544-53. https://doi.org/10.1016/S2213-8587(16)30040-7",
+    "[2] Wosnitzer M, Goldstein M, Hardy MP. Review of azoospermia. Spermatogenesis 2014;4:e28218. https://doi.org/10.4161/spmg.28218",
+    "[3] Brant WO, Schlegel PN. Microdissection testicular sperm extraction. Semin Reprod Med 2023;41:267-72. https://doi.org/10.1055/s-0043-1777833",
+    "[4] Schlegel PN. Testicular sperm extraction: microdissection improves sperm yield with minimal tissue excision. Hum Reprod 1999;14:131-5. https://doi.org/10.1093/humrep/14.1.131",
+    "[5] Dabaja AA, Schlegel PN. Microdissection testicular sperm extraction: an update. Asian J Androl 2013;15:35-9. https://doi.org/10.1038/aja.2012.141",
+    "[6] Bernie AM, Mata DA, Ramasamy R, et al. Comparison of microdissection testicular sperm extraction, conventional testicular sperm extraction, and testicular sperm aspiration for nonobstructive azoospermia: a systematic review and meta-analysis. Fertil Steril 2015;104:1099-103.e3. https://doi.org/10.1016/j.fertnstert.2015.07.1136",
+    "[7] Ramasamy R, Padilla WO, Osterberg EC, et al. A comparison of models for predicting sperm retrieval before microdissection testicular sperm extraction in men with nonobstructive azoospermia. J Urol 2013;189:638-42. https://doi.org/10.1016/j.juro.2012.09.038",
+    "[8] Cissen M, Meijerink AM, D'Hauwers KW, et al. Prediction model for obtaining spermatozoa with testicular sperm extraction in men with non-obstructive azoospermia. Hum Reprod 2016;31:1934-41. https://doi.org/10.1093/humrep/dew147",
+    "[9] Amer MK, Ahmed AR, Abdel Hamid AA, et al. Can spermatozoa be retrieved in non-obstructive azoospermic patients with high FSH level?: a retrospective cohort study. Andrologia 2019;51:e13176. https://doi.org/10.1111/and.13176",
+    "[10] Kobayashi H, Uetani M, Yamabe F, et al. AI model developed using machine learning for predicting sperm retrieval in micro-TESE for nonobstructive azoospermia patients. Andrologia 2023;2023:5693116. https://doi.org/10.1155/2023/5693116",
+    "[11] Zeadna A, Khateeb N, Rokach L, et al. Prediction of sperm extraction in non-obstructive azoospermia patients: a machine-learning perspective. Hum Reprod 2020;35:1505-14. https://doi.org/10.1093/humrep/deaa109",
+    "[12] Bachelot G, Dhombres F, Sermondade N, et al. A machine learning approach for the prediction of testicular sperm extraction in nonobstructive azoospermia: algorithm development and validation study. J Med Internet Res 2023;25:e44047. https://doi.org/10.2196/44047",
+    "[13] Jamalirad H, Jajroudi M, Khajehpour B, et al. AI predictive models and advancements in microdissection testicular sperm extraction for non-obstructive azoospermia: a systematic scoping review. Hum Reprod Open 2025;2025:hoae070. https://doi.org/10.1093/hropen/hoae070",
+    "[14] Rudin C. Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead. Nat Mach Intell 2019;1:206-15. https://doi.org/10.1038/s42256-019-0048-x",
+    "[15] Chawla NV, Bowyer KW, Hall LO, et al. SMOTE: synthetic minority over-sampling technique. J Artif Intell Res 2002;16:321-57. https://doi.org/10.1613/jair.953",
+    "[16] Akiba T, Sano S, Yanase T, et al. Optuna: a next-generation hyperparameter optimization framework. In: Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining; 2019. p. 2623-31. https://doi.org/10.1145/3292500.3330701",
+    "[17] Steyerberg EW, Vickers AJ, Cook NR, et al. Assessing the performance of prediction models: a framework for traditional and novel measures. Epidemiology 2010;21:128-38. https://doi.org/10.1097/EDE.0b013e3181c30fb2",
+    "[18] Vickers AJ, Elkin EB. Decision curve analysis: a novel method for evaluating prediction models. Med Decis Making 2006;26:565-74. https://doi.org/10.1177/0272989X06295361",
+    "[19] Lundberg SM, Lee SI. A unified approach to interpreting model predictions. In: Advances in Neural Information Processing Systems 30. Curran Associates; 2017. p. 4765-74.",
+    "[20] Deng CY, Li G, Chen X, et al. Development of a predictive model for increasing sperm retrieval success by microdissection testicular sperm extraction in patients with nonobstructive azoospermia. Asian J Androl 2023;25:598-603. https://doi.org/10.4103/aja2022111",
+    "[21] Ramasamy R, Padilla WO, Osterberg EC, et al. A comparison of models for predicting sperm retrieval before microdissection testicular sperm extraction in men with nonobstructive azoospermia. J Urol 2013;189:638-42. https://doi.org/10.1016/j.juro.2012.09.038",
+    "[22] Schlegel PN. Causes of azoospermia and their management. Reprod Fertil Dev 2004;16:561-72. https://doi.org/10.1071/RD03087",
+    "[23] Corona G, Minhas S, Giwercman A, et al. Sperm recovery and ICSI outcomes in men with non-obstructive azoospermia: a systematic review and meta-analysis. Hum Reprod Update 2019;25:733-57. https://doi.org/10.1093/humupd/dmz028",
+    "[24] Silber SJ, Johnson L. Are spermatid injections of any clinical value? ROSNI and ROSI revisited. Hum Reprod 1998;13:509-23. https://doi.org/10.1093/humrep/13.3.509",
+    "[25] Van Calster B, McLernon DJ, van Smeden M, et al. Calibration: the Achilles heel of predictive analytics. BMC Med 2019;17:230. https://doi.org/10.1186/s12916-019-1466-7",
+    "[26] Collins GS, Reitsma JB, Altman DG, et al. Transparent reporting of a multivariable prediction model for individual prognosis or diagnosis (TRIPOD): the TRIPOD statement. BMJ 2015;350:g7594. https://doi.org/10.1136/bmj.g7594",
+    "[27] Moons KG, Wolff RF, Riley RD, et al. PROBAST: a tool to assess risk of bias and applicability of prediction model studies: explanation and elaboration. Ann Intern Med 2019;170:W1-W33. https://doi.org/10.7326/M18-1377",
+    "[28] von Elm E, Altman DG, Egger M, et al. The Strengthening the Reporting of Observational Studies in Epidemiology (STROBE) statement: guidelines for reporting observational studies. Lancet 2007;370:1453-7. https://doi.org/10.1016/S0140-6736(07)61602-X",
+    "[29] Zarezadeh R, Fattahi A, Nikanfar S, et al. Hormonal markers as noninvasive predictors of sperm retrieval in non-obstructive azoospermia. J Assist Reprod Genet 2021;38:1307-17. https://doi.org/10.1007/s10815-021-02176-3",
+    "[30] Achermann APP, Pereira TA, Esteves SC. Microdissection testicular sperm extraction (micro-TESE) in men with infertility due to nonobstructive azoospermia: summary of current literature. Int Urol Nephrol 2021;53:2193-210. https://doi.org/10.1007/s11255-021-02979-4",
+    "[31] Aboukhshaba A, Punjani N, Doukakis S, et al. Anti-Müllerian hormone level as a predictor of sperm retrieval with microdissection testicular sperm extraction in nonobstructive azoospermia. Andrologia 2021;53:e14220. https://doi.org/10.1111/and.14220",
+    "[32] Abdel Raheem A, Garaffa G, Rushwan N, et al. Testicular histopathology as a predictor of a positive sperm retrieval in men with non-obstructive azoospermia. BJU Int 2013;111:492-9. https://doi.org/10.1111/j.1464-410X.2012.11203.x",
+    "[33] Efron B, Tibshirani RJ. An Introduction to the Bootstrap. Boca Raton: CRC Press; 1994.",
+    "[34] Hastie T, Tibshirani R, Friedman J. The Elements of Statistical Learning. 2nd ed. New York: Springer; 2009. https://doi.org/10.1007/978-0-387-84858-7",
+    "[35] Aydin T, Sofikerim M, Yucel B, et al. Effects of testicular histopathology on sperm retrieval rates and ICSI results in non-obstructive azoospermia. J Obstet Gynaecol 2015;35:829-31. https://doi.org/10.3109/01443615.2015.1009879",
+    "[36] Marinaro JA, Goldstein M. Microsurgical management of male infertility: compelling evidence that collaboration with qualified male reproductive urologists enhances assisted reproductive technology (ART) outcomes. J Clin Med 2022;11:4593. https://doi.org/10.3390/jcm11154593",
+    "[37] Kresch E, Efimenko I, Engel A, et al. Novel male infertility biomarkers: a disruptive approach to improve the current diagnostic toolkit. Fertil Steril 2021;116:1275-85. https://doi.org/10.1016/j.fertnstert.2021.08.043",
+    "[38] GhoshRoy D, Alvi PA, Garg K. Machine learning-based semen quality prediction model for male infertility assessment and diagnosis: a systematic review and meta-analysis. J Assist Reprod Genet 2023;40:2843-57. https://doi.org/10.1007/s10815-023-02938-x",
+    "[39] Platt JC. Probabilistic outputs for support vector machines and comparisons to regularized likelihood methods. In: Smola AJ, Bartlett P, Scholkopf B, et al., editors. Advances in Large Margin Classifiers. Cambridge, MA: MIT Press; 1999. p. 61-74.",
+    "[40] Riley RD, Ensor J, Snell KIE, et al. Calculating the sample size required for developing a clinical prediction model. BMJ 2020;368:m441. https://doi.org/10.1136/bmj.m441"
+  ],
+  "supplements": {
+    "title": "Supplementary Materials",
+    "content": [
+      "Machine Learning Model for Predicting Sperm Retrieval Success in Non-Obstructive Azoospermia: A Retrospective Cohort Study"
+    ],
+    "subsections": [
+      {
+        "title": "Supplementary Table S1. PROBAST Assessment",
+        "content": [
+          "Prediction model Risk Of Bias ASsessment Tool (PROBAST) checklist, completed per Moons et al. (Ann Intern Med 2019;170:W1-W33)."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Domain 1: Participants",
+        "content": [
+          "Domain 1 Risk of Bias: LOW"
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Domain 2: Predictors",
+        "content": [
+          "Domain 2 Risk of Bias: HIGH",
+          "Concern: Histopathological features are obtained intraoperatively and constitute the dominant predictive category. This is acknowledged as a limitation in the manuscript. Separate preoperative and intraoperative models are recommended for future work."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Domain 3: Outcome",
+        "content": [
+          "Domain 3 Risk of Bias: LOW"
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Domain 4: Analysis",
+        "content": [
+          "Domain 4 Risk of Bias: LOW"
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Overall PROBAST Assessment",
+        "content": [
+          "Summary of PROBAST risk of bias and applicability assessment.",
+          "The overall PROBAST rating is HIGH risk of bias, driven exclusively by Domain 2 (Predictors). The primary concern is that histopathological features—the dominant predictive category—are obtained intraoperatively rather than preoperatively. This is transparently acknowledged in the manuscript as a limitation and discussed in the context of look-ahead bias. All other domains (Participants, Outcome, Analysis) are rated LOW risk."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Supplementary Table S2. TRIPOD Checklist",
+        "content": [
+          "Transparent Reporting of a multivariable prediction model for Individual Prognosis Or Diagnosis (TRIPOD) checklist, completed per Collins et al. (BMJ 2015;350:g7594). Study type: Development only (Type 1a)."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "TRIPOD Adherence Summary",
+        "content": [
+          "Of 29 applicable TRIPOD items, 25 were fully reported (86%), 3 were partially reported (10%), and 1 was not applicable (3%). Partially reported items include study dates (4b), formal sample size calculation (8), and blinding considerations that are not applicable to this study design. Overall TRIPOD adherence is rated as GOOD."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Supplementary Table S3. Complete Feature List by Category",
+        "content": [],
+        "subsections": []
+      },
+      {
+        "title": "Supplementary Table S4. Cross-Validation Results",
+        "content": [
+          "Stratified K-fold cross-validation results (training set, n = 1930)."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Supplementary Table S5. Missing Data Summary",
+        "content": [
+          "Percentage of missing data for key variables (n = 2413)."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Supplementary Table S6. Detailed Calibration Analysis",
+        "content": [
+          "Comprehensive calibration metrics for the logistic regression model before and after Platt scaling recalibration. Platt scaling was implemented using scikit-learn’s CalibratedClassifierCV with method=‘sigmoid’ and 5-fold stratified cross-validation on the training set (n = 1960). All metrics were evaluated on the held-out test set (n = 490)."
+        ],
+        "subsections": []
+      },
+      {
+        "title": "Supplementary Table S6. Calibration metrics comparison before and after Platt scaling.",
+        "content": [],
+        "subsections": []
+      },
+      {
+        "title": "Supplementary Figure Legends",
+        "content": [],
+        "subsections": []
+      },
+      {
+        "title": "Supplementary Figure S1. Calibration overlay comparison. Original (blue) and Platt-scaled (orange) calibration curves plotted together against the ideal diagonal. The Platt-scaled curve demonstrates improved agreement between predicted probabilities and observed frequencies across all deciles.",
+        "content": [],
+        "subsections": []
+      },
+      {
+        "title": "Supplementary Figure S2. Predicted probability distributions before and after Platt scaling. Histograms showing the distribution of predicted probabilities for positive (sperm found) and negative (no sperm) outcomes. After Platt scaling, probability distributions show improved separation and more concentrated predictions.",
+        "content": [],
+        "subsections": []
+      }
+    ]
+  }
 }

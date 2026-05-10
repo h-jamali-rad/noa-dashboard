@@ -32,7 +32,14 @@ type ProbastDomain = {
 
 type FigureItem = {
   figure_name: string
+  caption?: string
   description: string
+}
+
+type StructuredSection = {
+  title?: string
+  content?: unknown
+  subsections?: StructuredSection[]
 }
 
 export type ArticleData = {
@@ -43,7 +50,10 @@ export type ArticleData = {
   methods?: unknown
   results?: unknown
   discussion?: unknown
+  conclusions?: unknown
   references?: unknown
+  supplements?: unknown
+  usability_testing?: unknown
   key_results_summary?: unknown
   tables?: ArticleTable[]
   figures?: FigureItem[]
@@ -73,13 +83,23 @@ type CommentDraft = {
   y: number
 }
 
-const CORE_SECTIONS: Array<{ key: keyof ArticleData; label: string }> = [
+type RenderedSection = {
+  id: string
+  title: string
+  level: number
+  paragraphs: ParagraphBlock[]
+}
+
+const SECTION_ORDER: Array<{ key: keyof ArticleData; label: string }> = [
   { key: 'abstract', label: 'Abstract' },
   { key: 'introduction', label: 'Introduction' },
   { key: 'methods', label: 'Methods' },
   { key: 'results', label: 'Results' },
   { key: 'discussion', label: 'Discussion' },
+  { key: 'conclusions', label: 'Conclusions' },
   { key: 'references', label: 'References' },
+  { key: 'supplements', label: 'Supplements' },
+  { key: 'usability_testing', label: 'Usability Testing' },
 ]
 
 function toParagraphs(value: unknown, baseId: string): ParagraphBlock[] {
@@ -111,6 +131,116 @@ function toParagraphs(value: unknown, baseId: string): ParagraphBlock[] {
   }
 
   return [{ id: `${baseId}-p-1`, text: String(value) }]
+}
+
+function toHeadingLabel(value: string) {
+  return value
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (s) => s.toUpperCase())
+}
+
+function isStructuredSection(value: unknown): value is StructuredSection {
+  if (!value || typeof value !== 'object') return false
+  const candidate = value as StructuredSection
+  return 'content' in candidate || 'subsections' in candidate || 'title' in candidate
+}
+
+function buildUsabilitySections(value: unknown, baseId: string, defaultTitle: string): RenderedSection[] {
+  if (!value || typeof value !== 'object') return []
+  const data = value as Record<string, unknown>
+  const title = typeof data.title === 'string' ? data.title : defaultTitle
+
+  const summary = data.summary as Record<string, unknown> | undefined
+  const summaryParagraphs = summary
+    ? Object.entries(summary)
+        .map(([key, val]) => `${toHeadingLabel(key)}: ${Array.isArray(val) ? val.join(' to ') : String(val ?? '')}`)
+        .filter(Boolean)
+    : []
+
+  const sections: RenderedSection[] = [
+    {
+      id: baseId,
+      title,
+      level: 2,
+      paragraphs: toParagraphs(summaryParagraphs, `${baseId}-summary`),
+    },
+  ]
+
+  const sectionGroups = data.sections as Record<string, unknown> | undefined
+  if (sectionGroups) {
+    Object.entries(sectionGroups).forEach(([key, content], index) => {
+      sections.push({
+        id: `${baseId}-section-${index + 1}`,
+        title: toHeadingLabel(key),
+        level: 3,
+        paragraphs: toParagraphs(content, `${baseId}-section-${index + 1}`),
+      })
+    })
+  }
+
+  const individualScores = data.individual_scores as Array<Record<string, unknown>> | undefined
+  if (individualScores?.length) {
+    const lines = individualScores.map(
+      (item) => `${String(item.id ?? '')} — ${String(item.role ?? 'Evaluator')}: SUS ${String(item.sus_score ?? '')}`,
+    )
+    sections.push({
+      id: `${baseId}-individual-scores`,
+      title: 'Individual SUS Scores',
+      level: 3,
+      paragraphs: toParagraphs(lines, `${baseId}-individual-scores`),
+    })
+  }
+
+  const itemStats = data.item_level_statistics as Array<Record<string, unknown>> | undefined
+  if (itemStats?.length) {
+    const lines = itemStats.map((item) => {
+      const itemNo = item.item_number ? `Q${item.item_number}` : 'Item'
+      return `${itemNo}: ${String(item.item_text ?? '')} | Mean (0–4): ${String(
+        item.mean_directed_0_4 ?? '',
+      )} | Contribution: ${String(item.contribution_to_SUS_pct ?? '')}%`
+    })
+    sections.push({
+      id: `${baseId}-item-stats`,
+      title: 'Item-Level SUS Statistics',
+      level: 3,
+      paragraphs: toParagraphs(lines, `${baseId}-item-stats`),
+    })
+  }
+
+  return sections.filter((section) => section.paragraphs.length > 0)
+}
+
+function buildStructuredSections(value: unknown, baseId: string, defaultTitle: string, level: number): RenderedSection[] {
+  if (!value) return []
+
+  if (isStructuredSection(value)) {
+    const title = value.title ?? defaultTitle
+    const nodes: RenderedSection[] = [
+      {
+        id: baseId,
+        title,
+        level,
+        paragraphs: toParagraphs(value.content, `${baseId}-content`),
+      },
+    ]
+
+    if (Array.isArray(value.subsections)) {
+      value.subsections.forEach((subsection, index) => {
+        nodes.push(...buildStructuredSections(subsection, `${baseId}-sub-${index + 1}`, subsection.title ?? `Subsection ${index + 1}`, Math.min(level + 1, 4)))
+      })
+    }
+
+    return nodes.filter((node) => node.paragraphs.length > 0 || node.title)
+  }
+
+  return [
+    {
+      id: baseId,
+      title: defaultTitle,
+      level,
+      paragraphs: toParagraphs(value, `${baseId}-content`),
+    },
+  ].filter((node) => node.paragraphs.length > 0)
 }
 
 function formatDate(value: string) {
@@ -181,19 +311,23 @@ export default function ArticlePreviewClient({
   }, [comments])
 
   const sectionBlocks = useMemo(() => {
-    const blocks = CORE_SECTIONS.map(({ key, label }) => ({
-      key,
-      label,
-      paragraphs: toParagraphs(articleData[key], String(key)),
-    })).filter((section) => section.paragraphs.length > 0)
+    const blocks: RenderedSection[] = []
+
+    SECTION_ORDER.forEach(({ key, label }) => {
+      const sectionValue = articleData[key]
+      if (!sectionValue) return
+
+      if (key === 'usability_testing') {
+        blocks.push(...buildUsabilitySections(sectionValue, String(key), label))
+        return
+      }
+
+      blocks.push(...buildStructuredSections(sectionValue, String(key), label, 2))
+    })
 
     const keyResults = toParagraphs(articleData.key_results_summary, 'key-results')
     if (keyResults.length > 0) {
-      blocks.push({
-        key: 'key_results_summary',
-        label: 'Key Results Summary',
-        paragraphs: keyResults,
-      })
+      blocks.push({ id: 'key-results', title: 'Key Results Summary', level: 2, paragraphs: keyResults })
     }
 
     return blocks
@@ -348,57 +482,83 @@ export default function ArticlePreviewClient({
         {error && <p className="text-sm text-red-600">{error}</p>}
       </header>
 
-      <section className="space-y-8">
-        {sectionBlocks.map((section) => (
-          <article key={String(section.key)} className="space-y-4 rounded-xl border border-border/60 bg-card p-5">
-            <h2 className="text-xl font-semibold tracking-tight">{section.label}</h2>
-            <div className="space-y-3">
-              {section.paragraphs.map((paragraph) => {
-                const paragraphComments = commentsByParagraph.get(paragraph.id) ?? []
-                const hasComments = paragraphComments.length > 0
+      <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+        <aside className="hidden lg:block">
+          <div className="sticky top-24 rounded-xl border border-border/60 bg-card p-4">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">On this page</h2>
+            <nav className="mt-3 space-y-1">
+              {sectionBlocks.map((section) => (
+                <a
+                  key={section.id}
+                  href={`#${section.id}`}
+                  className={`block rounded px-2 py-1 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground ${
+                    section.level > 2 ? 'ml-3 text-xs' : ''
+                  }`}
+                >
+                  {section.title}
+                </a>
+              ))}
+            </nav>
+          </div>
+        </aside>
 
-                return (
-                  <div
-                    key={paragraph.id}
-                    data-paragraph-id={paragraph.id}
-                    className={`relative rounded-md border px-4 py-3 text-sm leading-relaxed transition-colors ${
-                      hasComments
-                        ? 'border-amber-400/60 bg-amber-50/70 dark:bg-amber-950/20'
-                        : 'border-border/60 bg-background/40'
-                    }`}
-                    onMouseUp={() => openDraftFromSelection(paragraph.id)}
-                  >
-                    <p className="whitespace-pre-line pr-14">{paragraph.text}</p>
+        <section className="space-y-8">
+          {sectionBlocks.map((section) => (
+            <article key={section.id} id={section.id} className="scroll-mt-24 space-y-4 rounded-xl border border-border/60 bg-card p-5">
+              {section.level <= 2 ? (
+                <h2 className="text-xl font-semibold tracking-tight">{section.title}</h2>
+              ) : (
+                <h3 className="text-lg font-semibold tracking-tight text-muted-foreground">{section.title}</h3>
+              )}
 
-                    {hasComments && (
-                      <div className="group absolute right-2 top-2">
-                        <span className="inline-flex cursor-default items-center rounded-full border border-amber-500/50 bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-900/30 dark:text-amber-200">
-                          {paragraphComments.length} comment{paragraphComments.length > 1 ? 's' : ''}
-                        </span>
-                        <div className="invisible absolute right-0 z-20 mt-2 w-80 rounded-md border border-border bg-popover p-3 text-xs opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100">
-                          <p className="mb-2 font-semibold">Comments on this paragraph</p>
-                          <ul className="max-h-56 space-y-2 overflow-auto pr-1">
-                            {paragraphComments.map((comment) => (
-                              <li key={comment.id} className="rounded border border-border/50 p-2">
-                                <p className="font-medium text-foreground">{comment.authorName}</p>
-                                <p className="mt-1 text-muted-foreground">“{comment.selectedText}”</p>
-                                <p className="mt-1 text-foreground">{comment.commentText}</p>
-                                <p className="mt-1 text-[10px] uppercase tracking-wider text-muted-foreground">
-                                  {formatDate(comment.createdAt)}
-                                </p>
-                              </li>
-                            ))}
-                          </ul>
+              <div className="space-y-3">
+                {section.paragraphs.map((paragraph) => {
+                  const paragraphComments = commentsByParagraph.get(paragraph.id) ?? []
+                  const hasComments = paragraphComments.length > 0
+
+                  return (
+                    <div
+                      key={paragraph.id}
+                      data-paragraph-id={paragraph.id}
+                      className={`relative rounded-md border px-4 py-3 text-sm leading-relaxed transition-colors ${
+                        hasComments
+                          ? 'border-amber-400/60 bg-amber-50/70 dark:bg-amber-950/20'
+                          : 'border-border/60 bg-background/40'
+                      }`}
+                      onMouseUp={() => openDraftFromSelection(paragraph.id)}
+                    >
+                      <p className="whitespace-pre-line pr-14">{paragraph.text}</p>
+
+                      {hasComments && (
+                        <div className="group absolute right-2 top-2">
+                          <span className="inline-flex cursor-default items-center rounded-full border border-amber-500/50 bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-900/30 dark:text-amber-200">
+                            {paragraphComments.length} comment{paragraphComments.length > 1 ? 's' : ''}
+                          </span>
+                          <div className="invisible absolute right-0 z-20 mt-2 w-80 rounded-md border border-border bg-popover p-3 text-xs opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100">
+                            <p className="mb-2 font-semibold">Comments on this paragraph</p>
+                            <ul className="max-h-56 space-y-2 overflow-auto pr-1">
+                              {paragraphComments.map((comment) => (
+                                <li key={comment.id} className="rounded border border-border/50 p-2">
+                                  <p className="font-medium text-foreground">{comment.authorName}</p>
+                                  <p className="mt-1 text-muted-foreground">“{comment.selectedText}”</p>
+                                  <p className="mt-1 text-foreground">{comment.commentText}</p>
+                                  <p className="mt-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+                                    {formatDate(comment.createdAt)}
+                                  </p>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </article>
-        ))}
-      </section>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </article>
+          ))}
+        </section>
+      </div>
 
       {articleData.tables && articleData.tables.length > 0 && (
         <section className="space-y-3">
@@ -418,7 +578,7 @@ export default function ArticlePreviewClient({
             {articleData.figures.map((figure, index) => (
               <li key={`${figure.figure_name}-${index}`} className="rounded-md border border-border/50 bg-background/30 px-4 py-3 text-sm">
                 <p className="font-semibold">{figure.figure_name}</p>
-                <p className="mt-1 text-muted-foreground">{figure.description}</p>
+                <p className="mt-1 text-muted-foreground">{figure.caption ?? figure.description}</p>
               </li>
             ))}
           </ul>

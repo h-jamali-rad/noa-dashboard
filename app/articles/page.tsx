@@ -374,12 +374,12 @@ export default function ArticlesPage() {
 type ArticleData = {
   title: string
   authors: string
-  abstract: string
+  abstract: unknown
   key_results_summary: string
   tables: { table_name: string; headers: string[]; rows: (string | number)[][] }[]
   tripod_ai_checklist: { items: TripodItem[] }
   probast_assessment: { domains: ProbastDomain[] }
-  figures?: { figure_name: string; description: string }[]
+  figures?: { figure_name: string; description: string; caption?: string }[]
 }
 
 function ArticleInPrepCard({
@@ -451,7 +451,7 @@ function ArticleInPrepCard({
             Abstract
           </h3>
           <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-line">
-            {data.abstract}
+            {Array.isArray(data.abstract) ? data.abstract.join('\n\n') : String(data.abstract ?? '')}
           </p>
         </section>
 
