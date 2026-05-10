@@ -1,390 +1,460 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Image from 'next/image'
+import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 
+/* ───────────────────── Team Data ───────────────────── */
 interface TeamMember {
-  id: string
-  name: string
-  title: string
-  specialty: string
-  hIndex: number
-  affiliation: string
-  image: string
-  activeImage: string
-  institutionLogo: string
-  height: number
-  row: number
-  position: number
-  idleAnimation: string
+  id: string;
+  name: string;
+  title: string;
+  hIndex: number;
+  affiliation: string;
+  baseImage: string;
+  activeImage: string;
+  logos: { src: string; alt: string }[];
 }
 
 const teamMembers: TeamMember[] = [
   {
-    id: 'jamalirad',
-    name: 'Hossein Jamalirad',
-    title: 'PhD Candidate',
-    specialty: 'Medical Informatics',
+    id: "jamalirad",
+    name: "Hossein Jamalirad",
+    title: "PhD Candidate",
     hIndex: 4,
-    affiliation: 'MUMS',
-    image: '/images/team/char_jamalirad.png',
-    activeImage: '/images/team/char_jamalirad_active.png',
-    institutionLogo: '/images/team/mums_logo.jpeg',
-    height: 186,
-    row: 0,
-    position: 0,
-    idleAnimation: 'idle-breathe',
+    affiliation: "MUMS",
+    baseImage: "/images/team/char_jamalirad.png",
+    activeImage: "/images/team/char_jamalirad_active.png",
+    logos: [
+      { src: "/images/team/mums_logo.jpeg", alt: "MUMS" },
+      { src: "/images/team/medical_informatics_logo.png", alt: "Medical Informatics" },
+    ],
   },
   {
-    id: 'sabbaghian',
-    name: 'Dr. Marjan Sabbaghian',
-    title: 'Principal Investigator',
-    specialty: 'Andrology & Biochemistry',
+    id: "sabbaghian",
+    name: "Marjan Sabbaghian",
+    title: "Principal Investigator",
     hIndex: 30,
-    affiliation: 'Royan Institute',
-    image: '/images/team/char_sabbaghian.png',
-    activeImage: '/images/team/char_sabbaghian_active.png',
-    institutionLogo: '/images/team/royan_logo.png',
-    height: 175,
-    row: 1,
-    position: 0.8,
-    idleAnimation: 'idle-sway-right',
+    affiliation: "Royan Institute",
+    baseImage: "/images/team/char_sabbaghian.png",
+    activeImage: "/images/team/char_sabbaghian_active.png",
+    logos: [{ src: "/images/team/royan_logo.png", alt: "Royan Institute" }],
   },
   {
-    id: 'gilani',
-    name: 'Dr. Mohammad Ali Sadighi Gilani',
-    title: 'Professor of Urology',
-    specialty: 'Urology & Andrology',
+    id: "gilani",
+    name: "Mohammad Ali Shah Gilani",
+    title: "Professor of Urology",
     hIndex: 30,
-    affiliation: 'Royan Institute',
-    image: '/images/team/char_gilani.png',
-    activeImage: '/images/team/char_gilani_active.png',
-    institutionLogo: '/images/team/royan_logo.png',
-    height: 175,
-    row: 1,
-    position: 1.6,
-    idleAnimation: 'idle-shift',
+    affiliation: "Royan Institute",
+    baseImage: "/images/team/char_gilani.png",
+    activeImage: "/images/team/char_gilani_active.png",
+    logos: [{ src: "/images/team/royan_logo.png", alt: "Royan Institute" }],
   },
   {
-    id: 'vakili',
-    name: 'Dr. Hassan Vakili Arki',
-    title: 'Associate Professor',
-    specialty: 'Medical Informatics',
+    id: "vakili",
+    name: "Saeid Vakili",
+    title: "Associate Professor",
     hIndex: 12,
-    affiliation: 'MUMS',
-    image: '/images/team/char_vakili.png',
-    activeImage: '/images/team/char_vakili_active.png',
-    institutionLogo: '/images/team/mums_logo.jpeg',
-    height: 175,
-    row: 1,
-    position: -0.8,
-    idleAnimation: 'idle-sway-left',
+    affiliation: "MUMS",
+    baseImage: "/images/team/char_vakili.png",
+    activeImage: "/images/team/char_vakili_active.png",
+    logos: [
+      { src: "/images/team/mums_logo.jpeg", alt: "MUMS" },
+      { src: "/images/team/medical_informatics_logo.png", alt: "Medical Informatics" },
+    ],
   },
   {
-    id: 'eslami',
-    name: 'Dr. Saeid Eslami',
-    title: 'Professor',
-    specialty: 'Medical Informatics & Pharmaceutical Research',
+    id: "eslami",
+    name: "Saeid Eslami",
+    title: "Professor",
     hIndex: 55,
-    affiliation: 'MUMS & University of Amsterdam',
-    image: '/images/team/char_eslami.png',
-    activeImage: '/images/team/char_eslami_active.png',
-    institutionLogo: '/images/team/medical_informatics_logo.png',
-    height: 175,
-    row: 1,
-    position: -1.6,
-    idleAnimation: 'idle-breathe-slow',
+    affiliation: "MUMS & University of Amsterdam",
+    baseImage: "/images/team/char_eslami.png",
+    activeImage: "/images/team/char_eslami_active.png",
+    logos: [
+      { src: "/images/team/medical_informatics_logo.png", alt: "Medical Informatics" },
+    ],
   },
-]
+];
 
-export default function TeamStanding() {
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [hoveredId, setHoveredId] = useState<string | null>(null)
+interface RobotData {
+  id: string;
+  image: string;
+  style: React.CSSProperties;
+}
 
-  function handleClick(id: string) {
-    setSelectedId((prev) => (prev === id ? null : id))
-  }
+const robots: RobotData[] = [
+  {
+    id: "robot1",
+    image: "/images/team/robot_male_1.png",
+    style: { left: "2%", bottom: "8%", height: "55%", opacity: 0.45, zIndex: 1 },
+  },
+  {
+    id: "robot2",
+    image: "/images/team/robot_female_1.png",
+    style: { left: "22%", bottom: "10%", height: "50%", opacity: 0.4, zIndex: 1 },
+  },
+  {
+    id: "robot3",
+    image: "/images/team/robot_male_2.png",
+    style: { right: "20%", bottom: "10%", height: "50%", opacity: 0.4, zIndex: 1 },
+  },
+  {
+    id: "robot4",
+    image: "/images/team/robot_female_2.png",
+    style: { right: "0%", bottom: "5%", height: "52%", opacity: 0.42, zIndex: 1 },
+  },
+];
 
-  const selected = teamMembers.find((m) => m.id === (hoveredId || selectedId)) ?? null
+/* ───────────────────── Character Card ───────────────────── */
+function CharacterCard({
+  member,
+  index,
+  isVisible,
+}: {
+  member: TeamMember;
+  index: number;
+  isVisible: boolean;
+}) {
+  const [hovered, setHovered] = useState(false);
 
   return (
-    <div className="relative w-full overflow-hidden min-h-[750px] bg-gradient-to-b from-transparent via-primary/5 to-transparent rounded-3xl">
-      {/* Background Holographic Infrastructure Logos */}
-      <div className="absolute top-12 left-0 w-full flex justify-around items-start opacity-10 pointer-events-none z-0 px-20">
-        <div className="w-48 h-48 relative animate-pulse" style={{ animationDuration: '6s' }}>
-          <Image src="/images/team/mums_logo.jpeg" alt="MUMS" fill className="object-contain grayscale contrast-125" />
-        </div>
-        <div className="w-56 h-56 relative animate-pulse" style={{ animationDuration: '8s', animationDelay: '1s' }}>
-          <Image src="/images/team/royan_logo.png" alt="Royan" fill className="object-contain grayscale contrast-125" />
-        </div>
-        <div className="w-48 h-48 relative animate-pulse" style={{ animationDuration: '7s', animationDelay: '2.5s' }}>
-          <Image src="/images/team/medical_informatics_logo.png" alt="MedInfo" fill className="object-contain grayscale contrast-125" />
-        </div>
-      </div>
-
-      {/* Team composition on Hologram Platform */}
-      <div className="relative z-10 flex flex-col items-center pt-32 pb-12 cursor-default">
-        {/* Hologram Platform Base */}
-        <div className="absolute bottom-16 w-full max-w-3xl h-64 bg-primary/10 blur-[130px] rounded-[100%] z-0" />
+    <div
+      className="relative flex flex-col items-center"
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? "translateY(0)" : "translateY(40px)",
+        transition: `opacity 0.6s ease ${index * 0.15}s, transform 0.6s ease ${index * 0.15}s`,
+        zIndex: hovered ? 20 : 10,
+        flex: "1 1 0",
+        minWidth: 0,
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* Hologram Info Card — appears on hover */}
+      <div
+        className="absolute -top-4 left-1/2 -translate-x-1/2 pointer-events-none"
+        style={{
+          opacity: hovered ? 1 : 0,
+          transform: hovered ? "translateY(-100%) scale(1)" : "translateY(-80%) scale(0.9)",
+          transition: "all 0.4s cubic-bezier(0.16,1,0.3,1)",
+          zIndex: 30,
+          width: "220px",
+        }}
+      >
         <div
-          className="absolute bottom-20 w-[80%] max-w-xl h-24 border-t border-primary/40 rounded-[100%] z-0"
+          className="relative rounded-xl p-4 text-center"
           style={{
-            background: 'radial-gradient(circle, rgba(var(--primary), 0.15) 0%, transparent 70%)',
-            boxShadow: '0 -20px 50px rgba(var(--primary), 0.3)',
+            background: "linear-gradient(135deg, rgba(0,255,255,0.12) 0%, rgba(0,100,255,0.10) 100%)",
+            border: "1px solid rgba(0,255,255,0.3)",
+            backdropFilter: "blur(16px)",
+            boxShadow: "0 0 30px rgba(0,255,255,0.15), inset 0 0 30px rgba(0,255,255,0.05)",
           }}
-        />
-        <div className="absolute bottom-22 w-[60%] max-w-lg h-12 border border-primary/20 rounded-[100%] z-0 opacity-50" />
-
-        {/* Back row */}
-        <div className="flex items-end justify-center gap-0 sm:gap-2 mb-[-100px] z-10">
-          {teamMembers
-            .filter((m) => m.row === 1)
-            .sort((a, b) => a.position - b.position)
-            .map((member) => (
-              <CharacterCard
-                key={member.id}
-                member={member}
-                isSelected={selectedId === member.id}
-                isHovered={hoveredId === member.id}
-                isFaded={hoveredId !== null && hoveredId !== member.id}
-                onClick={() => handleClick(member.id)}
-                onHover={(h) => setHoveredId(h ? member.id : null)}
-                scale={0.88}
-              />
-            ))}
-        </div>
-
-        {/* Front row */}
-        <div className="flex items-end justify-center z-30 mt-4">
-          {teamMembers
-            .filter((m) => m.row === 0)
-            .map((member) => (
-              <CharacterCard
-                key={member.id}
-                member={member}
-                isSelected={selectedId === member.id}
-                isHovered={hoveredId === member.id}
-                isFaded={hoveredId !== null && hoveredId !== member.id}
-                onClick={() => handleClick(member.id)}
-                onHover={(h) => setHoveredId(h ? member.id : null)}
-                scale={1.1}
-              />
-            ))}
-        </div>
-      </div>
-
-      {/* Hologram Light Dust / Particles */}
-      <div className="absolute inset-x-0 bottom-1/4 h-32 pointer-events-none opacity-40 z-10 overflow-hidden">
-        {[...Array(12)].map((_, i) => (
+        >
+          {/* Scanline effect */}
           <div
-            key={i}
-            className="absolute bg-primary rounded-full animate-hologram-particle"
+            className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none"
             style={{
-              width: `${Math.random() * 3 + 1}px`,
-              height: `${Math.random() * 3 + 1}px`,
-              left: `${Math.random() * 100}%`,
-              bottom: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${Math.random() * 3 + 2}s`,
+              background:
+                "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,255,0.03) 2px, rgba(0,255,255,0.03) 4px)",
             }}
           />
+          <h3
+            className="text-sm font-bold mb-1"
+            style={{ color: "#00ffff", textShadow: "0 0 10px rgba(0,255,255,0.5)" }}
+          >
+            {member.name}
+          </h3>
+          <p className="text-xs text-cyan-200 mb-1">{member.title}</p>
+          <p className="text-xs text-cyan-300/70 mb-2">{member.affiliation}</p>
+          <div
+            className="flex items-center justify-center gap-1 text-xs"
+            style={{ color: "#7dd3fc" }}
+          >
+            <span className="font-mono font-bold text-cyan-400">h-index:</span>
+            <span className="font-mono text-white font-bold">{member.hIndex}</span>
+          </div>
+          {/* Logos */}
+          <div className="flex justify-center gap-2 mt-2">
+            {member.logos.map((logo) => (
+              <div
+                key={logo.alt}
+                className="w-7 h-7 rounded-full overflow-hidden bg-white/10 flex items-center justify-center"
+                style={{ border: "1px solid rgba(0,255,255,0.3)" }}
+              >
+                <Image src={logo.src} alt={logo.alt} width={24} height={24} className="object-contain" />
+              </div>
+            ))}
+          </div>
+          {/* Bottom glow line */}
+          <div
+            className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] rounded-full"
+            style={{
+              width: "60%",
+              background: "linear-gradient(90deg, transparent, #00ffff, transparent)",
+              boxShadow: "0 0 10px rgba(0,255,255,0.5)",
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Character Image Container */}
+      <div
+        className="relative w-full"
+        style={{
+          height: "clamp(200px, 35vw, 380px)",
+          transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1)",
+          transform: hovered ? "translateY(-20px) scale(1.08)" : "translateY(0) scale(1)",
+          cursor: "pointer",
+        }}
+      >
+        {/* Base image */}
+        <Image
+          src={member.baseImage}
+          alt={member.name}
+          fill
+          className="object-contain object-bottom"
+          style={{
+            opacity: hovered ? 0 : 1,
+            transition: "opacity 0.3s ease",
+            filter: "drop-shadow(0 0 8px rgba(0,255,255,0.15))",
+          }}
+          sizes="(max-width: 768px) 40vw, 18vw"
+        />
+        {/* Active/hovered image (crossed arms) */}
+        <Image
+          src={member.activeImage}
+          alt={`${member.name} - active`}
+          fill
+          className="object-contain object-bottom"
+          style={{
+            opacity: hovered ? 1 : 0,
+            transition: "opacity 0.3s ease",
+            filter: "drop-shadow(0 0 15px rgba(0,255,255,0.3))",
+          }}
+          sizes="(max-width: 768px) 40vw, 18vw"
+        />
+      </div>
+
+      {/* Name label below character */}
+      <div
+        className="mt-1 text-center"
+        style={{
+          opacity: hovered ? 1 : 0.7,
+          transition: "opacity 0.3s ease",
+        }}
+      >
+        <p
+          className="text-xs sm:text-sm font-semibold"
+          style={{
+            color: hovered ? "#00ffff" : "#94a3b8",
+            textShadow: hovered ? "0 0 8px rgba(0,255,255,0.4)" : "none",
+            transition: "all 0.3s ease",
+          }}
+        >
+          {member.name.split(" ").slice(-1)[0]}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ───────────────────── Main Component ───────────────────── */
+export default function TeamStanding() {
+  const [loaded, setLoaded] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoaded(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <section
+      ref={containerRef}
+      className="relative w-full overflow-hidden"
+      style={{
+        minHeight: "600px",
+        background:
+          "linear-gradient(180deg, #030712 0%, #0a1628 30%, #0d1f3c 60%, #091525 100%)",
+      }}
+    >
+      {/* AI Corporation Background Effects */}
+      {/* Grid floor */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(0,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,255,0.03) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+          perspective: "500px",
+          transformStyle: "preserve-3d",
+        }}
+      />
+
+      {/* Ambient glow spots */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: "10%",
+          left: "15%",
+          width: "300px",
+          height: "300px",
+          background: "radial-gradient(circle, rgba(0,100,255,0.08) 0%, transparent 70%)",
+          borderRadius: "50%",
+        }}
+      />
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: "20%",
+          right: "10%",
+          width: "400px",
+          height: "400px",
+          background: "radial-gradient(circle, rgba(0,255,255,0.06) 0%, transparent 70%)",
+          borderRadius: "50%",
+        }}
+      />
+
+      {/* Floating holographic monitors in background */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: "8%",
+          left: "5%",
+          width: "180px",
+          height: "120px",
+          border: "1px solid rgba(0,255,255,0.1)",
+          borderRadius: "8px",
+          background: "linear-gradient(135deg, rgba(0,255,255,0.03), rgba(0,100,255,0.02))",
+          boxShadow: "0 0 20px rgba(0,255,255,0.05)",
+          transform: "perspective(800px) rotateY(15deg)",
+        }}
+      />
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: "5%",
+          right: "8%",
+          width: "200px",
+          height: "130px",
+          border: "1px solid rgba(0,255,255,0.08)",
+          borderRadius: "8px",
+          background: "linear-gradient(135deg, rgba(0,100,255,0.03), rgba(0,255,255,0.02))",
+          boxShadow: "0 0 15px rgba(0,100,255,0.05)",
+          transform: "perspective(800px) rotateY(-10deg)",
+        }}
+      />
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: "15%",
+          left: "40%",
+          width: "160px",
+          height: "100px",
+          border: "1px solid rgba(0,255,255,0.06)",
+          borderRadius: "8px",
+          background: "linear-gradient(135deg, rgba(0,255,255,0.02), rgba(0,100,255,0.01))",
+          boxShadow: "0 0 10px rgba(0,255,255,0.03)",
+        }}
+      />
+
+      {/* Title */}
+      <div className="relative z-10 text-center pt-8 pb-4">
+        <h2
+          className="text-2xl sm:text-3xl font-bold mb-1"
+          style={{
+            color: "#e2e8f0",
+            textShadow: "0 0 20px rgba(0,255,255,0.2)",
+          }}
+        >
+          NOA Research Team
+        </h2>
+        <div
+          className="mx-auto h-[2px] w-32 mt-2"
+          style={{
+            background: "linear-gradient(90deg, transparent, #00ffff, transparent)",
+            boxShadow: "0 0 10px rgba(0,255,255,0.3)",
+          }}
+        />
+        <p
+          className="text-xs sm:text-sm mt-2"
+          style={{ color: "rgba(0,255,255,0.5)" }}
+        >
+          AI Corporation Headquarters
+        </p>
+      </div>
+
+      {/* Robots in background */}
+      {robots.map((robot) => (
+        <div
+          key={robot.id}
+          className="absolute pointer-events-none"
+          style={{
+            ...robot.style,
+            position: "absolute",
+            opacity: loaded ? (robot.style.opacity as number) : 0,
+            transition: "opacity 1.5s ease",
+          }}
+        >
+          <Image
+            src={robot.image}
+            alt="AI Robot"
+            width={200}
+            height={300}
+            className="object-contain"
+            style={{
+              filter: "brightness(0.6) saturate(0.7) drop-shadow(0 0 10px rgba(0,255,255,0.1))",
+              height: "100%",
+              width: "auto",
+            }}
+          />
+        </div>
+      ))}
+
+      {/* Team Members Row */}
+      <div
+        className="relative z-10 flex items-end justify-center gap-2 sm:gap-4 px-4 sm:px-8 mt-4"
+        style={{ maxWidth: "1100px", margin: "0 auto", paddingBottom: "40px" }}
+      >
+        {teamMembers.map((member, i) => (
+          <CharacterCard key={member.id} member={member} index={i} isVisible={loaded} />
         ))}
       </div>
 
-      {/* Info card */}
-      {selected && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm z-50 animate-in fade-in slide-in-from-bottom-6 duration-400 pointer-events-auto">
-          <div className="rounded-2xl border border-primary/30 bg-card/85 backdrop-blur-2xl p-6 shadow-2xl shadow-primary/30 ring-1 ring-white/10 overflow-hidden relative">
-            {/* Institution Highlight Banner */}
-            <div className="absolute top-0 right-0 w-24 h-24 opacity-10 -mr-6 -mt-6 pointer-events-none">
-              <Image
-                src={selected.institutionLogo}
-                alt="Institution"
-                fill
-                className="object-contain"
-              />
-            </div>
-
-            <div className="flex items-center gap-4 mb-4 relative">
-              <div className="h-16 w-16 relative rounded-full overflow-hidden border-2 border-primary/40 flex-shrink-0 bg-primary/10 shadow-[0_0_15px_rgba(var(--primary),0.3)]">
-                <Image
-                  src={selected.activeImage}
-                  alt={selected.name}
-                  fill
-                  className="object-cover object-top scale-[1.5] origin-top translate-y-1"
-                />
-              </div>
-              <div>
-                <h3 className="font-display font-bold text-xl text-foreground tracking-tight leading-tight">
-                  {selected.name}
-                </h3>
-                <div className="flex items-center gap-2 mt-1">
-                  <p className="text-[10px] font-bold text-primary uppercase tracking-widest">{selected.title}</p>
-                  <div className="w-1 h-1 rounded-full bg-muted-foreground/30" />
-                  <p className="text-[10px] font-semibold text-muted-foreground">
-                    {selected.affiliation.split('&')[0].trim()}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="h-px w-full bg-gradient-to-r from-transparent via-primary/20 to-transparent mb-5" />
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl bg-primary/5 p-3 border border-primary/10 transition-colors hover:bg-primary/10">
-                <p className="text-[9px] text-muted-foreground uppercase mb-1 font-bold tracking-wider">Academic Score</p>
-                <div className="flex items-baseline gap-1">
-                  <p className="font-display font-black text-2xl text-primary">{selected.hIndex}</p>
-                  <span className="text-[10px] font-bold text-primary/60">h-index</span>
-                </div>
-              </div>
-              <div className="rounded-xl bg-primary/5 p-3 border border-primary/10 overflow-hidden">
-                <p className="text-[9px] text-muted-foreground uppercase mb-1 font-bold tracking-wider">Center</p>
-                <p className="font-bold text-foreground text-xs leading-tight line-clamp-2">{selected.affiliation}</p>
-              </div>
-              <div className="col-span-2 rounded-xl bg-primary/5 p-4 border border-primary/10">
-                <p className="text-[9px] text-muted-foreground uppercase mb-2 font-bold tracking-wider">
-                  Expertise / Research Domain
-                </p>
-                <p className="font-semibold text-foreground text-sm leading-relaxed">{selected.specialty}</p>
-              </div>
-            </div>
-
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                setSelectedId(null)
-              }}
-              className="mt-6 w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-black uppercase tracking-[0.2em] shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
-            >
-              System Return
-            </button>
-          </div>
-        </div>
-      )}
-
-      <style jsx>{`
-        @keyframes idle-breathe {
-          0%, 100% { transform: translateY(0px) scale(var(--char-scale)); }
-          50% { transform: translateY(-4px) scale(var(--char-scale)); }
-        }
-        @keyframes idle-sway-right {
-          0%, 100% { transform: translateX(0px) rotate(0deg) scale(var(--char-scale)); }
-          50% { transform: translateX(3px) rotate(0.2deg) scale(var(--char-scale)); }
-        }
-        @keyframes idle-sway-left {
-          0%, 100% { transform: translateX(0px) rotate(0deg) scale(var(--char-scale)); }
-          50% { transform: translateX(-3px) rotate(-0.2deg) scale(var(--char-scale)); }
-        }
-        @keyframes idle-shift {
-          0%, 100% { transform: translateY(0px) rotate(0deg) scale(var(--char-scale)); }
-          33% { transform: translateY(-3px) rotate(0.4deg) scale(var(--char-scale)); }
-          66% { transform: translateY(0px) rotate(-0.4deg) scale(var(--char-scale)); }
-        }
-        @keyframes idle-breathe-slow {
-          0%, 100% { transform: translateY(0px) scale(var(--char-scale)); }
-          50% { transform: translateY(-2px) scale(calc(var(--char-scale) * 1.008)); }
-        }
-        @keyframes hologram-particle {
-          0% { opacity: 0; transform: translateY(20px); }
-          50% { opacity: 1; }
-          100% { opacity: 0; transform: translateY(-40px); }
-        }
-        @keyframes scanner-line {
-          0% { transform: translateY(-100%); opacity: 0; }
-          20% { opacity: 0.5; }
-          80% { opacity: 0.5; }
-          100% { transform: translateY(200%); opacity: 0; }
-        }
-      `}</style>
-    </div>
-  )
-}
-
-function CharacterCard({
-  member,
-  isSelected,
-  isHovered,
-  isFaded,
-  onClick,
-  onHover,
-  scale,
-}: {
-  member: TeamMember
-  isSelected: boolean
-  isHovered: boolean
-  isFaded: boolean
-  onClick: () => void
-  onHover: (h: boolean) => void
-  scale: number
-}) {
-  const currentScale = isHovered ? scale * 1.12 : scale
-  const heightPx = (member.height / 186) * 320 * currentScale
-
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => onHover(true)}
-      onMouseLeave={() => onHover(false)}
-      className="relative group focus:outline-none transition-all duration-700 ease-out"
-      style={
-        {
-          '--char-scale': currentScale,
-          opacity: isFaded ? 0.3 : 1,
-          zIndex: isHovered ? 60 : (isSelected ? 55 : (member.row === 0 ? 40 : 20)),
-          filter: isFaded
-            ? 'grayscale(0.9) blur(2px)'
-            : isHovered
-              ? 'brightness(1.1) drop-shadow(0 0 35px rgba(var(--primary), 0.6))'
-              : 'drop-shadow(0 0 10px rgba(var(--primary), 0.15))',
-          animation: isHovered ? 'none' : `${member.idleAnimation} ${4 + Math.random() * 3}s ease-in-out infinite`,
-          transform: isHovered
-            ? `translateY(${-40 * scale}px)`
-            : `translateX(${member.position * 45 * scale}px)`,
-          cursor: 'pointer',
-        } as React.CSSProperties
-      }
-    >
+      {/* Floor hologram glow */}
       <div
-        style={{ height: `${heightPx}px`, width: `${heightPx * 0.65}px` }}
-        className="relative transition-all duration-500"
-      >
-        {/* Base Pose */}
-        <Image
-          src={member.image}
-          alt={member.name}
-          fill
-          className={`object-contain object-bottom transition-all duration-500 ${isHovered ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
-          sizes="500px"
-          priority
-        />
-        
-        {/* Active Pose */}
-        <Image
-          src={member.activeImage}
-          alt={`${member.name} active`}
-          fill
-          className={`object-contain object-bottom transition-all duration-500 ${isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
-          sizes="500px"
-          priority={isHovered}
-        />
+        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(0deg, rgba(0,255,255,0.06) 0%, transparent 100%)",
+        }}
+      />
 
-        {/* Hologram Scanner Loop on Hover */}
-        {isHovered && (
-          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-b-3xl">
-            <div
-              className="absolute top-0 left-0 w-full h-1 bg-primary/40 shadow-[0_0_15px_rgba(var(--primary),0.8)] z-10"
-              style={{ animation: 'scanner-line 2s linear infinite' }}
-            />
-            <div className="absolute inset-0 bg-primary/5 animate-pulse" />
-          </div>
-        )}
+      {/* Animated scanline */}
+      <div
+        className="absolute inset-0 pointer-events-none overflow-hidden"
+        style={{ zIndex: 5 }}
+      >
+        <div
+          className="absolute w-full h-[1px]"
+          style={{
+            background: "linear-gradient(90deg, transparent 0%, rgba(0,255,255,0.08) 50%, transparent 100%)",
+            animation: "scanline 8s linear infinite",
+          }}
+        />
       </div>
 
-      {/* Radial Base Glow on select/hover */}
-      {(isSelected || isHovered) && (
-        <div className="absolute bottom-[-10px] left-1/2 -translate-x-1/2 w-[120%] h-8 bg-primary/20 blur-xl rounded-[100%] animate-pulse" />
-      )}
-    </button>
-  )
+      <style jsx>{`
+        @keyframes scanline {
+          0% {
+            top: -10%;
+          }
+          100% {
+            top: 110%;
+          }
+        }
+      `}</style>
+    </section>
+  );
 }
