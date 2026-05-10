@@ -8,122 +8,86 @@ interface TeamMember {
   id: string;
   name: string;
   title: string;
-  hIndex: number;
   affiliation: string;
   baseImage: string;
   activeImage: string;
+  hIndex: number;
   logos: { src: string; alt: string }[];
   row: number; // 0=front, 1=middle, 2=back
-  col: number; // position in row
+  offset: number; // horizontal offset
 }
 
 const teamMembers: TeamMember[] = [
   {
     id: "jamalirad",
-    name: "Dr. Hossein Jamalirad",
+    name: "Hossein Jamalirad",
     title: "PhD Candidate",
-    hIndex: 4,
-    affiliation: "MUMS",
+    affiliation: "Medical University, Medical Informatics Group",
     baseImage: "/images/team/char_jamalirad.png",
     activeImage: "/images/team/char_jamalirad_active.png",
+    hIndex: 4,
     logos: [
       { src: "/images/team/mums_logo.jpeg", alt: "MUMS" },
       { src: "/images/team/medical_informatics_logo.png", alt: "Medical Informatics" },
     ],
     row: 0,
-    col: 0,
-  },
-  {
-    id: "sabbaghian",
-    name: "Dr. Marjan Sabbaghian",
-    title: "Principal Investigator",
-    hIndex: 30,
-    affiliation: "Royan Institute",
-    baseImage: "/images/team/char_sabbaghian.png",
-    activeImage: "/images/team/char_sabbaghian_active.png",
-    logos: [{ src: "/images/team/royan_logo.png", alt: "Royan Institute" }],
-    row: 1,
-    col: 0,
+    offset: 0,
   },
   {
     id: "vakili",
-    name: "Dr. Saeid Vakili",
-    title: "Associate Professor",
-    hIndex: 12,
-    affiliation: "MUMS",
+    name: "Dr. Hassan Vakili",
+    title: "1st Supervisor",
+    affiliation: "Medical University, Medical Informatics Group",
     baseImage: "/images/team/char_vakili.png",
     activeImage: "/images/team/char_vakili_active.png",
+    hIndex: 12,
     logos: [
       { src: "/images/team/mums_logo.jpeg", alt: "MUMS" },
       { src: "/images/team/medical_informatics_logo.png", alt: "Medical Informatics" },
     ],
     row: 1,
-    col: 1,
+    offset: 140, // right of center
+  },
+  {
+    id: "sabbaghian",
+    name: "Dr. Marjan Sabbaghian",
+    title: "1st Clinical Supervisor",
+    affiliation: "Royan Institute, Male Infertility Referral Center",
+    baseImage: "/images/team/char_sabbaghian.png",
+    activeImage: "/images/team/char_sabbaghian_active.png",
+    hIndex: 30,
+    logos: [{ src: "/images/team/royan_logo.png", alt: "Royan Institute" }],
+    row: 1,
+    offset: -140, // left of center
   },
   {
     id: "eslami",
     name: "Dr. Saeid Eslami",
-    title: "Professor",
-    hIndex: 55,
-    affiliation: "MUMS & University of Amsterdam",
+    title: "2nd Supervisor",
+    affiliation: "Medical University, Medical Informatics Group",
     baseImage: "/images/team/char_eslami.png",
     activeImage: "/images/team/char_eslami_active.png",
-    logos: [
-      { src: "/images/team/medical_informatics_logo.png", alt: "Medical Informatics" },
-    ],
+    hIndex: 55,
+    logos: [{ src: "/images/team/medical_informatics_logo.png", alt: "Medical Informatics" }],
     row: 2,
-    col: 0,
+    offset: -260, // far left
   },
   {
     id: "gilani",
     name: "Dr. Mohammad Ali Sadighi Gilani",
-    title: "Professor of Urology",
-    hIndex: 30,
-    affiliation: "Royan Institute",
+    title: "Associate",
+    affiliation: "Royan Institute, Male Infertility Referral Center",
     baseImage: "/images/team/char_gilani.png",
     activeImage: "/images/team/char_gilani_active.png",
+    hIndex: 30,
     logos: [{ src: "/images/team/royan_logo.png", alt: "Royan Institute" }],
     row: 2,
-    col: 1,
+    offset: 260, // far right
   },
 ];
 
-interface RobotData {
-  id: string;
-  image: string;
-  position: React.CSSProperties;
-  animDelay: number;
-}
-
-const robots: RobotData[] = [
-  {
-    id: "robot1",
-    image: "/images/team/robot_male_1.png",
-    position: { left: "1%", bottom: "4%" },
-    animDelay: 0,
-  },
-  {
-    id: "robot2",
-    image: "/images/team/robot_female_1.png",
-    position: { left: "16%", bottom: "6%" },
-    animDelay: 0.5,
-  },
-  {
-    id: "robot3",
-    image: "/images/team/robot_male_2.png",
-    position: { right: "14%", bottom: "6%" },
-    animDelay: 1.0,
-  },
-  {
-    id: "robot4",
-    image: "/images/team/robot_female_2.png",
-    position: { right: "-1%", bottom: "2%" },
-    animDelay: 1.5,
-  },
-];
-
-/* ───────────────────── Floating Info Card ───────────────────── */
-function FloatingCard({
+/* ───────────────────── Hover Card ───────────────────── */
+function HoverCard({
   member,
   show,
   anchorRect,
@@ -136,14 +100,12 @@ function FloatingCard({
 }) {
   if (!anchorRect || !containerRect) return null;
 
-  // Position card above the character, centered, clamped to viewport
-  const cardW = 240;
+  const cardW = 280;
   let left = anchorRect.left + anchorRect.width / 2 - containerRect.left - cardW / 2;
-  const top = anchorRect.top - containerRect.top - 12;
+  const top = anchorRect.top - containerRect.top - 15;
 
-  // Clamp horizontally
-  if (left < 8) left = 8;
-  if (left + cardW > containerRect.width - 8) left = containerRect.width - cardW - 8;
+  if (left < 10) left = 10;
+  if (left + cardW > containerRect.width - 10) left = containerRect.width - cardW - 10;
 
   return (
     <div
@@ -152,206 +114,49 @@ function FloatingCard({
         left: `${left}px`,
         top: `${top}px`,
         width: `${cardW}px`,
-        transform: show ? "translateY(-100%) scale(1)" : "translateY(-85%) scale(0.9)",
+        transform: show ? "translateY(-100%) scale(1)" : "translateY(-90%) scale(0.95)",
         opacity: show ? 1 : 0,
-        transition: "all 0.4s cubic-bezier(0.16,1,0.3,1)",
-        zIndex: 50,
+        transition: "all 0.3s cubic-bezier(0.2, 0, 0, 1)",
+        zIndex: 100,
         pointerEvents: "none",
       }}
     >
       <div
-        className="rounded-xl p-4 text-center relative"
+        className="rounded-2xl p-5 text-center shadow-2xl border"
         style={{
-          background:
-            "linear-gradient(135deg, rgba(0,255,255,0.14) 0%, rgba(0,100,255,0.12) 100%)",
-          border: "1px solid rgba(0,255,255,0.35)",
-          backdropFilter: "blur(18px)",
-          boxShadow:
-            "0 0 40px rgba(0,255,255,0.18), inset 0 0 30px rgba(0,255,255,0.06), 0 8px 32px rgba(0,0,0,0.3)",
+          background: "rgba(255, 255, 255, 0.85)",
+          backdropFilter: "blur(20px)",
+          borderColor: "rgba(0, 120, 255, 0.15)",
+          boxShadow: "0 20px 40px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.05)",
         }}
       >
-        {/* Scanline overlay */}
-        <div
-          className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none"
-          style={{
-            background:
-              "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,255,0.03) 2px, rgba(0,255,255,0.03) 4px)",
-          }}
-        />
-        <h3
-          className="text-sm font-bold mb-1"
-          style={{ color: "#00ffff", textShadow: "0 0 10px rgba(0,255,255,0.5)" }}
-        >
-          {member.name}
-        </h3>
-        <p className="text-xs text-cyan-200 mb-1">{member.title}</p>
-        <p className="text-xs text-cyan-300/70 mb-2">{member.affiliation}</p>
-        <div className="flex items-center justify-center gap-1 text-xs" style={{ color: "#7dd3fc" }}>
-          <span className="font-mono font-bold text-cyan-400">h-index:</span>
-          <span className="font-mono text-white font-bold">{member.hIndex}</span>
+        <h3 className="text-base font-bold text-slate-800 mb-1">{member.name}</h3>
+        <p className="text-xs font-semibold text-blue-600 mb-1 uppercase tracking-wider">
+          {member.title}
+        </p>
+        <p className="text-[11px] text-slate-500 leading-tight mb-3 px-2">
+          {member.affiliation}
+        </p>
+        
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <div className="px-2 py-0.5 rounded bg-blue-50 text-[10px] font-bold text-blue-700 border border-blue-100 uppercase tracking-tighter">
+            h-index: {member.hIndex}
+          </div>
         </div>
-        <div className="flex justify-center gap-2 mt-2">
+
+        <div className="flex justify-center gap-2.5">
           {member.logos.map((logo) => (
             <div
               key={logo.alt}
-              className="w-7 h-7 rounded-full overflow-hidden bg-white/10 flex items-center justify-center"
-              style={{ border: "1px solid rgba(0,255,255,0.3)" }}
+              className="w-8 h-8 rounded-full overflow-hidden bg-white shadow-sm border border-slate-100 flex items-center justify-center p-1"
             >
-              <Image src={logo.src} alt={logo.alt} width={24} height={24} className="object-contain" />
+              <Image src={logo.src} alt={logo.alt} width={28} height={28} className="object-contain" />
             </div>
           ))}
         </div>
-        {/* Bottom glow */}
-        <div
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] rounded-full"
-          style={{
-            width: "60%",
-            background: "linear-gradient(90deg, transparent, #00ffff, transparent)",
-            boxShadow: "0 0 10px rgba(0,255,255,0.5)",
-          }}
-        />
       </div>
-    </div>
-  );
-}
-
-/* ───────────────────── Character Card ───────────────────── */
-function CharacterCard({
-  member,
-  index,
-  isVisible,
-  onHover,
-  onLeave,
-  hovered,
-  setRef,
-}: {
-  member: TeamMember;
-  index: number;
-  isVisible: boolean;
-  onHover: () => void;
-  onLeave: () => void;
-  hovered: boolean;
-  setRef: (el: HTMLDivElement | null) => void;
-}) {
-  // Breathing / idle sway animation with unique timing
-  const breathDuration = 3.5 + index * 0.4;
-  const swayDuration = 5 + index * 0.7;
-  const isFront = member.row === 0;
-  const charHeight = isFront ? "clamp(220px, 38vw, 400px)" : member.row === 1 ? "clamp(180px, 30vw, 340px)" : "clamp(160px, 26vw, 300px)";
-
-  return (
-    <div
-      ref={setRef}
-      className="relative flex flex-col items-center"
-      style={{
-        opacity: isVisible ? 1 : 0,
-        transform: isVisible ? "translateY(0)" : "translateY(40px)",
-        transition: `opacity 0.6s ease ${index * 0.12}s, transform 0.6s ease ${index * 0.12}s`,
-        zIndex: hovered ? 20 : (isFront ? 15 : 10),
-        animation: isVisible
-          ? `charBreathe ${breathDuration}s ease-in-out infinite, charSway ${swayDuration}s ease-in-out infinite`
-          : "none",
-        animationDelay: `${index * 0.3}s`,
-        cursor: "pointer",
-      }}
-      onMouseEnter={onHover}
-      onMouseLeave={onLeave}
-    >
-      {/* Character Image */}
-      <div
-        className="relative"
-        style={{
-          width: isFront ? "clamp(140px, 22vw, 260px)" : member.row === 1 ? "clamp(120px, 18vw, 220px)" : "clamp(100px, 15vw, 190px)",
-          height: charHeight,
-          transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1)",
-          transform: hovered ? "translateY(-16px) scale(1.07)" : "translateY(0) scale(1)",
-        }}
-      >
-        <Image
-          src={member.baseImage}
-          alt={member.name}
-          fill
-          className="object-contain object-bottom"
-          style={{
-            opacity: hovered ? 0 : 1,
-            transition: "opacity 0.3s ease",
-            filter: `drop-shadow(0 0 ${isFront ? '12px' : '8px'} rgba(0,255,255,${isFront ? '0.25' : '0.15'}))`,
-          }}
-          sizes="(max-width: 768px) 35vw, 20vw"
-        />
-        <Image
-          src={member.activeImage}
-          alt={`${member.name} active`}
-          fill
-          className="object-contain object-bottom"
-          style={{
-            opacity: hovered ? 1 : 0,
-            transition: "opacity 0.3s ease",
-            filter: "drop-shadow(0 0 18px rgba(0,255,255,0.35))",
-          }}
-          sizes="(max-width: 768px) 35vw, 20vw"
-        />
-      </div>
-
-      {/* Name label */}
-      <div className="mt-1 text-center">
-        <p
-          className="text-xs sm:text-sm font-semibold whitespace-nowrap"
-          style={{
-            color: hovered ? "#00ffff" : isFront ? "#cbd5e1" : "#94a3b8",
-            textShadow: hovered ? "0 0 8px rgba(0,255,255,0.4)" : "none",
-            transition: "all 0.3s ease",
-          }}
-        >
-          {member.name}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/* ───────────────────── Animated Robot ───────────────────── */
-function AnimatedRobot({ robot, loaded }: { robot: RobotData; loaded: boolean }) {
-  return (
-    <div
-      className="absolute pointer-events-none"
-      style={{
-        ...robot.position,
-        height: "48%",
-        opacity: loaded ? 0.4 : 0,
-        transition: "opacity 1.5s ease",
-        zIndex: 1,
-        animation: loaded
-          ? `robotTyping 1.2s ease-in-out infinite, robotBreathe 4s ease-in-out infinite, robotSway 6s ease-in-out infinite`
-          : "none",
-        animationDelay: `${robot.animDelay}s, ${robot.animDelay + 0.3}s, ${robot.animDelay + 0.6}s`,
-      }}
-    >
-      <Image
-        src={robot.image}
-        alt="AI Robot"
-        width={200}
-        height={300}
-        className="object-contain"
-        style={{
-          filter:
-            "brightness(0.55) saturate(0.6) drop-shadow(0 0 12px rgba(0,255,255,0.12))",
-          height: "100%",
-          width: "auto",
-        }}
-      />
-      {/* Keyboard glow beneath robot */}
-      <div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2"
-        style={{
-          width: "70%",
-          height: "6px",
-          borderRadius: "50%",
-          background: "radial-gradient(ellipse, rgba(0,255,255,0.15), transparent 70%)",
-          animation: `kbGlow 1.2s ease-in-out infinite`,
-          animationDelay: `${robot.animDelay}s`,
-        }}
-      />
+      {/* Small arrow/beak */}
+      <div className="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-3 bg-[rgba(255,255,255,0.85)] rotate-45 border-r border-b" style={{ borderColor: 'rgba(0, 120, 255, 0.15)' }} />
     </div>
   );
 }
@@ -366,221 +171,122 @@ export default function TeamStanding() {
   const [anchorRects, setAnchorRects] = useState<Record<string, DOMRect>>({});
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoaded(true), 300);
-    return () => clearTimeout(timer);
+    setLoaded(true);
+    const handleResize = () => {
+      if (containerRef.current) setContainerRect(containerRef.current.getBoundingClientRect());
+    };
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Update rects on hover
-  useEffect(() => {
-    if (hoveredId && containerRef.current) {
-      setContainerRect(containerRef.current.getBoundingClientRect());
-      const el = charRefs.current[hoveredId];
-      if (el) {
-        setAnchorRects((prev) => ({ ...prev, [hoveredId]: el.getBoundingClientRect() }));
-      }
-    }
-  }, [hoveredId]);
-
-  // Rows for pyramid layout
-  const frontRow = teamMembers.filter((m) => m.row === 0);
-  const middleRow = teamMembers.filter((m) => m.row === 1);
-  const backRow = teamMembers.filter((m) => m.row === 2);
+  const updateRects = (id: string) => {
+    if (containerRef.current) setContainerRect(containerRef.current.getBoundingClientRect());
+    const el = charRefs.current[id];
+    if (el) setAnchorRects((prev) => ({ ...prev, [id]: el.getBoundingClientRect() }));
+  };
 
   return (
     <section
       ref={containerRef}
-      className="relative w-full overflow-visible"
+      className="relative w-full overflow-visible py-12"
       style={{
-        minHeight: "700px",
-        background:
-          "linear-gradient(180deg, #020810 0%, #071222 20%, #0c1e38 45%, #0a1a30 70%, #060e1c 100%)",
+        minHeight: "650px",
+        background: "radial-gradient(circle at center, #ffffff 0%, #f8fafc 100%)",
       }}
     >
-      {/* ── Background: Futuristic AI Corporation Steps ── */}
-      {/* Subtle perspective grid floor */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `
-            linear-gradient(rgba(0,255,255,0.025) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,255,255,0.025) 1px, transparent 1px)
-          `,
-          backgroundSize: "80px 80px",
-          maskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.8) 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.8) 100%)",
-        }}
+      {/* Background decoration: Subtle professional pattern */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+        style={{ 
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='https://i.etsystatic.com/31715137/r/il/318760/3318728368/il_570xN.3318728368_s0u8.jpg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+        }} 
       />
 
-      {/* Staircase / platform steps — seamless gradient bands */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Back step */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: "0",
-            left: "0",
-            right: "0",
-            height: "55%",
-            background: "linear-gradient(180deg, rgba(8,20,40,0) 0%, rgba(10,25,50,0.6) 30%, rgba(6,15,35,0.8) 100%)",
-          }}
-        />
-        {/* Middle step highlight */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: "18%",
-            left: "10%",
-            right: "10%",
-            height: "3px",
-            background: "linear-gradient(90deg, transparent, rgba(0,255,255,0.08), rgba(0,200,255,0.12), rgba(0,255,255,0.08), transparent)",
-            borderRadius: "2px",
-          }}
-        />
-        {/* Front step highlight */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: "8%",
-            left: "15%",
-            right: "15%",
-            height: "3px",
-            background: "linear-gradient(90deg, transparent, rgba(0,255,255,0.1), rgba(0,220,255,0.15), rgba(0,255,255,0.1), transparent)",
-            borderRadius: "2px",
-          }}
-        />
+      <div className="relative z-10 text-center mb-16">
+        <h2 className="text-3xl font-bold text-slate-800 tracking-tight">Meet Our Research Team</h2>
+        <div className="w-16 h-1 bg-blue-500 mx-auto mt-4 rounded-full opacity-30" />
       </div>
 
-      {/* Ambient glow orbs */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: "5%", left: "10%", width: "350px", height: "350px",
-          background: "radial-gradient(circle, rgba(0,80,200,0.07) 0%, transparent 70%)",
-          borderRadius: "50%",
-        }}
-      />
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: "15%", right: "5%", width: "400px", height: "400px",
-          background: "radial-gradient(circle, rgba(0,255,255,0.05) 0%, transparent 70%)",
-          borderRadius: "50%",
-        }}
-      />
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          bottom: "20%", left: "50%", transform: "translateX(-50%)", width: "600px", height: "300px",
-          background: "radial-gradient(ellipse, rgba(0,180,255,0.04) 0%, transparent 70%)",
-        }}
-      />
+      <div className="relative max-w-5xl mx-auto h-[400px]">
+        {/* The Overlapping Standing Team Composition */}
+        {teamMembers.map((member, i) => {
+          const isFront = member.row === 0;
+          const isMiddle = member.row === 1;
+          const isHovered = hoveredId === member.id;
+          
+          // Width/Scale logic
+          const baseScale = isFront ? 1.05 : isMiddle ? 0.9 : 0.8;
+          const scale = isHovered ? baseScale * 1.05 : baseScale;
+          const zIndex = isHovered ? 50 : (isFront ? 40 : isMiddle ? 30 : 20);
+          
+          // Responsive width for team members
+          const charWidth = isFront ? "240px" : isMiddle ? "210px" : "180px";
 
-      {/* Holographic monitor panels */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: "6%", left: "4%", width: "160px", height: "100px",
-          border: "1px solid rgba(0,255,255,0.08)",
-          borderRadius: "8px",
-          background: "linear-gradient(135deg, rgba(0,255,255,0.02), rgba(0,100,255,0.015))",
-          boxShadow: "0 0 15px rgba(0,255,255,0.04)",
-          transform: "perspective(800px) rotateY(12deg)",
-          animation: "monitorPulse 4s ease-in-out infinite",
-        }}
-      />
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: "4%", right: "6%", width: "180px", height: "110px",
-          border: "1px solid rgba(0,255,255,0.06)",
-          borderRadius: "8px",
-          background: "linear-gradient(135deg, rgba(0,100,255,0.02), rgba(0,255,255,0.015))",
-          boxShadow: "0 0 12px rgba(0,100,255,0.04)",
-          transform: "perspective(800px) rotateY(-10deg)",
-          animation: "monitorPulse 4.5s ease-in-out infinite 1s",
-        }}
-      />
-
-      {/* ── Title ── */}
-      <div className="relative z-10 text-center pt-8 pb-2">
-        <h2
-          className="text-2xl sm:text-3xl font-bold mb-1"
-          style={{ color: "#e2e8f0", textShadow: "0 0 20px rgba(0,255,255,0.2)" }}
-        >
-          NOA Research Team
-        </h2>
-        <div
-          className="mx-auto h-[2px] w-32 mt-2"
-          style={{
-            background: "linear-gradient(90deg, transparent, #00ffff, transparent)",
-            boxShadow: "0 0 10px rgba(0,255,255,0.3)",
-          }}
-        />
-        <p className="text-xs sm:text-sm mt-2" style={{ color: "rgba(0,255,255,0.45)" }}>
-          AI Corporation Headquarters
-        </p>
+          return (
+            <div
+              key={member.id}
+              ref={(el) => { charRefs.current[member.id] = el; }}
+              className="absolute bottom-0 transition-all duration-500 ease-out cursor-pointer"
+              style={{
+                left: `calc(50% + ${member.offset}px)`,
+                transform: `translateX(-50%)`,
+                zIndex,
+                width: charWidth,
+                opacity: loaded ? 1 : 0,
+              }}
+              onMouseEnter={() => {
+                setHoveredId(member.id);
+                updateRects(member.id);
+              }}
+              onMouseLeave={() => setHoveredId(null)}
+            >
+              <div 
+                className="relative w-full aspect-[2/3] transition-transform duration-300"
+                style={{ 
+                  transform: `scale(${scale})`,
+                  filter: !isHovered && hoveredId !== null ? "grayscale(0.4) opacity(0.7)" : "none",
+                  transition: 'all 0.4s ease'
+                }}
+              >
+                {/* Images */}
+                <Image
+                  src={member.baseImage}
+                  alt={member.name}
+                  fill
+                  className="object-contain object-bottom transition-opacity duration-300"
+                  style={{ 
+                    opacity: isHovered ? 0 : 1,
+                    filter: isFront ? "drop-shadow(0 10px 20px rgba(0,0,0,0.12))" : "drop-shadow(0 5px 10px rgba(0,0,0,0.08))"
+                  }}
+                  sizes="240px"
+                />
+                <Image
+                  src={member.activeImage}
+                  alt={`${member.name} active`}
+                  fill
+                  className="object-contain object-bottom transition-opacity duration-300"
+                  style={{ 
+                    opacity: isHovered ? 1 : 0,
+                    filter: "drop-shadow(0 15px 30px rgba(0,0,0,0.15))"
+                  }}
+                  sizes="240px"
+                />
+              </div>
+              
+              {/* Subtle name badge below */}
+              <div className="text-center mt-3 translate-y-2">
+                <span className={`text-[11px] font-bold tracking-tight px-3 py-1 rounded-full border transition-all ${isHovered ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200' : 'bg-white text-slate-500 border-slate-100'}`}>
+                  {member.name}
+                </span>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* ── Animated Robots ── */}
-      {robots.map((robot) => (
-        <AnimatedRobot key={robot.id} robot={robot} loaded={loaded} />
-      ))}
-
-      {/* ── Team Pyramid Layout ── */}
-      <div className="relative z-10" style={{ maxWidth: "1000px", margin: "0 auto", paddingBottom: "30px" }}>
-
-        {/* Back Row — smallest, furthest back */}
-        <div className="flex items-end justify-center gap-1 sm:gap-3 mb-0">
-          {backRow.map((member, i) => (
-            <CharacterCard
-              key={member.id}
-              member={member}
-              index={i + 3}
-              isVisible={loaded}
-              hovered={hoveredId === member.id}
-              onHover={() => setHoveredId(member.id)}
-              onLeave={() => setHoveredId(null)}
-              setRef={(el) => { charRefs.current[member.id] = el; }}
-            />
-          ))}
-        </div>
-
-        {/* Middle Row */}
-        <div className="flex items-end justify-center gap-1 sm:gap-4 -mt-6 sm:-mt-10">
-          {middleRow.map((member, i) => (
-            <CharacterCard
-              key={member.id}
-              member={member}
-              index={i + 1}
-              isVisible={loaded}
-              hovered={hoveredId === member.id}
-              onHover={() => setHoveredId(member.id)}
-              onLeave={() => setHoveredId(null)}
-              setRef={(el) => { charRefs.current[member.id] = el; }}
-            />
-          ))}
-        </div>
-
-        {/* Front Row — Jamalirad, biggest, forward */}
-        <div className="flex items-end justify-center -mt-8 sm:-mt-14">
-          {frontRow.map((member) => (
-            <CharacterCard
-              key={member.id}
-              member={member}
-              index={0}
-              isVisible={loaded}
-              hovered={hoveredId === member.id}
-              onHover={() => setHoveredId(member.id)}
-              onLeave={() => setHoveredId(null)}
-              setRef={(el) => { charRefs.current[member.id] = el; }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* ── Floating Hover Cards (rendered at container level to avoid clipping) ── */}
+      {/* Floating Hover Cards */}
       {teamMembers.map((member) => (
-        <FloatingCard
+        <HoverCard
           key={`card-${member.id}`}
           member={member}
           show={hoveredId === member.id}
@@ -588,67 +294,6 @@ export default function TeamStanding() {
           containerRect={containerRect}
         />
       ))}
-
-      {/* Floor glow */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
-        style={{
-          background: "linear-gradient(0deg, rgba(0,255,255,0.05) 0%, transparent 100%)",
-        }}
-      />
-
-      {/* Scanning line */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 5 }}>
-        <div
-          className="absolute w-full h-[1px]"
-          style={{
-            background: "linear-gradient(90deg, transparent 0%, rgba(0,255,255,0.07) 50%, transparent 100%)",
-            animation: "scanline 8s linear infinite",
-          }}
-        />
-      </div>
-
-      {/* ── Keyframe Animations ── */}
-      <style jsx>{`
-        @keyframes scanline {
-          0% { top: -5%; }
-          100% { top: 105%; }
-        }
-        @keyframes charBreathe {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-3px); }
-        }
-        @keyframes charSway {
-          0%, 100% { transform: translateX(0) rotate(0deg); }
-          25% { transform: translateX(1.5px) rotate(0.3deg); }
-          75% { transform: translateX(-1.5px) rotate(-0.3deg); }
-        }
-        @keyframes robotTyping {
-          0%, 100% { transform: translateY(0); }
-          15% { transform: translateY(-2px) rotate(-0.5deg); }
-          30% { transform: translateY(0) rotate(0.3deg); }
-          45% { transform: translateY(-1.5px) rotate(-0.3deg); }
-          60% { transform: translateY(0) rotate(0.2deg); }
-          75% { transform: translateY(-2px) rotate(-0.4deg); }
-          90% { transform: translateY(0); }
-        }
-        @keyframes robotBreathe {
-          0%, 100% { transform: scaleY(1); }
-          50% { transform: scaleY(1.008); }
-        }
-        @keyframes robotSway {
-          0%, 100% { transform: translateX(0); }
-          50% { transform: translateX(2px); }
-        }
-        @keyframes kbGlow {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.7; }
-        }
-        @keyframes monitorPulse {
-          0%, 100% { opacity: 0.6; }
-          50% { opacity: 1; }
-        }
-      `}</style>
     </section>
   );
 }
