@@ -99,7 +99,6 @@ const SECTION_ORDER: Array<{ key: keyof ArticleData; label: string }> = [
   { key: 'conclusions', label: 'Conclusions' },
   { key: 'references', label: 'References' },
   { key: 'supplements', label: 'Supplements' },
-  { key: 'usability_testing', label: 'Usability Testing' },
 ]
 
 function toParagraphs(value: unknown, baseId: string): ParagraphBlock[] {
@@ -145,69 +144,21 @@ function isStructuredSection(value: unknown): value is StructuredSection {
   return 'content' in candidate || 'subsections' in candidate || 'title' in candidate
 }
 
-function buildUsabilitySections(value: unknown, baseId: string, defaultTitle: string): RenderedSection[] {
-  if (!value || typeof value !== 'object') return []
-  const data = value as Record<string, unknown>
-  const title = typeof data.title === 'string' ? data.title : defaultTitle
+function toRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null
+  return value as Record<string, unknown>
+}
 
-  const summary = data.summary as Record<string, unknown> | undefined
-  const summaryParagraphs = summary
-    ? Object.entries(summary)
-        .map(([key, val]) => `${toHeadingLabel(key)}: ${Array.isArray(val) ? val.join(' to ') : String(val ?? '')}`)
-        .filter(Boolean)
-    : []
+function toRecordArray(value: unknown): Record<string, unknown>[] {
+  if (!Array.isArray(value)) return []
+  return value.filter((entry) => entry && typeof entry === 'object' && !Array.isArray(entry)) as Record<string, unknown>[]
+}
 
-  const sections: RenderedSection[] = [
-    {
-      id: baseId,
-      title,
-      level: 2,
-      paragraphs: toParagraphs(summaryParagraphs, `${baseId}-summary`),
-    },
-  ]
-
-  const sectionGroups = data.sections as Record<string, unknown> | undefined
-  if (sectionGroups) {
-    Object.entries(sectionGroups).forEach(([key, content], index) => {
-      sections.push({
-        id: `${baseId}-section-${index + 1}`,
-        title: toHeadingLabel(key),
-        level: 3,
-        paragraphs: toParagraphs(content, `${baseId}-section-${index + 1}`),
-      })
-    })
-  }
-
-  const individualScores = data.individual_scores as Array<Record<string, unknown>> | undefined
-  if (individualScores?.length) {
-    const lines = individualScores.map(
-      (item) => `${String(item.id ?? '')} — ${String(item.role ?? 'Evaluator')}: SUS ${String(item.sus_score ?? '')}`,
-    )
-    sections.push({
-      id: `${baseId}-individual-scores`,
-      title: 'Individual SUS Scores',
-      level: 3,
-      paragraphs: toParagraphs(lines, `${baseId}-individual-scores`),
-    })
-  }
-
-  const itemStats = data.item_level_statistics as Array<Record<string, unknown>> | undefined
-  if (itemStats?.length) {
-    const lines = itemStats.map((item) => {
-      const itemNo = item.item_number ? `Q${item.item_number}` : 'Item'
-      return `${itemNo}: ${String(item.item_text ?? '')} | Mean (0–4): ${String(
-        item.mean_directed_0_4 ?? '',
-      )} | Contribution: ${String(item.contribution_to_SUS_pct ?? '')}%`
-    })
-    sections.push({
-      id: `${baseId}-item-stats`,
-      title: 'Item-Level SUS Statistics',
-      level: 3,
-      paragraphs: toParagraphs(lines, `${baseId}-item-stats`),
-    })
-  }
-
-  return sections.filter((section) => section.paragraphs.length > 0)
+function formatDisplayValue(value: unknown): string {
+  if (Array.isArray(value)) return value.map((item) => formatDisplayValue(item)).join(', ')
+  if (value && typeof value === 'object') return JSON.stringify(value)
+  if (value === null || value === undefined || value === '') return '—'
+  return String(value)
 }
 
 function buildStructuredSections(value: unknown, baseId: string, defaultTitle: string, level: number): RenderedSection[] {
@@ -316,12 +267,6 @@ export default function ArticlePreviewClient({
     SECTION_ORDER.forEach(({ key, label }) => {
       const sectionValue = articleData[key]
       if (!sectionValue) return
-
-      if (key === 'usability_testing') {
-        blocks.push(...buildUsabilitySections(sectionValue, String(key), label))
-        return
-      }
-
       blocks.push(...buildStructuredSections(sectionValue, String(key), label, 2))
     })
 
@@ -332,6 +277,28 @@ export default function ArticlePreviewClient({
 
     return blocks
   }, [articleData])
+
+  const usabilityData = useMemo(() => toRecord(articleData.usability_testing), [articleData.usability_testing])
+
+  const usabilityStudyMetadata = useMemo(() => toRecord(usabilityData?.study_metadata), [usabilityData])
+  const usabilityPanelDemographics = useMemo(() => toRecord(usabilityData?.expert_panel_demographics), [usabilityData])
+  const usabilitySusScores = useMemo(() => toRecord(usabilityData?.sus_item_scores), [usabilityData])
+  const usabilityThemes = useMemo(() => toRecord(usabilityData?.qualitative_feedback_themes), [usabilityData])
+  const usabilityConclusions = useMemo(() => toRecord(usabilityData?.conclusions), [usabilityData])
+
+  const usabilityNavSections = useMemo(() => {
+    if (!usabilityData) return []
+    return [
+      { id: 'usability-testing', title: 'Usability Testing', level: 2 },
+      { id: 'usability-study-metadata', title: 'Study Metadata', level: 3 },
+      { id: 'usability-expert-panel-demographics', title: 'Expert Panel Demographics', level: 3 },
+      { id: 'usability-sus-item-scores', title: 'SUS Item Scores', level: 3 },
+      { id: 'usability-qualitative-feedback-themes', title: 'Qualitative Feedback Themes', level: 3 },
+      { id: 'usability-conclusions', title: 'Conclusions & Recommendations', level: 3 },
+    ]
+  }, [usabilityData])
+
+  const navigationSections = useMemo(() => [...sectionBlocks, ...usabilityNavSections], [sectionBlocks, usabilityNavSections])
 
   function getStorageKey() {
     return `noa-comments-${articleId}`
@@ -487,7 +454,7 @@ export default function ArticlePreviewClient({
           <div className="sticky top-24 rounded-xl border border-border/60 bg-card p-4">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">On this page</h2>
             <nav className="mt-3 space-y-1">
-              {sectionBlocks.map((section) => (
+              {navigationSections.map((section) => (
                 <a
                   key={section.id}
                   href={`#${section.id}`}
@@ -503,6 +470,139 @@ export default function ArticlePreviewClient({
         </aside>
 
         <section className="space-y-8">
+          {usabilityData && (
+            <article id="usability-testing" className="scroll-mt-24 space-y-6 rounded-xl border border-sky-500/30 bg-sky-500/5 p-6">
+              <h2 className="text-2xl font-semibold tracking-tight">Usability Testing</h2>
+              <p className="text-sm text-muted-foreground">
+                Structured SUS expert evaluation summary prepared for clinical and academic review.
+              </p>
+
+              <section id="usability-study-metadata" className="scroll-mt-24 space-y-3 rounded-lg border border-border/60 bg-card/80 p-4">
+                <h3 className="text-lg font-semibold tracking-tight">Study Metadata</h3>
+                <div className="grid gap-2 md:grid-cols-2">
+                  {Object.entries(usabilityStudyMetadata ?? {}).map(([key, value]) => (
+                    <div key={key} className="rounded border border-border/50 bg-background/50 px-3 py-2 text-sm">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{toHeadingLabel(key)}</p>
+                      <p className="mt-1 whitespace-pre-wrap text-foreground">{formatDisplayValue(value)}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section id="usability-expert-panel-demographics" className="scroll-mt-24 space-y-3 rounded-lg border border-border/60 bg-card/80 p-4">
+                <h3 className="text-lg font-semibold tracking-tight">Expert Panel Demographics</h3>
+                <div className="grid gap-2 md:grid-cols-2">
+                  {Object.entries(usabilityPanelDemographics ?? {})
+                    .filter(([key]) => key !== 'panel_members')
+                    .map(([key, value]) => (
+                      <div key={key} className="rounded border border-border/50 bg-background/50 px-3 py-2 text-sm">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{toHeadingLabel(key)}</p>
+                        <p className="mt-1 whitespace-pre-wrap text-foreground">{formatDisplayValue(value)}</p>
+                      </div>
+                    ))}
+                </div>
+                {toRecordArray(usabilityPanelDemographics?.panel_members).length > 0 && (
+                  <div className="overflow-x-auto rounded-lg border border-border/60 bg-background/50">
+                    <table className="w-full text-sm">
+                      <thead className="border-b border-border/60 bg-muted/30 text-xs uppercase tracking-wider text-muted-foreground">
+                        <tr>
+                          <th className="px-3 py-2 text-left">ID</th>
+                          <th className="px-3 py-2 text-left">Name</th>
+                          <th className="px-3 py-2 text-left">Specialty</th>
+                          <th className="px-3 py-2 text-left">Experience (Years)</th>
+                          <th className="px-3 py-2 text-left">SUS</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/50">
+                        {toRecordArray(usabilityPanelDemographics?.panel_members).map((member, idx) => (
+                          <tr key={idx}>
+                            <td className="px-3 py-2">{formatDisplayValue(member.id)}</td>
+                            <td className="px-3 py-2">{formatDisplayValue(member.name)}</td>
+                            <td className="px-3 py-2">{formatDisplayValue(member.specialty)}</td>
+                            <td className="px-3 py-2">{formatDisplayValue(member.years_experience)}</td>
+                            <td className="px-3 py-2">{formatDisplayValue(member.sus_score)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </section>
+
+              <section id="usability-sus-item-scores" className="scroll-mt-24 space-y-3 rounded-lg border border-border/60 bg-card/80 p-4">
+                <h3 className="text-lg font-semibold tracking-tight">SUS Item Scores</h3>
+                <div className="grid gap-2 md:grid-cols-2">
+                  {Object.entries(toRecord(usabilitySusScores?.aggregate_statistics) ?? {}).map(([key, value]) => (
+                    <div key={key} className="rounded border border-border/50 bg-background/50 px-3 py-2 text-sm">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{toHeadingLabel(key)}</p>
+                      <p className="mt-1 text-foreground">{formatDisplayValue(value)}</p>
+                    </div>
+                  ))}
+                </div>
+                {toRecordArray(usabilitySusScores?.item_statistics).length > 0 && (
+                  <div className="overflow-x-auto rounded-lg border border-border/60 bg-background/50">
+                    <table className="w-full text-sm">
+                      <thead className="border-b border-border/60 bg-muted/30 text-xs uppercase tracking-wider text-muted-foreground">
+                        <tr>
+                          <th className="px-3 py-2 text-left">Item</th>
+                          <th className="px-3 py-2 text-left">Question</th>
+                          <th className="px-3 py-2 text-left">Raw Mean ± SD</th>
+                          <th className="px-3 py-2 text-left">Contribution Mean ± SD</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/50">
+                        {toRecordArray(usabilitySusScores?.item_statistics).map((item, idx) => (
+                          <tr key={idx}>
+                            <td className="px-3 py-2 font-medium">{formatDisplayValue(item.item_id)}</td>
+                            <td className="px-3 py-2">{formatDisplayValue(item.item_text)}</td>
+                            <td className="px-3 py-2">{formatDisplayValue(item.raw_mean)} ± {formatDisplayValue(item.raw_sd)}</td>
+                            <td className="px-3 py-2">{formatDisplayValue(item.contribution_mean_0_to_4)} ± {formatDisplayValue(item.contribution_sd_0_to_4)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </section>
+
+              <section id="usability-qualitative-feedback-themes" className="scroll-mt-24 space-y-3 rounded-lg border border-border/60 bg-card/80 p-4">
+                <h3 className="text-lg font-semibold tracking-tight">Qualitative Feedback Themes</h3>
+                {Object.entries(usabilityThemes ?? {}).map(([key, value]) => (
+                  <div key={key} className="rounded border border-border/50 bg-background/50 p-3">
+                    <p className="text-sm font-semibold text-foreground">{toHeadingLabel(key)}</p>
+                    {Array.isArray(value) ? (
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                        {value.map((entry, idx) => (
+                          <li key={idx}>{formatDisplayValue(entry)}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">{formatDisplayValue(value)}</p>
+                    )}
+                  </div>
+                ))}
+              </section>
+
+              <section id="usability-conclusions" className="scroll-mt-24 space-y-3 rounded-lg border border-border/60 bg-card/80 p-4">
+                <h3 className="text-lg font-semibold tracking-tight">Conclusions & Recommendations</h3>
+                {Object.entries(usabilityConclusions ?? {}).map(([key, value]) => (
+                  <div key={key} className="rounded border border-border/50 bg-background/50 p-3">
+                    <p className="text-sm font-semibold text-foreground">{toHeadingLabel(key)}</p>
+                    {Array.isArray(value) ? (
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                        {value.map((entry, idx) => (
+                          <li key={idx}>{formatDisplayValue(entry)}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">{formatDisplayValue(value)}</p>
+                    )}
+                  </div>
+                ))}
+              </section>
+            </article>
+          )}
+
           {sectionBlocks.map((section) => (
             <article key={section.id} id={section.id} className="scroll-mt-24 space-y-4 rounded-xl border border-border/60 bg-card p-5">
               {section.level <= 2 ? (

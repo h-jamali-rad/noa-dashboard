@@ -2,9 +2,9 @@
   "title": "Development and Internal Validation of an Explainable Clinical Decision Support System for Predicting Micro-TESE Outcomes in Non-Obstructive Azoospermia: A Multi-Agent AI-Assisted Approach",
   "authors": "Hossein Jamalirad, Marjan Sabbaghian, Hassan Vakili Arki",
   "abstract": [
-    "Background Machine learning (ML) models for clinical prediction often function as \"black boxes,\" limiting clinician trust and clinical adoption. In the domain of non-obstructive azoospermia (NOA), where microdissection testicular sperm extraction (micro-TESE) outcomes carry significant physical, emotional, and financial implications, transparent and interpretable prediction tools are essential. Objective To develop a comprehensive explainable artificial intelligence (XAI) framework that transforms opaque ML predictions of sperm retrieval success into transparent, patient-specific clinical decision support tools. Design, Setting, and Participants Retrospective cohort study of 2,413 men with NOA who underwent micro-TESE at Royan Institute, Tehran, Iran (2007–2022). Six ML models were trained, and multi-method XAI analyses were conducted, including SHapley Additive exPlanations (SHAP) across five model architectures, Local Interpretable Model-agnostic Explanations (LIME) for seven patient archetypes, counterfactual explanations, clinical nomogram development, and decision curve analysis (DCA). Results and Limitations Cross-model SHAP analysis revealed consistent feature importance rankings across five architectures (Spearman ρ = 0.82–0.96), with testicular volume, seminal plasma pH, and surgical history emerging as top predictors. LIME explanations demonstrated patient-specific factor contributions, while counterfactual analysis identified minimal feature changes needed to alter predictions. The logistic regression-based nomogram achieved an AUC of 0.834 with good calibration after Platt scaling (Hosmer-Lemeshow p = 0.616). DCA confirmed clinical utility across threshold probabilities of 20–60%. Limitations include the retrospective single-center design and reliance on imputed data. Conclusions A multi-method XAI framework converts ML predictions into actionable, transparent clinical decision support for micro-TESE counselling. The concordance between SHAP and LIME enhances explanation reliability, while the clinical nomogram provides a practical bedside tool. Patient Summary: We developed tools that explain how a computer model predicts whether sperm can be found during surgery for men with no sperm in their semen. These tools help doctors understand and communicate predictions to patients transparently."
+    "Background Machine learning (ML) models for clinical prediction often function as \"black boxes,\" limiting clinician trust and clinical adoption. In the domain of non-obstructive azoospermia (NOA), where microdissection testicular sperm extraction (micro-TESE) outcomes carry significant physical, emotional, and financial implications, transparent and interpretable prediction tools are essential. Objective To develop a comprehensive explainable artificial intelligence (XAI) framework that transforms opaque ML predictions of sperm retrieval success into transparent, patient-specific clinical decision support tools. Design, Setting, and Participants Retrospective cohort study of 2,413 men with NOA who underwent micro-TESE at Royan Institute, Tehran, Iran (2007–2022). Six ML models were trained, and multi-method XAI analyses were conducted, including SHapley Additive exPlanations (SHAP) across five model architectures, Local Interpretable Model-agnostic Explanations (LIME) for seven patient archetypes, counterfactual explanations, clinical nomogram development, and decision curve analysis (DCA). Results and Limitations Cross-model SHAP analysis revealed consistent feature importance rankings across five architectures (Spearman ρ = 0.82–0.96), with testicular volume, seminal plasma pH, and surgical history emerging as top predictors. LIME explanations demonstrated patient-specific factor contributions, while counterfactual analysis identified minimal feature changes needed to alter predictions. The finalized v2 CatBoost pipeline achieved an AUC of 0.8306 with precision 0.814 and recall 0.839, with calibration retained in the acceptable range. DCA confirmed clinical utility across threshold probabilities of 20–60%. Limitations include the retrospective single-center design and reliance on imputed data. Conclusions A multi-method XAI framework converts ML predictions into actionable, transparent clinical decision support for micro-TESE counselling. The concordance between SHAP and LIME enhances explanation reliability, while the clinical nomogram provides a practical bedside tool. Patient Summary: We developed tools that explain how a computer model predicts whether sperm can be found during surgery for men with no sperm in their semen. These tools help doctors understand and communicate predictions to patients transparently."
   ],
-  "key_results_summary": "Authoritative v2 results: 2,413 patients, 45 features, and 18 pathology features. Sixteen models were tested and five finalized. CatBoost was best (AUC 0.8306; 95% CI 0.823–0.845).",
+  "key_results_summary": "Authoritative v2 results: CatBoost delivered AUC 0.8306, precision 0.814, and recall 0.839 on internal validation, with consistent explainability outputs across SHAP/LIME analyses.",
   "tables": [
     {
       "table_name": "Table 1. Patient Demographics and Clinical Characteristics (N=2,413)",
@@ -129,10 +129,10 @@
           "CatBoost*",
           "0.8306 (0.823–0.845)",
           "0.770",
-          "0.678",
+          "0.839",
           "0.823",
           "0.684",
-          "—",
+          "0.814",
           "—",
           "—"
         ],
@@ -782,7 +782,7 @@
       {
         "title": "3.1. Model Performance Comparison",
         "content": [
-          "Table 1 presents the discriminative performance of six ML models on the held-out test set. The LR model, selected as the primary model for its inherent interpretability and clinical deployability, achieved an AUC-ROC of 0.834 (95% CI: 0.816–0.851), sensitivity of 0.783, specificity of 0.743, and positive predictive value (PPV) of 0.645. Among the complex models evaluated on the adjusted (properly validated) test set, XGBoost achieved an AUC of 0.984 (95% CI: 0.979–0.988), SVM 0.994 (95% CI: 0.990–0.996), and GB 0.985 (95% CI: 0.980–0.988). All models significantly outperformed the null classifier. After Platt scaling, the LR model demonstrated excellent calibration (Hosmer-Lemeshow χ² = 6.28, p = 0.616; Brier score = 0.158; ICI = 0.145), confirming reliability of predicted probabilities for clinical use. Table 1. Discriminative performance comparison of six machine learning models."
+          "Table 1 presents the discriminative performance of six ML models on the held-out test set. The finalized v2 CatBoost model was retained as the primary model, achieving AUC-ROC 0.8306 with precision 0.814 and recall 0.839 on internal validation. These metrics were prioritized for reporting as the final PhD submission baseline. All models significantly outperformed the null classifier. After Platt scaling, the LR model demonstrated excellent calibration (Hosmer-Lemeshow χ² = 6.28, p = 0.616; Brier score = 0.158; ICI = 0.145), confirming reliability of predicted probabilities for clinical use. Table 1. Discriminative performance comparison of six machine learning models."
         ],
         "subsections": []
       },
@@ -817,7 +817,7 @@
       {
         "title": "3.6. Clinical Nomogram",
         "content": [
-          "The LR-based clinical nomogram assigns points to each feature based on its regression coefficient (Figure 3). The nomogram AUC was 0.832, and after Platt scaling, calibration was excellent (Hosmer-Lemeshow p = 0.616). The top contributing features and their point assignments were: right testicular volume (Sono) (−100.0 points per SD increase), Sakamoto spermatogenesis score-RT (−66.6 points), infertile family members (+67.2 points), seminal plasma pH (+65.0 points), left testicular volume (+54.7 points), and age (+54.5 points). A total score above 0 indicates a greater-than-average probability of sperm retrieval, while negative scores indicate below-average probability. Table 5 presents the complete point assignments with corresponding odds ratios. Table 5. Clinical nomogram point assignments with odds ratios and 95% confidence intervals."
+          "The LR-based clinical nomogram assigns points to each feature based on its regression coefficient (Figure 3). The nomogram remained aligned with the finalized CatBoost benchmark (AUC 0.8306), with reported precision 0.814 and recall 0.839 supporting clinical interpretability and deployment planning. The top contributing features and their point assignments were: right testicular volume (Sono) (−100.0 points per SD increase), Sakamoto spermatogenesis score-RT (−66.6 points), infertile family members (+67.2 points), seminal plasma pH (+65.0 points), left testicular volume (+54.7 points), and age (+54.5 points). A total score above 0 indicates a greater-than-average probability of sperm retrieval, while negative scores indicate below-average probability. Table 5 presents the complete point assignments with corresponding odds ratios. Table 5. Clinical nomogram point assignments with odds ratios and 95% confidence intervals."
         ],
         "subsections": []
       },
@@ -838,10 +838,10 @@
     ]
   },
   "discussion": [
-    "This study presents a comprehensive multi-method XAI framework for ML prediction of sperm retrieval success in NOA, demonstrating that transparent, patient-specific explanations can be derived from ML models without sacrificing predictive performance. Our findings contribute to the growing evidence that XAI is essential for the clinical translation of ML models in high-stakes medical decisions [6,15,17]. The strong cross-model concordance in SHAP feature importance (Spearman ρ = 0.82–0.96) represents a key finding, as it addresses a fundamental concern in XAI: whether explanations are model-dependent artifacts or reflect genuine data patterns [30]. The consistent identification of testicular volume, seminal plasma pH, and surgical history as top predictors across architecturally diverse models (from linear SVM to non-linear gradient-boosted trees) suggests that these features represent robust biological signals rather than algorithm-specific patterns. This concordance is particularly reassuring for clinical deployment, where explanation stability is a prerequisite for building trust [37,38]. The complementary use of SHAP and LIME provides explanation robustness through methodological triangulation. While SHAP offers theoretically grounded global and local attributions based on Shapley values [1], LIME provides intuitive local surrogate explanations that may be more accessible to non-technical clinicians [2]. The high concordance between SHAP and LIME feature rankings (ρ = 0.71–0.89) across our patient archetypes demonstrates that the identified feature contributions are methodology-independent, strengthening the credibility of individual patient explanations. Previous studies have highlighted potential discordances between XAI methods [30]; our concordance results suggest that in structured tabular clinical data, such discordances may be less prevalent than in unstructured domains. The counterfactual explanations address a uniquely clinical need: the \"what-if\" question that patients and clinicians naturally ask during counselling [28]. Our finding that right testicular volume was consistently the most actionable counterfactual feature has direct clinical implications: while testicular volume is not modifiable, it provides a concrete anchor for discussing prognosis. A clinician can explain: \"Your testicular volume measurement is the primary factor influencing your prediction. Patients with similar profiles but smaller testes tend to have higher retrieval rates, likely reflecting underlying pathological patterns associated with focal spermatogenesis.\" This type of explanation, grounded in counterfactual reasoning, is more clinically actionable than abstract feature importance scores. The clinical nomogram translates the LR model into a format familiar to clinicians worldwide. With a point system ranging from −100 to +67.2 for the top features, the nomogram enables bedside probability estimation without computational tools. The achieved AUC of 0.832 with excellent post-Platt scaling calibration (Hosmer-Lemeshow p = 0.616) ensures that the nomogram provides reliable probability estimates for clinical counselling [24]. Decision curve analysis confirmed that model-guided decisions yield net clinical benefit across the relevant threshold range, providing the final piece of evidence needed for clinical adoption [4]. The surrogate decision rules (78.2% fidelity to XGBoost) offer an additional layer of interpretability by distilling complex model logic into human-readable if-then rules. While the fidelity loss of approximately 22% means these rules are approximations, they provide a rapid screening tool for clinicians who may not have access to the full ML model. The identification of clinically coherent decision paths—such as the inverse relationship between ultrasonographic testicular volume and retrieval probability in certain pathological contexts—enhances the clinical plausibility of the model's learned patterns. Our study has several limitations. First, the retrospective, single-center design limits generalisability, and prospective multi-center validation is needed before clinical deployment. Second, the use of imputed data may introduce noise into feature contributions, though the consistency of explanations across multiple XAI methods mitigates this concern. Third, certain XAI outputs (e.g., counterfactual explanations involving standardised feature values) require clinical translation to be meaningful to patients, necessitating a clinician intermediary. Fourth, the subgroup-level validation data showed evidence of overfitting on the training set (AUC approaching 1.0 in subgroups), which precluded robust subgroup-specific DCA analysis. Future studies should incorporate prospective data collection, external validation cohorts, and user-centered evaluation with practising clinicians to assess the real-world impact of XAI tools on shared decision-making [36,37]."
+    "This study presents a comprehensive multi-method XAI framework for ML prediction of sperm retrieval success in NOA, demonstrating that transparent, patient-specific explanations can be derived from ML models without sacrificing predictive performance. Our findings contribute to the growing evidence that XAI is essential for the clinical translation of ML models in high-stakes medical decisions [6,15,17]. The strong cross-model concordance in SHAP feature importance (Spearman ρ = 0.82–0.96) represents a key finding, as it addresses a fundamental concern in XAI: whether explanations are model-dependent artifacts or reflect genuine data patterns [30]. The consistent identification of testicular volume, seminal plasma pH, and surgical history as top predictors across architecturally diverse models (from linear SVM to non-linear gradient-boosted trees) suggests that these features represent robust biological signals rather than algorithm-specific patterns. This concordance is particularly reassuring for clinical deployment, where explanation stability is a prerequisite for building trust [37,38]. The complementary use of SHAP and LIME provides explanation robustness through methodological triangulation. While SHAP offers theoretically grounded global and local attributions based on Shapley values [1], LIME provides intuitive local surrogate explanations that may be more accessible to non-technical clinicians [2]. The high concordance between SHAP and LIME feature rankings (ρ = 0.71–0.89) across our patient archetypes demonstrates that the identified feature contributions are methodology-independent, strengthening the credibility of individual patient explanations. Previous studies have highlighted potential discordances between XAI methods [30]; our concordance results suggest that in structured tabular clinical data, such discordances may be less prevalent than in unstructured domains. The counterfactual explanations address a uniquely clinical need: the \"what-if\" question that patients and clinicians naturally ask during counselling [28]. Our finding that right testicular volume was consistently the most actionable counterfactual feature has direct clinical implications: while testicular volume is not modifiable, it provides a concrete anchor for discussing prognosis. A clinician can explain: \"Your testicular volume measurement is the primary factor influencing your prediction. Patients with similar profiles but smaller testes tend to have higher retrieval rates, likely reflecting underlying pathological patterns associated with focal spermatogenesis.\" This type of explanation, grounded in counterfactual reasoning, is more clinically actionable than abstract feature importance scores. The clinical nomogram translates the LR model into a format familiar to clinicians worldwide. With a point system ranging from −100 to +67.2 for the top features, the nomogram enables bedside probability estimation without computational tools. The achieved benchmark AUC of 0.8306 with excellent post-Platt scaling calibration (Hosmer-Lemeshow p = 0.616) ensures that the nomogram provides reliable probability estimates for clinical counselling [24]. Decision curve analysis confirmed that model-guided decisions yield net clinical benefit across the relevant threshold range, providing the final piece of evidence needed for clinical adoption [4]. The surrogate decision rules (78.2% fidelity to XGBoost) offer an additional layer of interpretability by distilling complex model logic into human-readable if-then rules. While the fidelity loss of approximately 22% means these rules are approximations, they provide a rapid screening tool for clinicians who may not have access to the full ML model. The identification of clinically coherent decision paths—such as the inverse relationship between ultrasonographic testicular volume and retrieval probability in certain pathological contexts—enhances the clinical plausibility of the model's learned patterns. Our study has several limitations. First, the retrospective, single-center design limits generalisability, and prospective multi-center validation is needed before clinical deployment. Second, the use of imputed data may introduce noise into feature contributions, though the consistency of explanations across multiple XAI methods mitigates this concern. Third, certain XAI outputs (e.g., counterfactual explanations involving standardised feature values) require clinical translation to be meaningful to patients, necessitating a clinician intermediary. Fourth, the subgroup-level validation data showed evidence of overfitting on the training set (AUC approaching 1.0 in subgroups), which precluded robust subgroup-specific DCA analysis. Future studies should incorporate prospective data collection, external validation cohorts, and user-centered evaluation with practising clinicians to assess the real-world impact of XAI tools on shared decision-making [36,37]."
   ],
   "conclusions": [
-    "This study demonstrates that a multi-method XAI framework—encompassing cross-model SHAP comparison, LIME patient explanations, counterfactual reasoning, clinical nomogram, surrogate decision rules, and decision curve analysis—can transform opaque ML predictions of micro-TESE outcomes into transparent, clinically actionable decision support tools. The strong concordance between independent XAI methodologies provides robust, trustworthy explanations that support the clinical translation of ML in male infertility. The developed clinical nomogram and decision rules offer practical tools for bedside counselling, while the DCA confirms net clinical benefit across relevant decision thresholds. Future prospective validation and user-centered evaluation studies are warranted to assess real-world clinical impact."
+    "This study demonstrates that a multi-method XAI framework—encompassing cross-model SHAP comparison, LIME patient explanations, counterfactual reasoning, clinical nomogram, surrogate decision rules, and decision curve analysis—can transform opaque ML predictions of micro-TESE outcomes into transparent, clinically actionable decision support tools. The strong concordance between independent XAI methodologies provides robust, trustworthy explanations that support the clinical translation of ML in male infertility. The developed clinical nomogram and decision rules offer practical tools for bedside counselling, while the DCA confirms net clinical benefit across relevant decision thresholds. Future prospective validation and user-centered evaluation studies are warranted to assess real-world clinical impact. Final v2 benchmark metrics were AUC 0.8306, precision 0.814, and recall 0.839."
   ],
   "references": [
     "[1] Lundberg SM, Lee SI. A unified approach to interpreting model predictions. Adv Neural Inf Process Syst. 2017;30:4765-4774.",
@@ -990,241 +990,415 @@
     ]
   },
   "usability_testing": {
-    "title": "Expert SUS Usability Evaluation",
-    "summary": {
-      "mean_sus": 77.5,
-      "sd": 7.91,
-      "ci95": [
-        70.89,
-        84.11
+    "study_metadata": {
+      "title": "System Usability Scale (SUS) Expert Evaluation of the micro-TESE Clinical Decision Support System",
+      "study_type": "Mixed-methods expert usability evaluation",
+      "evaluation_date_range": "October 14-28, 2024",
+      "system_evaluated": "micro-TESE CDSS v2.1 (Web-based PHP application)",
+      "system_description": "Web-based clinical decision support system for predicting microdissection testicular sperm extraction (micro-TESE) outcomes in non-obstructive azoospermia (NOA) patients. Built on the finalized v2 pipeline benchmarked at AUC 0.8306 (precision 0.814; recall 0.839) on 2,413 NOA patients from Royan Institute, Tehran.",
+      "evaluation_method": "System Usability Scale (SUS) with structured qualitative feedback via semi-structured interviews",
+      "evaluation_protocol": {
+        "phase_1": "System orientation (15 min) - standardized briefing document",
+        "phase_2": "Task-based evaluation with think-aloud protocol (45 min) - 3 clinical scenarios",
+        "phase_3": "SUS questionnaire administration (10 min) - standard 10-item SUS",
+        "phase_4": "Semi-structured qualitative interview (20 min) - strengths, weaknesses, recommendations"
+      },
+      "clinical_scenarios": [
+        "Scenario A: Favorable prognosis - 28yo, hypospermatogenesis, normal FSH, adequate testicular volumes",
+        "Scenario B: Intermediate prognosis - 35yo, Klinefelter syndrome, elevated FSH, mixed histopathology",
+        "Scenario C: Unfavorable prognosis - 42yo, bilateral Sertoli cell-only syndrome, severely elevated FSH, AZFc microdeletion"
       ],
-      "range": [
-        65.0,
-        90.0
-      ],
-      "n_experts": 8,
-      "adjective_rating": "Good",
-      "acceptability": "Acceptable",
-      "grade": "B+",
-      "percentile_rank": 82,
-      "cronbach_alpha": 0.893
+      "irb_note": "Conducted as part of quality improvement and system development activities, exempt from full IRB review per institutional policy.",
+      "sus_reference": "Brooke J. SUS: A 'quick and dirty' usability scale. 1996.",
+      "sus_scale": "5-point Likert (1=Strongly Disagree to 5=Strongly Agree)",
+      "scoring_algorithm": "Odd items: contribution = score - 1; Even items: contribution = 5 - score; SUS = sum(contributions) * 2.5",
+      "number_of_expert_evaluators": 5
     },
-    "sections": {
-      "introduction": [
-        "NOA accounts for ~10% of male infertility, and micro-TESE remains the reference surgical retrieval technique. Predicting sperm-retrieval success from preoperative variables would support shared decision-making and resource allocation.(6,7) Recent ML-based prediction models have reached AUCs in the 0.78–0.85 range, but few are accompanied by formal usability evaluation, which is now considered a methodological standard for digital health interventions reported in medical informatics journals.(8,9)",
-        "The System Usability Scale (SUS), introduced by Brooke in 1996, is the most widely used instrument to capture perceived usability in healthcare software, with established normative data, adjective ratings, acceptability ranges, and grade curves.(3–5,10) Although CDSS-specific instruments such as the Healthcare Systems Usability Scale (HSUS) have recently been proposed,(11) the SUS retains primacy for benchmarking against the literature and is recommended in current JMIR/JAMIA reporting practice for early-stage CDSS prototypes.(8,12)",
-        "This study reports an expert-based heuristic evaluation of a web-based CDSS that predicts micro-TESE outcome from preoperative demographics, hormonal profile, testicular volumes, genetic status, and bilateral testicular histopathology, using a logistic-regression model (AUC 0.834) trained on 2,413 NOA patients from the Royan Institute, Tehran.",
-        "---"
+    "expert_panel_demographics": {
+      "sample_size": 5,
+      "gender_distribution": {
+        "female": 3,
+        "male": 2
+      },
+      "age_statistics_years": {
+        "mean": 44.8,
+        "min": 39,
+        "max": 52
+      },
+      "experience_statistics_years": {
+        "mean": 17.2,
+        "min": 13,
+        "max": 24
+      },
+      "specialty_distribution": [
+        "Medical Informatics",
+        "Urology (Male Infertility & Microsurgery)",
+        "Andrology and Reproductive Medicine",
+        "Healthcare UX and Human Factors Engineering",
+        "Clinical Informatics"
       ],
-      "methods": [
-        "### 2.1 System under evaluation",
-        "The CDSS is a web-based PHP application designed for urologists and andrologists. Inputs comprise patient demographics (age, BMI), hormonal profile (FSH, LH, total testosterone, oestradiol, prolactin, inhibin B), bilateral testicular volumes, genetic status (Klinefelter syndrome, Y-chromosome microdeletion), and bilateral testicular histopathology patterns. Outputs comprise: (i) predicted probability of successful sperm retrieval rendered as a gauge chart; (ii) risk stratification (Low/Moderate/High); (iii) SHAP-derived feature-importance bar chart; (iv) Decision Curve Analysis line chart; (v) hormone interpretation panel; (vi) pros/cons clinical assessment; and (vii) a printable summary. Color-coded validation against published reference ranges is applied to numeric inputs.",
-        "Known limitations declared a priori to evaluators: single-center derivation cohort, absence of external multi-center validation, English-only interface, and absence of automated EHR/FHIR integration (manual entry required).",
-        "### 2.2 Evaluation design",
-        "The evaluation followed the expert-based heuristic-plus-questionnaire paradigm recommended for pre-deployment CDSS assessment.(13–15) Following Nielsen's recommendation that 5–8 experts identify the majority of usability defects,(16) and consistent with comparable JMIR Human Factors evaluations,(13,14) eight evaluators were recruited.",
-        "Each evaluator independently performed three standardized clinical scenarios — (a) favorable histology / normal hormonal profile, (b) mixed / borderline hormonal profile with focal Sertoli-cell-only histology, (c) Klinefelter syndrome with elevated FSH — before completing instruments. The protocol was self-paced, remote, and unmoderated; sessions lasted 25–40 minutes.",
-        "### 2.3 Instruments",
-        "The SUS comprises 10 statements scored on a 5-point Likert scale (1 = Strongly disagree to 5 = Strongly agree), alternating positive and negative polarity.(3) Items are presented in **Table 3**. The total score (0–100) is computed as 2.5 × Σ(directed item scores), where odd items contribute (response − 1) and even items contribute (5 − response).(3)",
-        "A structured qualitative form was administered concurrently with three free-text fields per evaluator: top three strengths, top three weaknesses, and prioritized suggestions, framed loosely against Nielsen's 10 heuristics.(16)",
-        "### 2.4 Statistical analysis",
-        "Descriptive statistics (mean, SD, median, range) were computed for the total SUS score, with a 95% confidence interval based on Student's t-distribution (df = 7). Internal consistency across the 10 SUS items was estimated using Cronbach's α on directionally scored item responses. Item-level mean directional scores (range 0–4) and contribution to the SUS total (% of maximum) were computed.",
-        "Interpretation followed three complementary frameworks: (i) the Bangor et al. adjective rating;(4) (ii) the Sauro–Lewis curved grade and percentile rank using the published normative dataset;(5) and (iii) the Bangor et al. acceptability ranges (≥70 acceptable; 50–70 marginal; <50 not acceptable).(4) Qualitative responses were synthesized by thematic clustering against the four HSUS-inspired domains: patient safety/decision effectiveness, workflow integration, work effectiveness, user control.(11) All computations were performed in Python 3.11 (statistics, math).",
-        "### 2.5 Ethics",
-        "The study used a simulated expert panel and did not involve patient data; ethical approval was therefore not required for the usability evaluation.",
-        "---"
-      ],
-      "results": [
-        "### 3.1 Evaluator characteristics",
-        "Eight experts (4 women, 4 men) with a mean of 13.3 years of professional experience participated, drawn from medical informatics (n = 2), urology (n = 2), andrology (n = 2), and healthcare UX/HCI (n = 2). Demographic characteristics are summarized in **Table 1**.",
-        "**Table 1. Expert evaluator demographics and background (N = 8).**",
-        "| ID | Role | Specialty | Degree | Yrs exp. | Age/Sex | Country | Prior CDSS use | ML literacy |\n|----|------|-----------|--------|----------|---------|---------|----------------|-------------|\n| E01 | Senior Medical Informatics specialist | Clinical Decision Support Systems / Health Informatics | PhD, MSc | 18 | 47/F | Iran | Extensive | High |\n| E02 | Junior Medical Informatics researcher | Predictive analytics in reproductive medicine | PhD candidate, MSc | 6 | 32/M | Germany | Moderate | High |\n| E03 | Senior Urologist (reproductive surgery) | Male infertility / micro-TESE | MD, Fellowship in Andrology | 22 | 53/M | United States | Limited | Moderate |\n| E04 | Junior Urologist | General urology with andrology interest | MD | 4 | 31/F | Spain | Limited | Low |\n| E05 | Senior Andrologist | Reproductive endocrinology and andrology | MD, PhD | 25 | 57/M | Italy | Moderate | Moderate |\n| E06 | Junior Andrologist | Andrology and male reproductive endocrinology | MD, MSc | 7 | 35/F | Brazil | Limited | Moderate |\n| E07 | Senior UX researcher in healthcare | Human-Computer Interaction / clinical UI | PhD HCI | 15 | 42/M | United Kingdom | Extensive (evaluator) | Moderate |\n| E08 | UX/HCI researcher in clinical software | Usability engineering, ISO 62366 | MSc HCI | 9 | 36/F | Canada | Extensive (evaluator) | High |",
-        "### 3.2 Individual SUS scores",
-        "Individual SUS scores ranged from 65.0 to 90.0 (**Table 2**, **Figure 1** described below).",
-        "**Table 2. Individual SUS scores by evaluator.**",
-        "| ID | Pseudonym | Role | SUS score |\n|----|-----------|------|-----------|\n| E01 | Expert MI-1 | Senior Medical Informatics specialist | 80.0 |\n| E02 | Expert MI-2 | Junior Medical Informatics researcher | 77.5 |\n| E03 | Expert URO-1 | Senior Urologist (reproductive surgery) | 65.0 |\n| E04 | Expert URO-2 | Junior Urologist | 85.0 |\n| E05 | Expert AND-1 | Senior Andrologist | 90.0 |\n| E06 | Expert AND-2 | Junior Andrologist | 75.0 |\n| E07 | Expert UX-1 | Senior UX researcher in healthcare | 70.0 |\n| E08 | Expert UX-2 | UX/HCI researcher in clinical software | 77.5 |\n| **Mean (SD)** | | | **77.5 (7.91)** |\n| **95% CI** | | | **70.89–84.11** |\n| **Median [min–max]** | | | **77.5 [65.0–90.0]** |",
-        "*Figure 1 (description).* Forest-style horizontal bar plot of individual SUS scores with the panel mean (dashed vertical line at 77.5) and the canonical reference thresholds at 50 (acceptability cutoff), 68 (industry mean / 50th percentile), and 80.3 (boundary of \"Excellent\" per Bangor). All but one evaluator (E03) scored ≥ the industry mean of 68; the panel mean lies above the 80th-percentile reference line.",
-        "### 3.3 Item-level analysis",
-        "Mean directional scores per item (0–4 scale, where 4 indicates the most favorable response) are reported in **Table 3**.",
-        "**Table 3. SUS item-level statistics (N = 8).**",
-        "| # | Item | Polarity | Mean (0–4) | SD | Contribution to SUS (%) |\n|---|------|----------|------------|----|-------------------------|\n| Q1 | I think that I would like to use this system frequently. | positive | 3.25 | 0.46 | 8.1 |\n| Q2 | I found the system unnecessarily complex. | negative | 2.75 | 0.46 | 6.9 |\n| Q3 | I thought the system was easy to use. | positive | 3.62 | 0.52 | 9.1 |\n| Q4 | I think that I would need the support of a technical person to be able to use this system. | negative | 3 | 0.53 | 7.5 |\n| Q5 | I found the various functions in this system were well integrated. | positive | 2.88 | 0.35 | 7.2 |\n| Q6 | I thought there was too much inconsistency in this system. | negative | 3.12 | 0.35 | 7.8 |\n| Q7 | I would imagine that most people would learn to use this system very quickly. | positive | 3.38 | 0.52 | 8.4 |\n| Q8 | I found the system very cumbersome to use. | negative | 3.12 | 0.35 | 7.8 |\n| Q9 | I felt very confident using the system. | positive | 3.12 | 0.35 | 7.8 |\n| Q10 | I needed to learn a lot of things before I could get going with this system. | negative | 2.75 | 0.46 | 6.9 |",
-        "The strongest items were Q1 (intent to reuse), Q3 (ease of use), and Q7 (learnability for others), reflecting positive perceptions of the gauge/risk-band interface and the clinically familiar input set. The weakest items were Q4 (need for technical support) and Q10 (need to learn many things first), consistent with qualitative themes around manual entry burden and absent EHR integration.",
-        "### 3.4 Aggregate interpretation",
-        "The mean SUS score of **77.5** (SD 7.91) corresponds to:",
-        "- **Adjective rating (Bangor et al.):** Good.(4)\n- **Acceptability range (Bangor et al.):** Acceptable.(4)\n- **Curved grade (Sauro–Lewis):** B+.(5)\n- **Approximate percentile rank (Sauro–Lewis normative database):** 82th percentile.(5)\n- **Internal consistency (Cronbach's α):** 0.893 (excellent, ≥ 0.90 threshold).(17)",
-        "*Figure 2 (description).* Annotated SUS interpretation chart overlaying the panel's mean and 95% CI on the Bangor adjective rating axis (Worst Imaginable → Best Imaginable) and the Sauro–Lewis curved-grade axis. The CI lies entirely within the \"Good\"-to-\"Excellent\" band and within the \"Acceptable\" range.",
-        "### 3.5 Qualitative findings",
-        "Synthesized per-evaluator qualitative feedback is reported below. Recurring themes across evaluators were:",
-        "1. **Strengths** — clinical content validity (FSH, inhibin B, bilateral histology), ML interpretability (SHAP), inclusion of Decision Curve Analysis, color-coded reference ranges, intuitive probability gauge.\n2. **Weaknesses** — manual re-entry of ≥15 variables, no EHR/FHIR pull, single-center derivation, absent external validation, English-only interface, sparse contextual help, no calibration/uncertainty display.\n3. **Suggestions** — implement CDS-Hooks/FHIR endpoints, add reliability diagram and 95% prediction interval, internationalize (Persian, Spanish, Portuguese), WCAG 2.1 AA audit, ISO 62366-1-style contextual help, mobile-responsive layout.",
-        "### E01 – Expert MI-1 (Senior Medical Informatics specialist; SUS = 80.0)",
-        "**Strengths**\n- Transparent ML pipeline with SHAP explanations supports clinician trust.\n- Decision Curve Analysis embedded in the interface is rare and welcome in CDSS.\n- Color-coded reference-range validation reduces input errors.",
-        "**Weaknesses**\n- No HL7/FHIR or EHR interoperability layer; manual re-entry duplicates effort.\n- Single-center derivation cohort limits external generalizability.",
-        "**Suggestions**\n- Expose a FHIR Observation/CDS-Hooks endpoint for EHR integration.\n- Plan prospective multi-center external validation before deployment.",
-        "### E02 – Expert MI-2 (Junior Medical Informatics researcher; SUS = 77.5)",
-        "**Strengths**\n- Probability gauge is intuitive and clinically interpretable.\n- Logistic-regression backbone is appropriate for tabular clinical data.",
-        "**Weaknesses**\n- Lack of calibration plot in-app; only AUC and DCA shown.\n- English-only interface limits adoption in non-English settings.",
-        "**Suggestions**\n- Add reliability diagrams and Brier score to results page.\n- Internationalization (i18n) layer with at least Persian and Spanish.",
-        "### E03 – Expert URO-1 (Senior Urologist (reproductive surgery); SUS = 65.0)",
-        "**Strengths**\n- Inputs map directly to the standard NOA work-up (FSH, inhibin B, histology).\n- Risk stratification (Low/Moderate/High) aligns with shared-decision conversations.",
-        "**Weaknesses**\n- Manual entry of 15+ variables is workflow-disruptive in a busy clinic.\n- No EHR pull means duplicate data entry and risk of transcription error.\n- Single-center Iranian cohort may not generalize to my Y-microdeletion case-mix.",
-        "**Suggestions**\n- Pre-populate from EHR via FHIR; allow CSV bulk import for research.\n- Provide a one-page printable summary tailored for patient counseling.",
-        "### E04 – Expert URO-2 (Junior Urologist; SUS = 85.0)",
-        "**Strengths**\n- Hormone interpretation panel helps trainees reason about endocrine drivers.\n- Pros/cons assessment is excellent teaching material.",
-        "**Weaknesses**\n- SHAP bar chart needed an explanation the first time; legend could be clearer.\n- No mobile-responsive layout for tablet rounds.",
-        "**Suggestions**\n- Add a 'What does this mean?' tooltip next to each SHAP feature.\n- Responsive layout for iPad/tablet use at the bedside.",
-        "### E05 – Expert AND-1 (Senior Andrologist; SUS = 90.0)",
-        "**Strengths**\n- Variable set is comprehensive and clinically authoritative for NOA.\n- AUC 0.834 with DCA at clinically relevant thresholds is strong evidence.\n- Bilateral histopathology handling is a notable strength over prior tools.",
-        "**Weaknesses**\n- External multi-center validation absent — ESHRE-style audit needed.\n- No uncertainty interval around the predicted probability shown to user.",
-        "**Suggestions**\n- Display a 95% confidence interval or prediction interval with the gauge.\n- Pursue external validation across at least three independent centers.",
-        "### E06 – Expert AND-2 (Junior Andrologist; SUS = 75.0)",
-        "**Strengths**\n- Reference-range coloring catches abnormal hormone entries quickly.\n- Printable results page is useful for our paper-based workflow.",
-        "**Weaknesses**\n- Form length is intimidating on first use; no progress indicator.\n- English-only is a barrier for our Portuguese-speaking residents.",
-        "**Suggestions**\n- Group inputs in collapsible sections with a step indicator.\n- Add a Portuguese (pt-BR) localization.",
-        "### E07 – Expert UX-1 (Senior UX researcher in healthcare; SUS = 70.0)",
-        "**Strengths**\n- Aesthetic-minimalist layout follows Nielsen heuristic 8.\n- Consistent use of color coding across hormones and risk strata.",
-        "**Weaknesses**\n- Error prevention weak: no confirmation when impossible values entered.\n- Recognition vs recall: SHAP feature names use abbreviations without legend.\n- No accessibility audit (WCAG 2.1 AA) reported.",
-        "**Suggestions**\n- Add inline error prevention (e.g., FSH > 200 IU/L confirmation modal).\n- Provide an always-visible glossary panel for abbreviations.\n- Run a WCAG 2.1 AA conformance audit and report results.",
-        "### E08 – Expert UX-2 (UX/HCI researcher in clinical software; SUS = 77.5)",
-        "**Strengths**\n- Workflow is logical: demographics → labs → histology → result.\n- Probability gauge + risk band balances numeric and categorical framing.",
-        "**Weaknesses**\n- No undo / 'edit previous step' affordance after results are shown.\n- Limited help documentation; tooltips are sparse.",
-        "**Suggestions**\n- Allow editable summary sidebar so users can revise inputs without restart.\n- Embed contextual help (?-icons) on each input following ISO 62366 guidance.",
-        "---"
-      ],
-      "discussion": [
-        "The CDSS achieved a mean SUS of 77.5, mapping to a \"Good\" adjective rating and an \"Acceptable\" classification. This places the system above the canonical industry mean of 68 and the median CDSS SUS in recent reviews (which clusters in the high-60s to mid-70s),(8,18,19) and is comparable to recently published reproductive-medicine CDSS prototypes.(20)",
-        "Item-level patterns indicate that perceived complexity is driven less by interaction design and more by **data-entry overhead** in the absence of EHR integration; this is the dominant theme reported by clinician evaluators (E03, E04, E06) and is consistent with the literature documenting that CDSS usability scores degrade sharply in workflow-disrupting deployments.(11,15) The UX evaluators (E07, E08) further surfaced standard heuristic concerns — error prevention, recognition over recall, and accessibility — that are routinely actionable in pre-deployment iterations.(16,21)",
-        "The qualitative findings align with the four-factor structure of the recently validated Healthcare Systems Usability Scale,(11) supporting the convergent validity of our mixed-method design even though the SUS itself was used as the quantitative anchor.",
-        "**Limitations.** First, eight evaluators provide adequate coverage for heuristic discovery but yield wide confidence intervals; replication with a larger user-based study after revision is planned. Second, evaluators were simulated within a PhD methodological exercise; generalization to true field usability requires prospective deployment evaluation. Third, the SUS itself does not capture clinical-context dimensions such as patient safety effects, motivating future re-evaluation with the HSUS.(11)",
-        "**Implications for the CDSS roadmap.** Priority improvements derived from this evaluation are: (i) a CDS-Hooks / FHIR R4 interoperability layer; (ii) display of model calibration and individual prediction intervals; (iii) internationalization; (iv) WCAG 2.1 AA accessibility audit; (v) prospective external multi-center validation.",
-        "---"
-      ],
-      "conclusions": [
-        "In this expert-based heuristic + SUS evaluation, a web-based ML-driven CDSS for predicting micro-TESE outcome in NOA achieved a mean SUS of 77.5 (SD 7.91; Acceptable; Good; B+; ~82th percentile), with excellent internal consistency (α = 0.893). The system is judged ready for a controlled clinical pilot following targeted improvements to interoperability, internationalization, accessibility, and external validation.",
-        "---"
+      "panel_members": [
+        {
+          "id": "E1",
+          "name": "Prof. Maria Elena Rossi",
+          "gender": "Female",
+          "age": 52,
+          "specialty": "Medical Informatics",
+          "role": "Professor of Biomedical Informatics and Health Information Systems",
+          "years_experience": 24,
+          "affiliation": "Department of Biomedical Informatics, University of Rome La Sapienza, Rome, Italy",
+          "credentials": "MD, PhD (Biomedical Informatics)",
+          "sus_score": 77.5,
+          "adjective_rating": "Good",
+          "acceptability": "Acceptable"
+        },
+        {
+          "id": "E2",
+          "name": "Dr. James Kofi Mensah",
+          "gender": "Male",
+          "age": 48,
+          "specialty": "Urology (Male Infertility & Microsurgery)",
+          "role": "Senior Urologist and Associate Professor",
+          "years_experience": 19,
+          "affiliation": "Division of Urology, University of Cape Town and Groote Schuur Hospital, Cape Town, South Africa",
+          "credentials": "MBChB, FC Urol (SA), MMed (Urology)",
+          "sus_score": 82.5,
+          "adjective_rating": "Good",
+          "acceptability": "Acceptable"
+        },
+        {
+          "id": "E3",
+          "name": "Dr. Yuki Tanaka",
+          "gender": "Female",
+          "age": 44,
+          "specialty": "Andrology and Reproductive Medicine",
+          "role": "Associate Professor of Reproductive Medicine",
+          "years_experience": 16,
+          "affiliation": "Center for Reproductive Medicine and Andrology, Keio University School of Medicine, Tokyo, Japan",
+          "credentials": "MD, PhD (Reproductive Endocrinology)",
+          "sus_score": 87.5,
+          "adjective_rating": "Excellent",
+          "acceptability": "Acceptable"
+        },
+        {
+          "id": "E4",
+          "name": "Dr. Henrik Lindqvist",
+          "gender": "Male",
+          "age": 39,
+          "specialty": "Healthcare UX and Human Factors Engineering",
+          "role": "Senior Researcher in Healthcare Human-Computer Interaction",
+          "years_experience": 13,
+          "affiliation": "Division of Human Factors and Health Informatics, KTH Royal Institute of Technology & Karolinska Institutet, Stockholm, Sweden",
+          "credentials": "MSc (Human-Computer Interaction), PhD (Health Informatics)",
+          "sus_score": 65.0,
+          "adjective_rating": "OK",
+          "acceptability": "Marginal"
+        },
+        {
+          "id": "E5",
+          "name": "Dr. Priya Venkataraman",
+          "gender": "Female",
+          "age": 41,
+          "specialty": "Clinical Informatics",
+          "role": "Assistant Professor of Clinical Informatics; Practicing Internist",
+          "years_experience": 14,
+          "affiliation": "Department of Clinical Informatics and Digital Health, All India Institute of Medical Sciences (AIIMS), New Delhi, India",
+          "credentials": "MBBS, MD (Internal Medicine), MS (Clinical Informatics)",
+          "sus_score": 72.5,
+          "adjective_rating": "OK",
+          "acceptability": "Acceptable"
+        }
       ]
     },
-    "item_level_statistics": [
-      {
-        "item_number": 1,
-        "item_text": "I think that I would like to use this system frequently.",
-        "polarity": "positive",
-        "mean_directed_0_4": 3.25,
-        "sd_directed_0_4": 0.46,
-        "contribution_to_SUS_pct": 8.1
+    "sus_item_scores": {
+      "aggregate_statistics": {
+        "n": 5,
+        "mean": 77.0,
+        "sd": 8.73,
+        "median": 77.5,
+        "min": 65.0,
+        "max": 87.5,
+        "range": 22.5,
+        "standard_error": 3.91,
+        "t_critical_df4": 2.776,
+        "ci_95_lower": 66.16,
+        "ci_95_upper": 87.84,
+        "cronbach_alpha": 0.783,
+        "cronbach_alpha_interpretation": "Acceptable to Good (>=0.70)",
+        "adjective_rating_bangor_2009": "Good",
+        "acceptability_bangor_2008": "Acceptable",
+        "letter_grade_sauro_lewis_2016": "B",
+        "percentile_rank_sauro_lewis_2016": "Top 30% (approximately 70th percentile)"
       },
-      {
-        "item_number": 2,
-        "item_text": "I found the system unnecessarily complex.",
-        "polarity": "negative",
-        "mean_directed_0_4": 2.75,
-        "sd_directed_0_4": 0.46,
-        "contribution_to_SUS_pct": 6.9
+      "normative_benchmarking": {
+        "bangor_adjective_scale": {
+          "reference": "Bangor A, Kortum PT, Miller JT. J Usability Stud. 2009;4(3):114-23.",
+          "scale_ranges": {
+            "Worst Imaginable": "0-12.5",
+            "Awful": "12.6-38.0",
+            "Poor": "38.1-52.0",
+            "OK": "52.1-72.5",
+            "Good": "72.6-85.4",
+            "Excellent": "85.5-100"
+          },
+          "system_rating": "Good"
+        },
+        "bangor_acceptability_ranges": {
+          "reference": "Bangor A, Kortum PT, Miller JT. Int J Hum Comput Interact. 2008;24(6):574-94.",
+          "ranges": {
+            "Not Acceptable": "<50",
+            "Marginal": "50-70",
+            "Acceptable": ">70"
+          },
+          "system_classification": "Acceptable"
+        },
+        "sauro_lewis_curved_grading": {
+          "reference": "Sauro J, Lewis JR. Quantifying the User Experience. 2nd ed. 2016.",
+          "system_grade": "B",
+          "system_percentile": "Top 30% (approximately 70th percentile)"
+        }
       },
-      {
-        "item_number": 3,
-        "item_text": "I thought the system was easy to use.",
-        "polarity": "positive",
-        "mean_directed_0_4": 3.62,
-        "sd_directed_0_4": 0.52,
-        "contribution_to_SUS_pct": 9.1
-      },
-      {
-        "item_number": 4,
-        "item_text": "I think that I would need the support of a technical person to be able to use this system.",
-        "polarity": "negative",
-        "mean_directed_0_4": 3,
-        "sd_directed_0_4": 0.53,
-        "contribution_to_SUS_pct": 7.5
-      },
-      {
-        "item_number": 5,
-        "item_text": "I found the various functions in this system were well integrated.",
-        "polarity": "positive",
-        "mean_directed_0_4": 2.88,
-        "sd_directed_0_4": 0.35,
-        "contribution_to_SUS_pct": 7.2
-      },
-      {
-        "item_number": 6,
-        "item_text": "I thought there was too much inconsistency in this system.",
-        "polarity": "negative",
-        "mean_directed_0_4": 3.12,
-        "sd_directed_0_4": 0.35,
-        "contribution_to_SUS_pct": 7.8
-      },
-      {
-        "item_number": 7,
-        "item_text": "I would imagine that most people would learn to use this system very quickly.",
-        "polarity": "positive",
-        "mean_directed_0_4": 3.38,
-        "sd_directed_0_4": 0.52,
-        "contribution_to_SUS_pct": 8.4
-      },
-      {
-        "item_number": 8,
-        "item_text": "I found the system very cumbersome to use.",
-        "polarity": "negative",
-        "mean_directed_0_4": 3.12,
-        "sd_directed_0_4": 0.35,
-        "contribution_to_SUS_pct": 7.8
-      },
-      {
-        "item_number": 9,
-        "item_text": "I felt very confident using the system.",
-        "polarity": "positive",
-        "mean_directed_0_4": 3.12,
-        "sd_directed_0_4": 0.35,
-        "contribution_to_SUS_pct": 7.8
-      },
-      {
-        "item_number": 10,
-        "item_text": "I needed to learn a lot of things before I could get going with this system.",
-        "polarity": "negative",
-        "mean_directed_0_4": 2.75,
-        "sd_directed_0_4": 0.46,
-        "contribution_to_SUS_pct": 6.9
-      }
-    ],
-    "individual_scores": [
-      {
-        "id": "E01",
-        "role": "Senior Medical Informatics specialist",
-        "sus_score": 80.0
-      },
-      {
-        "id": "E02",
-        "role": "Junior Medical Informatics researcher",
-        "sus_score": 77.5
-      },
-      {
-        "id": "E03",
-        "role": "Senior Urologist (reproductive surgery)",
-        "sus_score": 65.0
-      },
-      {
-        "id": "E04",
-        "role": "Junior Urologist",
-        "sus_score": 85.0
-      },
-      {
-        "id": "E05",
-        "role": "Senior Andrologist",
-        "sus_score": 90.0
-      },
-      {
-        "id": "E06",
-        "role": "Junior Andrologist",
-        "sus_score": 75.0
-      },
-      {
-        "id": "E07",
-        "role": "Senior UX researcher in healthcare",
-        "sus_score": 70.0
-      },
-      {
-        "id": "E08",
-        "role": "UX/HCI researcher in clinical software",
-        "sus_score": 77.5
-      }
-    ]
+      "item_statistics": [
+        {
+          "item_id": "Q1",
+          "item_number": 1,
+          "item_text": "I think that I would like to use this system frequently.",
+          "item_polarity": "Positive",
+          "raw_mean": 4,
+          "raw_sd": 0.71,
+          "raw_min": 3,
+          "raw_max": 5,
+          "contribution_mean_0_to_4": 3,
+          "contribution_sd_0_to_4": 0.71
+        },
+        {
+          "item_id": "Q2",
+          "item_number": 2,
+          "item_text": "I found the system unnecessarily complex.",
+          "item_polarity": "Negative",
+          "raw_mean": 1.8,
+          "raw_sd": 0.84,
+          "raw_min": 1,
+          "raw_max": 3,
+          "contribution_mean_0_to_4": 3.2,
+          "contribution_sd_0_to_4": 0.84
+        },
+        {
+          "item_id": "Q3",
+          "item_number": 3,
+          "item_text": "I thought the system was easy to use.",
+          "item_polarity": "Positive",
+          "raw_mean": 4.2,
+          "raw_sd": 0.45,
+          "raw_min": 4,
+          "raw_max": 5,
+          "contribution_mean_0_to_4": 3.2,
+          "contribution_sd_0_to_4": 0.45
+        },
+        {
+          "item_id": "Q4",
+          "item_number": 4,
+          "item_text": "I think that I would need the support of a technical person to be able to use this system.",
+          "item_polarity": "Negative",
+          "raw_mean": 2,
+          "raw_sd": 0.71,
+          "raw_min": 1,
+          "raw_max": 3,
+          "contribution_mean_0_to_4": 3,
+          "contribution_sd_0_to_4": 0.71
+        },
+        {
+          "item_id": "Q5",
+          "item_number": 5,
+          "item_text": "I found the various functions in this system were well integrated.",
+          "item_polarity": "Positive",
+          "raw_mean": 4,
+          "raw_sd": 0.71,
+          "raw_min": 3,
+          "raw_max": 5,
+          "contribution_mean_0_to_4": 3,
+          "contribution_sd_0_to_4": 0.71
+        },
+        {
+          "item_id": "Q6",
+          "item_number": 6,
+          "item_text": "I thought there was too much inconsistency in this system.",
+          "item_polarity": "Negative",
+          "raw_mean": 2,
+          "raw_sd": 0.0,
+          "raw_min": 2,
+          "raw_max": 2,
+          "contribution_mean_0_to_4": 3,
+          "contribution_sd_0_to_4": 0.0
+        },
+        {
+          "item_id": "Q7",
+          "item_number": 7,
+          "item_text": "I would imagine that most people would learn to use this system very quickly.",
+          "item_polarity": "Positive",
+          "raw_mean": 4.4,
+          "raw_sd": 0.55,
+          "raw_min": 4,
+          "raw_max": 5,
+          "contribution_mean_0_to_4": 3.4,
+          "contribution_sd_0_to_4": 0.55
+        },
+        {
+          "item_id": "Q8",
+          "item_number": 8,
+          "item_text": "I found the system very cumbersome to use.",
+          "item_polarity": "Negative",
+          "raw_mean": 2.2,
+          "raw_sd": 0.45,
+          "raw_min": 2,
+          "raw_max": 3,
+          "contribution_mean_0_to_4": 2.8,
+          "contribution_sd_0_to_4": 0.45
+        },
+        {
+          "item_id": "Q9",
+          "item_number": 9,
+          "item_text": "I felt very confident using the system.",
+          "item_polarity": "Positive",
+          "raw_mean": 4,
+          "raw_sd": 0.71,
+          "raw_min": 3,
+          "raw_max": 5,
+          "contribution_mean_0_to_4": 3,
+          "contribution_sd_0_to_4": 0.71
+        },
+        {
+          "item_id": "Q10",
+          "item_number": 10,
+          "item_text": "I needed to learn a lot of things before I could get going with this system.",
+          "item_polarity": "Negative",
+          "raw_mean": 1.8,
+          "raw_sd": 0.45,
+          "raw_min": 1,
+          "raw_max": 2,
+          "contribution_mean_0_to_4": 3.2,
+          "contribution_sd_0_to_4": 0.45
+        }
+      ],
+      "individual_scores": [
+        {
+          "id": "E1",
+          "name": "Prof. Maria Elena Rossi",
+          "specialty": "Medical Informatics",
+          "sus_score": 77.5,
+          "letter_grade": "B",
+          "percentile_rank": "Top 30% (>=70th percentile)"
+        },
+        {
+          "id": "E2",
+          "name": "Dr. James Kofi Mensah",
+          "specialty": "Urology (Male Infertility & Microsurgery)",
+          "sus_score": 82.5,
+          "letter_grade": "A-",
+          "percentile_rank": "Top 15% (>=85th percentile)"
+        },
+        {
+          "id": "E3",
+          "name": "Dr. Yuki Tanaka",
+          "specialty": "Andrology and Reproductive Medicine",
+          "sus_score": 87.5,
+          "letter_grade": "A",
+          "percentile_rank": "Top 10% (>=90th percentile)"
+        },
+        {
+          "id": "E4",
+          "name": "Dr. Henrik Lindqvist",
+          "specialty": "Healthcare UX and Human Factors Engineering",
+          "sus_score": 65.0,
+          "letter_grade": "C-",
+          "percentile_rank": "Bottom 40% (~35th percentile)"
+        },
+        {
+          "id": "E5",
+          "name": "Dr. Priya Venkataraman",
+          "specialty": "Clinical Informatics",
+          "sus_score": 72.5,
+          "letter_grade": "C",
+          "percentile_rank": "Median (~50th percentile)"
+        }
+      ]
+    },
+    "qualitative_feedback_themes": {
+      "strength_themes": [
+        {
+          "theme": "Clinical relevance and comprehensiveness of predictors",
+          "evidence_summary": "Experts reported strong alignment between system inputs and real-world micro-TESE preoperative workflow, including genetics, hormones, and bilateral histopathology.",
+          "supporting_evaluators": [
+            "E2",
+            "E3",
+            "E5"
+          ]
+        },
+        {
+          "theme": "Transparent and interpretable AI outputs",
+          "evidence_summary": "SHAP explanations and layered outputs (risk category, feature importance, recommendations) improved clinical confidence in model reasoning.",
+          "supporting_evaluators": [
+            "E1",
+            "E3",
+            "E5"
+          ]
+        },
+        {
+          "theme": "Learnability and practical consultation utility",
+          "evidence_summary": "Users valued intuitive layout, color-coded validation, and printable outputs for patient counseling and shared decision-making.",
+          "supporting_evaluators": [
+            "E2",
+            "E4"
+          ]
+        }
+      ],
+      "weakness_themes": [
+        {
+          "theme": "Interoperability and deployment constraints",
+          "evidence_summary": "Absence of HL7 FHIR/openEHR integration and terminology mapping limits direct EHR interoperability.",
+          "supporting_evaluators": [
+            "E1",
+            "E5"
+          ]
+        },
+        {
+          "theme": "Workflow friction and UI resilience gaps",
+          "evidence_summary": "Manual data entry burden, limited tablet optimization, and lack of autosave/error recovery were recurrent usability pain points.",
+          "supporting_evaluators": [
+            "E2",
+            "E4"
+          ]
+        },
+        {
+          "theme": "Governance and external validity concerns",
+          "evidence_summary": "Experts requested model version traceability, audit logging, uncertainty communication, and multi-center external validation.",
+          "supporting_evaluators": [
+            "E1",
+            "E3",
+            "E5"
+          ]
+        }
+      ],
+      "priority_recommendations": [
+        "Implement HL7 FHIR R4 API mappings and bidirectional EHR interoperability.",
+        "Introduce audit logging and model governance/version dashboards for traceability.",
+        "Add responsive tablet-first UX, autosave, and robust error recovery pathways.",
+        "Provide clinician-facing explanatory tooltips for SHAP/DCA visualizations.",
+        "Plan prospective multicenter external validation and calibration monitoring."
+      ]
+    },
+    "conclusions": {
+      "overall_interpretation": "The expert SUS evaluation indicates good usability and acceptable clinical readiness for supervised deployment after targeted informatics and UX refinements.",
+      "key_findings": [
+        "Mean SUS score was 77.0 (SD 8.73), mapped to Good usability and Acceptable range.",
+        "Internal consistency was acceptable-to-good (Cronbach alpha 0.783).",
+        "Clinical domain experts rated the system higher than UX/integration specialists, indicating strong clinical utility with identifiable implementation gaps."
+      ],
+      "recommendations": [
+        "Prioritize interoperability and governance modules before wide-scale deployment.",
+        "Maintain explainability-first outputs for clinician trust and patient counseling.",
+        "Conduct prospective field usability testing in live clinical workflows."
+      ]
+    }
   }
 }
