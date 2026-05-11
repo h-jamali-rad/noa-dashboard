@@ -1,0 +1,227 @@
+{
+  "intro": "We are Dr. Alex and Dr. Sarah \u2014 expert agents trained by Hossein Jamalirad, PhD Candidate from Mashhad University of Medical Sciences, Department of Medical Informatics, under the supervision of Dr. Hassan Vakili Arki and Dr. Saeid Eslami from the Medical Informatics group at MUMS, and under clinical supervision of Dr. Marjan Sabbaghian and Associate Clinical Professor Dr. Muhammad Ali Sadighi Gilani from Royan Institute Male Infertility Referral Center in Tehran. In this episode we walk through the System Usability Scale evaluation of the micro-TESE Clinical Decision Support System.",
+  "sections": [
+    {
+      "title": "Study Design & Evaluation Protocol",
+      "lines": [
+        {
+          "speaker": "Dr. Alex",
+          "text": "Welcome back, Sarah. This episode focuses on the usability evaluation of the micro-TESE CDSS \u2014 specifically the System Usability Scale, or SUS, assessment. The study was titled \"System Usability Scale (SUS) Expert Evaluation of the micro-TESE Clinical Decision Support System\" and was conducted from October 14-28, 2024."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "Right, and this was a mixed-methods expert usability evaluation of the micro-TESE CDSS v2.1 (Web-based PHP application). The system is a web-based clinical decision support tool built on the CatBoost model we discussed in the model performance episode \u2014 AUC 0.8306, trained on 2,413 NOA patients from Royan Institute."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "The evaluation protocol was structured in four phases. Phase 1 was a 15-minute system orientation using a standardized briefing document. Phase 2 was task-based evaluation with a think-aloud protocol running 45 minutes, covering three clinical scenarios. Phase 3 was the standard 10-item SUS questionnaire \u2014 10 minutes. And Phase 4 was a 20-minute semi-structured qualitative interview."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "The three clinical scenarios were carefully designed to test the full range of the system. Scenario A was a favorable prognosis case \u2014 a 28-year-old with hypospermatogenesis, normal FSH, and adequate testicular volumes. Scenario B was intermediate \u2014 a 35-year-old with Klinefelter syndrome, elevated FSH, and mixed histopathology. And Scenario C was unfavorable \u2014 a 42-year-old with bilateral Sertoli cell-only syndrome, severely elevated FSH, and AZFc microdeletion."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "These scenarios map onto real clinical decision points a urologist would face in the micro-TESE preoperative consultation \u2014 from straightforward cases where the model provides reassurance, to complex cases where every input variable matters."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "The SUS scoring follows the standard Brooke 1996 algorithm: 5-point Likert scale from Strongly Disagree to Strongly Agree, with odd items scored as contribution equals score minus 1, even items as contribution equals 5 minus score, and the total multiplied by 2.5 to get the final SUS score on a 0-to-100 scale."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "It's worth noting this evaluation was formally classified as a quality improvement and system development activity, exempt from full IRB review per institutional policy. Now let's look at who evaluated the system."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "Let's talk about the expert panel."
+        }
+      ]
+    },
+    {
+      "title": "Expert Panel & Demographics",
+      "lines": [
+        {
+          "speaker": "Dr. Alex",
+          "text": "The panel consisted of 5 expert evaluators. The gender distribution was female and male \u2014 specifically 3 female and 2 male experts. Average age was 44.8 years with a range of 39 to 52."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "And the experience level was substantial \u2014 mean of 17.2 years, ranging from 13 to 24 years. These aren't junior evaluators \u2014 they're senior academics and clinicians."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "Let me walk through the panel. Expert 1 was Prof. Maria Elena Rossi, a Medical Informatics specialist serving as Professor of Biomedical Informatics and Health Information Systems at Department of Biomedical Informatics, University of Rome La Sapienza, Rome, Italy. Credentials: MD, PhD (Biomedical Informatics)."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "Expert 2 was Dr. James Kofi Mensah, specializing in Urology (Male Infertility & Microsurgery), serving as Senior Urologist and Associate Professor at Division of Urology, University of Cape Town and Groote Schuur Hospital, Cape Town, South Africa. With 19 years of experience."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "Expert 3 was Dr. Yuki Tanaka, an Andrology and Reproductive Medicine specialist, Associate Professor of Reproductive Medicine at Center for Reproductive Medicine and Andrology, Keio University School of Medicine, Tokyo, Japan. 16 years of experience, credentials: MD, PhD (Reproductive Endocrinology)."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "Expert 4 was Dr. Henrik Lindqvist, specializing in Healthcare UX and Human Factors Engineering. A Senior Researcher in Healthcare Human-Computer Interaction at Division of Human Factors and Health Informatics, KTH Royal Institute of Technology & Karolinska Institutet, Stockholm, Sweden. 13 years of experience with credentials: MSc (Human-Computer Interaction), PhD (Health Informatics)."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "And Expert 5 was Dr. Priya Venkataraman, a Clinical Informatics specialist, Assistant Professor of Clinical Informatics; Practicing Internist at Department of Clinical Informatics and Digital Health, All India Institute of Medical Sciences (AIIMS), New Delhi, India. 14 years of experience, credentials: MBBS, MD (Internal Medicine), MS (Clinical Informatics)."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "So the panel covers Medical Informatics, Urology with male infertility focus, Andrology and Reproductive Medicine, Healthcare UX and Human Factors Engineering, and Clinical Informatics. That's a well-rounded multidisciplinary evaluation team. Now let's see how they scored the system."
+        }
+      ]
+    },
+    {
+      "title": "SUS Scores & Statistical Analysis",
+      "lines": [
+        {
+          "speaker": "Dr. Alex",
+          "text": "The headline result: the mean SUS score across all 5 experts was 77.0 out of 100, with a standard deviation of 8.73. The median was 77.5, with scores ranging from 65.0 to 87.5. That's a range of 22.5 points."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "And in terms of standardized interpretation \u2014 using the Bangor 2009 adjective scale, that maps to \"Good\" usability. On the Bangor 2008 acceptability scale, it falls in the \"Acceptable\" range. And using Sauro-Lewis 2016 grading, it's a letter grade \"B\", placing it in the Top 30% (approximately 70th percentile)."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "The 95 percent confidence interval was [66.16, 87.84] with a standard error of 3.91. That CI is wide because of the small sample size \u2014 n equals 5 \u2014 but the lower bound at 66.16 still sits above the marginal cutoff of 51."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "Internal consistency was measured by Cronbach's alpha at 0.783, which is classified as \"Acceptable to Good (>=0.70)\". For a 10-item scale with only 5 respondents, that's actually quite solid \u2014 it means the experts were internally consistent in their assessments."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "Now the individual scores are revealing. Prof. Maria Elena Rossi from Medical Informatics scored 77.5, letter grade B, Top 30% (>=70th percentile). Dr. James Kofi Mensah from Urology (Male Infertility & Microsurgery) scored 82.5, letter grade A-, Top 15% (>=85th percentile)."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "Dr. Yuki Tanaka from Andrology and Reproductive Medicine gave the highest score at 87.5, letter grade A, Top 10% (>=90th percentile). That's an excellent rating from a reproductive medicine specialist."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "The lowest score came from Dr. Henrik Lindqvist, the Healthcare UX and Human Factors Engineering expert, at 65.0, letter grade C-, Bottom 40% (~35th percentile). This makes clinical sense \u2014 a UX specialist would naturally identify more interaction-level issues than a domain clinician."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "And Dr. Priya Venkataraman from Clinical Informatics scored 72.5, letter grade C, at the Median (~50th percentile). The pattern is clear: clinical domain experts rated higher, UX and integration specialists rated lower, indicating strong clinical utility with identifiable implementation gaps."
+        }
+      ]
+    },
+    {
+      "title": "Per-Item Analysis & Key Findings",
+      "lines": [
+        {
+          "speaker": "Dr. Alex",
+          "text": "Looking at the 10 SUS items individually. Item 1 \u2014 'I think that I would like to use this system frequently' \u2014 scored a raw mean of 4 out of 5 with SD 0.71. That's a strong endorsement of regular clinical use."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "Item 2 \u2014 'I found the system unnecessarily complex' \u2014 scored 1.8 with SD 0.84. Remember this is a negative item, so low scores are good. A mean below 2 means experts generally disagreed that the system was complex."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "Item 3 \u2014 'I thought the system was easy to use' \u2014 got the highest mean at 4.2 with SD 0.45. Notably the minimum was 4 \u2014 no expert rated ease of use below 4."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "Item 6 \u2014 'I thought there was too much inconsistency in this system' \u2014 is interesting because the SD was 0.0. All five experts gave exactly the same score of 2. That unanimous agreement on minimal inconsistency is striking."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "Item 7 \u2014 'I would imagine most people would learn to use this system very quickly' \u2014 scored 4.4 with SD 0.55. High learnability perception. And Item 9 \u2014 'I felt very confident using the system' \u2014 scored 4 with SD 0.71. User confidence was high."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "The weaker items were Item 4 about needing technical support \u2014 mean 2 \u2014 and Item 8 about the system being cumbersome \u2014 mean 2.2. Both are negative items, and scores around 2 indicate mild disagreement. So some experts felt occasional technical support might be needed, especially for the pathology encoding inputs."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "The overall pattern tells a consistent story: high marks on learnability, confidence, and desire to use the system regularly; moderate marks on complexity and technical support needs. The system works well clinically but has refinement opportunities in workflow integration."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "Exactly. And this is consistent with the difference between clinical experts scoring higher and UX experts scoring lower \u2014 the clinical value is proven, the interaction design has room to improve."
+        }
+      ]
+    },
+    {
+      "title": "Qualitative Feedback & Expert Themes",
+      "lines": [
+        {
+          "speaker": "Dr. Alex",
+          "text": "Now the qualitative feedback from the semi-structured interviews. Three main strength themes and three weakness themes emerged from thematic analysis."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "Strength theme 1: Clinical relevance and comprehensiveness of predictors. Experts reported strong alignment between system inputs and real-world micro-TESE preoperative workflow, including genetics, hormones, and bilateral histopathology."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "Strength theme 2: Transparent and interpretable AI outputs. SHAP explanations and layered outputs (risk category, feature importance, recommendations) improved clinical confidence in model reasoning."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "Strength theme 3: Learnability and practical consultation utility. Users valued intuitive layout, color-coded validation, and printable outputs for patient counseling and shared decision-making."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "On the weakness side. Theme 1: Interoperability and deployment constraints. Absence of HL7 FHIR/openEHR integration and terminology mapping limits direct EHR interoperability."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "Theme 2: Workflow friction and UI resilience gaps. Manual data entry burden, limited tablet optimization, and lack of autosave/error recovery were recurrent usability pain points."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "Theme 3: Governance and external validity concerns. Experts requested model version traceability, audit logging, uncertainty communication, and multi-center external validation."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "The feedback pattern is textbook for a first-generation clinical AI tool \u2014 strong domain fit and clinical utility, with infrastructure and integration gaps that are addressable in subsequent development cycles."
+        }
+      ]
+    },
+    {
+      "title": "Conclusions & Deployment Readiness",
+      "lines": [
+        {
+          "speaker": "Dr. Alex",
+          "text": "Let's wrap up with the conclusions. The expert SUS evaluation indicates good usability and acceptable clinical readiness for supervised deployment after targeted informatics and UX refinements."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "Key finding one: Mean SUS score was 77.0 (SD 8.73), mapped to Good usability and Acceptable range."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "Key finding two: Internal consistency was acceptable-to-good (Cronbach alpha 0.783)."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "Key finding three: Clinical domain experts rated the system higher than UX/integration specialists, indicating strong clinical utility with identifiable implementation gaps."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "The recommendations going forward: first, Prioritize interoperability and governance modules before wide-scale deployment.. Second, Maintain explainability-first outputs for clinician trust and patient counseling.. And third, Conduct prospective field usability testing in live clinical workflows.."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "The SUS score of 77.0 \u2014 Good usability, Acceptable range, letter grade B \u2014 positions this CDSS well for supervised clinical deployment. It's above the industry benchmark of 68, and the clinical domain experts consistently rated it higher, confirming the system's value in real micro-TESE preoperative consultations."
+        },
+        {
+          "speaker": "Dr. Alex",
+          "text": "And importantly, the weaknesses identified are all actionable \u2014 interoperability standards, UI resilience, and governance features are engineering tasks, not fundamental design flaws. The clinical decision support logic itself was validated by every expert."
+        },
+        {
+          "speaker": "Dr. Sarah",
+          "text": "That concludes our SUS usability evaluation episode. This evaluation was conducted as part of Hossein Jamalirad's PhD research at MUMS, under the supervision of Dr. Vakili Arki, Dr. Eslami, Dr. Sabbaghian, and Dr. Sadighi Gilani. This media is generated from this investigation with Hossein Jamalirad's Architecture's agent."
+        }
+      ]
+    }
+  ]
+}

@@ -26,6 +26,7 @@ import {
   Newspaper,
   Network,
   Mic,
+  ClipboardCheck,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -59,6 +60,7 @@ const EXTRA_NAV: NavItem[] = [
   { href: '/virtual-defense', label: 'Virtual Defense', icon: Presentation, description: '4 expert panels with votes and critiques' },
   { href: '/post-defense-actions', label: 'Post-Defense Actions', icon: ClipboardList, description: 'Corrective actions log' },
   { href: '/cdss', label: 'CDSS', icon: Stethoscope, description: 'Video + client-side prediction form' },
+  { href: '/usability-testing', label: 'Usability Testing', icon: ClipboardCheck, description: 'SUS expert evaluation & podcast' },
   { href: '/articles', label: 'Articles', icon: Newspaper, description: 'Published & in-preparation manuscripts' },
   { href: '/novelty-comparison', label: 'Novelty Comparison', icon: GitCompare, description: 'Hossein vs prior literature' },
   { href: '/references', label: 'References', icon: ScrollText, description: 'Static numbered bibliography' },
