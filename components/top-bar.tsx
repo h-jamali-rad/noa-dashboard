@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { Menu, FlaskConical, Github, ExternalLink } from 'lucide-react'
+import Image from 'next/image'
+import { Menu, Github, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from './theme-toggle'
 
@@ -20,9 +21,13 @@ export default function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
         </Button>
 
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="h-9 w-9 rounded-lg gradient-brand flex items-center justify-center shadow-md shadow-primary/20 group-hover:scale-105 transition-transform">
-            <FlaskConical className="h-5 w-5 text-white" />
-          </div>
+          <Image
+            src="/logos/royan.png"
+            alt="Royan Institute"
+            width={36}
+            height={36}
+            className="rounded-lg shadow-md group-hover:scale-105 transition-transform"
+          />
           <div className="hidden sm:block">
             <div className="font-display font-bold leading-tight tracking-tight text-base">
               NOA microTESE Pipeline

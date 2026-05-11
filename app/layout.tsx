@@ -31,8 +31,8 @@ export const metadata: Metadata = {
     'Mashhad University of Medical Sciences',
   ],
   icons: {
-    icon: '/favicon.svg',
-    shortcut: '/favicon.svg',
+    icon: '/logos/royan.png',
+    shortcut: '/logos/royan.png',
   },
   openGraph: {
     title: 'NOA microTESE Research Dashboard',
