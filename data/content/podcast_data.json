@@ -1,5 +1,5 @@
 {
-  "intro": "We are trained agents created by Hossein Jamalirad. As expert agents in statistics, AI, male infertility, and medical informatics \u2014 part of the agentic AI architecture he designed \u2014 we've produced this content to help clarify this entire section for you transparently.",
+  "intro": "We are Dr. Alex and Dr. Sarah \u2014 expert agents trained by Hossein Jamalirad, PhD Candidate from Mashhad University of Medical Sciences (MUMS), Department of Medical Informatics, under the supervision of Dr. Hassan Vakili Arki and Dr. Saeid Eslami from the Medical Informatics group at MUMS, and under clinical supervision of Dr. Marjan Sabbaghian and Associate Clinical Professor Dr. Muhammad Ali Sadighi Gilani from Royan Institute Male Infertility Referral Center in Tehran. As part of the agentic AI architecture he designed, we've produced this content to help clarify each section of this investigation transparently.",
   "hosts": {
     "host1": {
       "name": "Dr. Alex",
@@ -305,7 +305,7 @@
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "And that closes the loop. Real cohort, audited pipeline, calibrated model, deployable CDSS, agentic verification \u2014 all attributed to Hossein Jamalirad's PhD work at MUMS. Thanks for walking through it with me, Alex."
+          "text": "And that closes the loop. Real cohort, audited pipeline, calibrated model, deployable CDSS, agentic verification \u2014 all attributed to Hossein Jamalirad's PhD work at MUMS under the supervision of Dr. Vakili Arki, Dr. Eslami, Dr. Sabbaghian, and Dr. Sadighi Gilani. This media is generated from this investigation with Hossein Jamalirad's Architecture's agent. Thanks for walking through it with me, Alex."
         }
       ]
     }
