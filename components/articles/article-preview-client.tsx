@@ -304,21 +304,29 @@ export default function ArticlePreviewClient({
     return `noa-comments-${articleId}`
   }
 
-  function loadComments() {
+  async function loadComments() {
     setIsLoading(true)
     setError(null)
     try {
-      const raw = typeof window !== 'undefined' ? localStorage.getItem(getStorageKey()) : null
-      const stored: ArticleComment[] = raw ? JSON.parse(raw) : []
-      setComments(stored)
+      const res = await fetch(`/api/comments?articleId=${encodeURIComponent(articleId)}`)
+      if (!res.ok) throw new Error('API error')
+      const data = await res.json()
+      setComments(data.comments ?? [])
     } catch {
-      setError('Failed to load comments from local storage.')
+      // Fallback to localStorage
+      try {
+        const raw = typeof window !== 'undefined' ? localStorage.getItem(getStorageKey()) : null
+        const stored: ArticleComment[] = raw ? JSON.parse(raw) : []
+        setComments(stored)
+      } catch {
+        setError('Failed to load comments.')
+      }
     } finally {
       setIsLoading(false)
     }
   }
 
-  function saveComment() {
+  async function saveComment() {
     if (!draft) return
 
     const trimmedName = authorName.trim()
@@ -332,20 +340,19 @@ export default function ArticlePreviewClient({
     setError(null)
 
     try {
-      const newComment: ArticleComment = {
-        id: Date.now(),
-        articleId,
-        paragraphId: draft.paragraphId,
-        selectedText: draft.selectedText,
-        commentText: trimmedComment,
-        authorName: trimmedName,
-        createdAt: new Date().toISOString(),
-      }
+      const res = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          articleId,
+          paragraphId: draft.paragraphId,
+          selectedText: draft.selectedText,
+          commentText: trimmedComment,
+          authorName: trimmedName,
+        }),
+      })
 
-      const raw = typeof window !== 'undefined' ? localStorage.getItem(getStorageKey()) : null
-      const existing: ArticleComment[] = raw ? JSON.parse(raw) : []
-      existing.push(newComment)
-      localStorage.setItem(getStorageKey(), JSON.stringify(existing))
+      if (!res.ok) throw new Error('API error')
 
       setCommentText('')
       setDraft(null)
@@ -354,7 +361,7 @@ export default function ArticlePreviewClient({
       }
       loadComments()
     } catch {
-      setError('Failed to save comment.')
+      setError('Failed to save comment. Please try again.')
     }
   }
 

@@ -73,3 +73,30 @@ model Comment {
   @@index([articleId])
   @@index([articleId, paragraphId])
 }
+
+model SusEvaluation {
+  id              Int      @id @default(autoincrement())
+  evaluatorName   String
+  evaluatorEmail  String   @default("")
+  specialty       String
+  affiliation     String
+  yearsExperience Int      @default(0)
+  evaluatorType   String   @default("human")
+  q1              Int
+  q2              Int
+  q3              Int
+  q4              Int
+  q5              Int
+  q6              Int
+  q7              Int
+  q8              Int
+  q9              Int
+  q10             Int
+  susScore        Float
+  qualitativeStrengths String @default("")
+  qualitativeWeaknesses String @default("")
+  qualitativeRecommendations String @default("")
+  createdAt       DateTime @default(now())
+
+  @@index([evaluatorType])
+}

@@ -28,6 +28,19 @@ export default async function HomePage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-10 py-8 max-w-screen-2xl mx-auto space-y-8">
+      {/* Hero Video */}
+      <section className="rounded-xl overflow-hidden border bg-black relative">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-auto max-h-[420px] object-cover"
+        >
+          <source src="/videos/intro-hero.mp4" type="video/mp4" />
+        </video>
+      </section>
+
       <section className="rounded-xl border bg-card p-8">
         <h1 className="font-display font-bold text-4xl tracking-tight">NOA microTESE Prediction Dashboard</h1>
         <p className="text-muted-foreground mt-3 max-w-3xl">
