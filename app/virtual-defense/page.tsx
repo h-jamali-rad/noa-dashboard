@@ -42,7 +42,7 @@ const heroScaleIn: Variants = {
 export default function VirtualDefensePage() {
   const typedData = data as VirtualDefenseData
   const panels: DefensePanel[] = Array.isArray(typedData?.virtual_defense?.panels)
-    ? typedData.virtual_defense.panels
+    ? typedData.virtual_defense!.panels
     : []
 
   return (
