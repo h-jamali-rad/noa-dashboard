@@ -454,6 +454,12 @@ export default function ArticlePreviewClient({
           </Button>
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
+
+        {/* Hint banner for comment system */}
+        <div className="flex items-center gap-2 rounded-lg border border-blue-500/30 bg-blue-500/10 px-4 py-2.5 text-sm text-blue-300">
+          <MessageSquarePlus className="h-4 w-4 shrink-0" />
+          <span><strong>How to comment:</strong> Select (highlight) any text in the article below, then a comment box will appear.</span>
+        </div>
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">

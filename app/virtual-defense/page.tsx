@@ -82,38 +82,7 @@ export default function VirtualDefensePage() {
               />
             </motion.div>
 
-            {/* mTESE microscope inset (hologram replacement) */}
-            <motion.div
-              className="absolute top-4 right-4 sm:top-8 sm:right-8 w-28 sm:w-40 md:w-52"
-              initial={{ opacity: 0, scale: 0.7 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.2, duration: 0.8 }}
-            >
-              <motion.div
-                animate={{ y: [0, -4, 0], rotate: [0, 0.5, -0.5, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                className="relative"
-              >
-                <div className="rounded-xl border border-cyan-400/40 overflow-hidden shadow-[0_0_30px_rgba(6,182,212,0.3)]">
-                  <Image
-                    src="/images/mtese-microscope.png"
-                    alt="micro-TESE surgery — seminiferous tubule view under operating microscope"
-                    width={400}
-                    height={225}
-                    className="w-full h-auto"
-                  />
-                  <div className="absolute inset-0 ring-1 ring-cyan-300/30 rounded-xl" />
-                </div>
-                <p className="text-[8px] sm:text-[9px] text-cyan-300/70 text-center mt-1 font-mono">micro-TESE • 25× magnification</p>
-              </motion.div>
-            </motion.div>
 
-            {/* Pulsing scan line effect */}
-            <motion.div
-              className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent"
-              animate={{ top: ['10%', '90%', '10%'] }}
-              transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-            />
 
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/35 to-transparent" />
             <div className="absolute inset-0 ring-1 ring-cyan-300/20" />
