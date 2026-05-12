@@ -66,14 +66,53 @@ export default function VirtualDefensePage() {
           className="relative mx-auto max-w-7xl px-4 pb-8 pt-14 sm:px-6 md:pt-20 lg:px-10"
         >
           <div className="relative overflow-hidden rounded-2xl border border-slate-700/60 shadow-[0_0_80px_rgba(59,130,246,0.35)]">
-            <Image
-              src="/images/virtual-defense-hero-v2.png"
-              alt="Premium cinematic virtual PhD defense chamber illustration"
-              width={1920}
-              height={1080}
-              priority
-              quality={95}
-              className="h-auto w-full object-cover"
+            {/* Main hero with subtle floating animation */}
+            <motion.div
+              animate={{ y: [0, -6, 0] }}
+              transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <Image
+                src="/images/virtual-defense-hero-v2.png"
+                alt="Premium cinematic virtual PhD defense chamber illustration"
+                width={1920}
+                height={1080}
+                priority
+                quality={95}
+                className="h-auto w-full object-cover"
+              />
+            </motion.div>
+
+            {/* mTESE microscope inset (hologram replacement) */}
+            <motion.div
+              className="absolute top-4 right-4 sm:top-8 sm:right-8 w-28 sm:w-40 md:w-52"
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1.2, duration: 0.8 }}
+            >
+              <motion.div
+                animate={{ y: [0, -4, 0], rotate: [0, 0.5, -0.5, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+                className="relative"
+              >
+                <div className="rounded-xl border border-cyan-400/40 overflow-hidden shadow-[0_0_30px_rgba(6,182,212,0.3)]">
+                  <Image
+                    src="/images/mtese-microscope.png"
+                    alt="micro-TESE surgery — seminiferous tubule view under operating microscope"
+                    width={400}
+                    height={225}
+                    className="w-full h-auto"
+                  />
+                  <div className="absolute inset-0 ring-1 ring-cyan-300/30 rounded-xl" />
+                </div>
+                <p className="text-[8px] sm:text-[9px] text-cyan-300/70 text-center mt-1 font-mono">micro-TESE • 25× magnification</p>
+              </motion.div>
+            </motion.div>
+
+            {/* Pulsing scan line effect */}
+            <motion.div
+              className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent"
+              animate={{ top: ['10%', '90%', '10%'] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
             />
 
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/35 to-transparent" />
