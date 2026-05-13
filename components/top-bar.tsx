@@ -22,8 +22,8 @@ export default function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
 
         <Link href="/" className="flex items-center gap-2.5 group">
           <Image
-            src="/logos/royan.png"
-            alt="Royan Institute"
+            src="/logos/medical-informatics.jpeg"
+            alt="Medical Informatics"
             width={36}
             height={36}
             className="rounded-lg shadow-md group-hover:scale-105 transition-transform"
