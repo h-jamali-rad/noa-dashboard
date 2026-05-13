@@ -33,7 +33,7 @@ export default function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
               NOA microTESE Pipeline
             </div>
             <div className="text-[11px] text-muted-foreground leading-tight">
-              6-Agent ML Research Dashboard
+              Medical University of Mashhad
             </div>
           </div>
         </Link>
