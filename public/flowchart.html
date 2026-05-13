@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOA microTESE ML Pipeline — Data Cleaning &amp; Preprocessing</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg1:#0a0a1a;--bg2:#1a1a2e;--card-bg:#12122a;--card-border:#2a2a4a;
+--text:#e0e0f0;--text-dim:#8888aa;--text-bright:#ffffff;
+--purple:#9b59b6;--teal:#00bcd4;--green:#2ecc71;--orange:#e67e22;
+--red:#e74c3c;--blue:#3498db;--gold:#f1c40f;
+--glow-purple:rgba(155,89,182,.35);--glow-teal:rgba(0,188,212,.35);
+--glow-green:rgba(46,204,113,.35);--glow-orange:rgba(230,126,34,.35);
+--glow-red:rgba(231,76,60,.35);--glow-blue:rgba(52,152,219,.35);
+--glow-gold:rgba(241,196,15,.35);
+}
+html{scroll-behavior:smooth}
+body{background:linear-gradient(160deg,var(--bg1) 0%,var(--bg2) 50%,#0d0d2b 100%);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;line-height:1.6;min-height:100vh;overflow-x:hidden}
+
+/* ── HEADER ── */
+.header{text-align:center;padding:50px 20px 30px;position:relative}
+.header h1{font-size:clamp(1.4rem,3vw,2.2rem);font-weight:700;background:linear-gradient(135deg,var(--teal),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.5px}
+.header .subtitle{color:var(--text-dim);font-size:clamp(.85rem,1.5vw,1.05rem);margin-top:8px;font-weight:400}
+.header .badge{display:inline-block;margin-top:14px;padding:5px 18px;border:1px solid var(--teal);border-radius:20px;font-size:.78rem;color:var(--teal);letter-spacing:1px}
+
+/* ── LEGEND ── */
+.legend{position:sticky;top:0;z-index:1000;background:rgba(10,10,26,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--card-border);padding:10px 20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 18px;transition:all .3s}
+.legend-title{font-weight:600;color:var(--text-bright);font-size:.82rem;margin-right:8px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--text-dim)}
+.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.legend-toggle{background:none;border:1px solid var(--card-border);color:var(--text-dim);padding:3px 10px;border-radius:10px;cursor:pointer;font-size:.7rem;display:none}
+@media(max-width:768px){.legend-toggle{display:inline-block}.legend.collapsed .legend-item{display:none}.legend.collapsed .legend-title{display:none}}
+
+/* ── PIPELINE CONTAINER ── */
+.pipeline{max-width:1000px;margin:0 auto;padding:30px 20px 80px;position:relative}
+
+/* ── CONNECTOR LINES ── */
+.connector{display:flex;justify-content:center;padding:0;height:50px;position:relative}
+.connector-line{width:3px;height:100%;background:linear-gradient(180deg,var(--card-border),rgba(0,188,212,.4));position:relative;overflow:hidden}
+.connector-line::after{content:'';position:absolute;top:-20px;left:0;width:100%;height:20px;background:linear-gradient(180deg,var(--teal),transparent);animation:flowDown 1.5s linear infinite;border-radius:2px}
+@keyframes flowDown{0%{top:-20px;opacity:1}100%{top:100%;opacity:0}}
+.connector.split{width:80%;display:flex;justify-content:space-between;margin:0 auto}
+.connector.split .arm{width:3px;height:50px;position:relative}
+.connector.split .arm .connector-line{height:100%}
+.connector.split .bridge{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--card-border),var(--teal),var(--card-border))}
+.connector-short{height:30px}
+
+/* ── CARD BASE ── */
+.step-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:14px;padding:22px 26px;position:relative;cursor:default;transition:transform .25s,box-shadow .25s;margin:0 auto;max-width:860px}
+.step-card:hover{transform:translateY(-3px) scale(1.008)}
+.step-card .step-num{position:absolute;top:-12px;left:24px;background:var(--bg1);border:1px solid var(--card-border);border-radius:20px;padding:2px 14px;font-size:.72rem;color:var(--text-dim);font-weight:600;letter-spacing:.5px}
+.step-card h3{font-size:1.05rem;font-weight:600;color:var(--text-bright);margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.step-card h3 .icon{font-size:1.15rem}
+.step-card .desc{font-size:.85rem;color:var(--text-dim);line-height:1.55}
+.step-card .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.step-card .tag{padding:2px 10px;border-radius:10px;font-size:.7rem;border:1px solid;opacity:.85}
+
+/* accent colors */
+.accent-purple{border-left:4px solid var(--purple)}.accent-purple:hover{box-shadow:0 8px 32px var(--glow-purple)}
+.accent-teal{border-left:4px solid var(--teal)}.accent-teal:hover{box-shadow:0 8px 32px var(--glow-teal)}
+.accent-green{border-left:4px solid var(--green)}.accent-green:hover{box-shadow:0 8px 32px var(--glow-green)}
+.accent-orange{border-left:4px solid var(--orange)}.accent-orange:hover{box-shadow:0 8px 32px var(--glow-orange)}
+.accent-red{border-left:4px solid var(--red)}.accent-red:hover{box-shadow:0 8px 32px var(--glow-red)}
+.accent-blue{border-left:4px solid var(--blue)}.accent-blue:hover{box-shadow:0 8px 32px var(--glow-blue)}
+.accent-gold{border-left:4px solid var(--gold)}.accent-gold:hover{box-shadow:0 8px 32px var(--glow-gold)}
+
+/* ── SHAPES ── */
+.shape-diamond{clip-path:none;border-radius:14px;position:relative}
+.shape-diamond::before{content:'';position:absolute;top:6px;right:6px;width:18px;height:18px;background:var(--red);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);opacity:.5}
+.shape-hexagon{clip-path:none;border-radius:14px;position:relative}
+.shape-hexagon::before{content:'';position:absolute;top:6px;right:6px;width:20px;height:18px;background:var(--teal);clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%);opacity:.5}
+.shape-parallelogram{clip-path:none;border-radius:14px;position:relative}
+.shape-parallelogram::before{content:'';position:absolute;top:6px;right:6px;width:20px;height:14px;background:var(--green);clip-path:polygon(15% 0%,100% 0%,85% 100%,0% 100%);opacity:.5}
+.shape-rounded{border-radius:24px}
+
+/* ── TOOLTIPS ── */
+.tooltip-trigger{position:relative}
+.tooltip-card{position:absolute;z-index:900;width:420px;max-width:90vw;background:linear-gradient(135deg,#1a1a3a,#14142e);border:1px solid var(--card-border);border-radius:14px;padding:20px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .3s,transform .3s;transform:translateY(8px);box-shadow:0 20px 60px rgba(0,0,0,.6);left:50%;margin-left:-210px;top:calc(100% + 12px)}
+.tooltip-trigger:hover .tooltip-card{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}
+.tooltip-card h4{font-size:.88rem;color:var(--teal);margin-bottom:10px;border-bottom:1px solid var(--card-border);padding-bottom:6px;display:flex;align-items:center;gap:6px}
+.tooltip-section{margin-bottom:10px}
+.tooltip-section .label{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:3px}
+.tooltip-section .label.rat{color:var(--purple)}
+.tooltip-section .label.thr{color:var(--orange)}
+.tooltip-section .label.ref{color:var(--blue)}
+.tooltip-section .label.det{color:var(--green)}
+.tooltip-section p,.tooltip-section ul{font-size:.78rem;color:var(--text-dim);line-height:1.5}
+.tooltip-section ul{padding-left:14px}
+.tooltip-section ul li{margin-bottom:2px}
+
+/* position adjustments */
+.tooltip-right .tooltip-card{left:calc(100% + 14px);top:0;margin-left:0}
+.tooltip-left .tooltip-card{right:calc(100% + 14px);left:auto;top:0;margin-left:0}
+.tooltip-above .tooltip-card{bottom:calc(100% + 14px);top:auto}
+
+/* ── PARALLEL SPLIT ── */
+.parallel-container{display:flex;gap:20px;max-width:860px;margin:0 auto}
+.parallel-container .step-card{flex:1;min-width:0}
+@media(max-width:700px){.parallel-container{flex-direction:column}}
+.parallel-label{text-align:center;font-size:.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:2px;margin:6px 0}
+
+/* ── MINI BAR ── */
+.mini-bars{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:8px}
+.mini-bar-item{display:flex;align-items:center;gap:4px;font-size:.68rem;color:var(--text-dim)}
+.mini-bar-track{width:60px;height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.mini-bar-fill{height:100%;border-radius:3px}
+
+/* ── COLUMNS LIST ── */
+.col-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.col-chip{padding:2px 8px;border-radius:8px;font-size:.65rem;background:rgba(255,255,255,.05);color:var(--text-dim);border:1px solid rgba(255,255,255,.08)}
+.col-chip.dropped{background:rgba(231,76,60,.12);color:var(--red);border-color:rgba(231,76,60,.3);text-decoration:line-through}
+
+/* ── BEFORE/AFTER TABLE ── */
+.ba-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:12px;font-size:.78rem}
+.ba-table th{background:rgba(0,188,212,.12);color:var(--teal);padding:10px 14px;text-align:left;border-bottom:2px solid var(--teal);font-weight:600;letter-spacing:.5px}
+.ba-table td{padding:8px 14px;border-bottom:1px solid var(--card-border);color:var(--text-dim)}
+.ba-table tr:hover td{background:rgba(255,255,255,.03)}
+.ba-table .highlight{color:var(--green);font-weight:600}
+.ba-table .dim{color:var(--red)}
+
+/* ── FEATURE SELECTION STAGES ── */
+.stages{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.stage-badge{padding:6px 14px;border-radius:10px;font-size:.72rem;font-weight:600;border:1px solid;position:relative}
+.stage-arrow{color:var(--text-dim);font-size:1rem;display:flex;align-items:center}
+
+/* ── DATA QUALITY CHECKS ── */
+.checks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;margin-top:8px}
+.check-item{display:flex;align-items:flex-start;gap:5px;font-size:.74rem;color:var(--text-dim)}
+.check-icon{color:var(--green);flex-shrink:0;margin-top:1px}
+
+/* ── FOOTER ── */
+.footer{text-align:center;padding:40px 20px;color:var(--text-dim);font-size:.75rem;border-top:1px solid var(--card-border);margin-top:40px}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg1)}
+::-webkit-scrollbar-thumb{background:var(--card-border);border-radius:3px}
+
+/* ── STATS ROW ── */
+.stats-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.stat-box{flex:1;min-width:100px;background:rgba(255,255,255,.03);border:1px solid var(--card-border);border-radius:10px;padding:8px 12px;text-align:center}
+.stat-box .val{font-size:1.2rem;font-weight:700;color:var(--teal)}
+.stat-box .lbl{font-size:.65rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px}
+
+/* ── ANIMATE IN ── */
+.step-card{opacity:1;transform:translateY(0);transition:opacity .6s ease,transform .6s ease}
+.step-card.animate-hidden{opacity:0;transform:translateY(30px)}
+.step-card.animate-visible{opacity:1;transform:translateY(0)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>NOA microTESE ML Pipeline — Data Cleaning &amp; Preprocessing Methodology</h1>
+  <p class="subtitle">Hossein Jamalirad — PhD Candidate, Medical Informatics, MUMS</p>
+  <span class="badge">ROYAN INSTITUTE COHORT &bull; 2,450 PATIENTS</span>
+</div>
+
+<!-- LEGEND -->
+<div class="legend" id="legend">
+  <span class="legend-title">PIPELINE CATEGORIES</span>
+  <button class="legend-toggle" onclick="document.getElementById('legend').classList.toggle('collapsed')">☰ Legend</button>
+  <div class="legend-item"><span class="legend-dot" style="background:var(--purple)"></span>Data Quality</div>
+  <div class="legend-item"><span class="legend-dot" style="background:var(--teal)"></span>Preprocessing</div>
+  <div class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>Feature Engineering</div>
+  <div class="legend-item"><span class="legend-dot" style="background:var(--orange)"></span>Imputation / Missing Data</div>
+  <div class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>Outcome / Exclusion</div>
+  <div class="legend-item"><span class="legend-dot" style="background:var(--blue)"></span>Selection / Splitting</div>
+  <div class="legend-item"><span class="legend-dot" style="background:var(--gold)"></span>Validation / Checks</div>
+  <div class="legend-item" style="margin-left:12px;border-left:1px solid var(--card-border);padding-left:12px">
+    <span style="font-size:.65rem;color:var(--text-dim)">Shapes: ⬡ Data Source &nbsp; ◇ Decision &nbsp; ▱ I/O &nbsp; ▢ Transform</span>
+  </div>
+</div>
+
+<!-- PIPELINE -->
+<div class="pipeline" id="pipeline">
+
+<!-- ═══ STEP 1: RAW DATA INGESTION ═══ -->
+<div class="step-card accent-teal shape-hexagon tooltip-trigger" style="animation-delay:.1s">
+  <span class="step-num">STEP 01</span>
+  <h3><span class="icon">⬡</span> Raw Data Ingestion</h3>
+  <p class="desc">Loaded <strong>2,450 patients × 55 columns</strong> from <code>Book_11.17.2025_Dr. Rad_Final ID.xlsb</code> (Final Sheet) via <code>pyxlsb</code> → raw CSV.</p>
+  <div class="stats-row">
+    <div class="stat-box"><div class="val">2,450</div><div class="lbl">Patients</div></div>
+    <div class="stat-box"><div class="val">55</div><div class="lbl">Columns</div></div>
+    <div class="stat-box"><div class="val">.xlsb</div><div class="lbl">Format</div></div>
+    <div class="stat-box"><div class="val">Retrospective</div><div class="lbl">Study Design</div></div>
+  </div>
+  <div class="tooltip-card">
+    <h4>📥 Raw Data Ingestion Details</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>The .xlsb binary Excel format preserves the original clinical data as entered at Royan Institute. Using pyxlsb ensures lossless reading of the proprietary format without requiring Excel.</p></div>
+    <div class="tooltip-section"><span class="label thr">Threshold</span><p>No filtering at this stage — all 2,450 rows and 55 columns are ingested as-is to preserve data integrity.</p></div>
+    <div class="tooltip-section"><span class="label ref">Reference</span><p>Royan Institute, Tehran, Iran. IRB-approved retrospective cohort (de-identified). Persian dates 1398–1403 (≈2019–2025) appear in retrieval columns.</p></div>
+    <div class="tooltip-section"><span class="label det">Details</span>
+      <ul>
+        <li>Source: <code>Book_11.17.2025_Dr. Rad_Final ID.xlsb</code></li>
+        <li>Sheet: "Final Sheet"</li>
+        <li>Study population: NOA patients undergoing microTESE</li>
+        <li>Primary outcome: Outcome1 (binary 0/1) — successful sperm retrieval at first microTESE</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="connector"><div class="connector-line"></div></div>
+
+<!-- ═══ STEP 2: COLUMN INVENTORY ═══ -->
+<div class="step-card accent-purple tooltip-trigger" style="animation-delay:.15s">
+  <span class="step-num">STEP 02</span>
+  <h3><span class="icon">📋</span> Column Inventory — All 55 Variables</h3>
+  <p class="desc">Cataloged all 55 original columns grouped into 10 clinical categories.</p>
+  <div class="col-list">
+    <span class="col-chip">ID</span><span class="col-chip">Roy-ID</span><span class="col-chip">Age</span>
+    <span class="col-chip">Partner Age</span><span class="col-chip">Race</span><span class="col-chip">BMI</span>
+    <span class="col-chip">Hieght</span><span class="col-chip">Boby Weight</span>
+    <span class="col-chip">FSH</span><span class="col-chip">LH</span><span class="col-chip">Testosterone</span>
+    <span class="col-chip">Prolactin</span><span class="col-chip">E2</span>
+    <span class="col-chip">Pathology-RT</span><span class="col-chip">Pathology-LT</span>
+    <span class="col-chip">Karyotype</span><span class="col-chip">Y microdeletion</span>
+    <span class="col-chip">Varicocele</span><span class="col-chip">T.BX</span>
+    <span class="col-chip">Outcome1</span>
+    <span class="col-chip" style="opacity:.5">+35 more…</span>
+  </div>
+  <div class="tooltip-card">
+    <h4>📋 Complete Column Inventory</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>A comprehensive inventory ensures no variables are accidentally dropped or overlooked. Typos in column names (e.g., "Hieght", "Boby Weight") were preserved to maintain traceability to the source file.</p></div>
+    <div class="tooltip-section"><span class="label det">Details — 10 Categories</span>
+      <ul>
+        <li><strong>Demographics:</strong> Age, Partner Age, Race</li>
+        <li><strong>Anthropometrics:</strong> Hieght, Boby Weight, BMI</li>
+        <li><strong>Hormonal:</strong> FSH, LH, Testosterone, Prolactin, E2, TSH, SHBG, inhibin B, AMH</li>
+        <li><strong>Testicular:</strong> Sono RT/LT, Orchidometer RT/LT, RT-XYZ/LT-XYZ, Sakamoto RT/LT, Volume RT/LT</li>
+        <li><strong>Surgical/Urological:</strong> Surgery trauma(s), Varicocele, T.BX, Inguinal hernia, Orchiopexy</li>
+        <li><strong>Comorbidities:</strong> Diabetes, Hypertension</li>
+        <li><strong>Lifestyle:</strong> Habits, Occupation, infertile family members</li>
+        <li><strong>Semen:</strong> Seminal plasma pH</li>
+        <li><strong>Genetic:</strong> Karyotype, Y chromosome microdeletion (AZFa/b/c)</li>
+        <li><strong>Outcomes:</strong> Outcome1–4, Successful Sperm Retrieval 1–4</li>
+      </ul>
+    </div>
+    <div class="tooltip-section"><span class="label ref">Reference</span><p>Royan Institute clinical data dictionary. Column names preserved verbatim from source .xlsb file.</p></div>
+  </div>
+</div>
+
+<div class="connector"><div class="connector-line"></div></div>
+
+<!-- ═══ STEP 3: MISSINGNESS ANALYSIS ═══ -->
+<div class="step-card accent-orange tooltip-trigger" style="animation-delay:.2s">
+  <span class="step-num">STEP 03</span>
+  <h3><span class="icon">📊</span> Missingness Analysis</h3>
+  <p class="desc">Computed per-column missing rates. <strong>9 columns</strong> at 100% missing; <strong>40 columns</strong> exceed 50% missingness.</p>
+  <div class="mini-bars">
+    <div class="mini-bar-item"><span>Age</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:0%;background:var(--green)"></div></div><span>0%</span></div>
+    <div class="mini-bar-item"><span>Race</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:0%;background:var(--green)"></div></div><span>0%</span></div>
+    <div class="mini-bar-item"><span>Partner Age</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:8.6%;background:var(--green)"></div></div><span>8.6%</span></div>
+    <div class="mini-bar-item"><span>FSH</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:22.2%;background:var(--gold)"></div></div><span>22.2%</span></div>
+    <div class="mini-bar-item"><span>LH</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:25.1%;background:var(--gold)"></div></div><span>25.1%</span></div>
+    <div class="mini-bar-item"><span>Testosterone</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:22.6%;background:var(--gold)"></div></div><span>22.6%</span></div>
+    <div class="mini-bar-item"><span>Prolactin</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:40.4%;background:var(--orange)"></div></div><span>40.4%</span></div>
+    <div class="mini-bar-item"><span>E2</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:41.6%;background:var(--orange)"></div></div><span>41.6%</span></div>
+    <div class="mini-bar-item"><span>Pathology-LT</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:49%;background:var(--orange)"></div></div><span>49%</span></div>
+    <div class="mini-bar-item"><span>Karyotype</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:62.3%;background:var(--red)"></div></div><span>62.3%</span></div>
+    <div class="mini-bar-item"><span>BMI</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:65%;background:var(--red)"></div></div><span>64-67%</span></div>
+    <div class="mini-bar-item"><span>Testis Sono</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:82%;background:var(--red)"></div></div><span>82-83%</span></div>
+    <div class="mini-bar-item"><span>Diabetes</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:99%;background:var(--red)"></div></div><span>99.1%</span></div>
+    <div class="mini-bar-item"><span>Hypertension</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:99.8%;background:var(--red)"></div></div><span>99.8%</span></div>
+  </div>
+  <div class="tooltip-card">
+    <h4>📊 Missingness Analysis Details</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>Characterizing missingness patterns is critical because clinical data from retrospective cohorts often has informative missingness — the absence of a test result may itself carry diagnostic signal (e.g., karyotype ordered only when abnormality suspected).</p></div>
+    <div class="tooltip-section"><span class="label thr">Thresholds</span>
+      <ul>
+        <li>100% missing → automatic drop (no information)</li>
+        <li>&gt;50% missing → flagged, retained if clinically meaningful</li>
+        <li>&lt;50% missing → standard imputation eligible</li>
+      </ul>
+    </div>
+    <div class="tooltip-section"><span class="label ref">Reference</span><p>Van Buuren, S. (2018). Flexible Imputation of Missing Data. CRC Press. — MCAR/MAR/MNAR framework applied.</p></div>
+    <div class="tooltip-section"><span class="label det">Details</span><p>Baseline demographics (Age, Race) had 0% missing. Hormonal panel ranged from 22–42% missing. Comorbidities (Diabetes 99.1%, Hypertension 99.8%) were almost entirely unrecorded — likely documented only when present.</p></div>
+  </div>
+</div>
+
+<div class="connector"><div class="connector-line"></div></div>
+
+<!-- ═══ STEP 4: DROP 100% MISSING ═══ -->
+<div class="step-card accent-red shape-diamond tooltip-trigger" style="animation-delay:.25s">
+  <span class="step-num">STEP 04</span>
+  <h3><span class="icon">🗑️</span> Drop 100% Missing Columns — 9 Variables</h3>
+  <p class="desc">Excluded 9 columns with zero observed values across all 2,450 rows.</p>
+  <div class="col-list">
+    <span class="col-chip dropped">Cancer Type</span>
+    <span class="col-chip dropped">Torsion of spermatic cord</span>
+    <span class="col-chip dropped">Cancer Treatment</span>
+    <span class="col-chip dropped">Surgery Therapeutic</span>
+    <span class="col-chip dropped">Sex Hormone-Binding Globulin</span>
+    <span class="col-chip dropped">TSH</span>
+    <span class="col-chip dropped">inhibin B</span>
+    <span class="col-chip dropped">AMH</span>
+    <span class="col-chip dropped">Infertility length</span>
+  </div>
+  <div class="tooltip-card">
+    <h4>🗑️ Column Exclusion Details</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>Columns with 100% missingness carry zero information and cannot be imputed. These were likely planned data fields that were never systematically collected in clinical practice at Royan Institute.</p></div>
+    <div class="tooltip-section"><span class="label thr">Threshold</span><p>Strict 100% missingness cutoff. Any column with even a single observed value was retained for further analysis.</p></div>
+    <div class="tooltip-section"><span class="label ref">Reference</span><p>Standard practice per Sterne et al. (2009). BMJ. "Multiple imputation for missing data in epidemiological and clinical research." Columns with no observations cannot be multiply imputed.</p></div>
+    <div class="tooltip-section"><span class="label det">Details</span>
+      <ul>
+        <li><strong>Hormonal (4):</strong> TSH, SHBG, inhibin B, AMH — likely not routinely ordered for NOA patients at Royan</li>
+        <li><strong>Surgical (2):</strong> Cancer Treatment, Surgery Therapeutic — rare events not systematically captured</li>
+        <li><strong>Urological (1):</strong> Torsion of spermatic cord</li>
+        <li><strong>Oncological (1):</strong> Cancer Type</li>
+        <li><strong>Clinical (1):</strong> Infertility length</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="connector"><div class="connector-line"></div></div>
+
+<!-- ═══ STEP 5: HIGH-MISSINGNESS FLAGGING ═══ -->
+<div class="step-card accent-orange tooltip-trigger" style="animation-delay:.3s">
+  <span class="step-num">STEP 05</span>
+  <h3><span class="icon">⚠️</span> High-Missingness Flagging (&gt;50%)</h3>
+  <p class="desc"><strong>40 columns</strong> exceeded 50% missingness threshold. Retained when clinically meaningful (Karyotype, Y microdeletion, Testis size) but flagged with missingness indicators.</p>
+  <div class="tags">
+    <span class="tag" style="color:var(--orange);border-color:var(--orange)">40 cols &gt;50%</span>
+    <span class="tag" style="color:var(--green);border-color:var(--green)">Clinical exceptions retained</span>
+    <span class="tag" style="color:var(--purple);border-color:var(--purple)">Missingness indicators created</span>
+  </div>
+  <div class="tooltip-card">
+    <h4>⚠️ High-Missingness Handling Strategy</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>In clinical research, high missingness does not always justify exclusion. Karyotype and Y-microdeletion tests are expensive and typically ordered when clinical suspicion is high — making the missingness itself informative (MNAR pattern). Discarding these variables would lose valuable diagnostic signal.</p></div>
+    <div class="tooltip-section"><span class="label thr">Threshold</span><p>50% missingness threshold for flagging. Clinical domain knowledge used to override automated drop recommendations for diagnostically important variables.</p></div>
+    <div class="tooltip-section"><span class="label ref">Reference</span><p>Zeadna et al. (2020). Human Reproduction. — Retained genetic markers despite high missingness due to clinical informativeness.</p></div>
+    <div class="tooltip-section"><span class="label det">Details</span>
+      <ul>
+        <li><strong>Retained examples:</strong> Karyotype (62.3%), Y microdeletion (62.4%), Testis size sono (82-83%)</li>
+        <li><strong>Strategy:</strong> Binary missingness-indicator features created alongside original values</li>
+        <li><strong>Validation:</strong> SHAP analysis later confirmed these missingness indicators carry predictive signal</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="connector"><div class="connector-line"></div></div>
+
+<!-- ═══ STEP 6: OUTCOME DEFINITION ═══ -->
+<div class="step-card accent-red shape-diamond tooltip-trigger" style="animation-delay:.35s">
+  <span class="step-num">STEP 06</span>
+  <h3><span class="icon">🎯</span> Outcome Definition &amp; Cohort Exclusion</h3>
+  <p class="desc">Defined analytical cohort: rows with non-missing <code>Outcome1</code>. <strong>37 excluded → 2,413 analytical patients</strong>.</p>
+  <div class="stats-row">
+    <div class="stat-box"><div class="val">2,413</div><div class="lbl">Analytical Cohort</div></div>
+    <div class="stat-box"><div class="val">37</div><div class="lbl">Excluded</div></div>
+    <div class="stat-box"><div class="val">36.7%</div><div class="lbl">Success Rate</div></div>
+    <div class="stat-box"><div class="val">1.72:1</div><div class="lbl">Fail:Success</div></div>
+  </div>
+  <div class="tooltip-card">
+    <h4>🎯 Outcome Definition Details</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>Outcome1 (binary: successful sperm retrieval at first microTESE) is the primary prediction target. Patients without a recorded outcome cannot be used for supervised learning and must be excluded to avoid label noise.</p></div>
+    <div class="tooltip-section"><span class="label thr">Threshold</span><p>Binary Outcome1: 0 = failure, 1 = success. Any non-binary/missing value → exclusion from analytical cohort.</p></div>
+    <div class="tooltip-section"><span class="label ref">Reference</span><p>Ceyhan et al. (2025). Urology. — Used same binary SRR outcome definition for microTESE prediction.</p></div>
+    <div class="tooltip-section"><span class="label det">Details</span>
+      <ul>
+        <li>Failure (0): 1,527 patients (63.3%)</li>
+        <li>Success (1): 886 patients (36.7%)</li>
+        <li>Class imbalance ratio: ~1.72:1 (failure:success)</li>
+        <li>Primary mTESE: 2,234 (91.2%) | Salvage: 216 (8.8%)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="connector"><div class="connector-line"></div></div>
+
+<!-- PARALLEL LABEL -->
+<div class="parallel-label">▼ TWO PARALLEL MISSING-DATA STRATEGIES ▼</div>
+
+<!-- ═══ STEP 7: PARALLEL PATHS ═══ -->
+<div class="parallel-container">
+  <!-- Paper1 path -->
+  <div class="step-card accent-orange tooltip-trigger" style="animation-delay:.4s;border-top:3px solid var(--purple)">
+    <span class="step-num">STEP 07A — Paper 1</span>
+    <h3><span class="icon">🔲</span> Missingness Indicators + SHAP</h3>
+    <p class="desc">Binary features flag missing-vs-observed for each variable. SHAP validated that missingness itself carries clinical signal (e.g., karyotype not ordered = lower clinical suspicion).</p>
+    <div class="tags">
+      <span class="tag" style="color:var(--purple);border-color:var(--purple)">Missingness = Signal</span>
+      <span class="tag" style="color:var(--gold);border-color:var(--gold)">SHAP-validated</span>
+    </div>
+    <div class="tooltip-card" style="left:0;margin-left:0">
+      <h4>🔲 Paper 1 Strategy</h4>
+      <div class="tooltip-section"><span class="label rat">Rationale</span><p>In clinical settings, the decision to order a test is itself informative. A missing karyotype may indicate the clinician did not suspect a chromosomal abnormality. Creating binary missingness-indicator features captures this "decision-to-test" information that would be lost with standard imputation.</p></div>
+      <div class="tooltip-section"><span class="label thr">Threshold</span><p>Indicators created for all variables with non-trivial (&gt;5%) missingness rates. Each indicator: 1 = missing, 0 = observed.</p></div>
+      <div class="tooltip-section"><span class="label ref">Reference</span><p>Jamalirad et al. (2026). Paper1_revised.md. — "Missingness-indicator features validated as informative by SHAP."</p></div>
+      <div class="tooltip-section"><span class="label det">Details</span><p>Final feature set for Paper 1: 51 features including missingness indicators. SHAP global importance rankings showed several missingness flags among top-30 predictors.</p></div>
+    </div>
+  </div>
+
+  <!-- PaperB path -->
+  <div class="step-card accent-orange tooltip-trigger" style="animation-delay:.45s;border-top:3px solid var(--teal)">
+    <span class="step-num">STEP 07B — Paper B</span>
+    <h3><span class="icon">🔄</span> kNN Imputation (Train Folds Only)</h3>
+    <p class="desc">k-Nearest Neighbors imputation on continuous predictors. <strong>Fit on training folds only</strong> to prevent data leakage. Mode/explicit "Unknown" for categorical variables.</p>
+    <div class="tags">
+      <span class="tag" style="color:var(--teal);border-color:var(--teal)">kNN imputation</span>
+      <span class="tag" style="color:var(--green);border-color:var(--green)">No leakage</span>
+    </div>
+    <div class="tooltip-card" style="left:auto;right:0;margin-left:0">
+      <h4>🔄 Paper B Strategy</h4>
+      <div class="tooltip-section"><span class="label rat">Rationale</span><p>kNN imputation leverages the local structure of the feature space — patients with similar clinical profiles inform missing values. This is preferable to mean/median imputation for clinical data where feature correlations are complex and non-linear.</p></div>
+      <div class="tooltip-section"><span class="label thr">Threshold</span><p>kNN fitted within CV training folds only; k selected via inner CV. Continuous predictors imputed after standardization scaffolding. Categorical variables: mode imputation or explicit 'Unknown' category.</p></div>
+      <div class="tooltip-section"><span class="label ref">Reference</span><p>Jamalirad et al. (2026). PaperB_revised.md. — "kNN imputation applied within CV folds to prevent leakage."<br>Troyanskaya et al. (2001). Missing value estimation methods for DNA microarrays. Bioinformatics.</p></div>
+      <div class="tooltip-section"><span class="label det">Details</span><p>Final feature set for Paper B: 36 features after further pruning. All preprocessing (imputation + scaling + SMOTE) performed inside cross-validation loop.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="parallel-label">▲ STRATEGIES MERGE DOWNSTREAM ▲</div>
+<div class="connector"><div class="connector-line"></div></div>
+
+<!-- ═══ STEP 8: NLP PATHOLOGY ═══ -->
+<div class="step-card accent-green shape-parallelogram tooltip-trigger" style="animation-delay:.5s">
+  <span class="step-num">STEP 08</span>
+  <h3><span class="icon">🧬</span> NLP Pathology Parsing — Free-Text → 22 Features</h3>
+  <p class="desc">Custom regex/NLP pipeline parsed bilateral pathology reports (<code>Pathology-RT</code> and <code>Pathology-LT</code>) into 22 quantitative features: SCO, CSTH, Maturation Arrest stages 1–4, Hypospermatogenesis.</p>
+  <div class="tags">
+    <span class="tag" style="color:var(--green);border-color:var(--green)">8 RT features</span>
+    <span class="tag" style="color:var(--green);border-color:var(--green)">8 LT features</span>
+    <span class="tag" style="color:var(--teal);border-color:var(--teal)">6 aggregated features</span>
+    <span class="tag" style="color:var(--gold);border-color:var(--gold)">MA hierarchy enforced</span>
+  </div>
+  <div class="tooltip-card">
+    <h4>🧬 NLP Pathology Parsing Details</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>Histopathology reports are recorded as free text (e.g., "SCO (90%). CSTH (10%).") and cannot be directly used as ML features. Structured extraction converts qualitative descriptions into quantitative, per-side features while preserving the clinical hierarchy of maturation arrest stages.</p></div>
+    <div class="tooltip-section"><span class="label thr">Threshold</span>
+      <ul>
+        <li>Regex extracts explicit % when present; assigns 100% if pattern found without percentage</li>
+        <li>MA hierarchy: Spermatogonial → Spermatocytic → ImmatureRound → Elongated</li>
+        <li>If arrested at earlier phase, later phases set to 0</li>
+      </ul>
+    </div>
+    <div class="tooltip-section"><span class="label ref">Reference</span><p>Custom pipeline. Top pathology patterns: SCO (846 cases), SCO+CSTH (194), MA spermatocytic (120/115), CSTH (81), Hypospermatogenesis (38).</p></div>
+    <div class="tooltip-section"><span class="label det">Details — 16 Extracted + 6 Aggregated</span>
+      <ul>
+        <li><strong>Right (8):</strong> SCO_RT, CSTH_RT, MA_Spermatogonial_RT, MA_Spermatocytic_RT, MA_ImmatureRound_RT, MA_Elongated_RT, Hypospermatogenesis_RT, Severe_Hypospermatogenesis_RT</li>
+        <li><strong>Left (8):</strong> Same pattern for LT side</li>
+        <li><strong>Aggregated (6):</strong> SCO mean/binary, CSTH mean/binary, Pathology availability RT/LT</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="connector"><div class="connector-line"></div></div>
+
+<!-- ═══ STEP 9: FEATURE ENGINEERING ═══ -->
+<div class="step-card accent-green shape-rounded tooltip-trigger" style="animation-delay:.55s">
+  <span class="step-num">STEP 09</span>
+  <h3><span class="icon">⚙️</span> Feature Engineering — 55 → 73 Columns (+18 New)</h3>
+  <p class="desc">Expanded feature space from 55 original to <strong>73 total features</strong>: 16 pathology indicators + <code>is_Primary</code> + <code>Salvage_Count</code>.</p>
+  <div class="stats-row">
+    <div class="stat-box"><div class="val">55</div><div class="lbl">Original</div></div>
+    <div class="stat-box"><div class="val" style="color:var(--green)">+18</div><div class="lbl">Engineered</div></div>
+    <div class="stat-box"><div class="val">73</div><div class="lbl">Total</div></div>
+    <div class="stat-box"><div class="val">51 / 36</div><div class="lbl">Paper1 / PaperB</div></div>
+  </div>
+  <div class="tooltip-card">
+    <h4>⚙️ Feature Engineering Details</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>Raw clinical data requires transformation to capture domain-specific patterns. Bilateral pathology reports encode critical histological information in free text; primary vs. salvage microTESE status significantly affects prognosis and must be explicitly modeled.</p></div>
+    <div class="tooltip-section"><span class="label det">Details — 18 Engineered Features</span>
+      <ul>
+        <li><strong>16 pathology indicators:</strong> 8 per testis side (SCO, CSTH, 4 MA stages, Hypospermatogenesis, Severe Hypospermatogenesis)</li>
+        <li><strong>is_Primary:</strong> Binary flag = 1 if first microTESE attempt (Primary mTESE), 0 if Salvage</li>
+        <li><strong>Salvage_Count:</strong> Integer count of prior failed retrieval attempts (0 for Primary)</li>
+        <li>Primary mTESE: 2,234 (91.2%) | Salvage: 216 (8.8%)</li>
+      </ul>
+    </div>
+    <div class="tooltip-section"><span class="label ref">Reference</span><p>Feature engineering guided by Verratti et al. (2024). Current Urology Reports, and Deng et al. (2023). Predictors of sperm retrieval for NOA.</p></div>
+  </div>
+</div>
+
+<div class="connector"><div class="connector-line"></div></div>
+
+<!-- ═══ STEP 10: FEATURE SELECTION ═══ -->
+<div class="step-card accent-blue shape-rounded tooltip-trigger" style="animation-delay:.6s">
+  <span class="step-num">STEP 10</span>
+  <h3><span class="icon">🔬</span> Feature Selection Pipeline — 3-Stage UNION</h3>
+  <p class="desc">Three complementary selection methods applied, results combined via UNION to maximize recall of informative features.</p>
+  <div class="stages">
+    <span class="stage-badge" style="color:var(--blue);border-color:var(--blue)">① Mann-Whitney U<br><small>p &lt; 0.05</small></span>
+    <span class="stage-arrow">→</span>
+    <span class="stage-badge" style="color:var(--purple);border-color:var(--purple)">② Mutual Information<br><small>vs Outcome1</small></span>
+    <span class="stage-arrow">→</span>
+    <span class="stage-badge" style="color:var(--green);border-color:var(--green)">③ RFE-RF<br><small>Recursive Elimination</small></span>
+    <span class="stage-arrow">→</span>
+    <span class="stage-badge" style="color:var(--gold);border-color:var(--gold)">UNION<br><small>51 features (Paper1)</small></span>
+  </div>
+  <div class="tooltip-card">
+    <h4>🔬 Feature Selection Pipeline Details</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>No single feature selection method is universally optimal. Mann-Whitney U captures univariate distributional differences; Mutual Information captures non-linear dependencies; RFE-RF captures multivariate interaction effects. Using UNION (rather than intersection) ensures that features selected by any method are retained, reducing the risk of discarding informative variables.</p></div>
+    <div class="tooltip-section"><span class="label thr">Thresholds</span>
+      <ul>
+        <li>Stage 1: Mann-Whitney U, p &lt; 0.05 (univariate filter on continuous features)</li>
+        <li>Stage 2: Mutual Information ranking against Outcome1 (top features by MI score)</li>
+        <li>Stage 3: Recursive Feature Elimination with Random Forest (RFE-RF)</li>
+        <li>Final: UNION of all three → 51 features (Paper1), 36 features (PaperB)</li>
+      </ul>
+    </div>
+    <div class="tooltip-section"><span class="label ref">Reference</span><p>Guyon, I. & Elisseeff, A. (2003). "An Introduction to Variable and Feature Selection." JMLR.<br>Ory et al. (2022). World Journal of Men's Health. — Used similar multi-stage feature selection for microTESE prediction.</p></div>
+  </div>
+</div>
+
+<div class="connector"><div class="connector-line"></div></div>
+
+<!-- ═══ STEP 11: DATA QUALITY CHECKS ═══ -->
+<div class="step-card accent-gold tooltip-trigger" style="animation-delay:.65s">
+  <span class="step-num">STEP 11</span>
+  <h3><span class="icon">✅</span> Outlier Handling &amp; Data Quality Checks — 10 Checks</h3>
+  <div class="checks-grid">
+    <div class="check-item"><span class="check-icon">✓</span> Row-count integrity (2,450 confirmed)</div>
+    <div class="check-item"><span class="check-icon">✓</span> Column-name normalization (typos preserved)</div>
+    <div class="check-item"><span class="check-icon">✓</span> Per-column dtype coercion</div>
+    <div class="check-item"><span class="check-icon">✓</span> 100%-missing column detection</div>
+    <div class="check-item"><span class="check-icon">✓</span> >50%-missing detection (n=40)</div>
+    <div class="check-item"><span class="check-icon">✓</span> Outlier scan (hormonal + anthropometric)</div>
+    <div class="check-item"><span class="check-icon">✓</span> Outcome1 ↔ Sperm Retrieval-1 consistency</div>
+    <div class="check-item"><span class="check-icon">✓</span> Bilateral pathology consistency</div>
+    <div class="check-item"><span class="check-icon">✓</span> MA hierarchy enforcement</div>
+    <div class="check-item"><span class="check-icon">✓</span> Stratified Outcome1 distribution check</div>
+  </div>
+  <div class="tooltip-card">
+    <h4>✅ Data Quality Check Details</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>Systematic quality checks prevent garbage-in-garbage-out scenarios. Each check targets a specific potential failure mode: row loss during processing, type coercion errors, cross-field logical inconsistencies, and distributional anomalies that could bias models.</p></div>
+    <div class="tooltip-section"><span class="label thr">Thresholds</span>
+      <ul>
+        <li>Row-count: must match source (2,450)</li>
+        <li>Outlier detection: IQR-based scan on hormonal (FSH, LH, Testosterone, Prolactin, E2) and anthropometric (Height, Weight, BMI) variables</li>
+        <li>MA hierarchy: no later-phase arrest without earlier phase resolved</li>
+      </ul>
+    </div>
+    <div class="tooltip-section"><span class="label ref">Reference</span><p>NOA ML Architecture – Phase 1 Project Documentation. Pipeline audit checks.</p></div>
+  </div>
+</div>
+
+<div class="connector"><div class="connector-line"></div></div>
+
+<!-- ═══ STEP 12: STANDARDIZATION ═══ -->
+<div class="step-card accent-teal shape-rounded tooltip-trigger" style="animation-delay:.7s">
+  <span class="step-num">STEP 12</span>
+  <h3><span class="icon">📐</span> Standardization — Z-Score / RobustScaler</h3>
+  <p class="desc">Continuous features standardized (mean=0, σ=1). <strong>Scaler fit on training set ONLY</strong>, then applied to test set. RobustScaler selected in best LightGBM pipeline.</p>
+  <div class="tags">
+    <span class="tag" style="color:var(--teal);border-color:var(--teal)">Z-score (mean=0, σ=1)</span>
+    <span class="tag" style="color:var(--green);border-color:var(--green)">Train-only fitting</span>
+    <span class="tag" style="color:var(--purple);border-color:var(--purple)">RobustScaler (best pipeline)</span>
+  </div>
+  <div class="tooltip-card">
+    <h4>📐 Standardization Details</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>Different clinical variables have vastly different scales (e.g., Age in years vs. FSH in mIU/mL vs. testicular volume in mL). Without standardization, distance-based methods (kNN, SVM) and gradient-based optimizers are biased toward high-magnitude features. RobustScaler uses median/IQR, making it resistant to the outliers common in hormonal data.</p></div>
+    <div class="tooltip-section"><span class="label thr">Parameters</span>
+      <ul>
+        <li>Z-score: μ=0, σ=1 for standard pipeline</li>
+        <li>RobustScaler: centering=median, scaling=IQR (selected by nested CV)</li>
+        <li>Scaler choice tuned inside cross-validation loop</li>
+      </ul>
+    </div>
+    <div class="tooltip-section"><span class="label ref">Reference</span><p>Scikit-learn documentation. RobustScaler selected via RandomizedSearchCV (50 iterations, 2-outer × 5-inner CV).</p></div>
+    <div class="tooltip-section"><span class="label det">Scope</span><p>Applied to: Age, Partner Age, BMI, Height, Weight, FSH, LH, Testosterone, Prolactin, E2, testicular volume measurements, Sakamoto volumes, Seminal plasma pH.</p></div>
+  </div>
+</div>
+
+<div class="connector"><div class="connector-line"></div></div>
+
+<!-- ═══ STEP 13: CATEGORICAL ENCODING ═══ -->
+<div class="step-card accent-teal tooltip-trigger" style="animation-delay:.75s">
+  <span class="step-num">STEP 13</span>
+  <h3><span class="icon">🔢</span> Categorical Encoding — One-Hot &amp; Binary</h3>
+  <p class="desc">One-hot encoding for multi-class categoricals (Race, Habits, Karyotype, Y-microdeletion, Occupation). Binary 0/1 for comorbidities and surgical history.</p>
+  <div class="tags">
+    <span class="tag" style="color:var(--teal);border-color:var(--teal)">One-hot encoding</span>
+    <span class="tag" style="color:var(--blue);border-color:var(--blue)">Label encoding</span>
+    <span class="tag" style="color:var(--green);border-color:var(--green)">Binary flags</span>
+  </div>
+  <div class="tooltip-card">
+    <h4>🔢 Categorical Encoding Details</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>ML algorithms require numeric input. One-hot encoding preserves the nominal nature of multi-class variables without imposing ordinal assumptions. Binary indicators for comorbidities (Diabetes, Hypertension) and surgical flags are already naturally binary.</p></div>
+    <div class="tooltip-section"><span class="label det">Details</span>
+      <ul>
+        <li><strong>One-hot:</strong> Race, Habits, Karyotype categories, AZFa/AZFb/AZFc, Occupation exposure</li>
+        <li><strong>Binary (0/1):</strong> Diabetes, Hypertension, Varicocele, T.BX, Inguinal hernia, Orchiopexy, Surgery trauma(s)</li>
+        <li><strong>Engineered binary:</strong> is_Primary, all pathology indicators (SCO, CSTH, MA stages, Hypospermatogenesis)</li>
+      </ul>
+    </div>
+    <div class="tooltip-section"><span class="label ref">Reference</span><p>Standard practice. Bachelot et al. (2023). JMIR. — Similar encoding strategy for clinical prediction models.</p></div>
+  </div>
+</div>
+
+<div class="connector"><div class="connector-line"></div></div>
+
+<!-- ═══ STEP 14: CLASS IMBALANCE ═══ -->
+<div class="step-card accent-blue shape-rounded tooltip-trigger" style="animation-delay:.8s">
+  <span class="step-num">STEP 14</span>
+  <h3><span class="icon">⚖️</span> Class Imbalance Handling — SMOTE (Train Only)</h3>
+  <p class="desc">SMOTE applied <strong>exclusively to training set</strong> after train/test split. Never applied to test set to ensure unbiased evaluation. Class ratio: 1.72:1 (failure:success).</p>
+  <div class="stats-row">
+    <div class="stat-box"><div class="val">1,527</div><div class="lbl">Failure (63.3%)</div></div>
+    <div class="stat-box"><div class="val">886</div><div class="lbl">Success (36.7%)</div></div>
+    <div class="stat-box"><div class="val">SMOTE</div><div class="lbl">Oversampling</div></div>
+    <div class="stat-box"><div class="val">Train Only</div><div class="lbl">No Leakage</div></div>
+  </div>
+  <div class="tooltip-card">
+    <h4>⚖️ Class Imbalance Details</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>With a 1.72:1 failure-to-success ratio, classifiers tend to be biased toward predicting failure. SMOTE generates synthetic minority (success) examples by interpolating between existing minority-class neighbors, improving the classifier's sensitivity without simply duplicating records.</p></div>
+    <div class="tooltip-section"><span class="label thr">Parameters</span>
+      <ul>
+        <li>SMOTE applied inside CV training folds only (leakage prevention)</li>
+        <li>Never applied to test/validation sets</li>
+        <li>Original ratio: 1,527 failure : 886 success (1.72:1)</li>
+      </ul>
+    </div>
+    <div class="tooltip-section"><span class="label ref">Reference</span><p>Chawla et al. (2002). "SMOTE: Synthetic Minority Over-sampling Technique." JAIR.<br>Xiao et al. (2025). Scientific Reports. — SMOTE in microTESE prediction context.</p></div>
+  </div>
+</div>
+
+<div class="connector"><div class="connector-line"></div></div>
+
+<!-- ═══ STEP 15: TRAIN/TEST SPLIT ═══ -->
+<div class="step-card accent-blue tooltip-trigger" style="animation-delay:.85s">
+  <span class="step-num">STEP 15</span>
+  <h3><span class="icon">✂️</span> Train/Test Split — Stratified 80/20</h3>
+  <p class="desc">Stratified split on Outcome1 with <code>random_state=42</code>. Alternative 70/30 split used for calibration analyses.</p>
+  <div class="stats-row">
+    <div class="stat-box"><div class="val">1,930</div><div class="lbl">Training (80%)</div></div>
+    <div class="stat-box"><div class="val">483</div><div class="lbl">Test (20%)</div></div>
+    <div class="stat-box"><div class="val">42</div><div class="lbl">Random State</div></div>
+  </div>
+  <div class="tooltip-card">
+    <h4>✂️ Train/Test Split Details</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>Stratified splitting ensures that the class distribution (36.7% success) is preserved in both train and test sets. The 80/20 ratio balances having sufficient training data with a meaningful test set size. Fixed random_state ensures reproducibility.</p></div>
+    <div class="tooltip-section"><span class="label thr">Parameters</span>
+      <ul>
+        <li>Primary: 80/20 stratified split (1,930 / 483)</li>
+        <li>Alternative (calibration): ~70/30 (1,689 / 724)</li>
+        <li>Nested CV: 2-outer × 5-inner folds, RandomizedSearchCV with 50 iterations per model</li>
+      </ul>
+    </div>
+    <div class="tooltip-section"><span class="label ref">Reference</span><p>Kohavi, R. (1995). "A Study of Cross-Validation and Bootstrap for Accuracy Estimation." IJCAI.<br>random_state=42, n_models=16, generated 2026-04-27T08:50:04 UTC.</p></div>
+  </div>
+</div>
+
+<div class="connector"><div class="connector-line"></div></div>
+
+<!-- ═══ STEP 16: BIOMARKER CORRELATION ═══ -->
+<div class="step-card accent-gold tooltip-trigger" style="animation-delay:.9s">
+  <span class="step-num">STEP 16</span>
+  <h3><span class="icon">📈</span> Biomarker Correlation — Top SHAP Features</h3>
+  <p class="desc">Global SHAP analysis identified top predictors. Hormonal and demographic variables dominate; pathology features had near-zero contribution in preoperative model.</p>
+  <div class="mini-bars">
+    <div class="mini-bar-item"><span style="min-width:90px">LH</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:100%;background:linear-gradient(90deg,var(--teal),var(--purple))"></div></div><span>0.317</span></div>
+    <div class="mini-bar-item"><span style="min-width:90px">Partner Age</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:95%;background:linear-gradient(90deg,var(--teal),var(--purple))"></div></div><span>0.301</span></div>
+    <div class="mini-bar-item"><span style="min-width:90px">Age</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:85%;background:linear-gradient(90deg,var(--teal),var(--purple))"></div></div><span>0.270</span></div>
+    <div class="mini-bar-item"><span style="min-width:90px">FSH</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:79%;background:linear-gradient(90deg,var(--teal),var(--purple))"></div></div><span>0.250</span></div>
+    <div class="mini-bar-item"><span style="min-width:90px">Testosterone</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:67%;background:linear-gradient(90deg,var(--teal),var(--purple))"></div></div><span>0.212</span></div>
+    <div class="mini-bar-item"><span style="min-width:90px">Body Weight</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:55%;background:linear-gradient(90deg,var(--green),var(--teal))"></div></div><span>0.174</span></div>
+    <div class="mini-bar-item"><span style="min-width:90px">Sakamoto-LT</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:54%;background:linear-gradient(90deg,var(--green),var(--teal))"></div></div><span>0.171</span></div>
+    <div class="mini-bar-item"><span style="min-width:90px">BMI</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:53%;background:linear-gradient(90deg,var(--green),var(--teal))"></div></div><span>0.169</span></div>
+  </div>
+  <div class="tooltip-card">
+    <h4>📈 Top SHAP Feature Importance</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>SHAP (SHapley Additive exPlanations) provides theoretically grounded, consistent feature attribution. Global mean |SHAP| values identify which biomarkers most influence the model's predictions across the entire cohort, enabling clinical interpretation and biomarker discovery.</p></div>
+    <div class="tooltip-section"><span class="label det">Details — Top 10 Features</span>
+      <ul>
+        <li>1. LH (0.317) — strongest predictor</li>
+        <li>2. Partner_Age (0.301)</li>
+        <li>3. Age (0.270)</li>
+        <li>4. FSH (0.250)</li>
+        <li>5. Testosterone (0.212)</li>
+        <li>6. Body Weight (0.174)</li>
+        <li>7. Sakamoto-LT (0.171)</li>
+        <li>8. BMI (0.169)</li>
+        <li>9. Height (0.166)</li>
+        <li>10. RT-XYZ Sono (0.156)</li>
+      </ul>
+    </div>
+    <div class="tooltip-section"><span class="label ref">Reference</span><p>Lundberg, S. & Lee, S.-I. (2017). "A Unified Approach to Interpreting Model Predictions." NeurIPS.<br>Pathology_RT and Pathology_LT had mean |SHAP| = 0.0 in corrected preoperative model.</p></div>
+  </div>
+</div>
+
+<div class="connector"><div class="connector-line"></div></div>
+
+<!-- ═══ STEP 17: BEFORE/AFTER TABLE ═══ -->
+<div class="step-card accent-gold tooltip-trigger" style="animation-delay:.95s">
+  <span class="step-num">STEP 17</span>
+  <h3><span class="icon">📊</span> Before / After Summary — 55 → 73 Columns</h3>
+  <p class="desc">Comprehensive comparison of the dataset at pipeline entry vs. exit.</p>
+  <table class="ba-table">
+    <thead>
+      <tr><th>Metric</th><th>Before (Raw)</th><th>After (Preprocessed)</th><th>Change</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Patients</td><td>2,450</td><td>2,413</td><td class="dim">−37 (missing Outcome1)</td></tr>
+      <tr><td>Columns</td><td>55</td><td class="highlight">73</td><td class="highlight">+18 engineered features</td></tr>
+      <tr><td>100% Missing Cols</td><td>9</td><td class="highlight">0</td><td class="highlight">−9 dropped</td></tr>
+      <tr><td>Features (Paper 1)</td><td>55</td><td class="highlight">51</td><td>Selected via 3-stage UNION</td></tr>
+      <tr><td>Features (Paper B)</td><td>55</td><td class="highlight">36</td><td>Further pruned</td></tr>
+      <tr><td>Missing Data Strategy</td><td>Unhandled</td><td class="highlight">Missingness indicators + kNN</td><td>Dual-strategy</td></tr>
+      <tr><td>NLP Features</td><td>2 free-text cols</td><td class="highlight">22 structured features</td><td class="highlight">+20 from pathology parsing</td></tr>
+      <tr><td>Class Balance</td><td>1.72:1</td><td class="highlight">SMOTE-balanced (train)</td><td>Train-only resampling</td></tr>
+      <tr><td>Scaling</td><td>Raw scales</td><td class="highlight">Z-score / RobustScaler</td><td>Fit on train only</td></tr>
+      <tr><td>Train / Test</td><td>—</td><td class="highlight">1,930 / 483</td><td>Stratified 80/20, seed=42</td></tr>
+      <tr><td>Evaluation Metrics</td><td>—</td><td>AUC, Accuracy, Sensitivity, Specificity, PPV, NPV, F1, Brier, MCC</td><td>9 metrics tracked</td></tr>
+      <tr><td>CV Strategy</td><td>—</td><td>2-outer × 5-inner nested CV</td><td>RandomizedSearchCV, 50 iter, 16 models</td></tr>
+    </tbody>
+  </table>
+  <div class="tooltip-card tooltip-above">
+    <h4>📊 Pipeline Summary</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>A before/after comparison provides a transparent audit trail of every transformation applied to the data. This is essential for reproducibility and peer review of the preprocessing methodology.</p></div>
+    <div class="tooltip-section"><span class="label det">Key Transformations</span>
+      <ul>
+        <li>9 zero-information columns removed</li>
+        <li>18 domain-engineered features added (16 pathology + 2 cohort)</li>
+        <li>22 structured features extracted from 2 free-text pathology columns</li>
+        <li>Dual missing-data strategies: missingness indicators (Paper 1) + kNN (Paper B)</li>
+        <li>All preprocessing fit on training data only — no leakage</li>
+        <li>SMOTE applied inside CV folds only</li>
+      </ul>
+    </div>
+    <div class="tooltip-section"><span class="label ref">Reference</span><p>Jamalirad et al. (2026). Paper1_revised.md &amp; PaperB_revised.md. NOA ML Architecture Phase 1 Documentation.</p></div>
+  </div>
+</div>
+
+</div><!-- end pipeline -->
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>NOA microTESE ML Pipeline — Data Cleaning &amp; Preprocessing Methodology</p>
+  <p>Hossein Jamalirad &bull; PhD Candidate, Medical Informatics, MUMS &bull; Royan Institute Cohort</p>
+  <p style="margin-top:8px;font-size:.65rem;color:var(--card-border)">Evaluation: AUC · Accuracy · Sensitivity · Specificity · PPV · NPV · F1 · Brier Score · MCC &nbsp;|&nbsp; 16 Models · Nested 2×5 CV · RandomizedSearchCV</p>
+</div>
+
+<script>
+// Staggered fade-in animation (safe: cards default visible, animation is additive)
+document.addEventListener('DOMContentLoaded', function() {
+  const cards = document.querySelectorAll('.step-card');
+
+  // Only hide cards initially if IntersectionObserver is supported
+  if ('IntersectionObserver' in window) {
+    cards.forEach(card => card.classList.add('animate-hidden'));
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Stagger the reveal with a small delay based on index
+          const idx = Array.from(cards).indexOf(entry.target);
+          setTimeout(() => {
+            entry.target.classList.remove('animate-hidden');
+            entry.target.classList.add('animate-visible');
+          }, idx * 80 + 100);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05, rootMargin: '0px 0px 50px 0px' });
+
+    cards.forEach(card => observer.observe(card));
+
+    // SAFETY FALLBACK: force all cards visible after 3 seconds no matter what
+    setTimeout(() => {
+      cards.forEach(card => {
+        card.classList.remove('animate-hidden');
+        card.classList.add('animate-visible');
+      });
+    }, 3000);
+  }
+
+  // Tooltip repositioning to stay on-screen
+  document.querySelectorAll('.tooltip-trigger').forEach(trigger => {
+    trigger.addEventListener('mouseenter', function() {
+      const tooltip = this.querySelector('.tooltip-card');
+      if (!tooltip) return;
+      tooltip.style.opacity = '0';
+      tooltip.style.visibility = 'visible';
+      const rect = tooltip.getBoundingClientRect();
+      // Horizontal: keep within viewport
+      if (rect.right > window.innerWidth - 10) {
+        const overflow = rect.right - window.innerWidth + 20;
+        tooltip.style.marginLeft = (parseInt(getComputedStyle(tooltip).marginLeft) - overflow) + 'px';
+      }
+      if (rect.left < 10) {
+        tooltip.style.marginLeft = '10px';
+        tooltip.style.left = '0';
+      }
+      // Vertical: if off bottom, show above
+      if (rect.bottom > window.innerHeight - 10) {
+        tooltip.style.top = 'auto';
+        tooltip.style.bottom = 'calc(100% + 12px)';
+      }
+      tooltip.style.opacity = '';
+      tooltip.style.visibility = '';
+    });
+    trigger.addEventListener('mouseleave', function() {
+      const tooltip = this.querySelector('.tooltip-card');
+      if (!tooltip) return;
+      // Reset for next hover
+      tooltip.style.top = '';
+      tooltip.style.bottom = '';
+      tooltip.style.marginLeft = '';
+      tooltip.style.left = '';
+    });
+  });
+});
+</script>
+</body>
+</html>

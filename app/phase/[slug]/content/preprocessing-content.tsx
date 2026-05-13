@@ -10,6 +10,7 @@ import {
   AlertCircle,
   ListChecks,
   Hospital,
+  ExternalLink,
 } from 'lucide-react'
 import {
   ResponsiveContainer,
@@ -104,6 +105,23 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
         <p className="font-medium">Feature governance note</p>
         <p className="mt-1 text-xs text-muted-foreground">{PARTNER_AGE_NOTE}</p>
       </div>
+
+      <a
+        href="/flowchart.html"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group flex items-center justify-between rounded-lg border border-teal-500/30 bg-gradient-to-r from-teal-950/40 to-cyan-950/30 p-4 shadow-sm hover:border-teal-400/60 hover:shadow-md transition-all"
+      >
+        <div>
+          <p className="font-display font-semibold text-base text-teal-300 group-hover:text-teal-200 transition-colors">
+            Interactive Preprocessing Flowchart
+          </p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Full 17-step pipeline with hover tooltips — rationale, thresholds &amp; references for every decision
+          </p>
+        </div>
+        <ExternalLink className="h-5 w-5 text-teal-400 group-hover:text-teal-300 flex-shrink-0 ml-3" />
+      </a>
 
       <div className="grid lg:grid-cols-2 gap-5">
         <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
