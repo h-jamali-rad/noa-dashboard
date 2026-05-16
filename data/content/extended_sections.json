@@ -205,7 +205,7 @@
         "models_used": "16 tested; 5 finalized (v2 pathology-integrated pipeline)",
         "best_auc": "0.8306 (CatBoost; 95% CI 0.823\u20130.845)",
         "key_limitations": "No external multi-center validation yet",
-        "how_this_study_addresses": "Largest NOA ML-focused cohort (n=2,413), 45-feature dataset with 18 pathology features, and a verified 5-agent architecture."
+        "how_this_study_addresses": "Largest NOA ML-focused cohort (n=2,413), 73-feature dataset (55 + 18 engineered) with 22 histopathology features, and a verified 5-agent architecture."
       }
     ],
     "highlighted_points": [

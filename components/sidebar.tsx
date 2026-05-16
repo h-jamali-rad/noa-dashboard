@@ -47,7 +47,7 @@ const MAIN_NAV: NavItem[] = [
 ]
 
 const PHASE_NAV: NavItem[] = [
-  { href: '/phase/preprocessing', label: 'Agent 1 — Preprocessing', icon: Database, description: '2,413 patients • 45 features • 18 pathology features' },
+  { href: '/phase/preprocessing', label: 'Agent 1 — Preprocessing', icon: Database, description: '2,413 patients • 73 features (55+18) • 22 histopathology' },
   { href: '/phase/training', label: 'Agent 2 — Training', icon: Cpu, description: '16 models tested → 5 finalized • best CatBoost AUC 0.8306' },
   { href: '/phase/validation', label: 'Agent 3 — Validation', icon: ShieldCheck, description: 'Calibration + DCA + corrected benchmark' },
   { href: '/phase/xai', label: 'Agent 4 — Explainable AI', icon: BrainCircuit, description: 'SHAP + feature-importance synthesis' },

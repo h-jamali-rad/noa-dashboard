@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'NOA microTESE Research Dashboard',
     description:
-      'PhD ML pipeline portfolio: 2,413 patients, 45 features (including 18 pathology features), and CatBoost best AUC 0.8306.',
+      'PhD ML pipeline portfolio: 2,413 patients, 55 original columns → 73 features after engineering (+18 pathology), CatBoost v2 AUC 0.8306.',
     images: ['/og-image.png'],
     type: 'website',
   },

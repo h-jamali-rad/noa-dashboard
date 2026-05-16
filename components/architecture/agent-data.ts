@@ -65,7 +65,7 @@ export const AGENTS: AgentNode[] = [
     designReason:
       'Specialized to convert clinical and pathology feature insights into robust model performance under leakage-safe validation.',
     color: '#0ea5e9',
-    inputs: ['Engineered dataset (2,413 patients, 45 features)', 'Pathology feature block (18 features)', 'Training/validation protocol'],
+    inputs: ['Engineered dataset (2,413 patients, 73 features)', 'Pathology feature block (18 features)', 'Training/validation protocol'],
     outputs: ['Final 5-model comparison', 'Best model: CatBoost (AUC 0.8306, 95% CI 0.823–0.845)', 'Optimization notes'],
     connections: ['orchestrator', 'researcher', 'verifier', 'dashboard-builder'],
     pipelineRole: 'Model optimization core that translates data engineering into validated predictive performance.',

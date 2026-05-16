@@ -23,7 +23,7 @@ export default function XaiPage() {
       <h1 className="font-display font-bold text-3xl tracking-tight">Explainable AI (XAI) — v2 Pathology-Integrated Summary</h1>
 
       <div className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">
-        Authoritative dataset summary: 2,413 patients, 45 total features, and 18 pathology features extracted bilaterally (RT_/LT_).
+        Authoritative dataset summary: 2,413 patients · 55 original columns → 73 features after engineering · 22 histopathology features in modeling matrix.
       </div>
 
       <div className="rounded-lg border bg-card p-5">
