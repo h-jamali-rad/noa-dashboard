@@ -38,7 +38,7 @@ const TABLE_TIPS = {
 }
 
 const PARTNER_AGE_NOTE =
-  'Authoritative dataset lock: 2,413 patients, 45 total features, and 18 bilateral pathology features.'
+  'Authoritative dataset lock: 2,413 patients · 55 original columns → 73 after engineering (+18) → 51 after feature selection (Paper 1) · 22 histopathology features in modeling matrix.'
 
 import { useState } from 'react'
 
@@ -102,8 +102,8 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard label="Patient Cohort" value={(info?.patient_count ?? 2413).toLocaleString()} hint={info?.site} icon={Users} accent={accent} />
-        <StatCard label="Feature Set" value={`${info?.n_columns_after_engineering ?? 45}`} hint="37 numeric • 8 categorical" icon={Layers} accent={accent} />
-        <StatCard label="Pathology Features" value={`${info?.pathology_feature_count ?? 18}`} hint="Bilateral RT_/LT_ extraction" icon={Hospital} accent={accent} />
+        <StatCard label="Feature Set" value={`${info?.n_columns_after_engineering ?? 73}`} hint="55 original + 18 engineered" icon={Layers} accent={accent} />
+        <StatCard label="Pathology Features" value={`${info?.pathology_feature_count ?? 22}`} hint="16 bilateral + 6 aggregated (RT_/LT_)" icon={Hospital} accent={accent} />
         <StatCard label="Success Rate" value={info?.overall_success_rate_text ?? '36.7%'} hint={info?.class_imbalance_ratio ?? '886 success / 1,527 failure'} icon={PieIcon} accent={accent} />
       </div>
 

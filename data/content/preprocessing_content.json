@@ -5,8 +5,8 @@
       "cohort_size_analytical": 2413,
       "training_set_size": 1930,
       "test_set_size": 483,
-      "n_columns_original": 45,
-      "n_columns_after_engineering": 45,
+      "n_columns_original": 55,
+      "n_columns_after_engineering": 73,
       "pathology_feature_count": 18,
       "site": "Royan Institute Andrology Clinic, MUMS",
       "overall_success_rate_text": "36.7%",
@@ -26,7 +26,7 @@
       {
         "step": 3,
         "name": "Feature-space alignment",
-        "details": "Final feature matrix aligned to 45 features (37 numeric + 8 categorical)."
+        "details": "Original 55 columns expanded to 73 features after engineering (55 + 18 engineered: 16 pathology + is_Primary + Salvage_Count). After feature selection (Paper 1): 51 features."
       },
       {
         "step": 4,
@@ -36,7 +36,7 @@
       {
         "step": 5,
         "name": "Imputation & scaling",
-        "details": "kNN imputation with missingness indicators and Z-score standardization on continuous variables."
+        "details": "kNN imputation (k=5) fitted on training folds only, with missingness indicators. RobustScaler applied to continuous variables (robust to outliers in hormonal data)."
       },
       {
         "step": 6,
@@ -86,8 +86,8 @@
         "method": "Missing values imputed with kNN while preserving missingness signals."
       },
       {
-        "name": "Standardization",
-        "method": "Z-score standardization on continuous predictors."
+        "name": "RobustScaler",
+        "method": "RobustScaler (median/IQR-based) applied to continuous predictors. Selected via hyperparameter tuning inside nested CV. Robust to extreme outliers in hormonal and testicular volume measurements."
       },
       {
         "name": "Class imbalance handling",

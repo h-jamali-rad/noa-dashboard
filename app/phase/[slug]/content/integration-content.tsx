@@ -9,7 +9,7 @@ export default function IntegrationContent({ accent }: { accent: string }) {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard label="Final Deliverable" value="PhD Dissertation" hint="Complete HTML file" icon={GraduationCap} accent={accent} />
         <StatCard label="Dataset" value="2,413 patients" hint="NOA analytical cohort" icon={ImageIcon} accent={accent} />
-        <StatCard label="Feature Set" value="45 total" hint="37 numeric • 8 categorical" icon={Layers} accent={accent} />
+        <StatCard label="Feature Set" value="73 total" hint="55 original + 18 engineered" icon={Layers} accent={accent} />
         <StatCard label="Pathology Features" value="18" hint="RT/LT bilateral extraction" icon={FileText} accent={accent} />
       </div>
 
@@ -40,7 +40,7 @@ export default function IntegrationContent({ accent }: { accent: string }) {
             '→',
             '2,413 patients',
             '→',
-            '45 total features',
+            '73 features (55 + 18 engineered)',
             '→',
             '18 pathology features',
             '→',

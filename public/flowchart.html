@@ -585,10 +585,10 @@ Your browser does not support the audio element.
 <!-- ═══ STEP 12: STANDARDIZATION ═══ -->
 <div class="step-card accent-teal shape-rounded tooltip-trigger" style="animation-delay:.7s">
   <span class="step-num">STEP 12</span>
-  <h3><span class="icon">📐</span> Standardization — Z-Score / RobustScaler</h3>
-  <p class="desc">Continuous features standardized (mean=0, σ=1). <strong>Scaler fit on training set ONLY</strong>, then applied to test set. RobustScaler selected in best LightGBM pipeline.</p>
+  <h3><span class="icon">📐</span> Standardization — RobustScaler</h3>
+  <p class="desc">Continuous features scaled using <strong>RobustScaler</strong> (median/IQR-based). <strong>Fit on training set ONLY</strong>, then applied to test set. Selected via hyperparameter tuning in nested CV.</p>
   <div class="tags">
-    <span class="tag" style="color:var(--teal);border-color:var(--teal)">Z-score (mean=0, σ=1)</span>
+    <span class="tag" style="color:var(--teal);border-color:var(--teal)">RobustScaler (median/IQR)</span>
     <span class="tag" style="color:var(--green);border-color:var(--green)">Train-only fitting</span>
     <span class="tag" style="color:var(--purple);border-color:var(--purple)">RobustScaler (best pipeline)</span>
   </div>
@@ -597,7 +597,7 @@ Your browser does not support the audio element.
     <div class="tooltip-section"><span class="label rat">Rationale</span><p>Different clinical variables have vastly different scales (e.g., Age in years vs. FSH in mIU/mL vs. testicular volume in mL). Without standardization, distance-based methods (kNN, SVM) and gradient-based optimizers are biased toward high-magnitude features. RobustScaler uses median/IQR, making it resistant to the outliers common in hormonal data.</p></div>
     <div class="tooltip-section"><span class="label thr">Parameters</span>
       <ul>
-        <li>Z-score: μ=0, σ=1 for standard pipeline</li>
+        <li>RobustScaler: centering=median, scaling=IQR — robust to outliers</li>
         <li>RobustScaler: centering=median, scaling=IQR (selected by nested CV)</li>
         <li>Scaler choice tuned inside cross-validation loop</li>
       </ul>
@@ -745,7 +745,7 @@ Your browser does not support the audio element.
       <tr><td>Missing Data Strategy</td><td>Unhandled</td><td class="highlight">Missingness indicators + kNN</td><td>Dual-strategy</td></tr>
       <tr><td>NLP Features</td><td>2 free-text cols</td><td class="highlight">22 structured features</td><td class="highlight">+20 from pathology parsing</td></tr>
       <tr><td>Class Balance</td><td>1.72:1</td><td class="highlight">SMOTE-balanced (train)</td><td>Train-only resampling</td></tr>
-      <tr><td>Scaling</td><td>Raw scales</td><td class="highlight">Z-score / RobustScaler</td><td>Fit on train only</td></tr>
+      <tr><td>Scaling</td><td>Raw scales</td><td class="highlight">RobustScaler</td><td>Fit on train only</td></tr>
       <tr><td>Train / Test</td><td>—</td><td class="highlight">1,930 / 483</td><td>Stratified 80/20, seed=42</td></tr>
       <tr><td>Evaluation Metrics</td><td>—</td><td>AUC, Accuracy, Sensitivity, Specificity, PPV, NPV, F1, Brier, MCC</td><td>9 metrics tracked</td></tr>
       <tr><td>CV Strategy</td><td>—</td><td>2-outer × 5-inner nested CV</td><td>RandomizedSearchCV, 50 iter, 16 models</td></tr>
