@@ -11,6 +11,9 @@ import {
   ListChecks,
   Hospital,
   ExternalLink,
+  FileImage,
+  Download,
+  ZoomIn,
 } from 'lucide-react'
 import {
   ResponsiveContainer,
@@ -37,7 +40,10 @@ const TABLE_TIPS = {
 const PARTNER_AGE_NOTE =
   'Authoritative dataset lock: 2,413 patients, 45 total features, and 18 bilateral pathology features.'
 
+import { useState } from 'react'
+
 export default function PreprocessingContent({ data, accent }: { data: any; accent: string }) {
+  const [flowchartZoom, setFlowchartZoom] = useState(false)
   const info = data?.dataset_info ?? {}
   const cleaning = data?.cleaning_steps ?? []
   const featureEng = data?.feature_engineering ?? {}
@@ -263,6 +269,78 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
               <p className="text-[11px] uppercase font-mono text-muted-foreground">Salvage success</p>
               <p className="font-display font-bold text-xl">{outcome.segmentation_primary_vs_salvage_with_outcome?.salvage_success_pct}%</p>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Publication-Quality Pipeline Flowchart ── */}
+      <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <FileImage className="h-4 w-4 text-primary" />
+            <h3 className="font-display font-semibold text-base">Publication-Quality Pipeline Flowchart</h3>
+          </div>
+          <div className="flex items-center gap-2">
+            <a
+              href="/flowchart_article.pdf"
+              download="NOA_Pipeline_Flowchart.pdf"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
+            >
+              <Download className="h-3 w-3" /> PDF
+            </a>
+            <a
+              href="/flowchart_article.svg"
+              download="NOA_Pipeline_Flowchart.svg"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
+            >
+              <Download className="h-3 w-3" /> SVG
+            </a>
+            <a
+              href="/flowchart_article.png"
+              download="NOA_Pipeline_Flowchart.png"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
+            >
+              <Download className="h-3 w-3" /> PNG
+            </a>
+          </div>
+        </div>
+        <p className="text-xs text-muted-foreground mb-4">
+          Complete 16-step data cleaning &amp; preprocessing pipeline — print-ready for journal submission (300 DPI).
+          Click to enlarge.
+        </p>
+        <div
+          className="relative cursor-pointer group rounded-lg overflow-hidden border border-border bg-white"
+          onClick={() => setFlowchartZoom(true)}
+        >
+          <img
+            src="/flowchart_article.png"
+            alt="NOA Micro-TESE ML Pipeline — Data Cleaning & Preprocessing Flowchart (Publication Quality)"
+            className="w-full h-auto"
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+            <ZoomIn className="h-8 w-8 text-white opacity-0 group-hover:opacity-80 transition-opacity drop-shadow-lg" />
+          </div>
+        </div>
+      </div>
+
+      {/* Lightbox */}
+      {flowchartZoom && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 cursor-pointer"
+          onClick={() => setFlowchartZoom(false)}
+        >
+          <div className="relative max-w-3xl max-h-[90vh] overflow-auto rounded-lg shadow-2xl">
+            <img
+              src="/flowchart_article.png"
+              alt="NOA Pipeline Flowchart — Full Resolution"
+              className="w-full h-auto bg-white rounded-lg"
+            />
+            <button
+              className="absolute top-3 right-3 rounded-full bg-black/60 text-white px-3 py-1 text-sm hover:bg-black/80 transition-colors"
+              onClick={(e) => { e.stopPropagation(); setFlowchartZoom(false); }}
+            >
+              ✕ Close
+            </button>
           </div>
         </div>
       )}
