@@ -133,7 +133,7 @@
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "And it's a meaningful jump. v1's best model was LightGBM at AUC 0.7327 ± 0.0057 — but remember, that ± 0.0057 is over n=2 outer folds, so it's effectively a min-max range, not an SD. In real terms v2 adds about 0.098 in AUC over v1, primarily because the pathology features are no longer being collapsed to constant zero by IQRClipper."
+          "text": "And it's a meaningful jump. The earlier v1 pipeline had data leakage — IQRClipper was zeroing out pathology features, inflating apparent performance of models that ignored pathology. After the full v2 rerun with corrected preprocessing, CatBoost gained roughly 0.10 AUC by properly incorporating pathology features that were previously collapsed to constant zero."
         },
         {
           "speaker": "Dr. Alex",

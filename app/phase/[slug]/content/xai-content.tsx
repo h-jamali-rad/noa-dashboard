@@ -2,6 +2,7 @@
 
 import { StatCard } from '@/components/stat-card'
 import { BrainCircuit, Layers, Target, Sparkles } from 'lucide-react'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 const PARTNER_AGE_NOTE =
   'Final v2 explainability focuses on pathology-aware signals, with 18 bilateral pathology features integrated into interpretation.'
@@ -14,10 +15,18 @@ export default function XaiContent({ data, accent }: { data: any; accent: string
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="XAI Method" value="SHAP" hint={data?.method ?? 'TreeExplainer'} icon={BrainCircuit} accent={accent} />
-        <StatCard label="Best Model" value="CatBoost" hint="AUC 0.8306 (v2)" icon={Target} accent={accent} />
-        <StatCard label="Pathology Features" value="18" hint="Bilateral RT_/LT_ extraction" icon={Sparkles} accent={accent} />
-        <StatCard label="Top Predictors" value={String(top5.length)} hint="Pathology-dominant ranking" icon={Layers} accent={accent} />
+        <AIAssistWrapper id="xai-stat-method">
+          <StatCard label="XAI Method" value="SHAP" hint={data?.method ?? 'TreeExplainer'} icon={BrainCircuit} accent={accent} />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="xai-stat-best-model">
+          <StatCard label="Best Model" value="CatBoost" hint="AUC 0.8306 (v2)" icon={Target} accent={accent} />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="xai-stat-pathology">
+          <StatCard label="Pathology Features" value="18" hint="Bilateral RT_/LT_ extraction" icon={Sparkles} accent={accent} />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="xai-stat-top-predictors">
+          <StatCard label="Top Predictors" value={String(top5.length)} hint="Pathology-dominant ranking" icon={Layers} accent={accent} />
+        </AIAssistWrapper>
       </div>
 
       <div className="rounded-lg border border-amber-300/50 bg-amber-50/40 p-4 text-sm text-foreground/90">
@@ -25,6 +34,7 @@ export default function XaiContent({ data, accent }: { data: any; accent: string
         <p className="mt-1 text-xs text-muted-foreground">{PARTNER_AGE_NOTE}</p>
       </div>
 
+      <AIAssistWrapper id="xai-top5-features">
       <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
         <h3 className="font-display font-semibold text-base mb-3">Top-5 SHAP features</h3>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 text-sm">
@@ -33,8 +43,10 @@ export default function XaiContent({ data, accent }: { data: any; accent: string
           ))}
         </div>
       </div>
+      </AIAssistWrapper>
 
       <div className="grid lg:grid-cols-2 gap-5">
+        <AIAssistWrapper id="xai-shap-top10">
         <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
           <h3 className="font-display font-semibold text-base mb-3">Global SHAP top-10</h3>
           <ul className="space-y-1.5 text-sm">
@@ -43,7 +55,9 @@ export default function XaiContent({ data, accent }: { data: any; accent: string
             ))}
           </ul>
         </div>
+        </AIAssistWrapper>
 
+        <AIAssistWrapper id="xai-catboost-fi-top10">
         <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
           <h3 className="font-display font-semibold text-base mb-3">CatBoost feature-importance top-10</h3>
           <ul className="space-y-1.5 text-sm">
@@ -52,6 +66,7 @@ export default function XaiContent({ data, accent }: { data: any; accent: string
             ))}
           </ul>
         </div>
+        </AIAssistWrapper>
       </div>
     </div>
   )

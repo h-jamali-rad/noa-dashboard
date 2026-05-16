@@ -1,4 +1,5 @@
 import BreadcrumbNav from '@/components/breadcrumb-nav'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 const TOP_MODELS = [
   { model: 'CatBoost', auc: '0.8306', ci: '0.823–0.845', accuracy: '0.770', sensitivity: '0.678', specificity: '0.823', f1: '0.684' },
@@ -26,6 +27,7 @@ export default function XaiPage() {
         Authoritative dataset summary: 2,413 patients · 55 original columns → 73 features after engineering · 22 histopathology features in modeling matrix.
       </div>
 
+      <AIAssistWrapper id="xai-v2-model-comparison">
       <div className="rounded-lg border bg-card p-5">
         <h2 className="font-semibold text-lg mb-3">Final v2 model comparison (5 finalized models)</h2>
         <div className="overflow-x-auto">
@@ -57,7 +59,9 @@ export default function XaiPage() {
           </table>
         </div>
       </div>
+      </AIAssistWrapper>
 
+      <AIAssistWrapper id="xai-best-model-summary">
       <div className="rounded-lg border bg-card p-5 space-y-2 text-sm text-muted-foreground">
         <p>
           <strong className="text-foreground">Best model:</strong> CatBoost with AUC 0.8306 (95% CI 0.823–0.845).
@@ -69,7 +73,9 @@ export default function XaiPage() {
           <strong className="text-foreground">Pathology signal:</strong> 18 pathology features were extracted from free-text reports and treated as a significant component of the final pipeline.
         </p>
       </div>
+      </AIAssistWrapper>
 
+      <AIAssistWrapper id="xai-pathology-feature-groups">
       <div className="rounded-lg border bg-card p-5">
         <h2 className="font-semibold text-lg mb-3">Pathology feature groups used in v2</h2>
         <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
@@ -78,6 +84,7 @@ export default function XaiPage() {
           ))}
         </ul>
       </div>
+      </AIAssistWrapper>
     </div>
   )
 }

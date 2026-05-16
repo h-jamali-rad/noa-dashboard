@@ -1,6 +1,7 @@
 import BreadcrumbNav from '@/components/breadcrumb-nav'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import CdssForm from './cdss-form'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 export default function CdssPage() {
   return (
@@ -8,16 +9,21 @@ export default function CdssPage() {
       <BreadcrumbNav items={[{ label: 'CDSS' }]} />
       <h1 className="font-display font-bold text-3xl tracking-tight">Clinical Decision Support System (CDSS)</h1>
 
+      <AIAssistWrapper id="cdss-intro-video">
       <div className="rounded-lg border bg-card p-4">
         <video controls className="w-full rounded-md" src="/videos/cdss_intro.mp4" />
       </div>
+      </AIAssistWrapper>
 
+      <AIAssistWrapper id="cdss-form">
       <div className="rounded-lg border bg-card p-5">
         <CdssForm />
       </div>
+      </AIAssistWrapper>
 
       <div className="rounded-lg border bg-card p-5">
         <Accordion type="single" collapsible className="w-full">
+          <AIAssistWrapper id="cdss-pathology-explanation">
           <AccordionItem value="pathology-explanation" className="border rounded-lg px-4">
             <AccordionTrigger className="text-left hover:no-underline">
               <span className="font-semibold">Pathology explanation in CDSS</span>
@@ -54,7 +60,9 @@ export default function CdssPage() {
               </div>
             </AccordionContent>
           </AccordionItem>
+          </AIAssistWrapper>
 
+          <AIAssistWrapper id="cdss-pathology-faq">
           <AccordionItem value="pathology-faq" className="border rounded-lg px-4 mt-3">
             <AccordionTrigger className="text-left hover:no-underline">
               <span className="font-semibold">FAQ for universities and treatment centers</span>
@@ -72,6 +80,7 @@ export default function CdssPage() {
               </div>
             </AccordionContent>
           </AccordionItem>
+          </AIAssistWrapper>
         </Accordion>
       </div>
     </div>

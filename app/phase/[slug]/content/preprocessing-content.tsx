@@ -41,6 +41,7 @@ const PARTNER_AGE_NOTE =
   'Authoritative dataset lock: 2,413 patients · 55 original columns → 73 after engineering (+18) → 51 after feature selection (Paper 1) · 22 histopathology features in modeling matrix.'
 
 import { useState } from 'react'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 export default function PreprocessingContent({ data, accent }: { data: any; accent: string }) {
   const [flowchartZoom, setFlowchartZoom] = useState(false)
@@ -101,35 +102,48 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="Patient Cohort" value={(info?.patient_count ?? 2413).toLocaleString()} hint={info?.site} icon={Users} accent={accent} />
-        <StatCard label="Feature Set" value={`${info?.n_columns_after_engineering ?? 73}`} hint="55 original + 18 engineered" icon={Layers} accent={accent} />
-        <StatCard label="Pathology Features" value={`${info?.pathology_feature_count ?? 22}`} hint="16 bilateral + 6 aggregated (RT_/LT_)" icon={Hospital} accent={accent} />
-        <StatCard label="Success Rate" value={info?.overall_success_rate_text ?? '36.7%'} hint={info?.class_imbalance_ratio ?? '886 success / 1,527 failure'} icon={PieIcon} accent={accent} />
+        <AIAssistWrapper id="prep-stat-card-cohort">
+          <StatCard label="Patient Cohort" value={(info?.patient_count ?? 2413).toLocaleString()} hint={info?.site} icon={Users} accent={accent} />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="prep-stat-card-features">
+          <StatCard label="Feature Set" value={`${info?.n_columns_after_engineering ?? 73}`} hint="55 original + 18 engineered" icon={Layers} accent={accent} />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="prep-stat-card-pathology">
+          <StatCard label="Pathology Features" value={`${info?.pathology_feature_count ?? 22}`} hint="16 bilateral + 6 aggregated (RT_/LT_)" icon={Hospital} accent={accent} />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="prep-stat-card-success">
+          <StatCard label="Success Rate" value={info?.overall_success_rate_text ?? '36.7%'} hint={info?.class_imbalance_ratio ?? '886 success / 1,527 failure'} icon={PieIcon} accent={accent} />
+        </AIAssistWrapper>
       </div>
 
-      <div className="rounded-lg border border-amber-300/50 bg-amber-50/40 p-4 text-sm text-foreground/90">
-        <p className="font-medium">Feature governance note</p>
-        <p className="mt-1 text-xs text-muted-foreground">{PARTNER_AGE_NOTE}</p>
-      </div>
-
-      <a
-        href="/flowchart.html"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="group flex items-center justify-between rounded-lg border border-teal-500/30 bg-gradient-to-r from-teal-950/40 to-cyan-950/30 p-4 shadow-sm hover:border-teal-400/60 hover:shadow-md transition-all"
-      >
-        <div>
-          <p className="font-display font-semibold text-base text-teal-300 group-hover:text-teal-200 transition-colors">
-            Interactive Preprocessing Flowchart
-          </p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Full 17-step pipeline with hover tooltips — rationale, thresholds &amp; references for every decision
-          </p>
+      <AIAssistWrapper id="prep-governance-note">
+        <div className="rounded-lg border border-amber-300/50 bg-amber-50/40 p-4 text-sm text-foreground/90">
+          <p className="font-medium">Feature governance note</p>
+          <p className="mt-1 text-xs text-muted-foreground">{PARTNER_AGE_NOTE}</p>
         </div>
-        <ExternalLink className="h-5 w-5 text-teal-400 group-hover:text-teal-300 flex-shrink-0 ml-3" />
-      </a>
+      </AIAssistWrapper>
+
+      <AIAssistWrapper id="prep-flowchart-link">
+        <a
+          href="/flowchart.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex items-center justify-between rounded-lg border border-teal-500/30 bg-gradient-to-r from-teal-950/40 to-cyan-950/30 p-4 shadow-sm hover:border-teal-400/60 hover:shadow-md transition-all"
+        >
+          <div>
+            <p className="font-display font-semibold text-base text-teal-300 group-hover:text-teal-200 transition-colors">
+              Interactive Preprocessing Flowchart
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Full 17-step pipeline with hover tooltips — rationale, thresholds &amp; references for every decision
+            </p>
+          </div>
+          <ExternalLink className="h-5 w-5 text-teal-400 group-hover:text-teal-300 flex-shrink-0 ml-3" />
+        </a>
+      </AIAssistWrapper>
 
       <div className="grid lg:grid-cols-2 gap-5">
+        <AIAssistWrapper id="prep-outcome-pie">
         <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
           <h3 className="font-display font-semibold text-base mb-1">Outcome distribution</h3>
           <p className="text-xs text-muted-foreground mb-3">Successful sperm retrieval (Outcome1) on the 2,413-patient analytical cohort.</p>
@@ -146,7 +160,9 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
             </ResponsiveContainer>
           </div>
         </div>
+        </AIAssistWrapper>
 
+        <AIAssistWrapper id="prep-pathology-shap">
         <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
           <h3 className="font-display font-semibold text-base mb-1">Pathology feature importance (SHAP)</h3>
           <p className="text-xs text-muted-foreground mb-3">Mean |SHAP| values for pathology features — higher values indicate greater influence on CatBoost v2 predictions.</p>
@@ -163,8 +179,10 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
             </ResponsiveContainer>
           </div>
         </div>
+        </AIAssistWrapper>
       </div>
 
+      <AIAssistWrapper id="prep-missingness-chart">
       <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
         <h3 className="font-display font-semibold text-base mb-1">Per-variable missingness</h3>
         <p className="text-xs text-muted-foreground mb-3">Missingness rate (%) for variables retained after clinical curation and leakage checks.</p>
@@ -179,8 +197,10 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
           </ResponsiveContainer>
         </div>
       </div>
+      </AIAssistWrapper>
 
       <div className="grid lg:grid-cols-2 gap-5">
+        <AIAssistWrapper id="prep-cleaning-steps">
         <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <ListChecks className="h-4 w-4 text-primary" />
@@ -198,7 +218,9 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
             ))}
           </ol>
         </div>
+        </AIAssistWrapper>
 
+        <AIAssistWrapper id="prep-pathology-features-list">
         <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <Microscope className="h-4 w-4 text-primary" />
@@ -213,8 +235,10 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
             ))}
           </div>
         </div>
+        </AIAssistWrapper>
       </div>
 
+      <AIAssistWrapper id="prep-transformations-table">
       <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
         <div className="flex items-center gap-2 mb-3">
           <CheckCircle2 className="h-4 w-4 text-primary" />
@@ -245,8 +269,10 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
           </table>
         </div>
       </div>
+      </AIAssistWrapper>
 
       {outcome?.segmentation_primary_vs_salvage_with_outcome && (
+        <AIAssistWrapper id="prep-primary-vs-salvage">
         <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <AlertCircle className="h-4 w-4" style={{ color: accent }} />
@@ -271,9 +297,11 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
             </div>
           </div>
         </div>
+        </AIAssistWrapper>
       )}
 
       {/* ── Publication-Quality Pipeline Flowchart ── */}
+      <AIAssistWrapper id="prep-pipeline-flowchart">
       <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -322,6 +350,7 @@ export default function PreprocessingContent({ data, accent }: { data: any; acce
           </div>
         </div>
       </div>
+      </AIAssistWrapper>
 
       {/* Lightbox */}
       {flowchartZoom && (

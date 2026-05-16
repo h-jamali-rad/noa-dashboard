@@ -1,0 +1,340 @@
+{
+  "meta": {
+    "version": "1.0",
+    "description": "AI Assist audio scripts for NOA Dashboard hover explanations",
+    "voice": "US English Male",
+    "style": "Educational, conversational, clear"
+  },
+  "pages": {
+    "preprocessing": {
+      "page_id": "preprocessing",
+      "page_title": "Data Cleaning & Preprocessing",
+      "elements": [
+        {
+          "id": "prep-stat-patient-cohort",
+          "selector": "[data-ai-assist='prep-stat-patient-cohort']",
+          "label": "Patient Cohort Stat Card",
+          "script": "This study analyzed 2,413 patients from the Royan Institute, one of the largest fertility centers in the Middle East. All patients had confirmed non-obstructive azoospermia and underwent micro-TESE — a surgical procedure to retrieve sperm directly from testicular tissue. The cohort size of over 2,400 patients is notably large for this field. Most published studies on sperm retrieval prediction use fewer than 500 patients, so this dataset provides significantly more statistical power and generalizability."
+        },
+        {
+          "id": "prep-stat-feature-set",
+          "selector": "[data-ai-assist='prep-stat-feature-set']",
+          "label": "Feature Set Stat Card",
+          "script": "The feature set started with 55 original clinical variables from the Royan Institute database. Through careful feature engineering — particularly the extraction of 18 bilateral pathology features from free-text pathology reports — we expanded this to 73 total features. These 18 engineered pathology features turned out to be among the most important predictors in the final model, which highlights why domain-specific feature engineering is so critical in medical machine learning."
+        },
+        {
+          "id": "prep-stat-pathology-features",
+          "selector": "[data-ai-assist='prep-stat-pathology-features']",
+          "label": "Pathology Features Stat Card",
+          "script": "Twenty-two histopathology features were included in the modeling matrix, with 16 bilateral features — meaning separate values for right testis and left testis — plus 6 aggregated scores. These were extracted from free-text pathology reports using natural language processing techniques. This bilateral extraction approach is novel in sperm retrieval prediction research, as most studies use only a single overall pathology classification rather than detailed left-right tissue analysis."
+        },
+        {
+          "id": "prep-stat-success-rate",
+          "selector": "[data-ai-assist='prep-stat-success-rate']",
+          "label": "Success Rate Stat Card",
+          "script": "The overall sperm retrieval success rate in this cohort was 36.7 percent — that's 886 successful cases out of 2,413 total. This means roughly one in three patients had successful sperm retrieval. This class imbalance — with about twice as many failures as successes — is important for model training and is why we used stratified sampling and appropriate evaluation metrics like AUC rather than simple accuracy."
+        },
+        {
+          "id": "prep-chart-outcome-distribution",
+          "selector": "[data-ai-assist='prep-chart-outcome-distribution']",
+          "label": "Outcome Distribution Pie Chart",
+          "script": "This pie chart shows the binary outcome distribution for our 2,413-patient cohort. The green segment represents 886 patients with successful sperm retrieval, while the red segment shows 1,527 patients where no sperm was found during micro-TESE. This roughly 37 to 63 percent split creates a moderate class imbalance. To handle this, our modeling pipeline used stratified cross-validation to ensure both classes were proportionally represented in every training and test fold."
+        },
+        {
+          "id": "prep-chart-pathology-shap",
+          "selector": "[data-ai-assist='prep-chart-pathology-shap']",
+          "label": "Pathology SHAP Importance Bar Chart",
+          "script": "This bar chart displays the SHAP importance values specifically for the pathology features in our CatBoost v2 model. SHAP — which stands for SHapley Additive exPlanations — measures how much each feature contributes to individual predictions. Notice that right testis severe hypospermatogenesis has the highest SHAP value at 0.396, followed by right testis hypospermatogenesis and left testis severe hypospermatogenesis. This confirms that testicular tissue histology — particularly the severity of spermatogenic failure — is a crucial predictor of sperm retrieval success. The dominance of pathology features here validates our decision to extract bilateral pathology information from the original free-text reports."
+        },
+        {
+          "id": "prep-chart-missingness",
+          "selector": "[data-ai-assist='prep-chart-missingness']",
+          "label": "Per-Variable Missingness Bar Chart",
+          "script": "This horizontal bar chart shows the percentage of missing values for each variable retained after clinical curation. In real-world clinical datasets, missingness is inevitable — some lab tests aren't always ordered, some fields aren't always recorded. Variables with high missingness — like previous TESE outcome at over 21 percent — were handled through KNN imputation, which estimates missing values based on similar patients. Importantly, imputation was fitted only on training folds to prevent data leakage — a critical methodological safeguard."
+        },
+        {
+          "id": "prep-cleaning-steps",
+          "selector": "[data-ai-assist='prep-cleaning-steps']",
+          "label": "Cleaning Steps List",
+          "script": "These are the sequential data cleaning steps applied to the raw clinical dataset. Starting from ingesting the original Excel workbook, we went through column inventory, missingness quantification, duplicate removal, and data type standardization. Each step was carefully documented and is reproducible. A key decision was removing the IQR Clipper from the v2 pipeline — in the original v1 pipeline, the IQR Clipper inadvertently zeroed out pathology features, causing data leakage that inflated model performance artificially."
+        },
+        {
+          "id": "prep-pathology-features-list",
+          "selector": "[data-ai-assist='prep-pathology-features-list']",
+          "label": "18 Pathology Features Grid",
+          "script": "This grid lists all 18 bilateral pathology features engineered from the original free-text pathology reports. They are split into right testis features — prefixed with RT — and left testis features — prefixed with LT. Categories include Sertoli Cell-Only syndrome, hypospermatogenesis at different severity levels, various stages of maturation arrest — from spermatogonial to elongated — and CSTH, which stands for Complete Spermatogenic Tubular Hyalinization. This bilateral extraction was a novel contribution of this research, as previous studies typically used only a single pathology label."
+        },
+        {
+          "id": "prep-transformations-table",
+          "selector": "[data-ai-assist='prep-transformations-table']",
+          "label": "Transformations Table",
+          "script": "This table documents every data transformation applied during preprocessing. Key transformations include RobustScaler for feature scaling — chosen over StandardScaler because it's less sensitive to outliers — ordinal encoding with the detailed-plus-raw strategy for pathology variables, and KNN imputation for missing values. The v2 pipeline specifically removed the IQR Clipper that was present in v1, as it was identified as the source of data leakage during the virtual defense review."
+        },
+        {
+          "id": "prep-flowchart",
+          "selector": "[data-ai-assist='prep-flowchart']",
+          "label": "Publication-Quality Pipeline Flowchart",
+          "script": "This is the publication-quality flowchart showing the complete 16-step data cleaning and preprocessing pipeline. It's designed to be included in journal submissions and provides a visual overview of every decision made from raw data to model-ready features. The flowchart clearly shows the data flow from the original 2,413-patient Royan Institute dataset through cleaning, feature engineering, pathology extraction, and scaling — culminating in the CatBoost v2 model achieving an AUC of 0.8306. You can download this in PDF, SVG, or PNG format for your publications."
+        },
+        {
+          "id": "prep-primary-vs-salvage",
+          "selector": "[data-ai-assist='prep-primary-vs-salvage']",
+          "label": "Primary vs Salvage microTESE",
+          "script": "This section compares outcomes between primary and salvage micro-TESE procedures. Primary micro-TESE refers to the first surgical attempt at sperm retrieval, while salvage procedures are repeat attempts after a previous failed micro-TESE. Comparing these subgroups is clinically important because salvage cases typically have lower success rates due to prior surgical trauma and tissue scarring. Understanding these differences helps clinicians counsel patients more accurately about their individual chances of success."
+        }
+      ]
+    },
+    "training": {
+      "page_id": "training",
+      "page_title": "Model Training & Selection",
+      "elements": [
+        {
+          "id": "train-stat-models-tested",
+          "selector": "[data-ai-assist='train-stat-models-tested']",
+          "label": "Models Tested Stat Card",
+          "script": "We benchmarked a total of 16 different machine learning algorithms for predicting sperm retrieval success. This comprehensive evaluation included tree-based methods like Random Forest, XGBoost, LightGBM, and CatBoost; ensemble approaches like Stacking and Voting; neural networks including MLP and TabNet; linear models like Logistic Regression, Ridge, Lasso, and Elastic Net; and other approaches including SVM, KNN, Decision Tree, and Naive Bayes. Testing this many diverse algorithms ensures we find the best-performing approach rather than just assuming one model type will work best."
+        },
+        {
+          "id": "train-stat-finalized",
+          "selector": "[data-ai-assist='train-stat-finalized']",
+          "label": "Finalized Models Stat Card",
+          "script": "From the initial 16 models tested, 5 were retained in the final v2 pathology-integrated pipeline: CatBoost, XGBoost, LightGBM, Random Forest, and Logistic Regression. These five were selected based on their performance across multiple metrics — AUC, accuracy, sensitivity, specificity, and calibration. The final comparison among these five models clearly showed CatBoost as the top performer."
+        },
+        {
+          "id": "train-stat-best-model",
+          "selector": "[data-ai-assist='train-stat-best-model']",
+          "label": "Best Model Stat Card",
+          "script": "CatBoost emerged as the best-performing model in the v2 pipeline. CatBoost — which stands for Categorical Boosting — is a gradient boosting algorithm developed by Yandex. It excels at handling categorical features natively and has built-in mechanisms to prevent overfitting, such as ordered boosting. In our study, CatBoost's ability to naturally handle the mix of continuous clinical measurements and categorical pathology variables made it particularly well-suited for this dataset."
+        },
+        {
+          "id": "train-stat-best-auc",
+          "selector": "[data-ai-assist='train-stat-best-auc']",
+          "label": "Best AUC Stat Card",
+          "script": "The best AUC achieved was 0.8306 with a 95 percent confidence interval from 0.823 to 0.845. AUC — or Area Under the Receiver Operating Characteristic Curve — measures a model's ability to distinguish between successful and unsuccessful sperm retrieval. An AUC of 0.83 means that if you randomly pick one patient who had successful retrieval and one who didn't, the model would correctly rank them 83 percent of the time. For a clinical prediction model in reproductive medicine, this represents strong discriminative performance."
+        },
+        {
+          "id": "train-model-roster",
+          "selector": "[data-ai-assist='train-model-roster']",
+          "label": "Model Roster Grid",
+          "script": "This grid shows all 16 machine learning algorithms that were evaluated in our benchmark. Each model was trained using nested cross-validation with hyperparameter tuning via randomized search. The models span diverse algorithmic families — from simple interpretable models like Logistic Regression and Decision Tree, to complex ensemble methods like Stacking and Voting, to modern gradient boosting frameworks like CatBoost, XGBoost, and LightGBM. This diversity ensures we capture different approaches to modeling the complex relationship between clinical features and sperm retrieval outcomes."
+        },
+        {
+          "id": "train-comparison-table",
+          "selector": "[data-ai-assist='train-comparison-table']",
+          "label": "Top Model Comparison Table",
+          "script": "This table provides a detailed side-by-side comparison of the top-performing models. For each model, you can see AUC, accuracy, sensitivity, specificity, F1-score, and Brier score. CatBoost leads with an AUC of 0.8306, followed closely by XGBoost at 0.8214 and LightGBM at 0.8213. Notice that while the AUC values are similar among the top three, CatBoost also achieves the best balance between sensitivity — correctly identifying successful cases — and specificity — correctly identifying unsuccessful cases. The Brier score measures calibration quality — how well predicted probabilities match actual outcomes — with lower values being better."
+        }
+      ]
+    },
+    "validation": {
+      "page_id": "validation",
+      "page_title": "Validation & Calibration",
+      "elements": [
+        {
+          "id": "val-stat-design",
+          "selector": "[data-ai-assist='val-stat-design']",
+          "label": "Validation Design Stat Card",
+          "script": "We used nested cross-validation as our primary validation strategy — this is a rigorous two-loop design where the outer loop evaluates model performance and the inner loop tunes hyperparameters. This prevents the common pitfall of overfitting during hyperparameter selection, which would inflate performance estimates. Nested CV is considered the gold standard for model evaluation when external validation data isn't available, and it's especially important in medical AI where overly optimistic performance claims can have real clinical consequences."
+        },
+        {
+          "id": "val-stat-bootstrap",
+          "selector": "[data-ai-assist='val-stat-bootstrap']",
+          "label": "Bootstrap Stat Card",
+          "script": "One thousand bootstrap iterations were performed on the top models to estimate confidence intervals for their performance metrics. Bootstrap resampling works by repeatedly sampling with replacement from the test data and computing the metric each time. This gives us a distribution of possible values rather than a single point estimate, resulting in the 95 percent confidence intervals you see reported — for example, CatBoost's AUC of 0.8306 with a CI of 0.823 to 0.845. This tells us we can be quite confident the true AUC lies within that narrow range."
+        },
+        {
+          "id": "val-stat-dca",
+          "selector": "[data-ai-assist='val-stat-dca']",
+          "label": "Clinical Utility (DCA) Stat Card",
+          "script": "Decision Curve Analysis — or DCA — evaluates the clinical utility of our prediction model by comparing it against two default strategies: treating all patients and treating no patients. DCA plots net benefit across different threshold probabilities, showing at which risk levels our model provides better clinical decisions than either default strategy. Our top models showed net benefit exceeding both baselines across a clinically meaningful threshold range of roughly 5 to 60 percent, meaning the model adds genuine value for clinical decision-making in preoperative counseling."
+        },
+        {
+          "id": "val-stat-brier",
+          "selector": "[data-ai-assist='val-stat-brier']",
+          "label": "Best Calibration Stat Card",
+          "script": "The Brier score measures how well a model's predicted probabilities match actual outcomes — it's essentially the mean squared error between predicted probabilities and the binary outcome. A Brier score of zero means perfect calibration, while 0.25 represents no skill. CatBoost achieved a Brier score of approximately 0.20, indicating reasonably good calibration. This is important because in clinical settings, a well-calibrated model means that when it predicts a 70 percent chance of success, roughly 70 percent of such patients actually do have successful sperm retrieval."
+        },
+        {
+          "id": "val-brier-grid",
+          "selector": "[data-ai-assist='val-brier-grid']",
+          "label": "Brier Score Model Grid",
+          "script": "This grid compares the Brier scores across all validated models. Remember, lower Brier scores indicate better calibration — meaning the predicted probabilities are more trustworthy. CatBoost and the ensemble models generally achieve the best calibration. Good calibration is especially critical for the CDSS tool on this dashboard, where clinicians use predicted probabilities to counsel patients about their chances of successful sperm retrieval."
+        },
+        {
+          "id": "val-dca-text",
+          "selector": "[data-ai-assist='val-dca-text']",
+          "label": "Decision Curve Analysis Text",
+          "script": "This section provides the detailed interpretation of the Decision Curve Analysis results. The key finding is that our model's net benefit consistently exceeds the treat-all and treat-none strategies across a wide range of clinically relevant threshold probabilities. In practical terms, this means using our model to guide micro-TESE decisions would lead to better outcomes than either performing the surgery on everyone or on no one — validating its use as a clinical decision support tool."
+        }
+      ]
+    },
+    "xai_phase": {
+      "page_id": "xai_phase",
+      "page_title": "Explainable AI (Phase Page)",
+      "elements": [
+        {
+          "id": "xai-stat-method",
+          "selector": "[data-ai-assist='xai-stat-method']",
+          "label": "XAI Method Stat Card",
+          "script": "SHAP — SHapley Additive exPlanations — is our primary explainability method. It's based on game theory, specifically Shapley values, which fairly distribute the 'credit' for a prediction among all input features. Unlike simpler methods like feature importance, SHAP provides both global explanations — which features matter overall — and local explanations — why the model made a specific prediction for a specific patient. We used TreeExplainer, which is optimized for tree-based models like CatBoost and computes exact Shapley values efficiently."
+        },
+        {
+          "id": "xai-stat-best-model",
+          "selector": "[data-ai-assist='xai-stat-best-model']",
+          "label": "XAI Best Model Stat Card",
+          "script": "All explainability analysis in the v2 pipeline is based on CatBoost, our best-performing model with AUC 0.8306. It's important to note that the v1 pipeline used LightGBM, but those results were invalidated due to data leakage from the IQR Clipper bug that zeroed pathology features. The v2 CatBoost SHAP analysis reveals a fundamentally different feature ranking — with pathology features now properly contributing — providing a clinically valid picture of what drives sperm retrieval predictions."
+        },
+        {
+          "id": "xai-stat-pathology",
+          "selector": "[data-ai-assist='xai-stat-pathology']",
+          "label": "Pathology Features Stat Card",
+          "script": "Eighteen bilateral pathology features were extracted from the original free-text pathology reports. These features — covering both right testis and left testis patterns — include SCO, hypospermatogenesis, various maturation arrest stages, and CSTH. In the v2 pipeline, these pathology features rank among the top predictors, which makes clinical sense because testicular histology directly reflects the state of spermatogenesis and is the strongest biological indicator of whether viable sperm can be found."
+        },
+        {
+          "id": "xai-top5-features",
+          "selector": "[data-ai-assist='xai-top5-features']",
+          "label": "Top-5 SHAP Features Grid",
+          "script": "These are the top 5 features by global SHAP importance in the CatBoost v2 model. LH — luteinizing hormone — ranks first, which is clinically significant because LH directly stimulates testosterone production in the testes and reflects the hypothalamic-pituitary-gonadal axis function. Age is second, reflecting the well-known decline in spermatogenic capacity with age. FSH — follicle stimulating hormone — is third, another key hormonal marker. Testosterone levels rank fourth. These top features align well with clinical knowledge about factors influencing spermatogenesis."
+        },
+        {
+          "id": "xai-shap-top10",
+          "selector": "[data-ai-assist='xai-shap-top10']",
+          "label": "Global SHAP Top-10 List",
+          "script": "This list shows the top 10 features ranked by mean absolute SHAP value across all predictions. The SHAP values represent the average magnitude of each feature's contribution to model output. Notice how hormonal markers — LH, FSH, Testosterone — and demographic features — Age, Body Weight — dominate the top ranks. Importantly, Partner Age is not in this list — it was excluded from the v2 pipeline as it had no clinical plausibility for predicting the male patient's sperm retrieval outcome. Its high ranking in v1 was an artifact of the data leakage."
+        },
+        {
+          "id": "xai-catboost-fi-top10",
+          "selector": "[data-ai-assist='xai-catboost-fi-top10']",
+          "label": "CatBoost Feature Importance Top-10",
+          "script": "This shows CatBoost's native feature importance — calculated during model training based on how often and how effectively each feature is used in tree splits. While SHAP values give a more nuanced picture, native feature importance provides a complementary view. Comparing SHAP and native importance helps validate that the important features are consistently ranked across different measurement approaches, increasing our confidence in the feature rankings."
+        }
+      ]
+    },
+    "xai_standalone": {
+      "page_id": "xai_standalone",
+      "page_title": "XAI Summary Page",
+      "elements": [
+        {
+          "id": "xai-v2-comparison-table",
+          "selector": "[data-ai-assist='xai-v2-comparison-table']",
+          "label": "V2 Model Comparison Table",
+          "script": "This table presents the final v2 model comparison for the 5 retained models. CatBoost leads with AUC 0.8306, followed by XGBoost at 0.8214 and LightGBM at 0.8213. Note the relatively tight clustering — the top three are separated by less than one percentage point in AUC. However, CatBoost's advantage extends beyond AUC: it also shows the best specificity at 0.823, meaning it's the most accurate at identifying patients who will not have successful sperm retrieval. This is clinically important because it reduces unnecessary surgical procedures."
+        },
+        {
+          "id": "xai-best-model-summary",
+          "selector": "[data-ai-assist='xai-best-model-summary']",
+          "label": "Best Model Summary Text",
+          "script": "This summary confirms CatBoost as the best model from the v2 pathology-integrated pipeline. The selection path — 16 models tested, then narrowed to 5 for final comparison — ensures thoroughness. The pathology signal is highlighted as a significant contributor, with 18 features extracted from free-text reports. This pathology-aware approach is one of the novel contributions of this research, as most existing studies in NOA prediction rely only on hormonal and demographic variables."
+        },
+        {
+          "id": "xai-pathology-groups",
+          "selector": "[data-ai-assist='xai-pathology-groups']",
+          "label": "Pathology Feature Groups List",
+          "script": "This section categorizes the pathology features used in the v2 pipeline into logical groups. Severity scores capture an overall measure of spermatogenic impairment for each testis. SCO percentages indicate the proportion of seminiferous tubules showing Sertoli Cell-Only pattern — where germ cells are absent. Hypospermatogenesis measures reduced but not absent sperm production. Maturation arrest captures cases where sperm development stops at various stages. And CSTH — Complete Spermatogenic Tubular Hyalinization — represents the most severe form of testicular damage. Each of these pathology patterns has distinct clinical implications for sperm retrieval success."
+        }
+      ]
+    },
+    "cdss": {
+      "page_id": "cdss",
+      "page_title": "Clinical Decision Support System",
+      "elements": [
+        {
+          "id": "cdss-video",
+          "selector": "[data-ai-assist='cdss-video']",
+          "label": "CDSS Introduction Video",
+          "script": "This introduction video explains how the Clinical Decision Support System works. The CDSS translates our machine learning model's predictions into a practical tool that clinicians can use during preoperative counseling. By entering a patient's clinical measurements, hormonal levels, and pathology results, clinicians get a probability estimate for successful sperm retrieval — helping both the medical team and the patient make more informed decisions about whether to proceed with micro-TESE surgery."
+        },
+        {
+          "id": "cdss-form",
+          "selector": "[data-ai-assist='cdss-form']",
+          "label": "CDSS Input Form",
+          "script": "This is the CDSS prediction form where you can enter patient clinical data. The input fields are organized by clinical relevance, starting with hormonal markers like LH, FSH, and Testosterone, then demographic features like Age and BMI, followed by ultrasound measurements. Each field shows its interquartile range as a placeholder — these are the typical values from our 2,413-patient cohort. Fields are color-coded based on the entered value: green for values within the normal interquartile range, and amber or red for values outside typical ranges. The bilateral pathology inputs allow you to specify right and left testis histology separately."
+        },
+        {
+          "id": "cdss-pathology-explanation",
+          "selector": "[data-ai-assist='cdss-pathology-explanation']",
+          "label": "Pathology Explanation Accordion",
+          "script": "This section explains how pathology is handled in the CDSS. In the original dataset, pathology was recorded as percentage patterns in testicular tissue — for example, SCO 45 percent, Maturation Arrest 30 percent. The CDSS maintains this structure by accepting right and left pathology inputs separately. These pathology values are integrated as a penalty or bonus term in the prediction logit, reflecting their strong influence on sperm retrieval outcomes. The prediction is aligned with CatBoost v2, the best-performing model with AUC 0.8306."
+        },
+        {
+          "id": "cdss-faq",
+          "selector": "[data-ai-assist='cdss-faq']",
+          "label": "FAQ Accordion",
+          "script": "This frequently asked questions section is designed for universities and treatment centers that might adopt this CDSS tool. It addresses common questions about how pathology is processed, the validation methodology behind the predictions, and the model's limitations. The key takeaway is that this CDSS uses a rigorously validated CatBoost model from the v2 pipeline — with proper cross-validation, bootstrap confidence intervals, and calibration analysis — making it suitable for research and clinical pilot studies, though further external validation on independent cohorts would strengthen the evidence before widespread clinical deployment."
+        }
+      ]
+    },
+    "literature": {
+      "page_id": "literature",
+      "page_title": "Literature Review",
+      "elements": [
+        {
+          "id": "lit-stat-references",
+          "selector": "[data-ai-assist='lit-stat-references']",
+          "label": "References Stat Card",
+          "script": "The literature review is anchored by 41 key references spanning reproductive medicine, machine learning in healthcare, and clinical prediction modeling. These references were systematically selected to cover the theoretical foundations, methodological precedents, and clinical context for predicting sperm retrieval outcomes in non-obstructive azoospermia."
+        },
+        {
+          "id": "lit-stat-gaps",
+          "selector": "[data-ai-assist='lit-stat-gaps']",
+          "label": "Research Gaps Stat Card",
+          "script": "Seven specific research gaps were identified through the literature review, and each gap is directly addressed by this study. These gaps include the lack of large-cohort ML studies for NOA prediction, insufficient use of histopathology data as predictive features, absence of explainability in existing models, and the need for properly validated clinical decision support tools in reproductive medicine."
+        },
+        {
+          "id": "lit-research-gaps",
+          "selector": "[data-ai-assist='lit-research-gaps']",
+          "label": "Research Gaps List",
+          "script": "This list details the seven articulated research gaps and how each one is addressed by our study. Identifying and explicitly addressing research gaps is essential for a PhD dissertation because it demonstrates the study's contribution to the field. Each gap maps to specific methodological choices — for example, the gap about small sample sizes motivated our use of the large 2,413-patient Royan cohort, and the gap about lack of histopathology integration led to our novel bilateral pathology feature engineering."
+        },
+        {
+          "id": "lit-bibliography",
+          "selector": "[data-ai-assist='lit-bibliography']",
+          "label": "Bibliography List",
+          "script": "This searchable bibliography contains all 41 anchor citations used in the study. Each reference includes authors, year, title, source journal, and a relevance note explaining why it's included. You can search by author name, keyword, or year to quickly find specific references. These citations support everything from the clinical background of NOA and micro-TESE, to the machine learning methodologies used, to the statistical validation approaches employed."
+        },
+        {
+          "id": "lit-frameworks",
+          "selector": "[data-ai-assist='lit-frameworks']",
+          "label": "Theoretical Frameworks List",
+          "script": "Nine theoretical frameworks underpin this research, providing the conceptual scaffolding for our methodology. These frameworks span machine learning theory, clinical prediction model development standards like TRIPOD, explainable AI principles, and medical informatics best practices. Having a strong theoretical foundation is important for demonstrating that the research methodology is grounded in established scientific principles rather than ad hoc decisions."
+        },
+        {
+          "id": "lit-benchmarks",
+          "selector": "[data-ai-assist='lit-benchmarks']",
+          "label": "Key Benchmark Studies",
+          "script": "These benchmark studies represent the most relevant prior work against which our study is compared. They include previous attempts at predicting sperm retrieval outcomes using various approaches — from simple logistic regression to more recent machine learning methods. Our study advances beyond these benchmarks in several ways: larger cohort size, more comprehensive feature engineering with bilateral pathology, rigorous nested cross-validation, and the addition of explainability through SHAP analysis."
+        }
+      ]
+    },
+    "integration": {
+      "page_id": "integration",
+      "page_title": "Integration & Dissertation",
+      "elements": [
+        {
+          "id": "int-stat-deliverable",
+          "selector": "[data-ai-assist='int-stat-deliverable']",
+          "label": "Final Deliverable Stat Card",
+          "script": "The final deliverable of this entire pipeline is the PhD dissertation — a comprehensive document integrating all six agent phases from data collection through preprocessing, modeling, validation, and explainability analysis. The dissertation represents the culmination of the research and is designed to meet the requirements for a doctoral degree in Medical Informatics at Mashhad University of Medical Sciences."
+        },
+        {
+          "id": "int-stat-dataset",
+          "selector": "[data-ai-assist='int-stat-dataset']",
+          "label": "Dataset Stat Card",
+          "script": "The analytical cohort of 2,413 patients from the Royan Institute forms the data foundation for the entire study. This is one of the largest single-center cohorts used for sperm retrieval prediction in published literature, providing robust statistical power for training and validating multiple machine learning models."
+        },
+        {
+          "id": "int-agent6-produced",
+          "selector": "[data-ai-assist='int-agent6-produced']",
+          "label": "Agent 6 Production List",
+          "script": "This list summarizes what the integration agent produced — it's essentially a quality control checklist showing how all the pieces from the previous five pipeline phases were assembled. The integration process involved synchronizing all dashboard narratives to the authoritative cohort, aligning metrics to the finalized v2 pipeline, incorporating the pathology block summary, generating the integration report, and validating consistency across all pages. This systematic integration ensures that no contradictory information appears anywhere in the dashboard."
+        },
+        {
+          "id": "int-full-chain",
+          "selector": "[data-ai-assist='int-full-chain']",
+          "label": "Data-to-Dissertation Chain",
+          "script": "This visual chain shows the complete journey from raw data to PhD dissertation in a single flow. Starting from the Royan workbook — the original clinical database — through the 2,413 patients, 73 engineered features, 18 pathology features, 16 tested models narrowed to 5, nested cross-validation with calibration and Decision Curve Analysis, arriving at CatBoost with AUC 0.8306 and 95 percent confidence interval 0.823 to 0.845. This end-to-end traceability is important for research reproducibility and for demonstrating the complete methodology during defense presentations."
+        }
+      ]
+    }
+  }
+}

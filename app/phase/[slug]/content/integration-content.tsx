@@ -2,17 +2,27 @@
 
 import { StatCard } from '@/components/stat-card'
 import { GraduationCap, FileText, Layers, ImageIcon, CheckCircle2 } from 'lucide-react'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 export default function IntegrationContent({ accent }: { accent: string }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="Final Deliverable" value="PhD Dissertation" hint="Complete HTML file" icon={GraduationCap} accent={accent} />
-        <StatCard label="Dataset" value="2,413 patients" hint="NOA analytical cohort" icon={ImageIcon} accent={accent} />
-        <StatCard label="Feature Set" value="73 total" hint="55 original + 18 engineered" icon={Layers} accent={accent} />
-        <StatCard label="Pathology Features" value="18" hint="RT/LT bilateral extraction" icon={FileText} accent={accent} />
+        <AIAssistWrapper id="int-stat-deliverable">
+          <StatCard label="Final Deliverable" value="PhD Dissertation" hint="Complete HTML file" icon={GraduationCap} accent={accent} />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="int-stat-dataset">
+          <StatCard label="Dataset" value="2,413 patients" hint="NOA analytical cohort" icon={ImageIcon} accent={accent} />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="int-stat-features">
+          <StatCard label="Feature Set" value="73 total" hint="55 original + 18 engineered" icon={Layers} accent={accent} />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="int-stat-pathology">
+          <StatCard label="Pathology Features" value="18" hint="RT/LT bilateral extraction" icon={FileText} accent={accent} />
+        </AIAssistWrapper>
       </div>
 
+      <AIAssistWrapper id="int-agent-output">
       <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
         <h3 className="font-display font-semibold text-base mb-3">What Agent 6 produced</h3>
         <ul className="space-y-2.5 text-sm">
@@ -31,7 +41,9 @@ export default function IntegrationContent({ accent }: { accent: string }) {
           ))}
         </ul>
       </div>
+      </AIAssistWrapper>
 
+      <AIAssistWrapper id="int-data-to-dissertation">
       <div className="rounded-lg border border-border bg-card p-5 shadow-sm gradient-brand-soft">
         <h3 className="font-display font-semibold text-base mb-3">From data to dissertation — the full chain</h3>
         <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
@@ -67,6 +79,7 @@ export default function IntegrationContent({ accent }: { accent: string }) {
           ))}
         </div>
       </div>
+      </AIAssistWrapper>
     </div>
   )
 }

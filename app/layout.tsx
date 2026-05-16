@@ -5,6 +5,8 @@ import { Toaster } from '@/components/ui/sonner'
 import { ChunkLoadErrorHandler } from '@/components/chunk-load-error-handler'
 import SiteShell from '@/components/site-shell'
 import RoadmapFab from '@/components/roadmap-fab'
+import { AIAssistProvider } from '@/components/ai-assist-provider'
+import AIAssistToggle from '@/components/ai-assist-toggle'
 import type { Metadata } from 'next'
 
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-sans' })
@@ -66,10 +68,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SiteShell>{children}</SiteShell>
-          <RoadmapFab />
-          <Toaster />
-          <ChunkLoadErrorHandler />
+          <AIAssistProvider>
+            <SiteShell>{children}</SiteShell>
+            <RoadmapFab />
+            <AIAssistToggle />
+            <Toaster />
+            <ChunkLoadErrorHandler />
+          </AIAssistProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -2,6 +2,7 @@
 
 import { StatCard } from '@/components/stat-card'
 import { Cpu, Trophy, FlaskConical, GitBranch } from 'lucide-react'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 const HEADER_TIPS: Record<string, string> = {
   rank: 'Rank: Model order based on overall comparative performance in this benchmark.',
@@ -23,12 +24,21 @@ export default function TrainingContent({ data, accent }: { data: any; accent: s
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="Models Tested" value={String(data?.n_models ?? 16)} hint="Paper 1 benchmark" icon={GitBranch} accent={accent} />
-        <StatCard label="Finalized in v2" value={String(data?.n_final_models ?? 5)} hint="Pathology-integrated pipeline" icon={FlaskConical} accent={accent} />
-        <StatCard label="Best Model" value={best} hint="v2 final comparison" icon={Trophy} accent={accent} />
-        <StatCard label="Best AUC" value={String(bestAuc)} hint="CatBoost performance" icon={Cpu} accent={accent} />
+        <AIAssistWrapper id="train-stat-card-models-tested">
+          <StatCard label="Models Tested" value={String(data?.n_models ?? 16)} hint="Paper 1 benchmark" icon={GitBranch} accent={accent} />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="train-stat-card-finalized">
+          <StatCard label="Finalized in v2" value={String(data?.n_final_models ?? 5)} hint="Pathology-integrated pipeline" icon={FlaskConical} accent={accent} />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="train-stat-card-best-model">
+          <StatCard label="Best Model" value={best} hint="v2 final comparison" icon={Trophy} accent={accent} />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="train-stat-card-best-auc">
+          <StatCard label="Best AUC" value={String(bestAuc)} hint="CatBoost performance" icon={Cpu} accent={accent} />
+        </AIAssistWrapper>
       </div>
 
+      <AIAssistWrapper id="train-model-roster">
       <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
         <h3 className="font-display font-semibold text-base mb-3">Model roster ({models.length})</h3>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 text-sm">
@@ -37,7 +47,9 @@ export default function TrainingContent({ data, accent }: { data: any; accent: s
           ))}
         </div>
       </div>
+      </AIAssistWrapper>
 
+      <AIAssistWrapper id="train-model-comparison-table">
       <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
         <h3 className="font-display font-semibold text-base mb-3">Top model comparison</h3>
         <div className="overflow-x-auto">
@@ -71,6 +83,7 @@ export default function TrainingContent({ data, accent }: { data: any; accent: s
           </table>
         </div>
       </div>
+      </AIAssistWrapper>
     </div>
   )
 }

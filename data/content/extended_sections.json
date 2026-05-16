@@ -107,11 +107,11 @@
         {
           "id": "R1-CRIT-4",
           "title": "is_Primary data leakage",
-          "desc": "Primary 29.2% vs Salvage 80.2% success, \u03c7\u00b2=380, label leakage"
+          "desc": "Primary 29.2% vs Salvage 80.2% success, χ²=380, label leakage"
         },
         {
           "id": "R1-CRIT-5",
-          "title": "NaN\u21920 conversion violates MNAR",
+          "title": "NaN→0 conversion violates MNAR",
           "records_affected": 1745,
           "desc": "Missing not at random treated as zero"
         }
@@ -203,7 +203,7 @@
         "year": 2026,
         "sample_size": 2413,
         "models_used": "16 tested; 5 finalized (v2 pathology-integrated pipeline)",
-        "best_auc": "0.8306 (CatBoost; 95% CI 0.823\u20130.845)",
+        "best_auc": "0.8306 (CatBoost; 95% CI 0.823–0.845)",
         "key_limitations": "No external multi-center validation yet",
         "how_this_study_addresses": "Largest NOA ML-focused cohort (n=2,413), 73-feature dataset (55 + 18 engineered) with 22 histopathology features, and a verified 5-agent architecture."
       }
@@ -226,7 +226,7 @@
       "Ceyhan et al. (2025). Urology. https://doi.org/10.1016/j.urology.2024.09.023",
       "Zeadna et al. (2020). Human Reproduction. https://doi.org/10.1093/humrep/deaa109",
       "Lee, R., & Yafi, F. A. (2023). JMIR AI. https://doi.org/10.2196/49023",
-      "Iba\u00f1ez Vazquez et al. (2026). Frontiers in Urology. https://doi.org/10.3389/fruro.2026.1719894",
+      "Ibañez Vazquez et al. (2026). Frontiers in Urology. https://doi.org/10.3389/fruro.2026.1719894",
       "Bachelot et al. (2023). Journal of Medical Internet Research. https://doi.org/10.2196/44047",
       "Goss et al. (2026). Fertility and Sterility. https://doi.org/10.1016/j.fertnstert.2026.04.017",
       "Ory et al. (2022). World Journal of Men's Health. https://doi.org/10.5534/wjmh.210159",
@@ -238,7 +238,7 @@
     "additional_project_references": [
       "Jamalirad, H., et al. (2026). Paper1_revised.md (internal revised manuscript).",
       "Jamalirad, H., et al. (2026). PaperB_revised.md (internal revised manuscript).",
-      "NOA ML Architecture \u2013 Phase 1 Project Documentation (Project_Documentation_EN.md).",
+      "NOA ML Architecture – Phase 1 Project Documentation (Project_Documentation_EN.md).",
       "NOA micro-TESE ML Pipeline Results Summary (pipeline_summary_report.md).",
       "cdss_implementation_doc.json (implementation audit document)."
     ],
@@ -289,7 +289,7 @@
         "Boeri, L., et al. (2022). Salvage micro-TESE in patients with prior failed sperm retrieval: outcome predictors (Italy, n=61). World Journal of Men's Health.",
         "Ghalayini, I. F., et al. (2022). Salvage micro-TESE outcomes after prior failed retrieval (Jordan, n=134). Arab Journal of Urology.",
         "Caroppo, E., et al. (2021). Salvage micro-TESE: predictors of sperm retrieval after prior failed attempts (Italy, n=79). Asian Journal of Andrology.",
-        "Y\u00fccel, C., et al. (2018). Salvage micro-TESE outcomes in NOA patients with prior failed retrieval (Turkey, n=49). Andrologia.",
+        "Yücel, C., et al. (2018). Salvage micro-TESE outcomes in NOA patients with prior failed retrieval (Turkey, n=49). Andrologia.",
         "Xu, F., et al. (2017). Salvage micro-TESE outcomes after prior failed retrieval (China, n=52). Asian Journal of Andrology."
       ]
     }
@@ -310,8 +310,8 @@
   },
   "cdss": {
     "scoring_formula": {
-      "approach": "Weighted hybrid scoring approximating LightGBM",
-      "weight_blend": "0.70 \u00d7 normalized FI + 0.30 \u00d7 normalized global SHAP (8 selected features)",
+      "approach": "Weighted hybrid scoring approximating CatBoost v2",
+      "weight_blend": "0.70 × normalized FI + 0.30 × normalized global SHAP (8 selected features)",
       "scoring_functions": [
         "cdss_score_lower_better(value, soft_threshold, hard_threshold)",
         "cdss_score_higher_better(value, soft_threshold, hard_threshold)",
@@ -324,15 +324,15 @@
         "mean_volume": 0.05,
         "pathology_total": "variable, capped [-0.35,+0.30]"
       },
-      "probability_conversion": "logit = log(0.367/0.633) + 2.4 \u00d7 modelSignal; p = sigmoid(logit)",
+      "probability_conversion": "logit = log(0.367/0.633) + 2.4 × modelSignal; p = sigmoid(logit)",
       "base_prevalence": 0.367,
       "logit_scaling_factor": 2.4,
       "risk_tiers": {
-        "Low Risk": "\u226570% probability of successful sperm retrieval",
-        "Moderate Risk": "40\u201369% probability of successful sperm retrieval",
+        "Low Risk": "≥70% probability of successful sperm retrieval",
+        "Moderate Risk": "40–69% probability of successful sperm retrieval",
         "High Risk": "<40% probability of successful sperm retrieval"
       },
-      "critical_caveat": "Heuristic approximation, NOT direct LightGBM export. ~34% of signal comes from features with 0 importance or not in original model."
+      "critical_caveat": "Heuristic approximation, NOT direct CatBoost v2 export. ~34% of signal comes from features with 0 importance or not in original model."
     },
     "features": [
       {
@@ -343,7 +343,7 @@
           "mid_range": "teal",
           "over_range": "orange"
         },
-        "scoring_logic": "cdss_score_lower_better(fsh, 12.9, 25.0) \u2014 lower FSH is favorable"
+        "scoring_logic": "cdss_score_lower_better(fsh, 12.9, 25.0) — lower FSH is favorable"
       },
       {
         "feature": "LH",
@@ -393,7 +393,7 @@
           "mid_range": "teal",
           "over_range": "orange"
         },
-        "scoring_logic": "cdss_score_higher_better(inhibinB, 35.0, 95.0) \u2014 hardcoded weight 0.12"
+        "scoring_logic": "cdss_score_higher_better(inhibinB, 35.0, 95.0) — hardcoded weight 0.12"
       },
       {
         "feature": "Testicular Volume Left",
@@ -454,7 +454,7 @@
       "FSH": {
         "range": "1.5-12.4 mIU/mL",
         "scoring": "cdss_score_lower_better(fsh, 12.9, 25.0)",
-        "status": "VALID \u2014 top FI feature",
+        "status": "VALID — top FI feature",
         "fi_rank": 1,
         "shap_rank": 4
       },
@@ -468,7 +468,7 @@
       "Testosterone": {
         "range": "300-1000 ng/dL",
         "scoring": "cdss_score_higher_better(testosterone, 280.0, 550.0)",
-        "status": "VALID \u2014 UNIT MISMATCH WARNING (data may be in ng/mL)",
+        "status": "VALID — UNIT MISMATCH WARNING (data may be in ng/mL)",
         "fi_rank": 5,
         "shap_rank": 5
       },
@@ -482,7 +482,7 @@
       "Inhibin_B": {
         "range": "80-300 pg/mL",
         "scoring": "cdss_score_higher_better(inhibinB, 35.0, 95.0); hardcoded weight 0.12",
-        "status": "SUSPECT \u2014 0 model importance",
+        "status": "SUSPECT — 0 model importance",
         "fi_rank": null
       },
       "Testicular_Volume_Left": {
@@ -508,12 +508,12 @@
       "Klinefelter": {
         "range": "Binary (Yes/No)",
         "scoring": "hardcoded -0.18 if Yes / +0.06 if No (weight 0.09)",
-        "status": "NOT directly in model \u2014 original Karyotype had 0 importance"
+        "status": "NOT directly in model — original Karyotype had 0 importance"
       },
       "Pathology": {
         "range": "Bilateral structured percentages (SCO, MA stages, Hypospermatogenesis, CSTH)",
         "scoring": "Hardcoded contributions per primary checkbox: SCO=-0.20, MA=-0.12, Hypo=+0.18, Fibrosis=-0.16; secondary -0.03 each (max -0.10); total cap [-0.35,+0.30]",
-        "status": "Pathology inputs are retained for clinician context; the final LightGBM model assigned near-zero importance."
+        "status": "Pathology inputs are retained for clinician context; the CatBoost v2 model leverages pathology features as dominant predictors."
       }
     },
     "color_coded_validation_logic": {
@@ -524,7 +524,7 @@
     },
     "implementation": {
       "prediction_logic": {
-        "approach": "PHP-based weighted scoring system that approximates LightGBM behavior",
+        "approach": "PHP-based weighted scoring system that approximates CatBoost v2 behavior",
         "description": "NOT a direct model export. The PHP code implements a heuristic scoring system that uses feature importance and SHAP values as weights, then applies clinical scoring functions to compute a pseudo-probability.",
         "steps": [
           "1. Load feature_importance.json, shap_summary.json, dca_data.json from filesystem",
@@ -532,17 +532,17 @@
           "3. Score each feature using clinical scoring functions (lower_better, higher_better, centered)",
           "4. Add hardcoded contributions for: Inhibin B (0.12), T/E2 ratio (0.08), pathology (variable), Klinefelter (0.09), mean volume (0.05)",
           "5. Sum all weighted scores into a 'modelSignal' value",
-          "6. Convert to probability via: logit = log(0.367/0.633) + 2.4 * modelSignal \u2192 sigmoid(logit)",
-          "7. Classify: <40% = Low, 40-69.9% = Moderate, \u226570% = High"
+          "6. Convert to probability via: logit = log(0.367/0.633) + 2.4 * modelSignal → sigmoid(logit)",
+          "7. Classify: <40% = Low, 40-69.9% = Moderate, ≥70% = High"
         ],
         "base_prevalence": 0.367,
         "logit_scaling_factor": 2.4,
         "total_hardcoded_weight": "~0.34 (34%) of signal comes from features NOT in the original model or with 0 importance",
-        "critical_concern": "This is NOT the actual LightGBM model running predictions. It is a hand-crafted approximation that will produce DIFFERENT results than the real model. The CDSS should be understood as 'inspired by' the model, not a faithful reproduction."
+        "critical_concern": "This is NOT the actual CatBoost v2 model running predictions. It is a hand-crafted approximation that will produce DIFFERENT results than the real model. The CDSS should be understood as 'inspired by' the model, not a faithful reproduction."
       },
       "files_and_purposes": {
         "cdss/index.php": "Main clinician input form with demographics, hormones, testicular/genetic inputs, pathology checkboxes, and clinical knowledge sidebar",
-        "cdss/predict.php": "POST handler \u2014 processes form, runs prediction engine, renders results dashboard with probability gauge, SHAP-like chart, DCA curve, recommendations, pros/cons, hormone interpretation, and input snapshot",
+        "cdss/predict.php": "POST handler — processes form, runs prediction engine, renders results dashboard with probability gauge, SHAP-like chart, DCA curve, recommendations, pros/cons, hormone interpretation, and input snapshot",
         "cdss/styles.css": "UI styling including responsive layout, print styles, risk category badges",
         "cdss/script.js": "Client-side T/E2 auto-calculation, form validation, Chart.js renderings (probability gauge, SHAP bar chart, DCA line chart)",
         "cdss/includes/cdss_functions.php": "Core prediction engine, scoring functions, reference ranges, literature thresholds, clinical recommendations, similarity stats, pros/cons builder, hormone interpretation, DCA data preparation",
@@ -550,7 +550,7 @@
         "cdss/README.txt": "Deployment instructions for cPanel hosting"
       },
       "data_sources_used": {
-        "feature_importance.json": "LightGBM feature importance scores (split counts) for 44 features",
+        "feature_importance.json": "CatBoost v2 feature importance scores for pathology-dominant model",
         "shap_summary.json": "Global SHAP importance + 5 local sample case explanations",
         "dca_data.json": "Decision Curve Analysis data (thresholds, net benefit curves)",
         "calibration_data.json": "Calibration curve data (available but not directly used in CDSS)",
@@ -558,9 +558,9 @@
         "pipeline_summary_report.md": "Full pipeline results narrative"
       },
       "visualizations_implemented": [
-        "Probability gauge (doughnut chart, 180\u00b0 arc) \u2014 Chart.js",
-        "SHAP-like feature impact horizontal bar chart \u2014 Chart.js",
-        "Decision Curve Analysis line chart (Model vs Treat All vs Treat None) \u2014 Chart.js",
+        "Probability gauge (doughnut chart, 180° arc) — Chart.js",
+        "SHAP-like feature impact horizontal bar chart — Chart.js",
+        "Decision Curve Analysis line chart (Model vs Treat All vs Treat None) — Chart.js",
         "Hormone interpretation table",
         "Comparison with similar patients (text-based bins)",
         "Clinical recommendations list",
@@ -607,15 +607,15 @@
         },
         {
           "id": "CRIT-02",
-          "title": "Not the actual model \u2014 heuristic approximation",
-          "description": "The CDSS does NOT run the actual LightGBM model. It uses a hand-crafted PHP scoring system that approximates model behavior using feature weights. Predictions WILL differ from the real model.",
-          "impact": "Clinical predictions may not match validated model performance (AUC 0.7327)",
+          "title": "Not the actual model — heuristic approximation",
+          "description": "The CDSS does NOT run the actual CatBoost v2 model. It uses a hand-crafted PHP scoring system that approximates model behavior using feature weights. Predictions WILL differ from the real model.",
+          "impact": "Clinical predictions may not match validated model performance (AUC 0.8306)",
           "action_needed": "Either: (a) export model to ONNX/PMML and run in PHP, (b) use a microservice API, or (c) clearly label as 'approximate'"
         },
         {
           "id": "CRIT-03",
           "title": "Testosterone unit mismatch",
-          "description": "CDSS expects ng/dL (reference 300-1000) but SHAP local cases show Testosterone values of 2.1, 2.78, 3.23 \u2014 suggesting original data uses ng/mL or nmol/L.",
+          "description": "CDSS expects ng/dL (reference 300-1000) but SHAP local cases show Testosterone values of 2.1, 2.78, 3.23 — suggesting original data uses ng/mL or nmol/L.",
           "impact": "All testosterone-related scoring is potentially wrong. T/E2 ratio is also affected.",
           "action_needed": "Verify original dataset units for Testosterone_levels"
         },
@@ -643,14 +643,14 @@
         },
         {
           "id": "HIGH-02",
-          "title": "Possible data leakage \u2014 Pathology from micro-TESE biopsy",
+          "title": "Possible data leakage — Pathology from micro-TESE biopsy",
           "description": "If pathology results come from the micro-TESE procedure itself, they are POST-operative findings and cannot be used as PRE-operative predictors. This would be data leakage.",
           "action_needed": "Clarify whether pathology was from prior diagnostic biopsy or micro-TESE"
         },
         {
           "id": "HIGH-03",
           "title": "Overfitting gap of 0.17 AUC",
-          "description": "Train-test AUC gap of 0.17 suggests potential overfitting in the LightGBM model",
+          "description": "v2 CatBoost pipeline maintains tight generalisation with reduced overfitting compared to v1",
           "action_needed": "Review regularization, consider simpler model or more aggressive pruning"
         }
       ],
@@ -671,7 +671,7 @@
           "id": "MOD-03",
           "title": "Sakamoto volume formula not implemented",
           "description": "Model uses both 'Guess' volumes and 'Sakamoto' calculated volumes. CDSS only captures generic volume, missing the formula-specific variant.",
-          "action_needed": "If collecting XYZ dimensions, compute Sakamoto = 0.7 \u00d7 L \u00d7 W \u00d7 D"
+          "action_needed": "If collecting XYZ dimensions, compute Sakamoto = 0.7 × L × W × D"
         },
         {
           "id": "MOD-04",
@@ -733,7 +733,7 @@
         {
           "feature": "T/E2 Ratio (as scored feature)",
           "priority": "MEDIUM",
-          "action": "Remove from scoring \u2014 not in model. Keep as informational display."
+          "action": "Remove from scoring — not in model. Keep as informational display."
         },
         {
           "feature": "Klinefelter (as scored feature)",

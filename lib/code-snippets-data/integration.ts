@@ -7,7 +7,7 @@ export const integrationSteps: CodeStep[] = [
     objective:
       'Stitch preprocessing, training, validation, XAI, and literature outputs into one inventory consumable by the Next.js dashboard.',
     initialCondition:
-      'Authoritative metrics already locked (2,413 patients; 45 features; 18 pathology features; CatBoost AUC 0.8306, 95% CI 0.823–0.845).',
+      'Authoritative metrics already locked (2,413 patients; 73 features (55+18); 18 pathology features; CatBoost AUC 0.8306, 95% CI 0.823–0.845).',
     language: 'python',
     code: [
       "import json, pathlib",

@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "description": "NOA AI Assist — mapping of element IDs to their dashboard pages. Each id corresponds to /public/audio/ai-assist/{id}.mp3, which is played on hover when the AI Assist toggle is ON.",
+    "audio_path_template": "/audio/ai-assist/{id}.mp3"
+  },
+  "app/phase/[slug]/content/preprocessing-content.tsx": [
+    { "id": "prep-stat-card-cohort",        "label": "Patient Cohort stat card" },
+    { "id": "prep-stat-card-features",      "label": "Feature Set stat card (55+18=73)" },
+    { "id": "prep-stat-card-pathology",     "label": "Pathology Features stat card (22)" },
+    { "id": "prep-stat-card-success",       "label": "Success Rate stat card" },
+    { "id": "prep-governance-note",         "label": "Feature governance note (amber)" },
+    { "id": "prep-flowchart-link",          "label": "Interactive Preprocessing Flowchart link" },
+    { "id": "prep-outcome-pie",             "label": "Outcome distribution pie chart" },
+    { "id": "prep-pathology-shap",          "label": "Pathology feature importance (SHAP)" },
+    { "id": "prep-missingness-chart",       "label": "Per-variable missingness bar chart" },
+    { "id": "prep-cleaning-steps",          "label": "Cleaning steps list" },
+    { "id": "prep-pathology-features-list", "label": "18 pathology features grid" },
+    { "id": "prep-transformations-table",   "label": "Transformations table" },
+    { "id": "prep-primary-vs-salvage",      "label": "Primary vs salvage microTESE block" },
+    { "id": "prep-pipeline-flowchart",      "label": "Publication-quality pipeline flowchart" }
+  ],
+  "app/phase/[slug]/content/training-content.tsx": [
+    { "id": "train-stat-card-models-tested", "label": "Models tested stat card" },
+    { "id": "train-stat-card-finalized",     "label": "Finalized in v2 stat card" },
+    { "id": "train-stat-card-best-model",    "label": "Best model stat card" },
+    { "id": "train-stat-card-best-auc",      "label": "Best AUC stat card" },
+    { "id": "train-model-roster",            "label": "Model roster card" },
+    { "id": "train-model-comparison-table",  "label": "Top model comparison table" }
+  ],
+  "app/phase/[slug]/content/validation-content.tsx": [
+    { "id": "val-stat-card-design",           "label": "Validation design stat card" },
+    { "id": "val-stat-card-bootstrap",        "label": "Bootstrap stat card" },
+    { "id": "val-stat-card-clinical-utility", "label": "Clinical utility stat card" },
+    { "id": "val-stat-card-calibration",      "label": "Best calibration stat card" },
+    { "id": "val-brier-summary",              "label": "Calibration summary (Brier)" },
+    { "id": "val-dca-summary",                "label": "Decision Curve Analysis card" }
+  ],
+  "app/phase/[slug]/content/xai-content.tsx": [
+    { "id": "xai-stat-method",          "label": "XAI method stat card" },
+    { "id": "xai-stat-best-model",      "label": "Best model stat card" },
+    { "id": "xai-stat-pathology",       "label": "Pathology features stat card" },
+    { "id": "xai-stat-top-predictors",  "label": "Top predictors stat card" },
+    { "id": "xai-top5-features",        "label": "Top-5 SHAP features card" },
+    { "id": "xai-shap-top10",           "label": "Global SHAP top-10 list" },
+    { "id": "xai-catboost-fi-top10",    "label": "CatBoost feature importance top-10" }
+  ],
+  "app/xai/page.tsx": [
+    { "id": "xai-v2-model-comparison",       "label": "Final v2 model comparison table" },
+    { "id": "xai-best-model-summary",        "label": "Best model summary block" },
+    { "id": "xai-pathology-feature-groups",  "label": "Pathology feature groups list" }
+  ],
+  "app/cdss/page.tsx": [
+    { "id": "cdss-intro-video",            "label": "CDSS intro video" },
+    { "id": "cdss-form",                   "label": "CDSS prediction form" },
+    { "id": "cdss-pathology-explanation",  "label": "Pathology explanation accordion" },
+    { "id": "cdss-pathology-faq",          "label": "Pathology FAQ accordion" }
+  ],
+  "app/phase/[slug]/content/literature-content.tsx": [
+    { "id": "lit-stat-references",      "label": "References stat card" },
+    { "id": "lit-stat-gaps",            "label": "Research gaps stat card" },
+    { "id": "lit-stat-frameworks",      "label": "Frameworks stat card" },
+    { "id": "lit-stat-methodologies",   "label": "Methodologies stat card" },
+    { "id": "lit-research-gaps",        "label": "7 articulated research gaps card" },
+    { "id": "lit-bibliography",         "label": "41-reference bibliography card" },
+    { "id": "lit-theoretical-frameworks","label": "Theoretical frameworks card" },
+    { "id": "lit-benchmarks",           "label": "Key benchmark studies card" }
+  ],
+  "app/phase/[slug]/content/integration-content.tsx": [
+    { "id": "int-stat-deliverable",      "label": "Final deliverable stat card" },
+    { "id": "int-stat-dataset",          "label": "Dataset stat card" },
+    { "id": "int-stat-features",         "label": "Feature set stat card" },
+    { "id": "int-stat-pathology",        "label": "Pathology features stat card" },
+    { "id": "int-agent-output",          "label": "What Agent 6 produced card" },
+    { "id": "int-data-to-dissertation",  "label": "From data to dissertation chain" }
+  ]
+}

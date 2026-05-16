@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { StatCard } from '@/components/stat-card'
 import { BookOpen, Quote, Search, Lightbulb, Library } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 export default function LiteratureContent({ data, accent }: { data: any; accent: string }) {
   const refs = data?.references ?? []
@@ -22,12 +23,21 @@ export default function LiteratureContent({ data, accent }: { data: any; accent:
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="References" value={String(refs?.length ?? 41)} hint="Anchor citations" icon={Library} accent={accent} />
-        <StatCard label="Research Gaps" value={String(gaps?.length ?? 7)} hint="Identified & addressed" icon={Lightbulb} accent={accent} />
-        <StatCard label="Frameworks" value={String(frameworks?.length ?? 9)} hint="Theoretical scaffolding" icon={BookOpen} accent={accent} />
-        <StatCard label="Methodologies" value={String(methodologies?.length ?? 21)} hint="Reviewed in detail" icon={Quote} accent={accent} />
+        <AIAssistWrapper id="lit-stat-references">
+          <StatCard label="References" value={String(refs?.length ?? 41)} hint="Anchor citations" icon={Library} accent={accent} />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="lit-stat-gaps">
+          <StatCard label="Research Gaps" value={String(gaps?.length ?? 7)} hint="Identified & addressed" icon={Lightbulb} accent={accent} />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="lit-stat-frameworks">
+          <StatCard label="Frameworks" value={String(frameworks?.length ?? 9)} hint="Theoretical scaffolding" icon={BookOpen} accent={accent} />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="lit-stat-methodologies">
+          <StatCard label="Methodologies" value={String(methodologies?.length ?? 21)} hint="Reviewed in detail" icon={Quote} accent={accent} />
+        </AIAssistWrapper>
       </div>
 
+      <AIAssistWrapper id="lit-research-gaps">
       <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
         <div className="flex items-center gap-2 mb-3">
           <Lightbulb className="h-4 w-4" style={{ color: accent }} />
@@ -45,7 +55,9 @@ export default function LiteratureContent({ data, accent }: { data: any; accent:
           ))}
         </ul>
       </div>
+      </AIAssistWrapper>
 
+      <AIAssistWrapper id="lit-bibliography">
       <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
         <div className="flex items-center gap-2 mb-3 flex-wrap gap-y-2">
           <BookOpen className="h-4 w-4" style={{ color: accent }} />
@@ -68,8 +80,10 @@ export default function LiteratureContent({ data, accent }: { data: any; accent:
           {filtered.length === 0 && <p className="text-sm text-muted-foreground py-6 text-center">No references match the search.</p>}
         </ol>
       </div>
+      </AIAssistWrapper>
 
       <div className="grid lg:grid-cols-2 gap-5">
+        <AIAssistWrapper id="lit-theoretical-frameworks">
         <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
           <h3 className="font-display font-semibold text-base mb-3">Theoretical frameworks ({frameworks.length})</h3>
           <ul className="space-y-2 text-sm">
@@ -81,6 +95,8 @@ export default function LiteratureContent({ data, accent }: { data: any; accent:
             ))}
           </ul>
         </div>
+        </AIAssistWrapper>
+        <AIAssistWrapper id="lit-benchmarks">
         <div className="rounded-lg border border-border bg-card p-5 shadow-sm gradient-brand-soft">
           <h3 className="font-display font-semibold text-base mb-3">Key benchmark studies</h3>
           <ul className="space-y-2 text-sm">
@@ -92,6 +108,7 @@ export default function LiteratureContent({ data, accent }: { data: any; accent:
             ))}
           </ul>
         </div>
+        </AIAssistWrapper>
       </div>
     </div>
   )

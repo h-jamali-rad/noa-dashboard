@@ -5,7 +5,7 @@ export const trainingSteps: CodeStep[] = [
     id: 't1',
     title: 'Step 1 - Build 16-model benchmark and finalize v2 shortlist',
     objective: 'Train and compare 16 candidate models, then retain 5 finalized models in the pathology-integrated v2 pipeline.',
-    initialCondition: 'Leakage-safe preprocessing completed on n=2,413 analytical records with 45 total features (including 18 pathology features).',
+    initialCondition: 'Leakage-safe preprocessing completed on n=2,413 analytical records with 73 features (55 original + 18 engineered) (including 18 pathology features).',
     language: 'python',
     code: [
       'from sklearn.model_selection import StratifiedKFold',

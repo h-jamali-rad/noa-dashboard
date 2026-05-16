@@ -2,21 +2,21 @@
   "training": {
     "n_models": 16,
     "models": [
-      "LightGBM",
-      "Gradient Boosting",
-      "XGBoost",
-      "Stacking Ensemble",
       "CatBoost",
+      "XGBoost",
+      "LightGBM",
       "Random Forest",
+      "Logistic Regression",
+      "Gradient Boosting",
+      "Stacking Ensemble",
       "Voting Ensemble",
-      "MLP (Neural Network)",
+      "Decision Tree",
+      "MLP",
       "Ridge Classifier",
       "K-Nearest Neighbors",
-      "Logistic Regression",
-      "Decision Tree",
       "Elastic Net",
-      "Lasso (L1)",
-      "SVM (RBF)",
+      "Lasso",
+      "SVM",
       "Naive Bayes"
     ],
     "nested_cv": {
@@ -97,15 +97,14 @@
       }
     ],
     "best_model": "CatBoost",
-    "best_auc": "0.8306 (95% CI 0.823\u20130.845)",
+    "best_auc": "0.8306 (95% CI 0.823–0.845)",
     "best_hyperparameters": {
-      "clf__colsample_bytree": 0.5575272831948894,
-      "clf__learning_rate": 0.0322650000404605,
-      "clf__max_depth": 5,
-      "clf__n_estimators": 116,
-      "clf__num_leaves": 66,
-      "clf__subsample": 0.6635695279055699,
-      "preprocess__num__scaler": "RobustScaler()"
+      "depth": 6,
+      "iterations": 657,
+      "l2_leaf_reg": 3.51,
+      "learning_rate": 0.00617,
+      "preprocess__num__scaler": "RobustScaler()",
+      "note": "CatBoost v2 production pipeline"
     },
     "brier_scores_top5": {
       "LightGBM": 0.20056728561007395,
