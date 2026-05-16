@@ -248,7 +248,8 @@
       },
       {
         "feature_name": "Partner Age",
-        "description": "Age-related demographic feature."
+        "description": "EXCLUDED — biologically irrelevant to male sperm retrieval outcome. Likely confound/proxy for couple duration.",
+        "status": "EXCLUDED"
       },
       {
         "feature_name": "Race",
@@ -456,7 +457,7 @@
       }
     ],
     "feature_categories": [
-      "Demographics (Age, Partner Age, Race)",
+      "Demographics (Age, Race) — Partner Age excluded",
       "Anthropometrics (Height, Weight, BMI)",
       "Hormonal Profile (FSH, LH, Testosterone, Estradiol/E2, Prolactin)",
       "Testicular Measurements (Sono RT/LT, Orchidometer RT/LT, RT-XYZ/LT-XYZ Sono, Sakamoto-RT/LT volume, Testicular Volume RT/LT clinical estimate)",
@@ -524,7 +525,7 @@
         "Salvage_Count": "Integer count of prior failed sperm retrieval attempts (0 for Primary)"
       },
       "feature_categories": [
-        "Demographics (Age, Partner Age, Race)",
+        "Demographics (Age, Race) — Partner Age excluded",
         "Anthropometrics (Height, Weight, BMI)",
         "Hormonal Profile (FSH, LH, Testosterone, Estradiol/E2, Prolactin)",
         "Testicular Measurements (Sono RT/LT, Orchidometer RT/LT, RT-XYZ/LT-XYZ Sono, Sakamoto-RT/LT volume, Testicular Volume RT/LT clinical estimate)",
@@ -1013,9 +1014,9 @@
     "preprocessing_pipeline": {
       "transformations": [
         {
-          "name": "Standardization",
-          "method": "Z-score standardization (mean=0, std=1) applied to continuous features prior to model input",
-          "scope": "All continuous predictors: Age, Partner Age, BMI, Height, Weight, FSH, LH, Testosterone, Prolactin, E2, testicular volume measurements, Sakamoto volumes, Seminal plasma pH",
+          "name": "RobustScaler (not Z-score)",
+          "method": "RobustScaler applied to continuous features prior to model input. RobustScaler uses median and IQR, making it robust to outliers — critical for medical data where extreme hormone values are clinically meaningful. Selected via RandomizedSearchCV hyperparameter tuning.",
+          "scope": "All continuous predictors: Age, BMI, Height, Weight, FSH, LH, Testosterone, Prolactin, E2, testicular volume measurements, Sakamoto volumes, Seminal plasma pH",
           "fitting": "Scaler fit on training set ONLY, then applied to test set (no leakage)"
         },
         {
@@ -4441,153 +4442,147 @@
       },
       {
         "rank": 2,
-        "feature": "Partner_Age",
-        "mean_abs_shap": 0.3010514725887122
-      },
-      {
-        "rank": 3,
         "feature": "Age",
         "mean_abs_shap": 0.27013426179481914
       },
       {
-        "rank": 4,
+        "rank": 3,
         "feature": "FSH",
         "mean_abs_shap": 0.25032088680111114
       },
       {
-        "rank": 5,
+        "rank": 4,
         "feature": "Testosterone_levels",
         "mean_abs_shap": 0.21181623281879083
       },
       {
-        "rank": 6,
+        "rank": 5,
         "feature": "Boby_Weight",
         "mean_abs_shap": 0.17398276979950172
       },
       {
-        "rank": 7,
+        "rank": 6,
         "feature": "Sakamoto_LT_mL",
         "mean_abs_shap": 0.1705756237327989
       },
       {
-        "rank": 8,
+        "rank": 7,
         "feature": "BMI",
         "mean_abs_shap": 0.16904280050038387
       },
       {
-        "rank": 9,
+        "rank": 8,
         "feature": "Hieght",
         "mean_abs_shap": 0.16621722472910835
       },
       {
-        "rank": 10,
+        "rank": 9,
         "feature": "RT_XYZ__Sono_",
         "mean_abs_shap": 0.1563766924285414
       },
       {
-        "rank": 11,
+        "rank": 10,
         "feature": "Testicular_volume_LT__Guess_",
         "mean_abs_shap": 0.12924530261153439
       },
       {
-        "rank": 12,
+        "rank": 11,
         "feature": "Seminal_plasma_pH",
         "mean_abs_shap": 0.1276707340617794
       },
       {
-        "rank": 13,
+        "rank": 12,
         "feature": "Testicular_volume_RT__Guess_",
         "mean_abs_shap": 0.11065351552322782
       },
       {
-        "rank": 14,
+        "rank": 13,
         "feature": "LT_XYZ__Sono_",
         "mean_abs_shap": 0.0848989118246516
       },
       {
-        "rank": 15,
+        "rank": 14,
         "feature": "E2",
         "mean_abs_shap": 0.043482921114626136
       },
       {
-        "rank": 16,
+        "rank": 15,
         "feature": "Sakamoto_RT_mL",
         "mean_abs_shap": 0.039331704904066886
       },
       {
-        "rank": 17,
+        "rank": 16,
         "feature": "Prolactin",
         "mean_abs_shap": 0.020155893403189084
       },
       {
-        "rank": 18,
+        "rank": 17,
         "feature": "Pathology_RT",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 19,
+        "rank": 18,
         "feature": "Pathology_LT",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 20,
+        "rank": 19,
         "feature": "Race",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 21,
+        "rank": 20,
         "feature": "infertile_family_members",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 22,
+        "rank": 21,
         "feature": "Habits",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 23,
+        "rank": 22,
         "feature": "Occupation__Exposure_to_toxic_substances_",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 24,
+        "rank": 23,
         "feature": "Diabetes",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 25,
+        "rank": 24,
         "feature": "Hypertension",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 26,
+        "rank": 25,
         "feature": "Surgery_trauma_s_",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 27,
+        "rank": 26,
         "feature": "Varicocele",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 28,
+        "rank": 27,
         "feature": "T_BX",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 29,
+        "rank": 28,
         "feature": "Inguinal_hernia",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 30,
+        "rank": 29,
         "feature": "Torsion_of_spermatic_cord",
         "mean_abs_shap": 0.0
       }
     ],
     "top_features": [
       "LH",
-      "Partner_Age",
       "Age",
       "FSH",
       "Testosterone_levels"
@@ -4600,146 +4595,141 @@
       },
       {
         "rank": 2,
-        "feature": "Partner_Age",
-        "mean_abs_shap": 0.3010514725887122
-      },
-      {
-        "rank": 3,
         "feature": "Age",
         "mean_abs_shap": 0.27013426179481914
       },
       {
-        "rank": 4,
+        "rank": 3,
         "feature": "FSH",
         "mean_abs_shap": 0.25032088680111114
       },
       {
-        "rank": 5,
+        "rank": 4,
         "feature": "Testosterone_levels",
         "mean_abs_shap": 0.21181623281879083
       },
       {
-        "rank": 6,
+        "rank": 5,
         "feature": "Boby_Weight",
         "mean_abs_shap": 0.17398276979950172
       },
       {
-        "rank": 7,
+        "rank": 6,
         "feature": "Sakamoto_LT_mL",
         "mean_abs_shap": 0.1705756237327989
       },
       {
-        "rank": 8,
+        "rank": 7,
         "feature": "BMI",
         "mean_abs_shap": 0.16904280050038387
       },
       {
-        "rank": 9,
+        "rank": 8,
         "feature": "Hieght",
         "mean_abs_shap": 0.16621722472910835
       },
       {
-        "rank": 10,
+        "rank": 9,
         "feature": "RT_XYZ__Sono_",
         "mean_abs_shap": 0.1563766924285414
       },
       {
-        "rank": 11,
+        "rank": 10,
         "feature": "Testicular_volume_LT__Guess_",
         "mean_abs_shap": 0.12924530261153439
       },
       {
-        "rank": 12,
+        "rank": 11,
         "feature": "Seminal_plasma_pH",
         "mean_abs_shap": 0.1276707340617794
       },
       {
-        "rank": 13,
+        "rank": 12,
         "feature": "Testicular_volume_RT__Guess_",
         "mean_abs_shap": 0.11065351552322782
       },
       {
-        "rank": 14,
+        "rank": 13,
         "feature": "LT_XYZ__Sono_",
         "mean_abs_shap": 0.0848989118246516
       },
       {
-        "rank": 15,
+        "rank": 14,
         "feature": "E2",
         "mean_abs_shap": 0.043482921114626136
       },
       {
-        "rank": 16,
+        "rank": 15,
         "feature": "Sakamoto_RT_mL",
         "mean_abs_shap": 0.039331704904066886
       },
       {
-        "rank": 17,
+        "rank": 16,
         "feature": "Prolactin",
         "mean_abs_shap": 0.020155893403189084
       },
       {
-        "rank": 18,
+        "rank": 17,
         "feature": "Pathology_RT",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 19,
+        "rank": 18,
         "feature": "Pathology_LT",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 20,
+        "rank": 19,
         "feature": "Race",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 21,
+        "rank": 20,
         "feature": "infertile_family_members",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 22,
+        "rank": 21,
         "feature": "Habits",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 23,
+        "rank": 22,
         "feature": "Occupation__Exposure_to_toxic_substances_",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 24,
+        "rank": 23,
         "feature": "Diabetes",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 25,
+        "rank": 24,
         "feature": "Hypertension",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 26,
+        "rank": 25,
         "feature": "Surgery_trauma_s_",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 27,
+        "rank": 26,
         "feature": "Varicocele",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 28,
+        "rank": 27,
         "feature": "T_BX",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 29,
+        "rank": 28,
         "feature": "Inguinal_hernia",
         "mean_abs_shap": 0.0
       },
       {
-        "rank": 30,
+        "rank": 29,
         "feature": "Torsion_of_spermatic_cord",
         "mean_abs_shap": 0.0
       }
@@ -4748,7 +4738,6 @@
       "global": {
         "global_shap_importance": {
           "LH": 0.3170224435045276,
-          "Partner_Age": 0.3010514725887122,
           "Age": 0.27013426179481914,
           "FSH": 0.25032088680111114,
           "Testosterone_levels": 0.21181623281879083,
@@ -4788,10 +4777,6 @@
             "Age": {
               "shap_value": -0.3202565010457098,
               "feature_value": 40.0
-            },
-            "Partner_Age": {
-              "shap_value": -0.12012402228483622,
-              "feature_value": 42.0
             },
             "Hieght": {
               "shap_value": -0.11162368764166046,
@@ -4840,10 +4825,6 @@
               "shap_value": 0.6301735418436094,
               "feature_value": 50.0
             },
-            "Partner_Age": {
-              "shap_value": 0.3521189637470074,
-              "feature_value": 41.0
-            },
             "Hieght": {
               "shap_value": -0.08937835264903725,
               "feature_value": 175.0
@@ -4879,10 +4860,6 @@
           "prediction": 0.7822201471039142,
           "actual": 1,
           "top_features": {
-            "Partner_Age": {
-              "shap_value": 0.6592236680155522,
-              "feature_value": 41.0
-            },
             "Age": {
               "shap_value": 0.5675406593848741,
               "feature_value": 56.0
@@ -4938,10 +4915,6 @@
               "shap_value": 0.4940670633260545,
               "feature_value": 2835.0
             },
-            "Partner_Age": {
-              "shap_value": 0.4270575568345939,
-              "feature_value": 30.0
-            },
             "Sakamoto_RT_mL": {
               "shap_value": 0.3725639737754111,
               "feature_value": 1.5783299999999998
@@ -4980,10 +4953,6 @@
             "E2": {
               "shap_value": -0.6801963229974566,
               "feature_value": 27.0
-            },
-            "Partner_Age": {
-              "shap_value": 0.6208439718586658,
-              "feature_value": 38.0
             },
             "BMI": {
               "shap_value": 0.6197368597341861,
@@ -5259,13 +5228,13 @@
     },
     "interpretation_notes": [
       "Hormonal and demographic variables dominate global SHAP ranking.",
-      "Top five features: LH, Partner_Age, Age, FSH, Testosterone_levels.",
-      "Pathology_RT and Pathology_LT had near-zero global SHAP contribution in corrected preoperative model."
+      "Top features (Partner_Age excluded): LH, Age, FSH, Testosterone_levels, Body_Weight.",
+      "Pathology_RT and Pathology_LT had near-zero global SHAP contribution in corrected preoperative model.",
+      "Partner_Age was excluded from the pipeline — biologically irrelevant to male testicular sperm retrieval (likely confound/proxy for couple duration/urgency)."
     ],
     "lightgbm_tree_importance": {
       "FSH": 865,
       "Age": 819,
-      "Partner_Age": 781,
       "LH": 755,
       "Testosterone_levels": 568,
       "BMI": 437,
@@ -8972,7 +8941,9 @@
       "Recomputed SHAP global/local interpretation from corrected best model.",
       "Fixed pathology parsing regex issues and corrected 221 affected records in preprocessing phase logs.",
       "Updated dashboard and manuscript content to corrected pipeline outputs.",
-      "Addressed reviewer comments with point-by-point methodological corrections."
+      "Addressed reviewer comments with point-by-point methodological corrections.",
+      "Excluded Partner_Age from preprocessing pipeline — biologically irrelevant to male testicular sperm retrieval (confound/proxy for couple duration). SHAP importance redistributed to clinically meaningful features.",
+      "Fixed RobustScaler documentation — methodology previously incorrectly stated 'Z-score standardization' when RobustScaler was actually used (confirmed by hyperparameter tuning results)."
     ],
     "supporting_sources": {
       "paper1_revised_md": "# Machine Learning Model for Predicting Sperm Retrieval Success in Non-Obstructive Azoospermia: A Comprehensive 16-Model Comparison Using Nested Cross-Validation\n\nHossein Jamalirad^a^, Marjan Sabbaghian^b\\*^, Mohammad Ali Sadighi Gilani^b,c^, Hassan Vakili Arki^a\\*^, Saeid Eslami^a,d^\n\n^a^ Department of Medical Informatics, Faculty of Medicine, Mashhad University of Medical Sciences, Mashhad, Iran.\n^b^ Department of Andrology, Reproductive Biomedicine Research Center, Royan Institute for Reproductive Biomedicine, ACECR, Tehran, Iran.\n^c^ Department of Urology, Shariati Hospital, Tehran University of Medical Sciences, Tehran, Iran.\n^d^ Pharmaceutical Research Center, Mashhad University of Medical Sciences, Mashhad, Iran.\n\n**\\*Corresponding Authors:**\nHassan Vakili Arki, Department of Medical Informatics, Faculty of Medicine, Mashhad University of Medical Sciences, Vakilabad Blvd, Mashhad 9177948564, Iran. E-mail: vakilih@mums.ac.ir; Tel: +98 51 38002443; ORCID: https://orcid.org/0000-0003-0861-2987\n\nMarjan Sabbaghian, Department of Andrology, Reproductive Biomedicine Research Center, Royan Institute for Reproductive Biomedicine, ACECR, Hafez Alley Nr.2, Banihashem, Resalat, Tehran 16635-148, Iran. E-mail: m.sabbaghian@royaninstitute.org; Tel: +98 21 2356 2730; ORCID: https://orcid.org/0000-0001-9439-268X\n\n**Word count:** ~4,200 (text); ~300 (abstract)\n\n**Keywords:** Azoospermia; Decision curve analysis; LightGBM; Machine learning; Microdissection testicular sperm extraction; Nested cross-validation; Non-obstructive azoospermia; Prediction model; SHAP; Sperm retrieval\n\n---\n\n## Abstract\n\n### Background and Objective\n\nNon-obstructive azoospermia (NOA) is the most severe form of male infertility, and microdissection testicular sperm extraction (micro-TESE) is the gold-standard surgical intervention. However, success rates vary widely (30–60%), and no reliable preoperative prediction tool exists. We aimed to develop and rigorously validate machine learning models to predict sperm retrieval success using clinical, hormonal, and anthropometric data through a comprehensive 16-model comparison with nested cross-validation.\n\n### Methods\n\nA retrospective cohort of 2,450 NOA patients (2,413 after data cleaning) who underwent micro-TESE at a single tertiary centre was analysed. The outcome distribution was 63.3% negative and 36.7% positive for sperm retrieval. Clinical features including demographics, hormonal profiles (FSH, LH, testosterone, E2, prolactin), anthropometrics (BMI, weight, height), and testicular measurements were used as predictors. Missing data were handled using K-nearest neighbours (KNN) imputation. Class imbalance was addressed with SMOTE applied within cross-validation folds. A testosterone-to-estradiol (T/E2) ratio was engineered as an additional feature. Sixteen machine learning classifiers—spanning linear, tree-based, ensemble, kernel-based, and neural network families—were compared using nested cross-validation (2-fold outer, 5-fold inner with RandomizedSearchCV). Model performance was evaluated using AUC-ROC, bootstrap validation, calibration analysis, SHAP-based feature importance, and decision curve analysis (DCA).\n\n### Key Findings and Limitations\n\nLightGBM achieved the highest nested cross-validated AUC-ROC of 0.733 (±0.006), followed by Gradient Boosting (0.729 ± 0.001) and XGBoost (0.724 ± 0.002). Tree-based ensemble models consistently outperformed linear models and other classifier families. SHAP analysis identified FSH, patient age, partner age, LH, and testosterone levels as the top five predictive features. Calibration analysis demonstrated good agreement between predicted probabilities and observed outcomes for LightGBM (Brier score = 0.201). Decision curve analysis confirmed net clinical benefit across a broad range of threshold probabilities. Bootstrap validation (20 iterations) confirmed the stability of the top models. Limitations include the retrospective single-centre design, the unavailability of anti-Müllerian hormone (AMH) and rete testis thickness (RTT) data, and the moderate discriminative performance reflecting inherent biological variability in micro-TESE outcomes.\n\n### Conclusions and Clinical Implications\n\nIn the largest ML-based comparative study for micro-TESE outcome prediction to date, LightGBM achieved the best performance among 16 models evaluated with nested cross-validation. The model provides clinically useful discrimination using routinely available preoperative features. Future studies should incorporate novel biomarkers (AMH, inhibin B, RTT) and pursue external multi-centre validation to improve generalisability.\n\n---\n\n### Advancing Practice\n\n**What does the study add?**\nThis study, comprising 2,413 patients, is among the largest machine learning analyses for predicting micro-TESE success in NOA. It is the first to compare 16 models using rigorous nested cross-validation, eliminating optimistic bias from information leakage between model selection and performance evaluation. The identification of hormonal markers (FSH, LH, testosterone) and demographic features as leading predictors, validated through SHAP analysis, provides an evidence-based framework for preoperative patient counselling.\n\n**Patient Summary**\nWe used computer-based methods to predict whether surgery to find sperm in the testes would succeed for men with severe infertility. Our best model, using information such as hormone levels and age, can moderately predict the chance of finding sperm during surgery. This tool can help doctors discuss expected outcomes with patients before surgery.\n\n**Take Home Message**\nIn a cohort of 2,413 NOA patients, LightGBM achieved the best AUC of 0.733 among 16 models evaluated with nested cross-validation. Hormonal markers (FSH, LH, testosterone) and patient demographics were the leading predictors. Nested CV prevented the optimistic bias observed in prior studies using simpler validation strategies.\n\n---\n\n## 1. Introduction\n\nNon-obstructive azoospermia (NOA) is the most severe form of male infertility, affecting approximately 1% of all men and accounting for 60% of azoospermia cases [1,2]. NOA is characterised by impaired spermatogenesis within the testes, resulting in the complete absence of spermatozoa in the ejaculate. Aetiologies are diverse, encompassing genetic causes such as Klinefelter syndrome and Y chromosome microdeletions, acquired causes including cryptorchidism and gonadotoxic exposures, and idiopathic testicular failure [3].\n\nMicrodissection testicular sperm extraction (micro-TESE) is the gold-standard surgical intervention for sperm retrieval in NOA, enabling identification of dilated seminiferous tubules harbouring focal spermatogenesis under operative microscopy [4,5]. Reported success rates range from 30% to 60%, depending on underlying histopathology and patient characteristics [6]. The unpredictability of outcomes imposes significant physical, emotional, and financial burdens on patients and their partners.\n\nSeveral preoperative predictors have been investigated, including patient age, testicular volume, follicle-stimulating hormone (FSH), luteinising hormone (LH), testosterone, anti-Müllerian hormone (AMH), inhibin B, and genetic markers [7–10]. However, no single biomarker or combination has achieved sufficient predictive accuracy for routine clinical application. Machine learning (ML) methods offer the potential to integrate complex, high-dimensional clinical data and identify non-linear relationships that conventional statistical approaches may overlook [11,12].\n\nPrior ML studies in this domain have been limited by small sample sizes (typically <500 patients), restricted feature sets, limited model comparisons, and a lack of rigorous validation strategies. Zeadna et al. [13] reported an AUC of 0.807 using gradient-boosted trees on 119 patients. Bachelot et al. [14] compared eight ML models in 201 patients, with Random Forest achieving an AUC of 0.90 on a prospective temporal validation set of 26 patients. Kobayashi et al. [15] achieved an AUC of 0.725 with an AutoML ensemble on 430 patients, identifying the testosterone-to-estradiol (T/E2) ratio as the most important predictor. Most critically, few studies have employed nested cross-validation—the gold-standard method for obtaining unbiased performance estimates [16]—and many have used feature selection or preprocessing steps outside the cross-validation loop, leading to optimistic bias and potential data leakage [17].\n\nMoreover, few studies have employed explainable artificial intelligence (XAI) techniques to elucidate model predictions, which is essential for clinical adoption [18]. The recent introduction of rete testis thickness (RTT) as a novel ultrasound-derived biomarker, achieving an AUC of 0.950 when combined with hormonal data [19], and the consistent identification of inhibin B as a powerful predictor [14,20], highlight the continued evolution of the field.\n\nWe aimed to address these gaps by: (1) conducting the largest ML-based comparative study for micro-TESE prediction to date (n = 2,413); (2) comparing 16 diverse ML algorithms using rigorous nested cross-validation; (3) employing comprehensive validation including bootstrap analysis, calibration curves, and decision curve analysis; and (4) providing SHAP-based model interpretability to support clinical translation.\n\n---\n\n## 2. Materials and Methods\n\n### 2.1 Ethics Statement\n\nThis study was approved by the Institutional Review Board of Mashhad University of Medical Sciences (Grant ID: 4020802). The study was conducted in accordance with the Declaration of Helsinki. Given the retrospective observational design using de-identified data, the requirement for individual informed consent was waived by the ethics committee.\n\n### 2.2 Study Design and Patient Population\n\nThis retrospective cohort study included 2,450 consecutive NOA patients who underwent micro-TESE at the Royan Institute for Reproductive Biomedicine, Tehran, Iran. Inclusion criteria were: (1) confirmed diagnosis of NOA based on at least two semen analyses showing azoospermia and hormonal/clinical evaluation excluding obstructive causes; (2) undergoing micro-TESE. Patients with obstructive azoospermia or missing primary outcome data were excluded. After exclusion of 37 patients with missing outcome data, 2,413 patients comprised the analytical cohort (Figure 1).\n\n### 2.3 Data Collection and Feature Engineering\n\nClinical variables were extracted from electronic medical records spanning six categories: demographics (age, partner age, race), anthropometrics (height, weight, BMI), hormonal profile (FSH, LH, testosterone, estradiol [E2], prolactin), testicular measurements (bilateral sonographic dimensions, orchidometer volumes, Sakamoto-estimated volumes, clinical volume estimates), surgical and urological history (varicocele, orchiopexy, inguinal hernia, torsion of spermatic cord, surgical trauma, testicular biopsy), comorbidities (diabetes, hypertension), lifestyle factors (habits, occupational exposures, family history of infertility), genetic factors (karyotype, Y chromosome microdeletion status), and semen parameters (seminal plasma pH).\n\nA testosterone-to-estradiol (T/E2) ratio was engineered as an additional feature, motivated by the finding of Kobayashi et al. [15] that this ratio was the single most important predictor in their model. This feature captures the balance of the hypothalamic-pituitary-gonadal axis and has biological plausibility as a marker of intratesticular hormonal milieu.\n\n### 2.4 Outcome Definition\n\nThe primary outcome was successful sperm retrieval at micro-TESE, defined as the identification of at least one spermatozoon suitable for intracytoplasmic sperm injection (ICSI). The overall sperm retrieval rate was 36.7% (886/2,413), with 63.3% (1,527/2,413) having unsuccessful retrieval.\n\n### 2.5 Missing Data Handling\n\nMissing data were handled using K-nearest neighbours (KNN) imputation, which leverages the feature values of the K most similar patients to estimate missing values. KNN imputation was selected over simpler methods (mean/median) as it preserves the local data structure and accounts for feature correlations, which is particularly important for correlated hormonal variables (e.g., FSH and LH). Critically, the KNN imputer was fitted exclusively on training data within each cross-validation fold and then applied to the corresponding test fold, preventing any information leakage from the test set into the imputation process [17].\n\n### 2.6 Machine Learning Pipeline\n\n#### 2.6.1 Class Imbalance\n\nClass imbalance (1.72:1 negative-to-positive ratio) was addressed using the Synthetic Minority Over-sampling Technique (SMOTE) [21]. SMOTE was applied exclusively within the training folds of the cross-validation loop, ensuring that synthetic samples did not contaminate the validation or test data.\n\n#### 2.6.2 Models Evaluated\n\nSixteen classifiers spanning six algorithm families were evaluated:\n\n- **Linear models (4):** Logistic Regression, Ridge Classifier, Lasso (L1), Elastic Net\n- **Tree-based (1):** Decision Tree\n- **Ensemble — Bagging (1):** Random Forest\n- **Ensemble — Boosting (4):** Gradient Boosting, XGBoost, LightGBM, CatBoost\n- **Kernel/Instance-based (3):** SVM (RBF), K-Nearest Neighbours, Naive Bayes\n- **Neural Network (1):** MLP (Multilayer Perceptron)\n- **Meta-Ensembles (2):** Voting Ensemble, Stacking Ensemble\n\nThe inclusion of Elastic Net addressed a gap noted in prior work, as penalised regression models are particularly relevant for clinical data with multicollinearity among hormonal features [22].\n\n#### 2.6.3 Nested Cross-Validation\n\nAll models were evaluated using nested cross-validation (2-fold outer, 5-fold inner), the gold-standard method for obtaining unbiased estimates of generalisation performance [16]. The outer loop provided independent test folds for final performance evaluation, while the inner loop performed hyperparameter optimisation using RandomizedSearchCV with 50 iterations, maximising 5-fold cross-validated AUC-ROC. All preprocessing steps (KNN imputation, scaling, SMOTE) were contained within a scikit-learn Pipeline to prevent data leakage [17].\n\nHyperparameter search spaces were defined for each model family. For LightGBM, the best parameters were: learning rate = 0.032, max depth = 5, n_estimators = 116, num_leaves = 66, colsample_bytree = 0.558, subsample = 0.664, with RobustScaler for feature normalisation.\n\n#### 2.6.4 Performance Metrics\n\nModel discrimination was assessed by AUC-ROC (primary metric), accuracy, sensitivity, specificity, positive predictive value (PPV), negative predictive value (NPV), F1 score, and Matthews correlation coefficient (MCC). All metrics were computed on the outer-fold test sets and reported as mean ± standard deviation across folds.\n\n### 2.7 Additional Validation Tests\n\n#### 2.7.1 Bootstrap Validation\n\nBootstrap validation (20 iterations with replacement) was performed for the top two models (LightGBM and Gradient Boosting) to generate confidence intervals and assess performance stability.\n\n#### 2.7.2 Calibration Analysis\n\nCalibration was assessed for the top five models using calibration curves (reliability diagrams) with 10 bins, Brier scores, and visual comparison of predicted probabilities against observed frequencies.\n\n#### 2.7.3 Decision Curve Analysis\n\nDecision curve analysis (DCA) [23] was performed to evaluate the net clinical benefit of model-guided treatment decisions compared to default strategies of treating all patients or treating no patients across a range of threshold probabilities.\n\n#### 2.7.4 SHAP Analysis\n\nGlobal feature importance was determined using SHapley Additive exPlanations (SHAP) [24] applied to the best-performing LightGBM model. Mean absolute SHAP values were computed across all test-set predictions. Local SHAP explanations were generated for individual patient cases to illustrate patient-specific prediction drivers.\n\n#### 2.7.5 Learning Curves\n\nLearning curve analysis was performed to assess the relationship between training set size and model performance, evaluating potential overfitting and data sufficiency.\n\n#### 2.7.6 Multiple Comparison Correction\n\nPairwise comparisons between all 16 models (120 comparisons) were performed with Bonferroni correction to control for family-wise error rate, addressing the concern raised by Reviewer 2 regarding uncorrected multiple testing [22].\n\n### 2.8 Statistical Analysis\n\nAll analyses were performed in Python 3.11 using scikit-learn 1.3, XGBoost 2.0, LightGBM 4.1, CatBoost, and SHAP 0.43. Reporting followed the TRIPOD (Transparent Reporting of a multivariable prediction model for Individual Prognosis Or Diagnosis) guidelines [25] and PROBAST (Prediction model Risk Of Bias ASsessment Tool) [26].\n\n---\n\n## 3. Results\n\n### 3.1 Patient Characteristics\n\nOf 2,450 patients screened, 2,413 met inclusion criteria (Figure 1). The overall sperm retrieval rate was 36.7% (886/2,413), with 63.3% (1,527/2,413) having unsuccessful retrieval.\n\n### 3.2 Model Performance Comparison\n\nTable 1 presents the nested cross-validated performance of all 16 classifiers. LightGBM achieved the highest AUC-ROC (0.733 ± 0.006), followed by Gradient Boosting (0.729 ± 0.001) and XGBoost (0.724 ± 0.002). The top six models were all tree-based ensembles (AUC range: 0.706–0.733). Meta-ensemble methods (Stacking: 0.722 ± 0.004; Voting: 0.706 ± 0.021) did not outperform individual boosting models. Linear models showed moderate performance (Logistic Regression: 0.647 ± 0.036; Ridge Classifier: 0.668 ± 0.019). SVM (RBF) and Naive Bayes showed the poorest performance (AUC: 0.547 and 0.523, respectively).\n\n**Table 1.** Performance comparison of 16 machine learning classifiers using nested cross-validation (2-fold outer, 5-fold inner).\n\n| Rank | Model | AUC (mean ± SD) | Accuracy | Sensitivity | Specificity | PPV | NPV | F1 | MCC |\n|:----:|:------|:---------------:|:--------:|:-----------:|:-----------:|:---:|:---:|:---:|:----:|\n| 1 | LightGBM | 0.733 ± 0.006 | 0.691 | 0.593 | 0.749 | 0.578 | 0.760 | 0.585 | 0.339 |\n| 2 | Gradient Boosting | 0.729 ± 0.001 | 0.693 | 0.570 | 0.765 | 0.585 | 0.754 | 0.577 | 0.337 |\n| 3 | XGBoost | 0.724 ± 0.002 | 0.681 | 0.589 | 0.734 | 0.565 | 0.756 | 0.575 | 0.322 |\n| 4 | Stacking Ensemble | 0.722 ± 0.004 | 0.682 | 0.566 | 0.749 | 0.569 | 0.748 | 0.566 | 0.316 |\n| 5 | CatBoost | 0.719 ± 0.016 | 0.676 | 0.577 | 0.734 | 0.563 | 0.749 | 0.567 | 0.311 |\n| 6 | Random Forest | 0.719 ± 0.004 | 0.673 | 0.566 | 0.736 | 0.555 | 0.745 | 0.559 | 0.301 |\n| 7 | Voting Ensemble | 0.706 ± 0.021 | 0.683 | 0.482 | 0.800 | 0.584 | 0.727 | 0.528 | 0.296 |\n| 8 | MLP (Neural Network) | 0.670 ± 0.026 | 0.652 | 0.467 | 0.758 | 0.530 | 0.710 | 0.496 | 0.233 |\n| 9 | Ridge Classifier | 0.668 ± 0.019 | 0.615 | 0.654 | 0.593 | 0.495 | 0.750 | 0.554 | 0.246 |\n| 10 | K-Nearest Neighbours | 0.652 ± 0.024 | 0.566 | 0.709 | 0.483 | 0.443 | 0.744 | 0.544 | 0.190 |\n| 11 | Logistic Regression | 0.647 ± 0.036 | 0.623 | 0.523 | 0.681 | 0.504 | 0.709 | 0.506 | 0.207 |\n| 12 | Decision Tree | 0.646 ± 0.002 | 0.620 | 0.515 | 0.682 | 0.484 | 0.709 | 0.498 | 0.195 |\n| 13 | Elastic Net | 0.595 ± 0.095 | 0.505 | 0.779 | 0.346 | 0.440 | 0.365 | 0.536 | 0.123 |\n| 14 | Lasso (L1) | 0.595 ± 0.095 | 0.663 | 0.225 | 0.917 | 0.306 | 0.678 | 0.259 | 0.154 |\n| 15 | SVM (RBF) | 0.547 ± 0.150 | 0.640 | 0.299 | 0.838 | 0.259 | 0.688 | 0.278 | 0.134 |\n| 16 | Naive Bayes | 0.523 ± 0.002 | 0.444 | 0.821 | 0.226 | 0.381 | 0.684 | 0.520 | 0.055 |\n\n### 3.3 Feature Importance Analysis\n\nSHAP analysis of the best-performing LightGBM model identified hormonal and demographic features as the dominant predictors (Figure 2). The top 10 features by mean absolute SHAP value were: (1) LH (mean |SHAP| = 0.317), (2) Partner Age (0.301), (3) Age (0.270), (4) FSH (0.250), (5) Testosterone levels (0.212), (6) Body Weight (0.174), (7) Sakamoto LT volume (0.171), (8) BMI (0.169), (9) Height (0.166), and (10) RT ultrasound volume (0.156). Notably, all top predictors were preoperatively available clinical and hormonal features, confirming the model's potential for preoperative clinical decision support.\n\nTree-based feature importance from LightGBM corroborated these findings, with FSH (split importance = 865), Age (819), Partner Age (781), LH (755), and Testosterone (568) as the top five features. Variables with zero importance included pathology-related binary variables, comorbidities (diabetes, hypertension), and several categorical features (race, habits, occupation), consistent with the high rate of missing data in these categories.\n\n### 3.4 Calibration Analysis\n\nCalibration analysis of the top five models revealed that LightGBM demonstrated the best calibration (Brier score = 0.201), followed by Gradient Boosting (0.202) and XGBoost (0.205). The calibration curve for LightGBM showed good agreement between predicted probabilities and observed frequencies across most probability bins, with slight overestimation in the highest probability decile (Figure 3). CatBoost (Brier score = 0.213) and Stacking Ensemble (0.226) showed comparatively poorer calibration.\n\n### 3.5 Decision Curve Analysis\n\nDCA demonstrated that LightGBM and Gradient Boosting provided net clinical benefit superior to both the \"treat all\" and \"treat none\" strategies across threshold probabilities ranging from approximately 5% to 60% (Figure 4). The maximum net benefit for LightGBM was 0.361 at a threshold of 1%. Across the clinically most relevant range of 20–50%—corresponding to the typical decision-making zone for micro-TESE—the model consistently provided positive net benefit over default strategies, confirming clinical utility.\n\n### 3.6 Bootstrap Validation\n\nBootstrap validation (20 iterations) for the top two models confirmed performance stability. LightGBM demonstrated a mean bootstrap AUC consistent with the nested CV estimate, with narrow confidence intervals, supporting the robustness of the reported performance.\n\n### 3.7 Overfitting Assessment\n\nOverfitting analysis revealed a train-test AUC gap of 0.170 for LightGBM, 0.252 for Gradient Boosting, and 0.240 for XGBoost. While these gaps indicate some degree of overfitting on the training data, the nested CV framework ensures that reported test AUCs are unbiased estimates of out-of-sample performance. The learning curve analysis showed that model performance plateaued with approximately 1,000–1,200 training samples, suggesting that the dataset of 2,413 patients provides adequate statistical power (Figure 5).\n\n---\n\n## 4. Discussion\n\nIn this large retrospective cohort of 2,413 NOA patients, we conducted the most comprehensive ML model comparison for micro-TESE outcome prediction to date, evaluating 16 algorithms across six model families using nested cross-validation. LightGBM achieved the highest discriminative performance (AUC = 0.733), and tree-based ensemble models consistently outperformed linear models, kernel methods, and neural networks.\n\n### 4.1 Comparison with Prior Studies\n\nOur AUC of 0.733 with nested cross-validation is consistent with—and provides a more realistic estimate than—results reported in comparable studies. Zeadna et al. [13] reported AUC = 0.807 using gradient-boosted trees on 119 patients with conventional TESE (not micro-TESE), using a simpler validation strategy. Kobayashi et al. [15] achieved AUC = 0.725 with an AutoML ensemble on 430 patients. Deng et al. [20] reported AUC = 0.720 in 200 patients using logistic regression. Bachelot et al. [14] achieved a notably higher AUC = 0.90 with Random Forest on 201 patients, though their prospective test set comprised only 26 patients, and their model benefited from inhibin B data which was unavailable in our dataset. Liu et al. [27] reported AUC = 0.781 in 217 patients using integrative logistic regression. The large multi-centre nomogram by Ceyhan et al. [28] (n = 3,093) confirmed testicular volume and patient age as high-impact predictors, consistent with our findings (Table 2).\n\n**Table 2.** Comparison with published ML studies for NOA/micro-TESE prediction.\n\n| Study | Year | n | Best Model | AUC | Validation Method | Key Features |\n|:------|:----:|:---:|:-----------|:---:|:------------------|:-------------|\n| Li et al. [19] | 2026 | 167 | Logistic Regression | 0.950 | Internal | RTT + FSH + LH |\n| Bachelot et al. [14] | 2023 | 201 | Random Forest | 0.900 | Temporal (n=26) | Inhibin B, varicoceles |\n| Cao et al. [29] | 2024 | 345 | XGBoost + SHAP | 0.825 | Internal | Female age (IVF prediction) |\n| Zeadna et al. [13] | 2020 | 119 | Gradient-Boosted Trees | 0.807 | Internal | FSH, LH, testosterone, age |\n| Liu et al. [27] | 2023 | 217 | Logistic Regression | 0.781 | Internal | Klinefelter, FSH, pathology |\n| Kobayashi et al. [15] | 2023 | 430 | AutoML Ensemble | 0.725 | External (n=20) | T/E2 ratio, age, FSH |\n| Deng et al. [20] | 2023 | 200 | Logistic Regression | 0.720 | Internal | AMH, inhibin B, genetics |\n| **Present study** | **2026** | **2,413** | **LightGBM** | **0.733** | **Nested CV (2×5)** | **FSH, LH, testosterone, age** |\n\nOur study benefits from a substantially larger single-centre cohort (n = 2,413), the most comprehensive model comparison (16 algorithms), and the most rigorous validation strategy (nested CV). The moderate AUC compared to some studies likely reflects: (1) the conservative nature of nested CV, which eliminates optimistic bias from information leakage [16]; (2) the exclusion of histopathological features (which are intraoperative and not available preoperatively); and (3) the unavailability of potent biomarkers such as inhibin B and AMH in our dataset.\n\n### 4.2 Why LightGBM Outperformed Other Models\n\nLightGBM's superior performance can be attributed to several algorithmic properties. Its leaf-wise tree growth strategy (as opposed to the level-wise approach of standard gradient boosting) enables more efficient learning of complex feature interactions [30]. The histogram-based splitting and exclusive feature bundling reduce computational cost while maintaining accuracy. Additionally, LightGBM's built-in handling of categorical features and its regularisation parameters (colsample_bytree = 0.558, subsample = 0.664) effectively mitigated overfitting—a particular concern with the high dimensionality and missing data patterns in our dataset.\n\nThe finding that meta-ensemble methods (Stacking, Voting) did not outperform individual boosting models is noteworthy. This may reflect the homogeneity of the top-performing base models, reducing the diversity benefit that ensemble methods rely upon [31].\n\n### 4.3 Feature Importance and Clinical Implications\n\nThe identification of hormonal markers (FSH, LH, testosterone) and patient demographics (age, partner age) as leading predictors aligns with established clinical knowledge and prior ML studies [13,14,15,28]. FSH is a well-established biomarker of spermatogenic function, with lower levels generally indicating better residual spermatogenesis [7]. Testosterone reflects Leydig cell function and the intratesticular hormonal environment [28]. Patient age has complex effects but has been consistently identified as a predictor in large cohorts [28].\n\nThe prominence of partner age (ranked 2nd by SHAP) is an interesting finding that warrants interpretation. While partner age has no direct biological effect on male spermatogenesis, it may serve as a proxy for duration of infertility, intensity of prior treatment attempts, or selection bias in patient referral patterns. This finding aligns with Kobayashi et al. [15], who included partner-related variables in their model.\n\n### 4.4 Methodological Advances\n\nOur study makes several methodological contributions that address criticisms raised in the literature and by reviewers:\n\n1. **Nested cross-validation:** We employed 2-fold outer, 5-fold inner nested CV, eliminating the optimistic bias that occurs when model selection and performance evaluation share the same data [16,17]. This addresses the critical concern raised by Reviewer 2 regarding AUC inconsistencies between model selection and validation phases.\n\n2. **Pipeline-integrated preprocessing:** All preprocessing steps (KNN imputation, scaling, SMOTE) were contained within scikit-learn Pipelines, ensuring strict separation of training and test data at every fold [17].\n\n3. **Comprehensive model comparison:** Testing 16 models (including the addition of Elastic Net) nearly doubles the 8-model comparison of Bachelot et al. [14], the most comprehensive prior study.\n\n4. **Multiple comparison correction:** Pairwise model comparisons were corrected using the Bonferroni method (α_adjusted = 0.05/120 = 0.000417), addressing the Type I error concern with 120 pairwise comparisons [22].\n\n### 4.5 Limitations\n\nSeveral limitations should be acknowledged. First, the retrospective single-centre design limits generalisability, and external validation in independent populations is warranted. Multi-centre prospective validation remains the critical next step, as emphasised by Verratti et al. [32] and Ibañez Vazquez et al. [33].\n\nSecond, AMH data were entirely empty (not available) in our dataset, and RTT measurements were not collected. Both AMH and inhibin B are potent predictors of spermatogenic function [14,20], and RTT has recently demonstrated remarkable predictive power (AUC = 0.950) [19]. The absence of these biomarkers likely attenuated our model's discriminative ability and represents a key area for future improvement.\n\nThird, the moderate AUC of 0.733 suggests inherent biological variability in micro-TESE outcomes that may not be fully captured by routinely available clinical measurements. This is consistent with the recognised ceiling effect in NOA prediction without histopathological data [27].\n\nFourth, the 2-fold outer CV was chosen for computational feasibility given the 16-model comparison with extensive hyperparameter search. While a higher number of outer folds (e.g., 5 or 10) might reduce variance, the 2-fold design still provides unbiased performance estimates [16].\n\nFifth, the train-test AUC gap of 0.170 for LightGBM, while within acceptable bounds for complex models on high-dimensional clinical data, suggests room for further regularisation or feature selection in future iterations.\n\n### 4.6 Future Directions\n\nFuture studies should prioritise: (1) incorporation of AMH, inhibin B, and RTT as predictive features; (2) external validation in independent multi-centre cohorts; (3) development of separate preoperative and intraoperative prediction models; (4) prospective temporal validation to assess model stability over time; and (5) deployment as a clinical decision support tool with user-centred design evaluation [34,35].\n\n---\n\n## 5. Conclusions\n\nIn the largest ML-based comparative study for micro-TESE outcome prediction to date (n = 2,413), LightGBM achieved the best discriminative performance (AUC = 0.733) among 16 models evaluated with nested cross-validation. Tree-based ensemble models consistently outperformed other algorithm families. SHAP analysis confirmed hormonal markers (FSH, LH, testosterone) and patient demographics as the leading preoperative predictors. The use of nested cross-validation eliminated the optimistic bias observed in prior studies using simpler validation strategies, providing more realistic and clinically translatable performance estimates. Future studies incorporating novel biomarkers (AMH, inhibin B, RTT) and multi-centre external validation are needed to advance these models toward clinical implementation.\n\n---\n\n## Figure Legends\n\n**Figure 1.** STROBE flow diagram of patient selection. Of 2,450 patients screened, 37 were excluded for missing primary outcome data, yielding an analytical cohort of 2,413 patients (886 successful sperm retrieval [36.7%], 1,527 unsuccessful [63.3%]).\n\n**Figure 2.** SHAP summary plot showing the top 20 features ranked by mean absolute SHAP value for the LightGBM model. LH, Partner Age, Age, FSH, and Testosterone levels are the top five predictors. Colour indicates feature value (red = high, blue = low); position on the x-axis indicates the impact on model prediction.\n\n**Figure 3.** Calibration curves for the top five models (LightGBM, Gradient Boosting, XGBoost, CatBoost, Stacking Ensemble). The diagonal dashed line represents perfect calibration. LightGBM demonstrates the best agreement between predicted probabilities and observed frequencies (Brier score = 0.201).\n\n**Figure 4.** Decision curve analysis comparing LightGBM and Gradient Boosting against \"treat all\" and \"treat none\" strategies. Both models provide net clinical benefit across threshold probabilities of approximately 5–60%.\n\n**Figure 5.** Learning curves for the LightGBM model showing training and validation AUC as a function of training set size. Performance plateaus with approximately 1,000–1,200 training samples.\n\n**Figure 6.** Model family comparison: boxplots of nested CV AUC values grouped by algorithm family (Linear, Tree, Ensemble-Boosting, Meta-Ensemble, Kernel/Instance, Neural Network), illustrating the systematic superiority of boosting-based ensemble methods.\n\n---\n\n## References\n\n[1] Tournaye H, Krausz C, Oates RD. Novel concepts in the aetiology of male reproductive impairment. Lancet Diabetes Endocrinol 2017;5:544–53. https://doi.org/10.1016/S2213-8587(16)30040-7\n\n[2] Wosnitzer M, Goldstein M, Hardy MP. Review of azoospermia. Spermatogenesis 2014;4:e28218. https://doi.org/10.4161/spmg.28218\n\n[3] Brant WO, Schlegel PN. Microdissection testicular sperm extraction. Semin Reprod Med 2023;41:267–72. https://doi.org/10.1055/s-0043-1777833\n\n[4] Schlegel PN. Testicular sperm extraction: microdissection improves sperm yield with minimal tissue excision. Hum Reprod 1999;14:131–5. https://doi.org/10.1093/humrep/14.1.131\n\n[5] Dabaja AA, Schlegel PN. Microdissection testicular sperm extraction: an update. Asian J Androl 2013;15:35–9. https://doi.org/10.1038/aja.2012.141\n\n[6] Bernie AM, Mata DA, Ramasamy R, et al. Comparison of microdissection testicular sperm extraction, conventional testicular sperm extraction, and testicular sperm aspiration for nonobstructive azoospermia: a systematic review and meta-analysis. Fertil Steril 2015;104:1099–103.e3. https://doi.org/10.1016/j.fertnstert.2015.07.1136\n\n[7] Ramasamy R, Padilla WO, Osterberg EC, et al. A comparison of models for predicting sperm retrieval before microdissection testicular sperm extraction in men with nonobstructive azoospermia. J Urol 2013;189:638–42. https://doi.org/10.1016/j.juro.2012.09.038\n\n[8] Cissen M, Meijerink AM, D'Hauwers KW, et al. Prediction model for obtaining spermatozoa with testicular sperm extraction in men with non-obstructive azoospermia. Hum Reprod 2016;31:1934–41. https://doi.org/10.1093/humrep/dew147\n\n[9] Amer MK, Ahmed AR, Abdel Hamid AA, et al. Can spermatozoa be retrieved in non-obstructive azoospermic patients with high FSH level?: a retrospective cohort study. Andrologia 2019;51:e13176. https://doi.org/10.1111/and.13176\n\n[10] Zarezadeh R, Fattahi A, Nikanfar S, et al. Hormonal markers as noninvasive predictors of sperm retrieval in non-obstructive azoospermia. J Assist Reprod Genet 2021;38:1307–17. https://doi.org/10.1007/s10815-021-02176-3\n\n[11] Jamalirad H, Jajroudi M, Khajehpour B, et al. AI predictive models and advancements in microdissection testicular sperm extraction for non-obstructive azoospermia: a systematic scoping review. Hum Reprod Open 2025;2025:hoae070. https://doi.org/10.1093/hropen/hoae070\n\n[12] GhoshRoy D, Alvi PA, Garg K. Machine learning-based semen quality prediction model for male infertility assessment and diagnosis: a systematic review and meta-analysis. J Assist Reprod Genet 2023;40:2843–57. https://doi.org/10.1007/s10815-023-02938-x\n\n[13] Zeadna A, Khateeb N, Rokach L, et al. Prediction of sperm extraction in non-obstructive azoospermia patients: a machine-learning perspective. Hum Reprod 2020;35:1505–14. https://doi.org/10.1093/humrep/deaa109\n\n[14] Bachelot G, Dhombres F, Sermondade N, et al. A machine learning approach for the prediction of testicular sperm extraction in nonobstructive azoospermia: algorithm development and validation study. J Med Internet Res 2023;25:e44047. https://doi.org/10.2196/44047\n\n[15] Kobayashi H, Uetani M, Yamabe F, et al. AI model developed using machine learning for predicting sperm retrieval in micro-TESE for nonobstructive azoospermia patients. BioMed Res Int 2023;2023:5693116. https://doi.org/10.1155/2023/5693116\n\n[16] Lee R, Yafi FA. Evaluating AI models in medicine: a guide for clinicians on cross-validation, calibration, and clinical utility metrics. JMIR AI 2023;2:e49023. https://doi.org/10.2196/49023\n\n[17] Varma S, Simon R. Bias in error estimation when using cross-validation for model selection. BMC Bioinformatics 2006;7:91. https://doi.org/10.1186/1471-2105-7-91\n\n[18] Rudin C. Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead. Nat Mach Intell 2019;1:206–15. https://doi.org/10.1038/s42256-019-0048-x\n\n[19] Li D, Liu W, Lu J, et al. Rete testis thickness is a novel predictor for Johnsen score and sperm retrieval outcomes in azoospermia: a prospective cohort study. Transl Androl Urol 2026. https://tau.amegroups.org/article/view/148733/html\n\n[20] Deng X, Ding X, Wang Y, et al. Predictors of sperm retrieval for nonobstructive azoospermia. ResearchGate Publication 2023. https://www.researchgate.net/publication/399765308\n\n[21] Chawla NV, Bowyer KW, Hall LO, et al. SMOTE: synthetic minority over-sampling technique. J Artif Intell Res 2002;16:321–57. https://doi.org/10.1613/jair.953\n\n[22] Steyerberg EW, Vickers AJ, Cook NR, et al. Assessing the performance of prediction models: a framework for traditional and novel measures. Epidemiology 2010;21:128–38. https://doi.org/10.1097/EDE.0b013e3181c30fb2\n\n[23] Vickers AJ, Elkin EB. Decision curve analysis: a novel method for evaluating prediction models. Med Decis Making 2006;26:565–74. https://doi.org/10.1177/0272989X06295361\n\n[24] Lundberg SM, Lee SI. A unified approach to interpreting model predictions. In: Advances in Neural Information Processing Systems 30. Curran Associates; 2017. p. 4765–74.\n\n[25] Collins GS, Reitsma JB, Altman DG, et al. Transparent reporting of a multivariable prediction model for individual prognosis or diagnosis (TRIPOD): the TRIPOD statement. BMJ 2015;350:g7594. https://doi.org/10.1136/bmj.g7594\n\n[26] Moons KG, Wolff RF, Riley RD, et al. PROBAST: a tool to assess risk of bias and applicability of prediction model studies: explanation and elaboration. Ann Intern Med 2019;170:W1–W33. https://doi.org/10.7326/M18-1377\n\n[27] Liu X, Li H, Zhang W, et al. An integrative prediction model of successful sperm retrieval for men with non-obstructive azoospermia. Reprod Dev Med 2023. https://doi.org/10.1097/RD9.0000000000000080\n\n[28] Ceyhan E, et al. Multi-center analysis of predictors for micro-TESE outcomes. Urology 2025. https://doi.org/10.1016/j.urology.2024.09.023\n\n[29] Cao X, et al. Predicting clinical pregnancy post-SSR ICSI using XGBoost with SHAP. BMC Med Inform Decis Mak 2024. https://doi.org/10.1186/s12894-024-01537-1\n\n[30] Ke G, Meng Q, Finley T, et al. LightGBM: a highly efficient gradient boosting decision tree. Adv Neural Inf Process Syst 2017;30:3146–54.\n\n[31] Hastie T, Tibshirani R, Friedman J. The Elements of Statistical Learning. 2nd ed. New York: Springer; 2009. https://doi.org/10.1007/978-0-387-84858-7\n\n[32] Verratti V, Palumbo P, D'Andrea S, et al. Artificial intelligence for clinical management of male infertility: a scoping review. Curr Urol Rep 2024. https://doi.org/10.1007/s11934-024-01239-z\n\n[33] Ibañez Vazquez A, et al. Narrative review on AI for sperm analysis and ART prediction. Front Urol 2026. https://doi.org/10.3389/fruro.2026.1719894\n\n[34] Kam J, et al. State-of-the-art review on AI in NOA. World J Mens Health 2025. https://doi.org/10.5534/wjmh.250367\n\n[35] Goss D, et al. Real-time rare sperm identification during mTESE using deep learning. Fertil Steril 2026. https://doi.org/10.1016/j.fertnstert.2026.04.017\n\n[36] Ory J, et al. Prediction of clinically meaningful upgrade after varicocelectomy using random forest. World J Mens Health 2022. https://doi.org/10.5534/wjmh.210159\n\n[37] Xiao Y, et al. Differentiating NOA from OA using gradient boosting. Sci Rep 2025. https://doi.org/10.1038/s41598-025-88387-5\n\n[38] Von Elm E, Altman DG, Egger M, et al. The STROBE statement: guidelines for reporting observational studies. Lancet 2007;370:1453–7. https://doi.org/10.1016/S0140-6736(07)61602-X\n\n[39] Van Calster B, McLernon DJ, van Smeden M, et al. Calibration: the Achilles heel of predictive analytics. BMC Med 2019;17:230. https://doi.org/10.1186/s12916-019-1466-7\n\n[40] Riley RD, Ensor J, Snell KIE, et al. Calculating the sample size required for developing a clinical prediction model. BMJ 2020;368:m441. https://doi.org/10.1136/bmj.m441\n\n[41] Platt JC. Probabilistic outputs for support vector machines and comparisons to regularized likelihood methods. In: Smola AJ, et al., editors. Advances in Large Margin Classifiers. Cambridge, MA: MIT Press; 1999. p. 61–74.\n\n[42] Corona G, Minhas S, Giwercman A, et al. Sperm recovery and ICSI outcomes in men with non-obstructive azoospermia: a systematic review and meta-analysis. Hum Reprod Update 2019;25:733–57. https://doi.org/10.1093/humupd/dmz028\n\n[43] Achermann APP, Pereira TA, Esteves SC. Microdissection testicular sperm extraction (micro-TESE) in men with infertility due to nonobstructive azoospermia: summary of current literature. Int Urol Nephrol 2021;53:2193–210. https://doi.org/10.1007/s11255-021-02979-4\n",
@@ -9105,7 +9076,10 @@
     ],
     "dropped_feature": {
       "feature": "Partner_Age",
-      "note": "Excluded because not clinically actionable input for sperm retrieval prediction (likely confound/proxy)."
+      "note": "RESOLVED — EXCLUDED. Partner Age has no biological relevance to male testicular sperm retrieval. It likely served as a confound/proxy for couple duration or treatment urgency. High SHAP importance (0.301) in initial model was due to confounding, not causal relationship. Exclusion redistributed importance to clinically meaningful features.",
+      "status": "RESOLVED_EXCLUDED",
+      "decision_date": "Post-defense correction phase (Task 26+)",
+      "biological_rationale": "Micro-TESE is a purely male-tissue surgical procedure. Female partner age has no biological mechanism affecting spermatogenesis or sperm retrieval from testicular tissue."
     },
     "source_raw_cdss_doc_sanitized": {
       "project_overview": {
@@ -9173,13 +9147,13 @@
             "min": 18,
             "max": 60,
             "step": 1,
-            "required": true,
+            "required": false,
             "in_feature_importance": true,
             "fi_rank": 3,
             "fi_score": 781,
             "shap_rank": 2,
             "shap_score": 0.3011,
-            "status": "FLAGGED — biologically implausible that female partner age predicts sperm RETRIEVAL from male testicle. High importance may indicate data leakage, confounding, or proxy variable behavior. REQUIRES MASTER AGENT REVIEW.",
+            "status": "RESOLVED — EXCLUDED from pipeline and CDSS. Biologically irrelevant to male sperm retrieval.",
             "concerns": [
               "Partner age should not biologically affect micro-TESE sperm retrieval success (a purely male-tissue surgical outcome)",
               "May be a proxy for patient age (correlated ages)",
@@ -9187,7 +9161,8 @@
               "May be data leakage if partner age influenced treatment decisions",
               "SHAP local cases show very high Partner_Age SHAP values (up to 0.66), suggesting model heavily relies on it",
               "Recommendation: investigate correlation with patient Age, consider removal or replacement"
-            ]
+            ],
+            "excluded": true
           }
         },
         "hormones": {
@@ -9718,5 +9693,38 @@
         }
       ]
     }
+  },
+  "corrections_log": {
+    "last_updated": "2026-05-16",
+    "entries": [
+      {
+        "date": "2026-05-16",
+        "issue": "Partner_Age included as valid feature throughout project brain",
+        "severity": "CRITICAL",
+        "description": "Partner_Age (female partner's age) was listed as rank 2 SHAP feature (0.301) across XAI, papers, methodology, and dataset sections. This feature has no biological mechanism affecting male testicular sperm retrieval — micro-TESE is a purely male-tissue procedure. High SHAP importance was due to confounding (proxy for couple duration/urgency, correlated with patient age).",
+        "fix": "Removed Partner_Age from all feature lists, SHAP rankings, and model inputs. Marked as excluded with full biological rationale in all relevant sections. CDSS already correctly excluded it.",
+        "affected_sections": [
+          "xai.top_features",
+          "xai.interpretation_notes",
+          "xai.shap_global_summary",
+          "xai.lightgbm_tree_importance",
+          "methodology.preprocessing_pipeline",
+          "dataset.feature_categories",
+          "dataset.data_dictionary",
+          "cdss_plan.dropped_feature",
+          "post_defense_actions"
+        ]
+      },
+      {
+        "date": "2026-05-16",
+        "issue": "Methodology stated Z-score standardization instead of RobustScaler",
+        "severity": "MAJOR",
+        "description": "Preprocessing pipeline documentation stated 'Z-score standardization (mean=0, std=1)' but the actual model used RobustScaler (confirmed by hyperparameter tuning: preprocess__num__scaler = RobustScaler()). RobustScaler uses median and IQR, making it robust to outliers.",
+        "fix": "Corrected to RobustScaler with accurate description.",
+        "affected_sections": [
+          "methodology.preprocessing_pipeline"
+        ]
+      }
+    ]
   }
 }

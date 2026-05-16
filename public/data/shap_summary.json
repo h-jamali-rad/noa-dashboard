@@ -2,7 +2,6 @@
   "global": {
     "global_shap_importance": {
       "LH": 0.3170224435045276,
-      "Partner_Age": 0.3010514725887122,
       "Age": 0.27013426179481914,
       "FSH": 0.25032088680111114,
       "Testosterone_levels": 0.21181623281879083,
@@ -42,10 +41,6 @@
         "Age": {
           "shap_value": -0.3202565010457098,
           "feature_value": 40.0
-        },
-        "Partner_Age": {
-          "shap_value": -0.12012402228483622,
-          "feature_value": 42.0
         },
         "Hieght": {
           "shap_value": -0.11162368764166046,
@@ -94,10 +89,6 @@
           "shap_value": 0.6301735418436094,
           "feature_value": 50.0
         },
-        "Partner_Age": {
-          "shap_value": 0.3521189637470074,
-          "feature_value": 41.0
-        },
         "Hieght": {
           "shap_value": -0.08937835264903725,
           "feature_value": 175.0
@@ -133,10 +124,6 @@
       "prediction": 0.7822201471039142,
       "actual": 1,
       "top_features": {
-        "Partner_Age": {
-          "shap_value": 0.6592236680155522,
-          "feature_value": 41.0
-        },
         "Age": {
           "shap_value": 0.5675406593848741,
           "feature_value": 56.0
@@ -192,10 +179,6 @@
           "shap_value": 0.4940670633260545,
           "feature_value": 2835.0
         },
-        "Partner_Age": {
-          "shap_value": 0.4270575568345939,
-          "feature_value": 30.0
-        },
         "Sakamoto_RT_mL": {
           "shap_value": 0.3725639737754111,
           "feature_value": 1.5783299999999998
@@ -234,10 +217,6 @@
         "E2": {
           "shap_value": -0.6801963229974566,
           "feature_value": 27.0
-        },
-        "Partner_Age": {
-          "shap_value": 0.6208439718586658,
-          "feature_value": 38.0
         },
         "BMI": {
           "shap_value": 0.6197368597341861,

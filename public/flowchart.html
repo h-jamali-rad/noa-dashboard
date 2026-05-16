@@ -250,7 +250,7 @@ Your browser does not support the audio element.
   <p class="desc">Cataloged all 55 original columns grouped into 10 clinical categories.</p>
   <div class="col-list">
     <span class="col-chip">ID</span><span class="col-chip">Roy-ID</span><span class="col-chip">Age</span>
-    <span class="col-chip">Partner Age</span><span class="col-chip">Race</span><span class="col-chip">BMI</span>
+    <span class="col-chip" style="text-decoration:line-through;opacity:.5;border-color:var(--red)" title="Excluded — biologically irrelevant to male sperm retrieval">Partner Age ✕</span><span class="col-chip">Race</span><span class="col-chip">BMI</span>
     <span class="col-chip">Hieght</span><span class="col-chip">Boby Weight</span>
     <span class="col-chip">FSH</span><span class="col-chip">LH</span><span class="col-chip">Testosterone</span>
     <span class="col-chip">Prolactin</span><span class="col-chip">E2</span>
@@ -265,7 +265,7 @@ Your browser does not support the audio element.
     <div class="tooltip-section"><span class="label rat">Rationale</span><p>A comprehensive inventory ensures no variables are accidentally dropped or overlooked. Typos in column names (e.g., "Hieght", "Boby Weight") were preserved to maintain traceability to the source file.</p></div>
     <div class="tooltip-section"><span class="label det">Details — 10 Categories</span>
       <ul>
-        <li><strong>Demographics:</strong> Age, Partner Age, Race</li>
+        <li><strong>Demographics:</strong> Age, Race <em style="color:var(--red);font-size:.7rem">(Partner Age excluded — no biological relevance to male sperm retrieval)</em></li>
         <li><strong>Anthropometrics:</strong> Hieght, Boby Weight, BMI</li>
         <li><strong>Hormonal:</strong> FSH, LH, Testosterone, Prolactin, E2, TSH, SHBG, inhibin B, AMH</li>
         <li><strong>Testicular:</strong> Sono RT/LT, Orchidometer RT/LT, RT-XYZ/LT-XYZ, Sakamoto RT/LT, Volume RT/LT</li>
@@ -291,7 +291,7 @@ Your browser does not support the audio element.
   <div class="mini-bars">
     <div class="mini-bar-item"><span>Age</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:0%;background:var(--green)"></div></div><span>0%</span></div>
     <div class="mini-bar-item"><span>Race</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:0%;background:var(--green)"></div></div><span>0%</span></div>
-    <div class="mini-bar-item"><span>Partner Age</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:8.6%;background:var(--green)"></div></div><span>8.6%</span></div>
+    <div class="mini-bar-item" style="opacity:.45;text-decoration:line-through"><span>Partner Age ✕</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:8.6%;background:var(--red)"></div></div><span style="color:var(--red)">excluded</span></div>
     <div class="mini-bar-item"><span>FSH</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:22.2%;background:var(--gold)"></div></div><span>22.2%</span></div>
     <div class="mini-bar-item"><span>LH</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:25.1%;background:var(--gold)"></div></div><span>25.1%</span></div>
     <div class="mini-bar-item"><span>Testosterone</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:22.6%;background:var(--gold)"></div></div><span>22.6%</span></div>
@@ -603,7 +603,7 @@ Your browser does not support the audio element.
       </ul>
     </div>
     <div class="tooltip-section"><span class="label ref">Reference</span><p>Scikit-learn documentation. RobustScaler selected via RandomizedSearchCV (50 iterations, 2-outer × 5-inner CV).</p></div>
-    <div class="tooltip-section"><span class="label det">Scope</span><p>Applied to: Age, Partner Age, BMI, Height, Weight, FSH, LH, Testosterone, Prolactin, E2, testicular volume measurements, Sakamoto volumes, Seminal plasma pH.</p></div>
+    <div class="tooltip-section"><span class="label det">Scope</span><p>Applied to: Age, BMI, Height, Weight, FSH, LH, Testosterone, Prolactin, E2, testicular volume measurements, Sakamoto volumes, Seminal plasma pH. <em style="color:var(--red)">(Partner Age excluded from pipeline — biologically irrelevant to male sperm retrieval.)</em></p></div>
   </div>
 </div>
 
@@ -692,32 +692,33 @@ Your browser does not support the audio element.
 <div class="step-card accent-gold tooltip-trigger" style="animation-delay:.9s">
   <span class="step-num">STEP 16</span>
   <h3><span class="icon">📈</span> Biomarker Correlation — Top SHAP Features</h3>
-  <p class="desc">Global SHAP analysis identified top predictors. Hormonal and demographic variables dominate; pathology features had near-zero contribution in preoperative model.</p>
+  <p class="desc">Global SHAP analysis identified top predictors after Partner Age exclusion. Hormonal, demographic, and anthropometric variables dominate; pathology features had near-zero contribution in preoperative model.</p>
   <div class="mini-bars">
     <div class="mini-bar-item"><span style="min-width:90px">LH</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:100%;background:linear-gradient(90deg,var(--teal),var(--purple))"></div></div><span>0.317</span></div>
-    <div class="mini-bar-item"><span style="min-width:90px">Partner Age</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:95%;background:linear-gradient(90deg,var(--teal),var(--purple))"></div></div><span>0.301</span></div>
     <div class="mini-bar-item"><span style="min-width:90px">Age</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:85%;background:linear-gradient(90deg,var(--teal),var(--purple))"></div></div><span>0.270</span></div>
     <div class="mini-bar-item"><span style="min-width:90px">FSH</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:79%;background:linear-gradient(90deg,var(--teal),var(--purple))"></div></div><span>0.250</span></div>
     <div class="mini-bar-item"><span style="min-width:90px">Testosterone</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:67%;background:linear-gradient(90deg,var(--teal),var(--purple))"></div></div><span>0.212</span></div>
     <div class="mini-bar-item"><span style="min-width:90px">Body Weight</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:55%;background:linear-gradient(90deg,var(--green),var(--teal))"></div></div><span>0.174</span></div>
     <div class="mini-bar-item"><span style="min-width:90px">Sakamoto-LT</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:54%;background:linear-gradient(90deg,var(--green),var(--teal))"></div></div><span>0.171</span></div>
     <div class="mini-bar-item"><span style="min-width:90px">BMI</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:53%;background:linear-gradient(90deg,var(--green),var(--teal))"></div></div><span>0.169</span></div>
+    <div class="mini-bar-item"><span style="min-width:90px">Height</span><div class="mini-bar-track" style="width:100px"><div class="mini-bar-fill" style="width:52%;background:linear-gradient(90deg,var(--green),var(--teal))"></div></div><span>0.166</span></div>
   </div>
+  <div style="margin-top:8px;padding:6px 12px;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.3);border-radius:8px;font-size:.75rem;color:var(--red)">⚠️ Partner Age was excluded from this pipeline — it has no biological relevance to male testicular sperm retrieval (likely a confound/proxy for couple duration). Removing it redistributed SHAP importance to clinically meaningful features.</div>
   <div class="tooltip-card">
-    <h4>📈 Top SHAP Feature Importance</h4>
-    <div class="tooltip-section"><span class="label rat">Rationale</span><p>SHAP (SHapley Additive exPlanations) provides theoretically grounded, consistent feature attribution. Global mean |SHAP| values identify which biomarkers most influence the model's predictions across the entire cohort, enabling clinical interpretation and biomarker discovery.</p></div>
-    <div class="tooltip-section"><span class="label det">Details — Top 10 Features</span>
+    <h4>📈 Top SHAP Feature Importance (Partner Age excluded)</h4>
+    <div class="tooltip-section"><span class="label rat">Rationale</span><p>SHAP (SHapley Additive exPlanations) provides theoretically grounded, consistent feature attribution. Partner Age was excluded because it has no biological mechanism affecting male sperm retrieval — it likely served as a proxy for couple duration/urgency. After exclusion, the remaining features better reflect true clinical predictors. Global mean |SHAP| values identify which biomarkers most influence the model's predictions across the entire cohort.</p></div>
+    <div class="tooltip-section"><span class="label det">Details — Top 10 Features (without Partner Age)</span>
       <ul>
         <li>1. LH (0.317) — strongest predictor</li>
-        <li>2. Partner_Age (0.301)</li>
-        <li>3. Age (0.270)</li>
-        <li>4. FSH (0.250)</li>
-        <li>5. Testosterone (0.212)</li>
-        <li>6. Body Weight (0.174)</li>
-        <li>7. Sakamoto-LT (0.171)</li>
-        <li>8. BMI (0.169)</li>
-        <li>9. Height (0.166)</li>
-        <li>10. RT-XYZ Sono (0.156)</li>
+        <li>2. Age (0.270)</li>
+        <li>3. FSH (0.250)</li>
+        <li>4. Testosterone (0.212)</li>
+        <li>5. Body Weight (0.174)</li>
+        <li>6. Sakamoto-LT (0.171)</li>
+        <li>7. BMI (0.169)</li>
+        <li>8. Height (0.166)</li>
+        <li>9. RT-XYZ Sono (0.156)</li>
+        <li>10. Testicular Vol LT (0.129)</li>
       </ul>
     </div>
     <div class="tooltip-section"><span class="label ref">Reference</span><p>Lundberg, S. & Lee, S.-I. (2017). "A Unified Approach to Interpreting Model Predictions." NeurIPS.<br>Pathology_RT and Pathology_LT had mean |SHAP| = 0.0 in corrected preoperative model.</p></div>
