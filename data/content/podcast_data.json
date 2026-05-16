@@ -1,5 +1,5 @@
 {
-  "intro": "We are Dr. Alex and Dr. Sarah \u2014 expert agents trained by Hossein Jamalirad, PhD Candidate from Mashhad University of Medical Sciences (MUMS), Department of Medical Informatics, under the supervision of Dr. Hassan Vakili Arki and Dr. Saeid Eslami from the Medical Informatics group at MUMS, and under clinical supervision of Dr. Marjan Sabbaghian and Associate Clinical Professor Dr. Muhammad Ali Sadighi Gilani from Royan Institute Male Infertility Referral Center in Tehran. As part of the agentic AI architecture he designed, we've produced this content to help clarify each section of this investigation transparently.",
+  "intro": "We are Dr. Alex and Dr. Sarah — expert agents trained by Hossein Jamalirad, PhD Candidate from Mashhad University of Medical Sciences (MUMS), Department of Medical Informatics, under the supervision of Dr. Hassan Vakili Arki and Dr. Saeid Eslami from the Medical Informatics group at MUMS, and under clinical supervision of Dr. Marjan Sabbaghian and Associate Clinical Professor Dr. Muhammad Ali Sadighi Gilani from Royan Institute Male Infertility Referral Center in Tehran. As part of the agentic AI architecture he designed, we've produced this content to help clarify each section of this investigation transparently.",
   "hosts": {
     "host1": {
       "name": "Dr. Alex",
@@ -18,11 +18,11 @@
       "lines": [
         {
           "speaker": "Dr. Alex",
-          "text": "Welcome back, Sarah. Today we're walking through a clinical machine-learning project with one of the most rigorous audit trails I've seen lately \u2014 preoperative prediction of micro-TESE sperm retrieval success in non-obstructive azoospermia, designed by Hossein Jamalirad, PhD candidate in Medical Informatics at Mashhad University of Medical Sciences."
+          "text": "Welcome back, Sarah. Today we're walking through a clinical machine-learning project with one of the most rigorous audit trails I've seen lately — preoperative prediction of micro-TESE sperm retrieval success in non-obstructive azoospermia, designed by Hossein Jamalirad, PhD candidate in Medical Informatics at Mashhad University of Medical Sciences."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "Right, and the clinical motivation is sharp. Non-obstructive azoospermia, NOA, is the most severe form of male infertility \u2014 patients have essentially no sperm in the ejaculate because spermatogenesis itself is failing. It affects about one percent of all men and roughly ten percent of infertile men."
+          "text": "Right, and the clinical motivation is sharp. Non-obstructive azoospermia, NOA, is the most severe form of male infertility — patients have essentially no sperm in the ejaculate because spermatogenesis itself is failing. It affects about one percent of all men and roughly ten percent of infertile men."
         },
         {
           "speaker": "Dr. Alex",
@@ -30,19 +30,19 @@
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "Which means more than half of these men go through major scrotal surgery and walk out empty-handed. The clinical question this project tries to answer is whether we can use routinely collected pre-operative data \u2014 hormones, testicular volume, karyotype, and especially diagnostic biopsy histopathology \u2014 to estimate retrieval probability before the patient is on the operating table."
+          "text": "Which means more than half of these men go through major scrotal surgery and walk out empty-handed. The clinical question this project tries to answer is whether we can use routinely collected pre-operative data — hormones, testicular volume, karyotype, and especially diagnostic biopsy histopathology — to estimate retrieval probability before the patient is on the operating table."
         },
         {
           "speaker": "Dr. Alex",
-          "text": "The cohort is from the Royan Institute in Tehran \u2014 2,450 NOA patients screened, 2,413 with a valid Outcome1 label. The overall successful-retrieval prevalence is 36.7 percent, which gives a class-imbalance ratio of about 1.72 to 1, failure to success."
+          "text": "The cohort is from the Royan Institute in Tehran — 2,450 NOA patients screened, 2,413 with a valid Outcome1 label. The overall successful-retrieval prevalence is 36.7 percent, which gives a class-imbalance ratio of about 1.72 to 1, failure to success."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "And what makes this dataset interesting is that it's a real-world clinical cohort, not a curated benchmark. The pathology reports are mixed Persian and English free text, and a major chunk of the project is structured information extraction from those reports \u2014 sixteen bilateral pathology percentage features plus engineered severity scores."
+          "text": "And what makes this dataset interesting is that it's a real-world clinical cohort, not a curated benchmark. The pathology reports are mixed Persian and English free text, and a major chunk of the project is structured information extraction from those reports — sixteen bilateral pathology percentage features plus engineered severity scores."
         },
         {
           "speaker": "Dr. Alex",
-          "text": "It's also explicitly a v2 pipeline. The team published a v1, then ran an independent ground-truth audit, found nine critical ML-correctness defects plus twenty-two secondary issues, and rebuilt the entire pipeline. v2 is what we'll be unpacking today \u2014 the model, the audit fixes, the calibration story, the CDSS, and the multi-agent orchestration behind it."
+          "text": "It's also explicitly a v2 pipeline. The team published a v1, then ran an independent ground-truth audit, found nine critical ML-correctness defects plus twenty-two secondary issues, and rebuilt the entire pipeline. v2 is what we'll be unpacking today — the model, the audit fixes, the calibration story, the CDSS, and the multi-agent orchestration behind it."
         },
         {
           "speaker": "Dr. Sarah",
@@ -55,7 +55,7 @@
       "lines": [
         {
           "speaker": "Dr. Alex",
-          "text": "So, Sarah, the source workbook is Book_11.17.2025_Dr. Rad_Final ID.xlsb from the Royan Institute \u2014 2,450 rows times 55 original columns, ingested with pyxlsb. After feature engineering it grows to 73 columns; after filtering to valid Outcome1 cases the analytical cohort is 2,413."
+          "text": "So, Sarah, the source workbook is Book_11.17.2025_Dr. Rad_Final ID.xlsb from the Royan Institute — 2,450 rows times 55 original columns, ingested with pyxlsb. After feature engineering it grows to 73 columns; after filtering to valid Outcome1 cases the analytical cohort is 2,413."
         },
         {
           "speaker": "Dr. Sarah",
@@ -63,7 +63,7 @@
         },
         {
           "speaker": "Dr. Alex",
-          "text": "Pathology is the centrepiece, though. Pathology-RT is missing in about 22 percent and Pathology-LT in 49 percent. The team wrote a regex-based parser to extract structured percentages \u2014 Sertoli-Cell-Only, Hypospermatogenesis, Severe Hypospermatogenesis, four maturation-arrest stages, and CSTH \u2014 for both the right and left testis."
+          "text": "Pathology is the centrepiece, though. Pathology-RT is missing in about 22 percent and Pathology-LT in 49 percent. The team wrote a regex-based parser to extract structured percentages — Sertoli-Cell-Only, Hypospermatogenesis, Severe Hypospermatogenesis, four maturation-arrest stages, and CSTH — for both the right and left testis."
         },
         {
           "speaker": "Dr. Sarah",
@@ -71,52 +71,52 @@
         },
         {
           "speaker": "Dr. Alex",
-          "text": "That sparsity is exactly what bit the v1 pipeline \u2014 we'll come back to it. The other quality steps are worth highlighting: row-count integrity check against the source xlsb, column-name normalisation that deliberately preserves the original typos like 'Hieght' and 'Boby Weight', maturation-arrest hierarchy enforcement, and a bilateral consistency check between the parsed RT and LT pathology features."
+          "text": "That sparsity is exactly what bit the v1 pipeline — we'll come back to it. The other quality steps are worth highlighting: row-count integrity check against the source xlsb, column-name normalisation that deliberately preserves the original typos like 'Hieght' and 'Boby Weight', maturation-arrest hierarchy enforcement, and a bilateral consistency check between the parsed RT and LT pathology features."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "The split is stratified 80/20 on Outcome1 with random_state=42 \u2014 1,930 training and 483 test patients. There's also an alternative roughly 70/30 split with 1,689 training and 724 test cases used specifically for the calibration analyses."
+          "text": "The split is stratified 80/20 on Outcome1 with random_state=42 — 1,930 training and 483 test patients. There's also an alternative roughly 70/30 split with 1,689 training and 724 test cases used specifically for the calibration analyses."
         },
         {
           "speaker": "Dr. Alex",
-          "text": "And the time period is interesting \u2014 the stated range is 2007 to 2022, but the Persian-calendar dates inside the Successful Sperm Retrieval columns actually run 1398 to 1403, which corresponds to roughly 2019 to 2025. So the cohort is genuinely contemporary."
+          "text": "And the time period is interesting — the stated range is 2007 to 2022, but the Persian-calendar dates inside the Successful Sperm Retrieval columns actually run 1398 to 1403, which corresponds to roughly 2019 to 2025. So the cohort is genuinely contemporary."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "Right \u2014 IRB-approved retrospective cohort, fully de-identified at Royan. Solid foundation. Now methodology."
+          "text": "Right — IRB-approved retrospective cohort, fully de-identified at Royan. Solid foundation. Now methodology."
         }
       ]
     },
     {
-      "title": "Methodology \u2014 Nested CV, Preprocessing, Pathology Encoding",
+      "title": "Methodology — Nested CV, Preprocessing, Pathology Encoding",
       "lines": [
         {
           "speaker": "Dr. Alex",
-          "text": "Methodology in v2 is where the audit fixes really show up. The headline change is the nested cross-validation budget. v1 used N_OUTER, N_INNER, and N_ITER_SEARCH all set to 2 \u2014 that's only four model fits per outer fold, per algorithm. v2 uses 5\u00d75 StratifiedKFold with n_iter=50 RandomizedSearchCV, so 250 fits per outer fold per model."
+          "text": "Methodology in v2 is where the audit fixes really show up. The headline change is the nested cross-validation budget. v1 used N_OUTER, N_INNER, and N_ITER_SEARCH all set to 2 — that's only four model fits per outer fold, per algorithm. v2 uses 5×5 StratifiedKFold with n_iter=50 RandomizedSearchCV, so 250 fits per outer fold per model."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "And that single change matters statistically, because a 95 percent CI computed on n=2 fold values is mechanically just (min, max), not a confidence interval. Likewise the v1 Wilcoxon model-comparison adjusted p-values were forced to 1.0 by construction \u2014 n=2 paired observations can't reject anything."
+          "text": "And that single change matters statistically, because a 95 percent CI computed on n=2 fold values is mechanically just (min, max), not a confidence interval. Likewise the v1 Wilcoxon model-comparison adjusted p-values were forced to 1.0 by construction — n=2 paired observations can't reject anything."
         },
         {
           "speaker": "Dr. Alex",
-          "text": "The second big methodology fix is the preprocessing pipeline. v1's numeric pipeline ran KNNImputer first, then IQRClipper, then StandardScaler. v2 reorders it to StandardScaler then KNNImputer \u2014 and IQRClipper is deleted entirely from the codebase."
+          "text": "The second big methodology fix is the preprocessing pipeline. v1's numeric pipeline ran KNNImputer first, then IQRClipper, then StandardScaler. v2 reorders it to RobustScaler then KNNImputer — IQRClipper is deleted entirely from the codebase, and StandardScaler is replaced by RobustScaler because RobustScaler is less sensitive to the extreme outliers present in hormonal and testicular volume measurements."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "Why the reorder? Because k-NN distance is dominated by whichever feature has the largest raw magnitude. In v1 that meant total testicular volume and hormone concentrations were swamping the imputer's neighbour selection. Standardising first makes the imputation feature-scale invariant."
+          "text": "Why the reorder? Because k-NN distance is dominated by whichever feature has the largest raw magnitude. In v1 that meant total testicular volume and hormone concentrations were swamping the imputer's neighbour selection. Scaling first with RobustScaler makes the imputation feature-scale invariant — and RobustScaler uses median and IQR rather than mean and standard deviation, so it's naturally robust to the skewed distributions in this cohort."
         },
         {
           "speaker": "Dr. Alex",
-          "text": "And IQRClipper had to go because for sparse pathology percentage columns where 75 percent or more of values are zero, Q1 equals Q3 equals 0, so the inter-quartile range is 0, and np.clip then forces every value \u2014 including the rare informative non-zero ones \u2014 to zero. The downstream StandardScaler sees a constant column, and SHAP for a constant input is mathematically zero."
+          "text": "And IQRClipper had to go because for sparse pathology percentage columns where 75 percent or more of values are zero, Q1 equals Q3 equals 0, so the inter-quartile range is 0, and np.clip then forces every value — including the rare informative non-zero ones — to zero. In v1, the downstream StandardScaler then saw a constant column, and SHAP for a constant input is mathematically zero. v2 avoids this entirely by removing IQRClipper and using RobustScaler."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "Which is exactly why all sixteen pathology features showed SHAP equal to zero in v1. That was the smoking gun. The third methodology fix is pathology encoding \u2014 Faz 3 ran a 16-encoding-by-5-model investigation, eighty cells in total, and ordinal_detailed_plus_raw won. That's the sixteen raw percentage columns plus engineered RT_severity and LT_severity ordinal weighted-severity scores."
+          "text": "Which is exactly why all sixteen pathology features showed SHAP equal to zero in v1. That was the smoking gun. The third methodology fix is pathology encoding — Faz 3 ran a 16-encoding-by-5-model investigation, eighty cells in total, and ordinal_detailed_plus_raw won. That's the sixteen raw percentage columns plus engineered RT_severity and LT_severity ordinal weighted-severity scores."
         },
         {
           "speaker": "Dr. Alex",
-          "text": "Pathology-only with that encoding hits AUC 0.8042, while the clinical-only baseline tops out at 0.5642 \u2014 pathology is contributing roughly +0.27 in AUC. And there's one more subtle fix: pick_representative_params now uses the median of inner-CV best_score_ across folds, not argmax of outer-test AUC, which was canonical nested-CV protocol leakage in v1."
+          "text": "Pathology-only with that encoding hits AUC 0.8042, while the clinical-only baseline tops out at 0.5642 — pathology is contributing roughly +0.27 in AUC. And there's one more subtle fix: pick_representative_params now uses the median of inner-CV best_score_ across folds, not argmax of outer-test AUC, which was canonical nested-CV protocol leakage in v1."
         },
         {
           "speaker": "Dr. Sarah",
@@ -125,19 +125,19 @@
       ]
     },
     {
-      "title": "Model Performance \u2014 CatBoost & v1 vs v2",
+      "title": "Model Performance — CatBoost & v1 vs v2",
       "lines": [
         {
           "speaker": "Dr. Alex",
-          "text": "Now the headline result. The v2 best model is CatBoost \u2014 outer-CV AUC 0.8306 \u00b1 0.0094, with a bootstrap-on-OOF 95 percent confidence interval of [0.8130, 0.8462]. That's the number to remember."
+          "text": "Now the headline result. The v2 best model is CatBoost — outer-CV AUC 0.8306 ± 0.0094, with a bootstrap-on-OOF 95 percent confidence interval of [0.8130, 0.8462]. That's the number to remember."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "And it's a meaningful jump. v1's best model was LightGBM at AUC 0.7327 \u00b1 0.0057 \u2014 but remember, that \u00b1 0.0057 is over n=2 outer folds, so it's effectively a min-max range, not an SD. In real terms v2 adds about 0.098 in AUC over v1, primarily because the pathology features are no longer being collapsed to constant zero by IQRClipper."
+          "text": "And it's a meaningful jump. v1's best model was LightGBM at AUC 0.7327 ± 0.0057 — but remember, that ± 0.0057 is over n=2 outer folds, so it's effectively a min-max range, not an SD. In real terms v2 adds about 0.098 in AUC over v1, primarily because the pathology features are no longer being collapsed to constant zero by IQRClipper."
         },
         {
           "speaker": "Dr. Alex",
-          "text": "The v2 model leaderboard is tight at the top: CatBoost 0.8306 [0.8228, 0.8446], XGBoost 0.8214 [0.8139, 0.8345], LightGBM 0.8213 [0.8094, 0.8363], Random Forest 0.8157 [0.8086, 0.8286], and Logistic Regression at 0.7926 \u2014 all five are clinically respectable."
+          "text": "The v2 model leaderboard is tight at the top: CatBoost 0.8306 [0.8228, 0.8446], XGBoost 0.8214 [0.8139, 0.8345], LightGBM 0.8213 [0.8094, 0.8363], Random Forest 0.8157 [0.8086, 0.8286], and Logistic Regression at 0.7926 — all five are clinically respectable."
         },
         {
           "speaker": "Dr. Sarah",
@@ -145,7 +145,7 @@
         },
         {
           "speaker": "Dr. Alex",
-          "text": "The selected hyperparameters for the production CatBoost are depth=6, iterations=657, l2_leaf_reg=3.51, learning_rate=0.00617 \u2014 a deliberately shallow, low-learning-rate, high-iteration regime that fights overfitting. Compared to v1's overfit gap of 0.17 between train and test AUC, v2 keeps generalisation tight."
+          "text": "The selected hyperparameters for the production CatBoost are depth=6, iterations=657, l2_leaf_reg=3.51, learning_rate=0.00617 — a deliberately shallow, low-learning-rate, high-iteration regime that fights overfitting. Compared to v1's overfit gap of 0.17 between train and test AUC, v2 keeps generalisation tight."
         },
         {
           "speaker": "Dr. Sarah",
@@ -153,7 +153,7 @@
         },
         {
           "speaker": "Dr. Alex",
-          "text": "One more thing \u2014 both CatBoost and LightGBM produce well-calibrated probabilities directly, but the team picked CatBoost partly because it's robust under the broader 5\u00d75 nested CV with hyperparameter search and partly because of cleaner calibration behaviour, which we'll get to next."
+          "text": "One more thing — both CatBoost and LightGBM produce well-calibrated probabilities directly, but the team picked CatBoost partly because it's robust under the broader 5×5 nested CV with hyperparameter search and partly because of cleaner calibration behaviour, which we'll get to next."
         },
         {
           "speaker": "Dr. Sarah",
@@ -162,15 +162,15 @@
       ]
     },
     {
-      "title": "XAI & SHAP \u2014 Pathology Dominance",
+      "title": "XAI & SHAP — Pathology Dominance",
       "lines": [
         {
           "speaker": "Dr. Alex",
-          "text": "On to interpretability. SHAP TreeExplainer was run on a full-data refit of the production CatBoost. The headline is striking: 17 of the top 25 mean-absolute-SHAP features are pathology-derived \u2014 either RT/LT percentage columns or the engineered severity scores."
+          "text": "On to interpretability. SHAP TreeExplainer was run on a full-data refit of the production CatBoost. The headline is striking: 17 of the top 25 mean-absolute-SHAP features are pathology-derived — either RT/LT percentage columns or the engineered severity scores."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "And the rank-1 feature is RT_Severe_Hypospermatogenesis_pct with mean absolute SHAP 0.3958. That's about double the next feature \u2014 RT_Hypospermatogenesis_pct at 0.2007 \u2014 and roughly two-and-a-half times LT_Severe_Hypospermatogenesis_pct at 0.1590. The bilateral asymmetry is real and reproducible across folds."
+          "text": "And the rank-1 feature is RT_Severe_Hypospermatogenesis_pct with mean absolute SHAP 0.3958. That's about double the next feature — RT_Hypospermatogenesis_pct at 0.2007 — and roughly two-and-a-half times LT_Severe_Hypospermatogenesis_pct at 0.1590. The bilateral asymmetry is real and reproducible across folds."
         },
         {
           "speaker": "Dr. Alex",
@@ -178,11 +178,11 @@
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "Clinically that's reassuring \u2014 diagnostic biopsy histopathology is genuinely the strongest preoperative signal we have for predicting whether residual spermatogenic foci exist. Severe hypospermatogenesis on the right side dominating makes biological sense."
+          "text": "Clinically that's reassuring — diagnostic biopsy histopathology is genuinely the strongest preoperative signal we have for predicting whether residual spermatogenic foci exist. Severe hypospermatogenesis on the right side dominating makes biological sense."
         },
         {
           "speaker": "Dr. Alex",
-          "text": "And the contrast with v1 is the punchline. In v1, all sixteen pathology features had mean absolute SHAP equal to zero. Zero. That's the IQRClipper artefact we discussed \u2014 sparse columns collapsed to constants, zero variance, zero attribution. In v2, 22 pathology features have non-zero SHAP."
+          "text": "And the contrast with v1 is the punchline. In v1, all sixteen pathology features had mean absolute SHAP equal to zero. Zero. That's the IQRClipper artefact we discussed — sparse columns collapsed to constants, zero variance, zero attribution. In v2, 22 pathology features have non-zero SHAP."
         },
         {
           "speaker": "Dr. Sarah",
@@ -190,7 +190,7 @@
         },
         {
           "speaker": "Dr. Alex",
-          "text": "And FSH \u2014 which urologists routinely flag as the canonical NOA hormonal predictor \u2014 only ranks 20 here at mean |SHAP| 0.0180. That isn't saying FSH is unimportant clinically, but in this multivariable, pathology-rich model it carries less marginal information than the histology."
+          "text": "And FSH — which urologists routinely flag as the canonical NOA hormonal predictor — only ranks 20 here at mean |SHAP| 0.0180. That isn't saying FSH is unimportant clinically, but in this multivariable, pathology-rich model it carries less marginal information than the histology."
         },
         {
           "speaker": "Dr. Sarah",
@@ -203,11 +203,11 @@
       "lines": [
         {
           "speaker": "Dr. Alex",
-          "text": "Calibration matters here because this model is going to feed a clinical decision support system \u2014 the urologist needs trustworthy probabilities, not just a binary cut-off. The team computed reliability diagrams and Brier scores across the candidate models."
+          "text": "Calibration matters here because this model is going to feed a clinical decision support system — the urologist needs trustworthy probabilities, not just a binary cut-off. The team computed reliability diagrams and Brier scores across the candidate models."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "And the Brier scores tell an interesting story. LightGBM clocks in at 0.2006, Gradient Boosting at 0.2025, XGBoost at 0.2055, CatBoost at 0.2131, and the Stacking Ensemble at 0.2259. So LightGBM is technically a hair sharper on Brier \u2014 but CatBoost was selected for the production pipeline based on the broader nested-CV performance."
+          "text": "And the Brier scores tell an interesting story. LightGBM clocks in at 0.2006, Gradient Boosting at 0.2025, XGBoost at 0.2055, CatBoost at 0.2131, and the Stacking Ensemble at 0.2259. So LightGBM is technically a hair sharper on Brier — but CatBoost was selected for the production pipeline based on the broader nested-CV performance."
         },
         {
           "speaker": "Dr. Alex",
@@ -215,23 +215,23 @@
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "Which means at the lowest predicted-probability bin, CatBoost is slightly under-confident \u2014 predicting about 4.5 percent but observing 17.3 percent positives. In the upper bins it tracks the diagonal pretty well. Not perfectly calibrated, but no catastrophic miscalibration either."
+          "text": "Which means at the lowest predicted-probability bin, CatBoost is slightly under-confident — predicting about 4.5 percent but observing 17.3 percent positives. In the upper bins it tracks the diagonal pretty well. Not perfectly calibrated, but no catastrophic miscalibration either."
         },
         {
           "speaker": "Dr. Alex",
-          "text": "Then comes decision curve analysis. They computed net benefit across thresholds from 0.01 up to roughly the prevalence, and the verdict is that the model's net benefit exceeds both treat-none and treat-all over substantial threshold windows \u2014 notably around 0.05 to 0.60 for the top models."
+          "text": "Then comes decision curve analysis. They computed net benefit across thresholds from 0.01 up to roughly the prevalence, and the verdict is that the model's net benefit exceeds both treat-none and treat-all over substantial threshold windows — notably around 0.05 to 0.60 for the top models."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "And that's the threshold range that maps onto realistic clinical practice \u2014 a urologist isn't going to operate on someone with a 5 percent estimated chance, and at 60 percent and above virtually everyone gets surgery anyway. So the DCA window is exactly where the model adds clinical value."
+          "text": "And that's the threshold range that maps onto realistic clinical practice — a urologist isn't going to operate on someone with a 5 percent estimated chance, and at 60 percent and above virtually everyone gets surgery anyway. So the DCA window is exactly where the model adds clinical value."
         },
         {
           "speaker": "Dr. Alex",
-          "text": "The interventions-per-100-patients calculation uses the standard formula: (NB_model \u2212 NB_treat_all) divided by the threshold odds, times 100. That converts net benefit into an interpretable count of unnecessary micro-TESEs avoided per hundred patients evaluated."
+          "text": "The interventions-per-100-patients calculation uses the standard formula: (NB_model − NB_treat_all) divided by the threshold odds, times 100. That converts net benefit into an interpretable count of unnecessary micro-TESEs avoided per hundred patients evaluated."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "And remember, the per-fold Youden thresholds ranged 0.444 to 0.507 \u2014 so the operating point used for binary classification metrics is right in the heart of the DCA's high-utility region. The pieces line up."
+          "text": "And remember, the per-fold Youden thresholds ranged 0.444 to 0.507 — so the operating point used for binary classification metrics is right in the heart of the DCA's high-utility region. The pieces line up."
         }
       ]
     },
@@ -240,11 +240,11 @@
       "lines": [
         {
           "speaker": "Dr. Alex",
-          "text": "Now the deployment story. The CDSS is intentionally lightweight \u2014 it's the NOA micro-TESE Clinical Decision Support System, designed to run on cPanel shared hosting, PHP 8.0+, with Bootstrap 5.3.3 and Chart.js 4.4.3 from CDN. No Python runtime, no database, no authentication, fully stateless."
+          "text": "Now the deployment story. The CDSS is intentionally lightweight — it's the NOA micro-TESE Clinical Decision Support System, designed to run on cPanel shared hosting, PHP 8.0+, with Bootstrap 5.3.3 and Chart.js 4.4.3 from CDN. No Python runtime, no database, no authentication, fully stateless."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "Why the constraint? Because the target deployment environment is a clinical workgroup that doesn't have the IT capacity to maintain a Python service. So the model has to be exported and the inference reimplemented in PHP \u2014 and the UI logic has to live there too. It forces a clean, portable export."
+          "text": "Why the constraint? Because the target deployment environment is a clinical workgroup that doesn't have the IT capacity to maintain a Python service. So the model has to be exported and the inference reimplemented in PHP — and the UI logic has to live there too. It forces a clean, portable export."
         },
         {
           "speaker": "Dr. Alex",
@@ -256,19 +256,19 @@
         },
         {
           "speaker": "Dr. Alex",
-          "text": "And the pathology indicators are kept as the structured bilateral percentages \u2014 SCO, MA stages, hypospermatogenesis, and CSTH \u2014 with the maturation-arrest hierarchical constraint enforced at input time. So the CDSS preserves the v2 ordinal_detailed_plus_raw encoding, not just at training time but at inference."
+          "text": "And the pathology indicators are kept as the structured bilateral percentages — SCO, MA stages, hypospermatogenesis, and CSTH — with the maturation-arrest hierarchical constraint enforced at input time. So the CDSS preserves the v2 ordinal_detailed_plus_raw encoding, not just at training time but at inference."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "There's also a derived T/E2 ratio threshold per literature recalibration. One feature explicitly dropped is Partner_Age \u2014 the team excluded it because partner age isn't a clinically actionable input for sperm-retrieval prediction; it's at best a confound or proxy."
+          "text": "There's also a derived T/E2 ratio threshold per literature recalibration. One feature explicitly dropped is Partner_Age — the team excluded it because partner age isn't a clinically actionable input for sperm-retrieval prediction; it's at best a confound or proxy."
         },
         {
           "speaker": "Dr. Alex",
-          "text": "And every approved input has explicit research backing \u2014 that's the 'approved feature set with research backing only' language in the spec. Nothing in the CDSS UI exists without a literature anchor or a model-derived contribution after retraining with the full v2 pipeline."
+          "text": "And every approved input has explicit research backing — that's the 'approved feature set with research backing only' language in the spec. Nothing in the CDSS UI exists without a literature anchor or a model-derived contribution after retraining with the full v2 pipeline."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "Stateless, transparent, deployable on commodity hosting. That's a deliberate engineering choice for clinical reach \u2014 and crucially, it means the UI can be audited independently of any black-box backend."
+          "text": "Stateless, transparent, deployable on commodity hosting. That's a deliberate engineering choice for clinical reach — and crucially, it means the UI can be audited independently of any black-box backend."
         }
       ]
     },
@@ -277,7 +277,7 @@
       "lines": [
         {
           "speaker": "Dr. Alex",
-          "text": "Last section \u2014 the infrastructure that produced all of this. The compute stack is an NVIDIA H100 80GB HBM3, an AMD EPYC 9654 96-core CPU at 2.4 GHz, 256 GB DDR5 RAM at 4800 MT/s, and 2 TB of PCIe 5.0 NVMe SSD."
+          "text": "Last section — the infrastructure that produced all of this. The compute stack is an NVIDIA H100 80GB HBM3, an AMD EPYC 9654 96-core CPU at 2.4 GHz, 256 GB DDR5 RAM at 4800 MT/s, and 2 TB of PCIe 5.0 NVMe SSD."
         },
         {
           "speaker": "Dr. Sarah",
@@ -285,11 +285,11 @@
         },
         {
           "speaker": "Dr. Alex",
-          "text": "And the GPU was used primarily for SHAP TreeExplainer computation and the hyperparameter search \u2014 50 RandomizedSearchCV iterations times 5\u00d75 nested CV times 5 models, plus the Faz 3 pathology investigation which alone was 16 encodings times 5 models. The CPU handled CV orchestration, KNN imputation, and the 1,000-resample bootstrap CI computation."
+          "text": "And the GPU was used primarily for SHAP TreeExplainer computation and the hyperparameter search — 50 RandomizedSearchCV iterations times 5×5 nested CV times 5 models, plus the Faz 3 pathology investigation which alone was 16 encodings times 5 models. The CPU handled CV orchestration, KNN imputation, and the 1,000-resample bootstrap CI computation."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "The phase breakdown shows where the time went. Phase 6 \u2014 pipeline v2 training \u2014 was the heaviest at 52 GPU hours and 134 CPU hours with peak RAM 187 GB. Phase 5, the pathology investigation, used 35 GPU hours and 94 CPU hours. Phase 3, the original v1 training, was 28 GPU and 67 CPU hours."
+          "text": "The phase breakdown shows where the time went. Phase 6 — pipeline v2 training — was the heaviest at 52 GPU hours and 134 CPU hours with peak RAM 187 GB. Phase 5, the pathology investigation, used 35 GPU hours and 94 CPU hours. Phase 3, the original v1 training, was 28 GPU and 67 CPU hours."
         },
         {
           "speaker": "Dr. Alex",
@@ -297,15 +297,15 @@
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "And the architectural flow is fully traced: User Request \u2192 Orchestrator \u2192 Task Decomposition \u2192 Agent Assignment \u2192 Embedding plus Retrieval over the knowledge base \u2192 Reranker for context prioritisation \u2192 Agent Execution \u2192 Cross-Verification \u2192 Result Aggregation \u2192 User Review. Every step is logged."
+          "text": "And the architectural flow is fully traced: User Request → Orchestrator → Task Decomposition → Agent Assignment → Embedding plus Retrieval over the knowledge base → Reranker for context prioritisation → Agent Execution → Cross-Verification → Result Aggregation → User Review. Every step is logged."
         },
         {
           "speaker": "Dr. Alex",
-          "text": "The audit numbers show 87 total agent interactions across 36 tasks, with 2 cross-verification rounds. That cross-verification is what produced the v2_verification_report \u2014 an independent re-execution that reproduced every published number to four decimal places, the kind of assurance you'd expect for a regulated medical device, not a research prototype."
+          "text": "The audit numbers show 87 total agent interactions across 36 tasks, with 2 cross-verification rounds. That cross-verification is what produced the v2_verification_report — an independent re-execution that reproduced every published number to four decimal places, the kind of assurance you'd expect for a regulated medical device, not a research prototype."
         },
         {
           "speaker": "Dr. Sarah",
-          "text": "And that closes the loop. Real cohort, audited pipeline, calibrated model, deployable CDSS, agentic verification \u2014 all attributed to Hossein Jamalirad's PhD work at MUMS under the supervision of Dr. Vakili Arki, Dr. Eslami, Dr. Sabbaghian, and Dr. Sadighi Gilani. This media is generated from this investigation with Hossein Jamalirad's Architecture's agent. Thanks for walking through it with me, Alex."
+          "text": "And that closes the loop. Real cohort, audited pipeline, calibrated model, deployable CDSS, agentic verification — all attributed to Hossein Jamalirad's PhD work at MUMS under the supervision of Dr. Vakili Arki, Dr. Eslami, Dr. Sabbaghian, and Dr. Sadighi Gilani. This media is generated from this investigation with Hossein Jamalirad's Architecture's agent. Thanks for walking through it with me, Alex."
         }
       ]
     }
