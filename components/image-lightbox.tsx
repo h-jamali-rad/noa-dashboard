@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useState, useMemo } from 'react'
 import Image from 'next/image'
-import { X, ChevronLeft, ChevronRight, Download } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight, Download, Volume2, Square } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useAIAssist } from './ai-assist-provider'
 
 export type LightboxImage = {
   publicPath: string
@@ -12,6 +13,15 @@ export type LightboxImage = {
   category?: string
   modelTag?: string | null
   filename?: string
+}
+
+function deriveAudioId(publicPath: string): string {
+  // e.g. /images/xai/shap_bar_CatBoost.png → phase=xai, name=shap_bar_CatBoost → fig-xai-shap_bar_CatBoost
+  const match = publicPath.match(/\/images\/([^/]+)\/([^/]+)\.[^.]+$/)
+  if (!match) return ''
+  const phase = match[1]
+  const name = match[2]
+  return `fig-${phase}-${name}`
 }
 
 export default function ImageLightbox({
@@ -25,24 +35,56 @@ export default function ImageLightbox({
   onClose: () => void
   onIndexChange: (i: number) => void
 }) {
+  const { enabled, play, stopCurrent } = useAIAssist()
+  const [playingId, setPlayingId] = useState<string | null>(null)
+
   const isOpen = index !== null && index >= 0 && index < images.length
+  const img = isOpen ? images[index!] : null
+
+  const audioId = useMemo(() => {
+    if (!img) return ''
+    return deriveAudioId(img.publicPath)
+  }, [img])
+
+  const isPlaying = playingId !== null && playingId === audioId
 
   const goPrev = useCallback(() => {
     if (index === null) return
+    stopCurrent()
+    setPlayingId(null)
     const next = (index - 1 + images.length) % images.length
     onIndexChange(next)
-  }, [index, images.length, onIndexChange])
+  }, [index, images.length, onIndexChange, stopCurrent])
 
   const goNext = useCallback(() => {
     if (index === null) return
+    stopCurrent()
+    setPlayingId(null)
     const next = (index + 1) % images.length
     onIndexChange(next)
-  }, [index, images.length, onIndexChange])
+  }, [index, images.length, onIndexChange, stopCurrent])
+
+  const handleClose = useCallback(() => {
+    stopCurrent()
+    setPlayingId(null)
+    onClose()
+  }, [onClose, stopCurrent])
+
+  const toggleAudio = useCallback(() => {
+    if (!audioId) return
+    if (isPlaying) {
+      stopCurrent()
+      setPlayingId(null)
+    } else {
+      play(audioId)
+      setPlayingId(audioId)
+    }
+  }, [audioId, isPlaying, play, stopCurrent])
 
   useEffect(() => {
     if (!isOpen) return
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') handleClose()
       if (e.key === 'ArrowLeft') goPrev()
       if (e.key === 'ArrowRight') goNext()
     }
@@ -52,10 +94,17 @@ export default function ImageLightbox({
       document.body.style.overflow = ''
       window.removeEventListener('keydown', handleKey)
     }
-  }, [isOpen, onClose, goPrev, goNext])
+  }, [isOpen, handleClose, goPrev, goNext])
+
+  // Stop audio when lightbox closes (unmounts or isOpen becomes false)
+  useEffect(() => {
+    if (!isOpen && playingId) {
+      stopCurrent()
+      setPlayingId(null)
+    }
+  }, [isOpen, playingId, stopCurrent])
 
   if (!isOpen) return null
-  const img = images[index!]
 
   return (
     <div
@@ -73,6 +122,22 @@ export default function ImageLightbox({
           </p>
         </div>
         <div className="flex items-center gap-1">
+          {enabled && audioId && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className={
+                isPlaying
+                  ? 'text-teal-400 hover:bg-teal-400/20 hover:text-teal-300'
+                  : 'text-teal-400 hover:bg-teal-400/20 hover:text-teal-300'
+              }
+              onClick={toggleAudio}
+              aria-label={isPlaying ? 'Stop AI interpretation' : 'Play AI interpretation'}
+              title={isPlaying ? 'Stop AI interpretation' : 'Play AI interpretation'}
+            >
+              {isPlaying ? <Square className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+            </Button>
+          )}
           <a
             href={img?.publicPath}
             download
@@ -86,7 +151,7 @@ export default function ImageLightbox({
             variant="ghost"
             size="icon"
             className="text-white hover:bg-white/10 hover:text-white"
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Close lightbox"
           >
             <X className="h-5 w-5" />
