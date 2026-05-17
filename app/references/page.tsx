@@ -1,5 +1,6 @@
 import BreadcrumbNav from '@/components/breadcrumb-nav'
 import data from '@/data/content/extended_sections.json'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 export default function ReferencesPage() {
   const kbRefs = [
@@ -28,6 +29,7 @@ export default function ReferencesPage() {
       </header>
 
       {/* ─────────────────────────────  Knowledge Base  ───────────────────────────── */}
+      <AIAssistWrapper id="ref-knowledge-base" className="block">
       <section className="space-y-3">
         <div className="flex items-baseline justify-between gap-3">
           <h2 className="font-display font-semibold text-xl tracking-tight">
@@ -51,9 +53,11 @@ export default function ReferencesPage() {
           ))}
         </ol>
       </section>
+      </AIAssistWrapper>
 
       {/* ─────────────────────  Studies Included in Systematic Review  ───────────────────── */}
       {totalSystematic > 0 && (
+        <AIAssistWrapper id="ref-systematic-review" className="block">
         <section className="space-y-4">
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="font-display font-semibold text-xl tracking-tight">
@@ -109,6 +113,7 @@ export default function ReferencesPage() {
             </div>
           )}
         </section>
+        </AIAssistWrapper>
       )}
     </div>
   )

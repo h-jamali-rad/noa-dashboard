@@ -1,0 +1,118 @@
+{
+  "instructions": "Wrap each element listed below with <AIAssistWrapper id=\"...\"> in the specified file. Import AIAssistWrapper from '@/components/ai-assist-wrapper'. For server components (no 'use client'), convert to client component by adding 'use client' at top OR wrap only the parts that need it. The component already exists at components/ai-assist-wrapper.tsx. All MP3 files already exist in public/audio/ai-assist/. The existing 8 phase content pages already have wrappers - do NOT touch those files.",
+  "pages": {
+    "app/page.tsx": {
+      "note": "Server component - needs 'use client' or extract client wrapper. Simplest: create a new client component app/home-content.tsx that receives props and wraps elements.",
+      "wrappers": [
+        {"id": "home-hero", "target": "The <section> containing the h1 'NOA microTESE Prediction Dashboard' and description paragraph"},
+        {"id": "home-stat-cohort", "target": "First StatCard (Patient Cohort, 2413)"},
+        {"id": "home-stat-features", "target": "Second StatCard (Features, 73)"},
+        {"id": "home-stat-best-model", "target": "Third StatCard (Best Model CatBoost, AUC 0.8306)"},
+        {"id": "home-stat-figures", "target": "Fourth StatCard (Figures count)"},
+        {"id": "home-architecture-banner", "target": "The <ArchitectureBanner /> component"},
+        {"id": "home-phase-cards", "target": "The entire <section> containing the phases.map grid"}
+      ]
+    },
+    "app/architecture/page.tsx": {
+      "note": "Already 'use client'. Wrap the main container and key sections.",
+      "wrappers": [
+        {"id": "arch-overview", "target": "The outermost container div of the architecture page"},
+        {"id": "arch-orchestrator", "target": "The orchestrator card/section (ORCHESTRATOR data)"},
+        {"id": "arch-agent-cards", "target": "The grid/section containing all agent cards"}
+      ]
+    },
+    "app/podcast/page.tsx": {
+      "note": "Already 'use client'.",
+      "wrappers": [
+        {"id": "podcast-intro", "target": "The intro banner div with 'Agent Introduction' and the quote"},
+        {"id": "podcast-sections", "target": "The div containing all podcast section cards (space-y-3)"}
+      ]
+    },
+    "app/publications/page.tsx": {
+      "note": "Server component - may need client wrapper extraction.",
+      "wrappers": [
+        {"id": "pub-article-overview", "target": "The main article overview card/section at the top"},
+        {"id": "pub-tables", "target": "The section containing research tables (ResearchTable components)"},
+        {"id": "pub-tripod", "target": "Any TRIPOD/PROBAST checklist or compliance section"}
+      ]
+    },
+    "app/novelty-comparison/page.tsx": {
+      "note": "Server component.",
+      "wrappers": [
+        {"id": "novelty-table", "target": "The div containing the comparison table"},
+        {"id": "novelty-differentiators", "target": "The 'Key Differentiators' card with highlighted_points"}
+      ]
+    },
+    "app/virtual-defense/page.tsx": {
+      "note": "Already 'use client'.",
+      "wrappers": [
+        {"id": "vdefense-hero", "target": "The hero image section with the cinematic illustration"},
+        {"id": "vdefense-panels", "target": "The section containing defense panel cards (panels.map)"}
+      ]
+    },
+    "app/hardware-specs/page.tsx": {
+      "note": "Server component.",
+      "wrappers": [
+        {"id": "hw-stat-gpu", "target": "First StatCard (GPU Hours, 142)"},
+        {"id": "hw-stat-cpu", "target": "Second StatCard (CPU Hours, 387)"},
+        {"id": "hw-stat-ram", "target": "Third StatCard (Peak RAM, 187 GB)"},
+        {"id": "hw-stat-storage", "target": "Fourth StatCard (Storage I/O, 1247 GB)"},
+        {"id": "hw-detail-cards", "target": "The grid section with 4 hardware detail cards (GPU/CPU/RAM/Storage)"},
+        {"id": "hw-compute-breakdown", "target": "The 'Compute Breakdown by Resource' section with progress bars"},
+        {"id": "hw-phase-table", "target": "The 'Per-Phase Compute Usage' section with the table"}
+      ]
+    },
+    "app/gallery/page.tsx": {
+      "note": "Server component.",
+      "wrappers": [
+        {"id": "gallery-overview", "target": "The main content area / ImageGallery component"}
+      ]
+    },
+    "app/code/page.tsx": {
+      "note": "Server component.",
+      "wrappers": [
+        {"id": "code-overview", "target": "The header section with 'Code & report library' title and description"}
+      ]
+    },
+    "app/about/page.tsx": {
+      "note": "Server component.",
+      "wrappers": [
+        {"id": "about-team", "target": "The rounded-xl border div containing TeamStanding"},
+        {"id": "about-project", "target": "The 'About This Project' card"}
+      ]
+    },
+    "app/references/page.tsx": {
+      "note": "Server component.",
+      "wrappers": [
+        {"id": "ref-knowledge-base", "target": "The 'Knowledge-Base References' section"},
+        {"id": "ref-systematic-review", "target": "The 'Studies Included in Systematic Review' section"}
+      ]
+    },
+    "app/articles/page.tsx": {
+      "note": "Server component.",
+      "wrappers": [
+        {"id": "articles-article-a", "target": "The Article A card/section"},
+        {"id": "articles-article-b", "target": "The Article B card/section"},
+        {"id": "articles-methodology-tables", "target": "Any methodology/data tables section"},
+        {"id": "articles-checklist", "target": "Any TRIPOD/PROBAST compliance checklist accordion or section"}
+      ]
+    },
+    "app/usability-testing/page.tsx": {
+      "note": "Already 'use client'.",
+      "wrappers": [
+        {"id": "usability-overview", "target": "The header section with title and description"},
+        {"id": "usability-agent-scores", "target": "The section showing individual expert SUS scores/cards"},
+        {"id": "usability-strengths", "target": "The strengths list/card"},
+        {"id": "usability-weaknesses", "target": "The weaknesses list/card"},
+        {"id": "usability-sus-form", "target": "The SUS evaluation form section"},
+        {"id": "usability-podcast", "target": "The podcast/audio section on this page"}
+      ]
+    },
+    "app/roadmap/page.tsx": {
+      "note": "Already 'use client'. Uses dynamic import.",
+      "wrappers": [
+        {"id": "roadmap-overview", "target": "The main roadmap container"}
+      ]
+    }
+  }
+}

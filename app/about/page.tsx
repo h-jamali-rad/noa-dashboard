@@ -1,5 +1,6 @@
 import BreadcrumbNav from '@/components/breadcrumb-nav'
 import TeamStanding from '@/components/about/team-standing'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 export default function AboutPage() {
   return (
@@ -14,11 +15,14 @@ export default function AboutPage() {
       </div>
 
       {/* Interactive team standing picture */}
-      <div className="rounded-xl border bg-gradient-to-b from-card via-card to-background p-4 sm:p-8 overflow-hidden">
-        <TeamStanding />
-      </div>
+      <AIAssistWrapper id="about-team">
+        <div className="rounded-xl border bg-gradient-to-b from-card via-card to-background p-4 sm:p-8 overflow-hidden">
+          <TeamStanding />
+        </div>
+      </AIAssistWrapper>
 
       {/* Project description */}
+      <AIAssistWrapper id="about-project">
       <div className="rounded-lg border bg-card p-5 text-sm text-muted-foreground space-y-3">
         <h2 className="font-display font-semibold text-lg text-foreground">About This Project</h2>
         <p>
@@ -34,6 +38,7 @@ export default function AboutPage() {
           All pipeline outputs shown here were produced by AI agents trained by Hossein Jamalirad.
         </p>
       </div>
+      </AIAssistWrapper>
     </div>
   )
 }

@@ -13,6 +13,7 @@ import {
   LlmFarmsIcon,
 } from '@/components/architecture/agent-icons'
 import { ORCHESTRATOR, AGENTS, LLM_FARMS, type AgentNode } from '@/components/architecture/agent-data'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 /* ---- Icon map ---- */
 const ICON_MAP: Record<string, React.FC<{ size?: number }>> = {
@@ -357,6 +358,7 @@ export default function ArchitecturePage() {
   const bottomRow = AGENTS.slice(2)
 
   return (
+    <AIAssistWrapper id="arch-overview" className="block">
     <div className="px-4 sm:px-6 lg:px-10 py-8 max-w-screen-2xl mx-auto space-y-6">
       {/* Page header */}
       <motion.section
@@ -408,6 +410,7 @@ export default function ArchitecturePage() {
           />
 
           {/* Layer 1: Master Orchestrator */}
+          <AIAssistWrapper id="arch-orchestrator" className="block">
           <div className="relative z-10 flex flex-col items-center mb-16 sm:mb-20">
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
@@ -451,8 +454,10 @@ export default function ArchitecturePage() {
               </div>
             </motion.div>
           </div>
+          </AIAssistWrapper>
 
           {/* Layer 2: Agent Nodes - Top Row */}
+          <AIAssistWrapper id="arch-agent-cards" className="block">
           <div className="relative z-10 flex flex-wrap justify-center gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12">
             {topRow.map((agent, i) => (
               <motion.div
@@ -491,6 +496,7 @@ export default function ArchitecturePage() {
               </motion.div>
             ))}
           </div>
+          </AIAssistWrapper>
 
           {/* Layer 3: LLM Farms */}
           <motion.div
@@ -641,5 +647,6 @@ export default function ArchitecturePage() {
         </p>
       </div>
     </div>
+    </AIAssistWrapper>
   )
 }

@@ -6,6 +6,7 @@ import { motion, type Variants } from 'framer-motion'
 import BreadcrumbNav from '@/components/breadcrumb-nav'
 import data from '@/data/content/extended_sections.json'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 type DefensePanel = {
   specialist?: string
@@ -47,6 +48,7 @@ export default function VirtualDefensePage() {
 
   return (
     <div className="w-full scroll-smooth bg-slate-950 text-slate-100">
+      <AIAssistWrapper id="vdefense-hero" className="block">
       <section className="relative isolate overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-blue-950">
         <motion.div
           className="pointer-events-none absolute inset-0"
@@ -103,7 +105,9 @@ export default function VirtualDefensePage() {
           </div>
         </motion.div>
       </section>
+      </AIAssistWrapper>
 
+      <AIAssistWrapper id="vdefense-panels" className="block">
       <motion.section
         className="mx-auto max-w-7xl space-y-6 px-4 py-10 sm:px-6 lg:px-10"
         variants={heroFadeIn}
@@ -188,6 +192,7 @@ export default function VirtualDefensePage() {
           </Accordion>
         )}
       </motion.section>
+      </AIAssistWrapper>
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db'
 import ImageGallery, { GalleryImage } from '@/components/image-gallery'
 import BreadcrumbNav from '@/components/breadcrumb-nav'
 import { Images } from 'lucide-react'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 async function getImages(): Promise<GalleryImage[]> {
   try {
@@ -40,7 +41,9 @@ export default async function GalleryPage() {
           </p>
         </div>
       </div>
-      <ImageGallery images={images} initialPageSize={32} />
+      <AIAssistWrapper id="gallery-overview" className="block">
+        <ImageGallery images={images} initialPageSize={32} />
+      </AIAssistWrapper>
     </div>
   )
 }

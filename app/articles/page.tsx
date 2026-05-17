@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import articleA from '@/article_a_extracted.json'
 import articleB from '@/article_b_extracted.json'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 export const metadata = {
   title: 'Articles — NOA microTESE Research Dashboard',
@@ -343,6 +344,7 @@ export default function ArticlesPage() {
       {/* ============================================================== */}
       {/*  CARD 2 — Article A (In Preparation)                           */}
       {/* ============================================================== */}
+      <AIAssistWrapper id="articles-article-a" className="block">
       <ArticleInPrepCard
         cardLabel="Article 2 / 3"
         targetJournal="Fertility & Sterility"
@@ -351,10 +353,12 @@ export default function ArticlesPage() {
         readFullArticleHref="/articles/article-a"
         data={articleA}
       />
+      </AIAssistWrapper>
 
       {/* ============================================================== */}
       {/*  CARD 3 — Article B (In Preparation)                           */}
       {/* ============================================================== */}
+      <AIAssistWrapper id="articles-article-b" className="block">
       <ArticleInPrepCard
         cardLabel="Article 3 / 3"
         targetJournal="JMIR Medical Informatics"
@@ -363,6 +367,7 @@ export default function ArticlesPage() {
         readFullArticleHref="/articles/article-b"
         data={articleB}
       />
+      </AIAssistWrapper>
     </div>
   )
 }
@@ -469,6 +474,7 @@ function ArticleInPrepCard({
         {/* Expandable detailed sections */}
         <Accordion type="multiple" className="w-full space-y-2">
           {/* Detailed tables */}
+          <AIAssistWrapper id="articles-methodology-tables" className="block space-y-2">
           {tables.map((tbl, idx) => (
             <AccordionItem
               key={`tbl-${idx}`}
@@ -518,7 +524,9 @@ function ArticleInPrepCard({
               </AccordionContent>
             </AccordionItem>
           )}
+          </AIAssistWrapper>
 
+          <AIAssistWrapper id="articles-checklist" className="block space-y-2">
           {/* TRIPOD+AI detailed checklist */}
           <AccordionItem
             value="tripod"
@@ -554,6 +562,7 @@ function ArticleInPrepCard({
               </div>
             </AccordionContent>
           </AccordionItem>
+          </AIAssistWrapper>
         </Accordion>
 
         {/* Footer actions */}

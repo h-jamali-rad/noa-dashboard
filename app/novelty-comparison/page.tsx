@@ -1,5 +1,6 @@
 import BreadcrumbNav from '@/components/breadcrumb-nav'
 import data from '@/data/content/extended_sections.json'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 const HEADER_TIPS: Record<string, string> = {
   study: 'Study: Prior publication or current work used for methodological comparison.',
@@ -16,6 +17,7 @@ export default function NoveltyComparisonPage() {
     <div className="px-4 sm:px-6 lg:px-10 py-8 max-w-screen-2xl mx-auto space-y-6">
       <BreadcrumbNav items={[{ label: 'Novelty Comparison' }]} />
       <h1 className="font-display font-bold text-3xl tracking-tight">Novelty Comparison</h1>
+      <AIAssistWrapper id="novelty-table">
       <div className="rounded-lg border bg-card p-4 overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="border-b text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -43,19 +45,22 @@ export default function NoveltyComparisonPage() {
           </tbody>
         </table>
       </div>
+      </AIAssistWrapper>
 
       {/* Highlighted points */}
-      <div className="rounded-xl border bg-card p-5 shadow-sm">
-        <h2 className="font-display font-semibold text-base mb-3">Key Differentiators</h2>
-        <ul className="space-y-2">
-          {data.novelty_comparison.highlighted_points.map((p, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-mono font-semibold text-white shrink-0 mt-0.5">{i + 1}</span>
-              <span>{p}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <AIAssistWrapper id="novelty-differentiators">
+        <div className="rounded-xl border bg-card p-5 shadow-sm">
+          <h2 className="font-display font-semibold text-base mb-3">Key Differentiators</h2>
+          <ul className="space-y-2">
+            {data.novelty_comparison.highlighted_points.map((p, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-mono font-semibold text-white shrink-0 mt-0.5">{i + 1}</span>
+                <span>{p}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </AIAssistWrapper>
     </div>
   )
 }

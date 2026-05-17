@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import BreadcrumbNav from '@/components/breadcrumb-nav'
 import data from '@/data/publications_data.json'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 type TableData = {
   title: string
@@ -160,6 +161,7 @@ export default function PublicationsPage() {
       </div>
 
       {/* Featured article card */}
+      <AIAssistWrapper id="pub-article-overview" className="block">
       <article className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
         {/* Decorative accent bar */}
         <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-secondary to-tertiary" />
@@ -318,7 +320,9 @@ export default function PublicationsPage() {
           </div>
         </div>
       </article>
+      </AIAssistWrapper>
 
+      <AIAssistWrapper id="pub-tables" className="block space-y-8">
       {/* Tables section header */}
       <div className="space-y-1 pt-2">
         <h2 className="font-display font-bold text-2xl tracking-tight">Review Tables</h2>
@@ -354,8 +358,10 @@ export default function PublicationsPage() {
         caption={`${table3.rows.length} studies — ${table3.description} ${table3.note}`}
         accent="tertiary"
       />
+      </AIAssistWrapper>
 
       {/* Citation block */}
+      <AIAssistWrapper id="pub-tripod">
       <section className="rounded-xl border bg-muted/30 p-5">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
           Cite this article
@@ -373,6 +379,7 @@ export default function PublicationsPage() {
           </Link>
         </p>
       </section>
+      </AIAssistWrapper>
     </div>
   )
 }

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import BreadcrumbNav from '@/components/breadcrumb-nav'
 import { Mic, ChevronDown, ChevronUp, Headphones, Play, Pause, Volume2 } from 'lucide-react'
 import podcastData from '@/data/content/podcast_data.json'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 const HOST_COLORS: Record<string, string> = {
   'Dr. Alex': '#0e7490',
@@ -93,14 +94,17 @@ export default function PodcastPage() {
       </div>
 
       {/* Intro banner */}
-      <div className="rounded-xl border border-primary/20 bg-primary/5 p-5">
-        <p className="text-sm font-medium text-primary mb-1">Agent Introduction</p>
-        <p className="text-sm text-foreground/80 italic">
-          &ldquo;{podcastData.intro}&rdquo;
-        </p>
-      </div>
+      <AIAssistWrapper id="podcast-intro">
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-5">
+          <p className="text-sm font-medium text-primary mb-1">Agent Introduction</p>
+          <p className="text-sm text-foreground/80 italic">
+            &ldquo;{podcastData.intro}&rdquo;
+          </p>
+        </div>
+      </AIAssistWrapper>
 
       {/* Sections */}
+      <AIAssistWrapper id="podcast-sections">
       <div className="space-y-3">
         {podcastData.sections.map((section, idx) => {
           const isOpen = openSection === idx
@@ -203,6 +207,7 @@ export default function PodcastPage() {
           )
         })}
       </div>
+      </AIAssistWrapper>
 
       {/* Footer */}
       <div className="text-xs text-muted-foreground text-center py-4 space-y-1">

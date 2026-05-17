@@ -5,6 +5,7 @@ import Link from 'next/link'
 import BreadcrumbNav from '@/components/breadcrumb-nav'
 import { ClipboardCheck, ChevronDown, ChevronUp, Headphones, Pause, Volume2, ExternalLink, BarChart3, Users, Star, MessageSquare, CheckCircle2, AlertTriangle, UserPlus, Send, Award } from 'lucide-react'
 import podcastData from '@/data/content/usability_podcast_data.json'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 const HOST_COLORS: Record<string, string> = {
   'Dr. Alex': '#0e7490',
@@ -196,17 +197,19 @@ export default function UsabilityTestingPage() {
       <BreadcrumbNav items={[{ label: 'Usability Testing' }]} />
 
       {/* Header */}
-      <div className="flex items-start gap-4">
-        <div className="h-12 w-12 rounded-md bg-emerald-600 text-white flex items-center justify-center shadow-md shrink-0">
-          <ClipboardCheck className="h-6 w-6" />
+      <AIAssistWrapper id="usability-overview">
+        <div className="flex items-start gap-4">
+          <div className="h-12 w-12 rounded-md bg-emerald-600 text-white flex items-center justify-center shadow-md shrink-0">
+            <ClipboardCheck className="h-6 w-6" />
+          </div>
+          <div>
+            <h1 className="font-display font-bold text-3xl tracking-tight">CDSS Usability Testing</h1>
+            <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+              System Usability Scale (SUS) evaluation of the micro-TESE CDSS — by AI agent experts and real human experts.
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 className="font-display font-bold text-3xl tracking-tight">CDSS Usability Testing</h1>
-          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            System Usability Scale (SUS) evaluation of the micro-TESE CDSS — by AI agent experts and real human experts.
-          </p>
-        </div>
-      </div>
+      </AIAssistWrapper>
 
       {/* Direct Access to CDSS */}
       <Link href="/cdss" className="flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 hover:bg-emerald-500/10 transition-colors group">
@@ -255,6 +258,7 @@ export default function UsabilityTestingPage() {
         </div>
 
         {/* Agent Expert Table */}
+        <AIAssistWrapper id="usability-agent-scores">
         <div className="rounded-xl border bg-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -288,17 +292,22 @@ export default function UsabilityTestingPage() {
             </table>
           </div>
         </div>
+        </AIAssistWrapper>
 
         {/* Strengths & Weaknesses */}
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="rounded-xl border bg-card p-4">
-            <h3 className="text-sm font-semibold flex items-center gap-2 mb-3"><CheckCircle2 className="h-4 w-4 text-emerald-500" />Strength Themes</h3>
-            <ul className="space-y-2">{STRENGTHS.map((s, i) => (<li key={i} className="flex items-start gap-2 text-xs text-foreground/80"><span className="text-emerald-500 mt-0.5">✓</span>{s}</li>))}</ul>
-          </div>
-          <div className="rounded-xl border bg-card p-4">
-            <h3 className="text-sm font-semibold flex items-center gap-2 mb-3"><AlertTriangle className="h-4 w-4 text-amber-500" />Improvement Areas</h3>
-            <ul className="space-y-2">{WEAKNESSES.map((w, i) => (<li key={i} className="flex items-start gap-2 text-xs text-foreground/80"><span className="text-amber-500 mt-0.5">⚠</span>{w}</li>))}</ul>
-          </div>
+          <AIAssistWrapper id="usability-strengths">
+            <div className="rounded-xl border bg-card p-4">
+              <h3 className="text-sm font-semibold flex items-center gap-2 mb-3"><CheckCircle2 className="h-4 w-4 text-emerald-500" />Strength Themes</h3>
+              <ul className="space-y-2">{STRENGTHS.map((s, i) => (<li key={i} className="flex items-start gap-2 text-xs text-foreground/80"><span className="text-emerald-500 mt-0.5">✓</span>{s}</li>))}</ul>
+            </div>
+          </AIAssistWrapper>
+          <AIAssistWrapper id="usability-weaknesses">
+            <div className="rounded-xl border bg-card p-4">
+              <h3 className="text-sm font-semibold flex items-center gap-2 mb-3"><AlertTriangle className="h-4 w-4 text-amber-500" />Improvement Areas</h3>
+              <ul className="space-y-2">{WEAKNESSES.map((w, i) => (<li key={i} className="flex items-start gap-2 text-xs text-foreground/80"><span className="text-amber-500 mt-0.5">⚠</span>{w}</li>))}</ul>
+            </div>
+          </AIAssistWrapper>
         </div>
       </div>
 
@@ -432,6 +441,7 @@ export default function UsabilityTestingPage() {
 
         {/* SUS Form */}
         {showForm && !formSuccess && (
+          <AIAssistWrapper id="usability-sus-form">
           <div id="sus-form" className="rounded-xl border bg-card p-6 space-y-6">
             <h3 className="text-lg font-bold flex items-center gap-2">
               <ClipboardCheck className="h-5 w-5 text-emerald-600" />
@@ -509,6 +519,7 @@ export default function UsabilityTestingPage() {
               {formSubmitting ? 'Submitting...' : 'Submit SUS Evaluation'}
             </button>
           </div>
+          </AIAssistWrapper>
         )}
 
         {/* Success Message */}
@@ -522,6 +533,7 @@ export default function UsabilityTestingPage() {
       </div>
 
       {/* ══════ SECTION 3: Podcast ══════ */}
+      <AIAssistWrapper id="usability-podcast">
       <div className="space-y-4">
         <h2 className="text-xl font-bold flex items-center gap-2 border-b pb-2">
           <Headphones className="h-5 w-5 text-emerald-600" />
@@ -589,6 +601,7 @@ export default function UsabilityTestingPage() {
           )
         })}
       </div>
+      </AIAssistWrapper>
 
       {/* Footer */}
       <div className="text-xs text-muted-foreground text-center py-4 space-y-1">

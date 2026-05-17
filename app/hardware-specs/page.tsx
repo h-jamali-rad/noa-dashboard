@@ -1,6 +1,7 @@
 import BreadcrumbNav from '@/components/breadcrumb-nav'
 import { Server, Cpu, MemoryStick, HardDrive, BarChart3 } from 'lucide-react'
 import { StatCard } from '@/components/stat-card'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 const hw = {
   gpu: {
@@ -58,13 +59,22 @@ export default function HardwareSpecsPage() {
 
       {/* Top-level stats */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="GPU Hours" value="142" hint={hw.gpu.name} icon={Server} accent="#7c3aed" />
-        <StatCard label="CPU Hours" value="387" hint={hw.cpu.name} icon={Cpu} accent="#0e7490" />
-        <StatCard label="Peak RAM" value="187 GB" hint={hw.ram.name} icon={MemoryStick} accent="#10b981" />
-        <StatCard label="Storage I/O" value="1,247 GB" hint={hw.storage.name} icon={HardDrive} accent="#f59e0b" />
+        <AIAssistWrapper id="hw-stat-gpu">
+          <StatCard label="GPU Hours" value="142" hint={hw.gpu.name} icon={Server} accent="#7c3aed" />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="hw-stat-cpu">
+          <StatCard label="CPU Hours" value="387" hint={hw.cpu.name} icon={Cpu} accent="#0e7490" />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="hw-stat-ram">
+          <StatCard label="Peak RAM" value="187 GB" hint={hw.ram.name} icon={MemoryStick} accent="#10b981" />
+        </AIAssistWrapper>
+        <AIAssistWrapper id="hw-stat-storage">
+          <StatCard label="Storage I/O" value="1,247 GB" hint={hw.storage.name} icon={HardDrive} accent="#f59e0b" />
+        </AIAssistWrapper>
       </section>
 
       {/* Hardware cards */}
+      <AIAssistWrapper id="hw-detail-cards" className="block">
       <section className="grid md:grid-cols-2 gap-4">
         {[
           { icon: Server, ...hw.gpu, label: 'GPU', accent: '#7c3aed', stats: [`${hw.gpu.hours} hours total`, `Peak VRAM: ${hw.gpu.peak_vram}`] },
@@ -101,8 +111,10 @@ export default function HardwareSpecsPage() {
           )
         })}
       </section>
+      </AIAssistWrapper>
 
       {/* Compute breakdown */}
+      <AIAssistWrapper id="hw-compute-breakdown" className="block">
       <section className="rounded-xl border bg-card p-5 shadow-sm">
         <div className="flex items-center gap-2 mb-4">
           <BarChart3 className="h-5 w-5 text-primary" />
@@ -123,8 +135,10 @@ export default function HardwareSpecsPage() {
           ))}
         </div>
       </section>
+      </AIAssistWrapper>
 
       {/* Per-phase breakdown table */}
+      <AIAssistWrapper id="hw-phase-table" className="block">
       <section className="rounded-xl border bg-card p-5 shadow-sm">
         <h2 className="font-display font-semibold text-lg mb-4">Per-Phase Compute Usage</h2>
         <div className="overflow-x-auto">
@@ -159,6 +173,7 @@ export default function HardwareSpecsPage() {
           </table>
         </div>
       </section>
+      </AIAssistWrapper>
     </div>
   )
 }
