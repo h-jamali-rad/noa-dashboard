@@ -2,7 +2,7 @@
 
 import BreadcrumbNav from '@/components/breadcrumb-nav'
 import { Button } from '@/components/ui/button'
-import { Download, FileJson, MessageSquarePlus, X } from 'lucide-react'
+import { Download, FileJson, Mail, MessageSquarePlus, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { sendCommentNotification } from './email-notify'
 import AIAssistWrapper from '@/components/ai-assist-wrapper'
@@ -306,29 +306,21 @@ export default function ArticlePreviewClient({
     return `noa-comments-${articleId}`
   }
 
-  async function loadComments() {
+  function loadComments() {
     setIsLoading(true)
     setError(null)
     try {
-      const res = await fetch(`/api/comments?articleId=${encodeURIComponent(articleId)}`)
-      if (!res.ok) throw new Error('API error')
-      const data = await res.json()
-      setComments(data.comments ?? [])
+      const raw = typeof window !== 'undefined' ? localStorage.getItem(getStorageKey()) : null
+      const stored: ArticleComment[] = raw ? JSON.parse(raw) : []
+      setComments(stored)
     } catch {
-      // Fallback to localStorage
-      try {
-        const raw = typeof window !== 'undefined' ? localStorage.getItem(getStorageKey()) : null
-        const stored: ArticleComment[] = raw ? JSON.parse(raw) : []
-        setComments(stored)
-      } catch {
-        setError('Failed to load comments.')
-      }
+      setError('Failed to load comments.')
     } finally {
       setIsLoading(false)
     }
   }
 
-  async function saveComment() {
+  function saveComment() {
     if (!draft) return
 
     const trimmedName = authorName.trim()
@@ -341,89 +333,62 @@ export default function ArticlePreviewClient({
 
     setError(null)
 
-    // Snapshot details needed for the email notification, taken BEFORE we
-    // clear the draft state below. Email is purely additive — failures here
-    // never block the comment save flow.
-    const notificationDetails = {
-      articleName: articleLabel,
-      articleId,
-      authorName: trimmedName,
-      selectedText: draft.selectedText,
-      commentText: trimmedComment,
-      paragraphId: draft.paragraphId,
-      timestamp: new Date().toISOString(),
-      pageUrl: typeof window !== 'undefined' ? window.location.href : '',
-    }
-
-    function fireEmailNotification() {
-      // Fire-and-forget: sendCommentNotification swallows its own errors and
-      // logs them; we still wrap in try/catch as defensive belt-and-braces.
-      try {
-        void sendCommentNotification(notificationDetails)
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.warn('Failed to dispatch comment email notification:', err)
-      }
-    }
-
     try {
-      const res = await fetch('/api/comments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          articleId,
-          paragraphId: draft.paragraphId,
-          selectedText: draft.selectedText,
-          commentText: trimmedComment,
-          authorName: trimmedName,
-        }),
-      })
-
-      if (!res.ok) throw new Error('API error')
-
+      const raw = typeof window !== 'undefined' ? localStorage.getItem(getStorageKey()) : null
+      const existing: ArticleComment[] = raw ? JSON.parse(raw) : []
+      const newComment: ArticleComment = {
+        id: Date.now(),
+        articleId,
+        paragraphId: draft.paragraphId,
+        selectedText: draft.selectedText,
+        commentText: trimmedComment,
+        authorName: trimmedName,
+        createdAt: new Date().toISOString(),
+      }
+      const updated = [...existing, newComment]
+      localStorage.setItem(getStorageKey(), JSON.stringify(updated))
+      setComments(updated)
       setCommentText('')
       setDraft(null)
       if (typeof window !== 'undefined') {
         window.getSelection()?.removeAllRanges()
       }
-      loadComments()
-
-      // Email notification AFTER the comment is saved (API success path).
-      fireEmailNotification()
     } catch {
-      // Fallback: persist the comment to localStorage so it isn't lost when
-      // the API is unavailable. Mirrors the localStorage read-fallback used
-      // in loadComments(). Email is sent here too.
-      try {
-        if (typeof window !== 'undefined') {
-          const raw = localStorage.getItem(getStorageKey())
-          const existing: ArticleComment[] = raw ? JSON.parse(raw) : []
-          const localComment: ArticleComment = {
-            id: Date.now(),
-            articleId,
-            paragraphId: draft.paragraphId,
-            selectedText: draft.selectedText,
-            commentText: trimmedComment,
-            authorName: trimmedName,
-            createdAt: notificationDetails.timestamp,
-          }
-          const updated = [...existing, localComment]
-          localStorage.setItem(getStorageKey(), JSON.stringify(updated))
-          setComments(updated)
-
-          setCommentText('')
-          setDraft(null)
-          window.getSelection()?.removeAllRanges()
-
-          // Email notification AFTER the localStorage save (offline path).
-          fireEmailNotification()
-          return
-        }
-      } catch {
-        // fall through to the generic error message
-      }
-
       setError('Failed to save comment. Please try again.')
+    }
+  }
+
+  async function sendAllCommentsViaEmail() {
+    if (comments.length === 0) {
+      setError('No comments to send.')
+      return
+    }
+    setError(null)
+
+    const allCommentsText = comments
+      .map((c, i) => `[${i + 1}] Section: ${c.paragraphId}\nSelected: "${c.selectedText}"\nComment: ${c.commentText}\nBy: ${c.authorName} — ${new Date(c.createdAt).toLocaleString()}`)
+      .join('\n\n---\n\n')
+
+    try {
+      const result = await sendCommentNotification({
+        articleName: articleLabel,
+        articleId,
+        authorName: comments.length === 1 ? comments[0].authorName : `${comments.length} reviewers`,
+        selectedText: `${comments.length} comment(s) across the article`,
+        commentText: allCommentsText,
+        paragraphId: 'all-sections',
+        timestamp: new Date().toISOString(),
+        pageUrl: typeof window !== 'undefined' ? window.location.href : '',
+      })
+
+      if (result.ok) {
+        setError(null)
+        alert(`✅ ${comments.length} comment(s) sent successfully to h.rad.it@gmail.com!`)
+      } else {
+        setError('Failed to send email. Check EmailJS configuration.')
+      }
+    } catch {
+      setError('Failed to send email. Please try again.')
     }
   }
 
@@ -514,6 +479,12 @@ export default function ArticlePreviewClient({
             <MessageSquarePlus className="mr-2 h-4 w-4" />
             {isLoading ? 'Refreshing comments...' : `Refresh Comments (${comments.length})`}
           </Button>
+          {comments.length > 0 && (
+            <Button variant="default" className="bg-emerald-600 hover:bg-emerald-700" onClick={sendAllCommentsViaEmail}>
+              <Mail className="mr-2 h-4 w-4" />
+              📧 Send All Comments ({comments.length})
+            </Button>
+          )}
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
 
