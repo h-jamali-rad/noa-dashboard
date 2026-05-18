@@ -31,7 +31,7 @@ export const EMAILJS_CONFIG = {
   /** Template ID used for usability / SUS evaluation notifications. */
   usabilityTemplateId: 'template_usability',
   /** EmailJS public key (formerly user ID). */
-  publicKey: 'YOUR_EMAILJS_PUBLIC_KEY',
+  publicKey: 'sUE_ueP_A3rZVi22E',
   /** Fixed recipient — also set inside each EmailJS template. */
   recipientEmail: 'h.rad.it@gmail.com',
 } as const
