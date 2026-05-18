@@ -4,6 +4,8 @@ import BreadcrumbNav from '@/components/breadcrumb-nav'
 import { Button } from '@/components/ui/button'
 import { Download, FileJson, MessageSquarePlus, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { sendCommentNotification } from './email-notify'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 
 type Primitive = string | number | null | undefined
 
@@ -339,6 +341,31 @@ export default function ArticlePreviewClient({
 
     setError(null)
 
+    // Snapshot details needed for the email notification, taken BEFORE we
+    // clear the draft state below. Email is purely additive — failures here
+    // never block the comment save flow.
+    const notificationDetails = {
+      articleName: articleLabel,
+      articleId,
+      authorName: trimmedName,
+      selectedText: draft.selectedText,
+      commentText: trimmedComment,
+      paragraphId: draft.paragraphId,
+      timestamp: new Date().toISOString(),
+      pageUrl: typeof window !== 'undefined' ? window.location.href : '',
+    }
+
+    function fireEmailNotification() {
+      // Fire-and-forget: sendCommentNotification swallows its own errors and
+      // logs them; we still wrap in try/catch as defensive belt-and-braces.
+      try {
+        void sendCommentNotification(notificationDetails)
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn('Failed to dispatch comment email notification:', err)
+      }
+    }
+
     try {
       const res = await fetch('/api/comments', {
         method: 'POST',
@@ -360,7 +387,42 @@ export default function ArticlePreviewClient({
         window.getSelection()?.removeAllRanges()
       }
       loadComments()
+
+      // Email notification AFTER the comment is saved (API success path).
+      fireEmailNotification()
     } catch {
+      // Fallback: persist the comment to localStorage so it isn't lost when
+      // the API is unavailable. Mirrors the localStorage read-fallback used
+      // in loadComments(). Email is sent here too.
+      try {
+        if (typeof window !== 'undefined') {
+          const raw = localStorage.getItem(getStorageKey())
+          const existing: ArticleComment[] = raw ? JSON.parse(raw) : []
+          const localComment: ArticleComment = {
+            id: Date.now(),
+            articleId,
+            paragraphId: draft.paragraphId,
+            selectedText: draft.selectedText,
+            commentText: trimmedComment,
+            authorName: trimmedName,
+            createdAt: notificationDetails.timestamp,
+          }
+          const updated = [...existing, localComment]
+          localStorage.setItem(getStorageKey(), JSON.stringify(updated))
+          setComments(updated)
+
+          setCommentText('')
+          setDraft(null)
+          window.getSelection()?.removeAllRanges()
+
+          // Email notification AFTER the localStorage save (offline path).
+          fireEmailNotification()
+          return
+        }
+      } catch {
+        // fall through to the generic error message
+      }
+
       setError('Failed to save comment. Please try again.')
     }
   }
@@ -617,7 +679,8 @@ export default function ArticlePreviewClient({
           )}
 
           {sectionBlocks.map((section) => (
-            <article key={section.id} id={section.id} className="scroll-mt-24 space-y-4 rounded-xl border border-border/60 bg-card p-5">
+            <AIAssistWrapper key={section.id} id={`${articleId}-${section.id}`}>
+            <article id={section.id} className="scroll-mt-24 space-y-4 rounded-xl border border-border/60 bg-card p-5">
               {section.level <= 2 ? (
                 <h2 className="text-xl font-semibold tracking-tight">{section.title}</h2>
               ) : (
@@ -669,11 +732,13 @@ export default function ArticlePreviewClient({
                 })}
               </div>
             </article>
+            </AIAssistWrapper>
           ))}
         </section>
       </div>
 
       {articleData.tables && articleData.tables.length > 0 && (
+        <AIAssistWrapper id={`${articleId}-tables`}>
         <section className="space-y-3">
           <h2 className="text-2xl font-semibold tracking-tight">Results Tables</h2>
           <div className="space-y-4">
@@ -682,9 +747,11 @@ export default function ArticlePreviewClient({
             ))}
           </div>
         </section>
+        </AIAssistWrapper>
       )}
 
       {articleData.figures && articleData.figures.length > 0 && (
+        <AIAssistWrapper id={`${articleId}-figures`}>
         <section className="space-y-3 rounded-xl border border-border/60 bg-card p-5">
           <h2 className="text-2xl font-semibold tracking-tight">Figures</h2>
           <ul className="space-y-2">
@@ -696,9 +763,11 @@ export default function ArticlePreviewClient({
             ))}
           </ul>
         </section>
+        </AIAssistWrapper>
       )}
 
       {articleData.tripod_ai_checklist?.items && articleData.tripod_ai_checklist.items.length > 0 && (
+        <AIAssistWrapper id={`${articleId}-tripod`}>
         <section className="space-y-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-5">
           <h2 className="text-2xl font-semibold tracking-tight">TRIPOD+AI Checklist</h2>
           <div className="overflow-x-auto rounded-lg border border-border/60 bg-background/30">
@@ -726,9 +795,11 @@ export default function ArticlePreviewClient({
             </table>
           </div>
         </section>
+        </AIAssistWrapper>
       )}
 
       {articleData.probast_assessment?.domains && articleData.probast_assessment.domains.length > 0 && (
+        <AIAssistWrapper id={`${articleId}-probast`}>
         <section className="space-y-3 rounded-xl border border-sky-500/30 bg-sky-500/5 p-5">
           <h2 className="text-2xl font-semibold tracking-tight">PROBAST Assessment</h2>
           <div className="overflow-x-auto rounded-lg border border-border/60 bg-background/30">
@@ -754,6 +825,7 @@ export default function ArticlePreviewClient({
             </table>
           </div>
         </section>
+        </AIAssistWrapper>
       )}
 
       {draft && (
