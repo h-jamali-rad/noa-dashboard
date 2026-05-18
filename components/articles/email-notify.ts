@@ -25,7 +25,7 @@ import emailjs from '@emailjs/browser'
 // ---------------------------------------------------------------------------
 export const EMAILJS_CONFIG = {
   /** EmailJS service ID (e.g. "service_xxxxxxx"). */
-  serviceId: 'service_noa_dashboard',
+  serviceId: 'service_j1dhj3h',
   /** Template ID used for comment notifications. */
   commentTemplateId: 'template_comment',
   /** Template ID used for usability / SUS evaluation notifications. */
