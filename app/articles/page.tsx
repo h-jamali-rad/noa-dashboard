@@ -347,8 +347,8 @@ export default function ArticlesPage() {
       <AIAssistWrapper id="articles-article-a" className="block">
       <ArticleInPrepCard
         cardLabel="Article 2 / 3"
-        targetJournal="Fertility & Sterility"
-        downloadHref="/downloads/article_a_pathology_encoding.docx"
+        targetJournal="Computers in Biology and Medicine"
+        downloadHref="/downloads/article_a_ml_framework.docx"
         downloadLabel="Download DOCX (Article A)"
         readFullArticleHref="/articles/article-a"
         data={articleA}
@@ -362,7 +362,7 @@ export default function ArticlesPage() {
       <ArticleInPrepCard
         cardLabel="Article 3 / 3"
         targetJournal="JMIR Medical Informatics"
-        downloadHref="/downloads/article_b_cdss_multiagent.docx"
+        downloadHref="/downloads/article_b_xai_cdss.docx"
         downloadLabel="Download DOCX (Article B)"
         readFullArticleHref="/articles/article-b"
         data={articleB}

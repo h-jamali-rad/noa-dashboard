@@ -4,7 +4,7 @@ import articleData from '@/article_b_extracted.json'
 export const metadata = {
   title: 'Article B — Full Preview',
   description:
-    'Full preview and supervisor review workspace for Article B (Explainable CDSS multi-agent manuscript).',
+    'Full preview and supervisor review workspace for Article B (Multi-Method Explainable AI for Micro-TESE with Clinical Decision Support).',
 }
 
 export default function ArticleBPage() {
@@ -13,8 +13,8 @@ export default function ArticleBPage() {
       articleId="article-b"
       articleLabel="Article B"
       articleData={articleData}
-      docxPath="/downloads/article_b_cdss_multiagent.docx"
-      pdfPath="/downloads/article_b_cdss_multiagent.pdf"
+      docxPath="/downloads/article_b_xai_cdss.docx"
+      pdfPath="/downloads/article_b_xai_cdss.pdf"
     />
   )
 }

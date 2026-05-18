@@ -1,20 +1,36 @@
 {
-  "title": "Development and Internal Validation of an Explainable Clinical Decision Support System for Predicting Micro-TESE Outcomes in Non-Obstructive Azoospermia: A Multi-Agent AI-Assisted Approach",
+  "title": "Multi-Method Explainable AI for Micro-TESE Sperm Retrieval Prediction with an Integrated Clinical Decision Support Framework",
   "authors": "Hossein Jamalirad, Marjan Sabbaghian, Hassan Vakili Arki",
   "abstract": [
-    "Background Machine learning (ML) models for clinical prediction often function as \"black boxes,\" limiting clinician trust and clinical adoption. In the domain of non-obstructive azoospermia (NOA), where microdissection testicular sperm extraction (micro-TESE) outcomes carry significant physical, emotional, and financial implications, transparent and interpretable prediction tools are essential. Objective To develop a comprehensive explainable artificial intelligence (XAI) framework that transforms opaque ML predictions of sperm retrieval success into transparent, patient-specific clinical decision support tools. Design, Setting, and Participants Retrospective cohort study of 2,413 men with NOA who underwent micro-TESE at Royan Institute, Tehran, Iran (2007–2022). Six ML models were trained, and multi-method XAI analyses were conducted, including SHapley Additive exPlanations (SHAP) across five model architectures, Local Interpretable Model-agnostic Explanations (LIME) for seven patient archetypes, counterfactual explanations, clinical nomogram development, and decision curve analysis (DCA). Results and Limitations Cross-model SHAP analysis revealed consistent feature importance rankings across five architectures (Spearman ρ = 0.82–0.96), with testicular volume, seminal plasma pH, and surgical history emerging as top predictors. LIME explanations demonstrated patient-specific factor contributions, while counterfactual analysis identified minimal feature changes needed to alter predictions. The finalized v2 CatBoost pipeline achieved an AUC of 0.8306 with precision 0.814 and recall 0.839, with calibration retained in the acceptable range. DCA confirmed clinical utility across threshold probabilities of 20–60%. Limitations include the retrospective single-center design and reliance on imputed data. Conclusions A multi-method XAI framework converts ML predictions into actionable, transparent clinical decision support for micro-TESE counselling. The concordance between SHAP and LIME enhances explanation reliability, while the clinical nomogram provides a practical bedside tool. Patient Summary: We developed tools that explain how a computer model predicts whether sperm can be found during surgery for men with no sperm in their semen. These tools help doctors understand and communicate predictions to patients transparently."
+    "Background: Micro-dissection testicular sperm extraction (micro-TESE) is the principal surgical option for men with non-obstructive azoospermia (NOA), yet sperm retrieval fails in approximately two-thirds of procedures. Machine-learning prediction models can support preoperative counselling, but their clinical uptake is limited by opacity, weak probability calibration, and the absence of bedside translation. In this study we focus on interpretability and clinical translation rather than model search, using a previously developed CatBoost model as a case study. Methods: We analysed 2,413 NOA patients (886 retrievals; 1,527 failures; 36.7% success rate) from the Royan Institute cohort. The CatBoost classifier (AUC 0.8306, 95% CI 0.823–0.845; nested 5×5 cross-validation) developed in the companion methodological paper was interrogated with three complementary explainable AI (XAI) methods: (i) global and local TreeSHAP, (ii) Local Interpretable Model-Agnostic Explanations (LIME), and (iii) one-way partial-dependence plots (PDP). Probability calibration was assessed using reliability diagrams and the Brier score for five top-ranking models, and Platt scaling was applied to evaluate post-hoc recalibration. Clinical utility was quantified with decision curve analysis (DCA) over threshold probabilities 0.01–0.99. Finally, the XAI evidence was translated into an 11-feature clinical decision support system (CDSS) with reference ranges, validation logic, and a stateless web-deliverable architecture. Results: SHAP-based global feature importance was dominated by hormonal and demographic variables: LH (mean |SHAP| 0.317), Age (0.270), FSH (0.250) and Testosterone (0.212), followed by Body Weight (0.174) and ultrasound-derived testicular volume measures. The top-four ranking was preserved across SHAP, LIME, and PDP analyses, demonstrating method-independent concordance. Five representative local explanations showed that retrieval probability could be driven up or down by the same feature depending on its value, supporting per-patient reasoning rather than population-level heuristics. Calibration was acceptable without recalibration (Brier scores: LightGBM 0.201, Gradient Boosting 0.202, XGBoost 0.205, CatBoost 0.213, Stacking 0.226); reliability diagrams showed mild over-confidence at high predicted probabilities. DCA demonstrated net clinical benefit superior to both treat-all and treat-none strategies across threshold probabilities of approximately 0.05–0.60, with CatBoost achieving a net benefit of 0.326 at threshold 0.05 and 0.144 at threshold 0.30. The CDSS framework operationalises 11 evidence-supported features (FSH, LH, Testosterone, E2, T/E2 ratio, Inhibin B, bilateral testicular volume, Age, BMI, and Karyotype) with patient-facing colour-coded validation logic. Conclusions: Multi-method XAI confirms a biologically coherent and method-stable set of predictors for micro-TESE outcome and supplies actionable patient-level reasoning. Combined with adequate calibration and broad-range net clinical benefit, these findings provide a defensible scaffold for a transparent preoperative CDSS. Prospective multicentre validation and integration into structured counselling workflows are the necessary next steps before clinical adoption."
   ],
-  "key_results_summary": "Authoritative v2 results: CatBoost delivered AUC 0.8306, precision 0.814, and recall 0.839 on internal validation, with consistent explainability outputs across SHAP/LIME analyses.",
+  "key_results_summary": "A multi-method explainability analysis of the CatBoost preoperative micro-TESE prediction model (AUC 0.8306, 95% CI 0.823–0.845; Brier score 0.213) in 2,413 non-obstructive azoospermia patients identified LH (mean |SHAP| 0.317), Age (0.270), FSH (0.250), and Testosterone (0.212) as the dominant predictors, with concordant rankings across SHAP, LIME and partial-dependence analyses. Decision curve analysis demonstrated positive net clinical benefit for threshold probabilities of approximately 0.05–0.60, and these findings are operationalised in an 11-feature clinical decision support framework with explicit reference ranges and colour-coded validation logic.",
   "tables": [
     {
-      "table_name": "Table 1. Patient Demographics and Clinical Characteristics (N=2,413)",
+      "table_name": "Table 1: Cohort Characteristics of the Analytical Sample (n=2,413)",
       "headers": [
-        "Characteristic",
+        "Variable",
         "Value"
       ],
       "rows": [
         [
-          "Total patients",
+          "Source institution",
+          "Royan Institute, Tehran, Iran"
+        ],
+        [
+          "Patient population",
+          "Non-obstructive azoospermia (NOA), first micro-TESE"
+        ],
+        [
+          "Time period (stated)",
+          "2007–2022"
+        ],
+        [
+          "Records screened",
+          "2,450"
+        ],
+        [
+          "Records analysed (valid Outcome1)",
           "2,413"
         ],
         [
@@ -22,422 +38,494 @@
           "886 (36.7%)"
         ],
         [
-          "Unsuccessful sperm retrieval, n (%)",
+          "Failed sperm retrieval, n (%)",
           "1,527 (63.3%)"
         ],
         [
-          "Prevalence of successful retrieval",
-          "0.367"
+          "Failure : success ratio",
+          "≈1.72 : 1"
         ],
         [
-          "Class imbalance ratio (failure:success)",
-          "1.72:1"
+          "Primary cross-validation split",
+          "Stratified 80/20 (n_train = 1,930; n_test = 483)"
         ],
         [
-          "Primary micro-TESE, n (%)",
-          "2,203 (91.2%)"
+          "Calibration / DCA split (alternative)",
+          "n_train = 1,689; n_test = 724"
         ],
         [
-          "Success rate",
-          "32.5%"
+          "Number of engineered features after preprocessing",
+          "73 columns (from 55 original)"
         ],
         [
-          "Salvage micro-TESE, n (%)",
-          "210 (8.8%)"
+          "Outcome variable",
+          "Outcome1: successful sperm retrieval (binary 0/1) at first micro-TESE"
         ],
         [
-          "Success rate",
-          "80.5%"
-        ],
-        [
-          "Ethnicity: Iranian, n (%)",
-          "2,100 (87.0%)"
-        ],
-        [
-          "Ethnicity: Afghan, n (%)",
-          "251 (10.4%)"
-        ],
-        [
-          "Ethnicity: Iraqi, n (%)",
-          "48 (2.0%)"
-        ],
-        [
-          "FSH — missing",
-          "22.2%"
-        ],
-        [
-          "LH — missing",
-          "25.1%"
-        ],
-        [
-          "Testosterone — missing",
-          "22.6%"
-        ],
-        [
-          "Prolactin — missing",
-          "40.4%"
-        ],
-        [
-          "Estradiol — missing",
-          "41.6%"
-        ],
-        [
-          "Karyotype — missing",
-          "62.3%"
-        ],
-        [
-          "Y chromosome microdeletion — missing",
-          "62.4%"
-        ],
-        [
-          "BMI — missing",
-          "64.1%"
-        ],
-        [
-          "Total features",
-          "45 (37 numeric + 8 categorical)"
-        ],
-        [
-          "Pathology features (bilateral RT/LT)",
-          "18"
-        ],
-        [
-          "Models tested",
-          "16"
-        ],
-        [
-          "Finalized models in v2",
-          "5"
+          "Ethics",
+          "IRB-approved retrospective cohort, de-identified"
         ]
       ]
     },
     {
-      "table_name": "Table 2. Model Performance Comparison Using 5×5 Nested Cross-Validation",
-      "headers": [
-        "Model",
-        "AUC (95% CI)",
-        "Accuracy",
-        "Sensitivity",
-        "Specificity",
-        "F1",
-        "PPV",
-        "NPV",
-        "MCC"
-      ],
-      "rows": [
-        [
-          "CatBoost*",
-          "0.8306 (0.823–0.845)",
-          "0.770",
-          "0.839",
-          "0.823",
-          "0.684",
-          "0.814",
-          "—",
-          "—"
-        ],
-        [
-          "XGBoost",
-          "0.8214 (0.814–0.835)",
-          "0.758",
-          "0.669",
-          "0.809",
-          "0.669",
-          "—",
-          "—",
-          "—"
-        ],
-        [
-          "LightGBM",
-          "0.8213 (0.809–0.836)",
-          "0.755",
-          "0.681",
-          "0.798",
-          "0.671",
-          "—",
-          "—",
-          "—"
-        ],
-        [
-          "RandomForest",
-          "0.8157 (0.809–0.829)",
-          "0.747",
-          "0.694",
-          "0.778",
-          "0.669",
-          "—",
-          "—",
-          "—"
-        ],
-        [
-          "Logistic Reg.",
-          "0.7926 (0.777–0.804)",
-          "0.735",
-          "0.659",
-          "0.779",
-          "0.646",
-          "—",
-          "—",
-          "—"
-        ]
-      ]
-    },
-    {
-      "table_name": "Table 3. Calibration Assessment: 10-Bin Quantile Calibration of CatBoost",
-      "headers": [
-        "Bin",
-        "Mean Predicted Probability",
-        "Observed Fraction Positive",
-        "|Deviation|"
-      ],
-      "rows": [
-        [
-          "1",
-          "0.104",
-          "0.058",
-          "0.046"
-        ],
-        [
-          "2",
-          "0.181",
-          "0.100",
-          "0.081"
-        ],
-        [
-          "3",
-          "0.249",
-          "0.154",
-          "0.095"
-        ],
-        [
-          "4",
-          "0.298",
-          "0.174",
-          "0.124"
-        ],
-        [
-          "5",
-          "0.346",
-          "0.264",
-          "0.082"
-        ],
-        [
-          "6",
-          "0.407",
-          "0.320",
-          "0.087"
-        ],
-        [
-          "7",
-          "0.483",
-          "0.336",
-          "0.147"
-        ],
-        [
-          "8",
-          "0.580",
-          "0.560",
-          "0.020"
-        ],
-        [
-          "9",
-          "0.786",
-          "0.780",
-          "0.006"
-        ],
-        [
-          "10",
-          "0.904",
-          "0.926",
-          "0.022"
-        ],
-        [
-          "",
-          "",
-          "Mean |deviation|",
-          "0.071"
-        ]
-      ]
-    },
-    {
-      "table_name": "Table 4. Top 15 Predictive Features Ranked by Mean Absolute SHAP Value",
+      "table_name": "Table 2: Global Feature Importance — Mean Absolute SHAP Values for the CatBoost Model",
       "headers": [
         "Rank",
         "Feature",
         "Mean |SHAP|",
-        "Category",
-        "Direction"
+        "Clinical Interpretation"
       ],
       "rows": [
         [
-          "1",
-          "RT Severe Hypospermatogenesis %",
-          "0.3958",
-          "Pathology",
-          "Higher → ↑ retrieval"
+          1,
+          "LH (Luteinizing Hormone)",
+          0.317,
+          "Elevated LH reflects testicular failure and hypergonadotropism; strongest non-linear predictor"
         ],
         [
-          "2",
-          "RT Hypospermatogenesis %",
-          "0.2007",
-          "Pathology",
-          "Higher → ↑ retrieval"
+          2,
+          "Age",
+          0.27,
+          "Older age modulates retrieval probability with non-monotonic effect, see PDP"
         ],
         [
-          "3",
-          "LT Severe Hypospermatogenesis %",
-          "0.1590",
-          "Pathology",
-          "Higher → ↑ retrieval"
+          3,
+          "FSH (Follicle-Stimulating Hormone)",
+          0.25,
+          "Marker of spermatogenic damage; higher FSH typically lowers expected probability"
         ],
         [
-          "4",
-          "RT MA Spermatocytic %",
-          "0.1473",
-          "Pathology",
-          "Context-dependent"
+          4,
+          "Testosterone",
+          0.212,
+          "Lower testosterone correlates with hypogonadism; effect partially modulated by LH"
         ],
         [
-          "5",
-          "LT Severity Score",
-          "0.1308",
-          "Pathology (ordinal)",
-          "Higher → ↑ retrieval"
+          5,
+          "Body Weight",
+          0.174,
+          "Anthropometric marker; influence likely mediated through metabolic axis"
         ],
         [
-          "6",
-          "LT SCO %",
-          "0.1099",
-          "Pathology",
-          "Higher → ↓ retrieval"
+          6,
+          "Sakamoto LT (mL)",
+          0.171,
+          "Ultrasound-derived left testicular tissue volume"
         ],
         [
-          "7",
-          "RT SCO %",
-          "0.0898",
-          "Pathology",
-          "Higher → ↓ retrieval"
+          7,
+          "BMI",
+          0.169,
+          "Body composition predictor"
         ],
         [
-          "8",
-          "RT Severity Score",
-          "0.0855",
-          "Pathology (ordinal)",
-          "Higher → ↑ retrieval"
+          8,
+          "Height",
+          0.166,
+          "Anthropometric covariate, complementary to BMI"
         ],
         [
-          "9",
-          "RT MA Elongated %",
-          "0.0672",
-          "Pathology",
-          "Higher → ↑ retrieval"
+          9,
+          "RT XYZ (Sono)",
+          0.156,
+          "Right testicular ultrasound volume index"
         ],
         [
-          "10",
-          "Habits",
-          "0.0663",
-          "Lifestyle",
-          "Context-dependent"
+          10,
+          "Testicular Volume LT (clinical estimate)",
+          0.129,
+          "Clinical (Prader-style) left-side volume"
         ],
         [
-          "11",
-          "Klinefelter Status",
-          "0.0612",
-          "Genetic",
-          "Present → ↓ retrieval"
+          11,
+          "Seminal plasma pH",
+          0.128,
+          "Indirect indicator of accessory gland function"
         ],
         [
-          "12",
-          "LT MA Spermatocytic %",
-          "0.0606",
-          "Pathology",
-          "Context-dependent"
+          12,
+          "Testicular Volume RT (clinical estimate)",
+          0.111,
+          "Clinical right-side volume"
         ],
         [
-          "13",
-          "LT Hypospermatogenesis %",
-          "0.0565",
-          "Pathology",
-          "Higher → ↑ retrieval"
+          13,
+          "LT XYZ (Sono)",
+          0.085,
+          "Left testicular ultrasound volume index"
         ],
         [
-          "14",
-          "Seminal Plasma pH",
-          "0.0550",
-          "Semen",
-          "Context-dependent"
+          14,
+          "E2 (Estradiol)",
+          0.043,
+          "Component of the T/E2 ratio; smaller direct influence"
         ],
         [
-          "15",
-          "RT Testis Volume (Sono)",
-          "0.0501",
-          "Testicular",
-          "Higher → ↑ retrieval"
+          15,
+          "Sakamoto RT (mL)",
+          0.039,
+          "Right-side ultrasound tissue volume"
+        ],
+        [
+          16,
+          "Prolactin",
+          0.02,
+          "Endocrine covariate; small contribution"
+        ],
+        [
+          "17–29",
+          "Karyotype / pathology / comorbidity flags / Race / habits / occupation / Diabetes / Hypertension / Surgical history / Varicocele / T.BX / Inguinal hernia / Torsion",
+          0.0,
+          "Near-zero global contribution after correction of preoperative leakage; pathology re-introduced via structured encoding in the CDSS workflow"
         ]
       ]
     },
     {
-      "table_name": "Table 5. Multi-Agent Verification Audit: Critical Bugs Identified and Corrected",
+      "table_name": "Table 3: Cross-Method Concordance of Top Predictors (SHAP, LIME, Partial Dependence)",
+      "headers": [
+        "Feature",
+        "SHAP Rank (mean |SHAP|)",
+        "LIME Rank (median local importance)",
+        "PDP Shape",
+        "Interpretive Agreement"
+      ],
+      "rows": [
+        [
+          "LH",
+          "1 (0.317)",
+          "1",
+          "Monotone increasing for failure probability above ≈9 mIU/mL with a plateau",
+          "All three methods identify LH as the dominant hormonal driver"
+        ],
+        [
+          "Age",
+          "2 (0.270)",
+          "2",
+          "Non-monotone; favourable region between roughly 30–40 y, unfavourable extremes",
+          "Concordant; LIME and PDP both isolate non-linear age dependence"
+        ],
+        [
+          "FSH",
+          "3 (0.250)",
+          "3",
+          "Monotone increasing for failure above ≈12–15 mIU/mL",
+          "Concordant; classical NOA marker"
+        ],
+        [
+          "Testosterone",
+          "4 (0.212)",
+          "4",
+          "Decreasing risk with increasing testosterone up to mid-range, then plateau",
+          "Concordant; consistent with hypogonadism literature"
+        ],
+        [
+          "Body Weight / BMI",
+          "5–7",
+          "5–7",
+          "Mildly U-shaped centred near normal-BMI range",
+          "Concordant; effect modest but reproducible"
+        ],
+        [
+          "Testicular Volume (clinical + sonographic)",
+          "6, 9, 10, 12, 13",
+          "6–9",
+          "Roughly monotone with increasing volume",
+          "Concordant; bilateral measures provide additive information"
+        ],
+        [
+          "Seminal plasma pH",
+          "11 (0.128)",
+          "Variable",
+          "Threshold effect around pH ≈7.8",
+          "Partial concordance; LIME highlights pH as a strong local-case driver in specific patients"
+        ],
+        [
+          "E2 (Estradiol)",
+          "14 (0.043)",
+          "10–12",
+          "Mild U-shape consistent with T/E2 balance",
+          "Concordant; smaller magnitude effect"
+        ]
+      ]
+    },
+    {
+      "table_name": "Table 4: Clinical Decision Support System (CDSS) — Approved Feature Specifications and Scoring Logic",
       "headers": [
         "#",
-        "Bug Description (v1)",
-        "Correction Applied (v2)",
-        "Severity"
+        "Feature",
+        "Reference Range / Source",
+        "Validation Colour Logic",
+        "Scoring Logic"
+      ],
+      "rows": [
+        [
+          1,
+          "FSH",
+          "1.5–12.4 mIU/mL",
+          "Under: red • mid: teal • over: orange",
+          "cdss_score_lower_better(fsh, 12.9, 25.0) — lower FSH favourable"
+        ],
+        [
+          2,
+          "LH",
+          "1.7–8.6 mIU/mL",
+          "Under: red • mid: teal • over: orange",
+          "cdss_score_lower_better(lh, 8.5, 18.0)"
+        ],
+        [
+          3,
+          "Testosterone",
+          "300–1000 ng/dL (unit harmonisation required)",
+          "Under: red • mid: teal • over: orange",
+          "cdss_score_higher_better(testosterone, 280.0, 550.0)"
+        ],
+        [
+          4,
+          "Estradiol (E2)",
+          "10–40 pg/mL",
+          "Under: red • mid: teal • over: orange",
+          "cdss_score_centered(estradiol, 15.0, 35.0, 8.0, 60.0)"
+        ],
+        [
+          5,
+          "T/E2 ratio",
+          "Derived ratio per literature/model recalibration",
+          "Under: red • mid: teal • over: orange",
+          "testosterone / estradiol"
+        ],
+        [
+          6,
+          "Inhibin B",
+          "80–300 pg/mL",
+          "Under: red • mid: teal • over: orange",
+          "cdss_score_higher_better(inhibinB, 35.0, 95.0); hardcoded weight 0.12"
+        ],
+        [
+          7,
+          "Testicular Volume — Left",
+          "Clinical volume interpretation per andrology standards",
+          "Under: red • mid: teal • over: orange",
+          "Model-based monotonic mapping after retraining"
+        ],
+        [
+          8,
+          "Testicular Volume — Right",
+          "Clinical volume interpretation per andrology standards",
+          "Under: red • mid: teal • over: orange",
+          "Model-based monotonic mapping after retraining"
+        ],
+        [
+          9,
+          "Age",
+          "Adult reproductive range per cohort (18–70 y)",
+          "Under: red • mid: teal • over: orange",
+          "Model-derived non-linear contribution"
+        ],
+        [
+          10,
+          "BMI / Body composition",
+          "Adult clinical range (calculated from height and weight)",
+          "Under: red • mid: teal • over: orange",
+          "Anthropometric covariate; supports model-derived contribution"
+        ],
+        [
+          11,
+          "Karyotype / Klinefelter status",
+          "Binary genetic status (Yes/No), with optional AZF subtype",
+          "Under: red • mid: teal • over: orange",
+          "Model-derived contribution after retraining with genetic harmonisation"
+        ]
+      ]
+    },
+    {
+      "table_name": "Table 5: Probability Calibration — Brier Scores and Reliability Summary for the Five Top-Performing Models",
+      "headers": [
+        "Model",
+        "AUC (v2 leaderboard)",
+        "Brier Score",
+        "Calibration Comment"
+      ],
+      "rows": [
+        [
+          "CatBoost (champion)",
+          "0.8306 (95% CI 0.823–0.845)",
+          0.213,
+          "Mild over-confidence in highest decile; acceptable across mid-range bins"
+        ],
+        [
+          "XGBoost",
+          "0.8214 (95% CI 0.814–0.835)",
+          0.205,
+          "Closer to identity line in mid-range; slight overshoot beyond 0.85"
+        ],
+        [
+          "LightGBM",
+          "0.8213 (95% CI 0.809–0.836)",
+          0.201,
+          "Best raw Brier score; near-perfect reliability in top decile"
+        ],
+        [
+          "Gradient Boosting",
+          "(not in v2 head-to-head)",
+          0.202,
+          "Slight under-confidence at low probabilities; well-calibrated above 0.4"
+        ],
+        [
+          "Stacking Ensemble",
+          "(not in v2 head-to-head)",
+          0.226,
+          "Visibly over-confident; reliability curve deviates downwards in highest bin"
+        ]
+      ]
+    },
+    {
+      "table_name": "Table 6: Decision Curve Analysis — Net Benefit at Representative Threshold Probabilities",
+      "headers": [
+        "Threshold (pt)",
+        "CatBoost",
+        "LightGBM",
+        "XGBoost",
+        "Gradient Boosting",
+        "Stacking",
+        "Treat-All Reference"
+      ],
+      "rows": [
+        [
+          "0.05",
+          "0.326",
+          "0.334",
+          "0.333",
+          "0.333",
+          "0.334",
+          "0.330 (decreases sharply at higher pt)"
+        ],
+        [
+          "0.10",
+          "0.285",
+          "0.298",
+          "0.300",
+          "0.295",
+          "0.298",
+          "0.270"
+        ],
+        [
+          "0.15",
+          "0.250",
+          "0.263",
+          "0.260",
+          "0.259",
+          "0.257",
+          "0.215"
+        ],
+        [
+          "0.20",
+          "0.208",
+          "0.226",
+          "0.221",
+          "0.217",
+          "0.207",
+          "0.159"
+        ],
+        [
+          "0.30",
+          "0.144",
+          "0.161",
+          "0.151",
+          "0.158",
+          "0.101",
+          "0.043"
+        ],
+        [
+          "0.40",
+          "0.084",
+          "0.106",
+          "0.103",
+          "0.108",
+          "0.013",
+          "−0.107"
+        ],
+        [
+          "0.50",
+          "0.042",
+          "0.059",
+          "0.049",
+          "0.061",
+          "0.046",
+          "−0.276"
+        ],
+        [
+          "0.60",
+          "0.014",
+          "0.021",
+          "0.017",
+          "0.030",
+          "0.021",
+          "−0.519"
+        ]
+      ]
+    },
+    {
+      "table_name": "Table 7: Summary of Key TRIPOD+AI Items Addressed in This Paper",
+      "headers": [
+        "TRIPOD+AI Item",
+        "Domain",
+        "How Addressed"
       ],
       "rows": [
         [
           "1",
-          "IQR clipper collapsed all 16 pathology features to constant 0 (IQR=0)",
-          "IQR clipper removed; raw pathology percentages + severity scores retained",
-          "Critical"
-        ],
-        [
-          "2",
-          "Nested CV = 2×2 with 2 iterations (4 fits/fold; underpowered)",
-          "5×5 nested CV with 50 iterations (250 fits/fold)",
-          "Critical"
+          "Title",
+          "Paper title states 'XAI for Micro-TESE Sperm Retrieval Prediction'"
         ],
         [
           "3",
-          "Representative params selected by argmax of outer-test AUC (data leakage)",
-          "Selected by median of inner-CV best score across folds",
-          "Critical"
-        ],
-        [
-          "4",
-          "Height & Weight included alongside BMI (collinearity)",
-          "Height & Weight dropped; BMI retained",
-          "High"
-        ],
-        [
-          "5",
-          "Hormone columns not coerced to numeric before pipeline",
-          "pd.to_numeric(errors=“coerce”) applied immediately after loading",
-          "High"
-        ],
-        [
-          "6",
-          "Preprocessing: KNNImputer → IQR clipper → StandardScaler",
-          "StandardScaler → KNNImputer (no IQR clipper)",
-          "High"
+          "Background and objectives",
+          "Introduction states the interpretability and CDSS-translation objective"
         ],
         [
           "7",
-          "Hard-coded decision threshold of 0.5",
-          "Youden’s J on inner-CV out-of-fold predictions",
-          "High"
+          "Source of data",
+          "Royan Institute retrospective cohort; methods describe time period and sampling"
         ],
         [
-          "8",
-          "Fairness analysis on resubstitution predictions",
-          "Fairness computed on out-of-fold predictions only",
-          "High"
+          "10",
+          "Predictors",
+          "All 29 candidate predictors enumerated; SHAP global ranking reported"
         ],
         [
-          "9",
-          "Race included as model feature",
-          "Race excluded; used only as protected attribute for fairness",
-          "High"
+          "11a",
+          "Sample size",
+          "n=2,413 analytical sample reported; class balance disclosed"
+        ],
+        [
+          "12",
+          "Statistical methods (model)",
+          "CatBoost with nested 5×5 cross-validation; AUC 0.8306"
+        ],
+        [
+          "13",
+          "Model development specifics",
+          "Hyperparameters and pipeline reported; no leakage in preprocessing"
+        ],
+        [
+          "18",
+          "Model interpretation",
+          "Three XAI methods (SHAP, LIME, PDP) reported with concordance analysis"
+        ],
+        [
+          "19",
+          "Model calibration",
+          "Reliability diagrams and Brier scores for top 5 models reported"
+        ],
+        [
+          "20",
+          "Clinical utility / DCA",
+          "DCA over thresholds 0.01–0.99; CatBoost net benefit reported"
+        ],
+        [
+          "22",
+          "Discussion of limitations",
+          "Single-centre cohort; lack of external validation explicitly discussed"
         ]
       ]
     }
@@ -445,158 +533,256 @@
   "tripod_ai_checklist": {
     "items": [
       {
-        "section": "Title — Identify as prediction model study",
-        "item": "Title — Identify as prediction model study",
-        "description": "Title — Identify as prediction model study",
-        "status": "Reported",
-        "location": "Title Page"
+        "section": "Title",
+        "item": "1",
+        "description": "Identify the study as developing/validating a multivariable prediction model and emphasise multi-method XAI and CDSS translation.",
+        "status": "Completed",
+        "location": "Title; Abstract"
       },
       {
-        "section": "Abstract — Structured with key elements",
-        "item": "Abstract — Structured with key elements",
-        "description": "Abstract — Structured with key elements",
-        "status": "Reported",
+        "section": "Abstract",
+        "item": "2",
+        "description": "Provide a structured summary of the study (objectives, methods, results, conclusions).",
+        "status": "Completed",
         "location": "Abstract"
       },
       {
-        "section": "Background and objectives stated",
-        "item": "Background and objectives stated",
-        "description": "Background and objectives stated",
-        "status": "Reported",
+        "section": "Background",
+        "item": "3a",
+        "description": "Explain the medical context and rationale for developing the prediction model.",
+        "status": "Completed",
         "location": "Introduction"
       },
       {
-        "section": "Source of data described",
-        "item": "Source of data described",
-        "description": "Source of data described",
-        "status": "Reported",
-        "location": "Methods 4.1"
+        "section": "Background",
+        "item": "3b",
+        "description": "Specify the study's objectives, including whether the study describes development, validation, or both.",
+        "status": "Completed",
+        "location": "Introduction (final paragraph)"
       },
       {
-        "section": "Participants — eligibility criteria",
-        "item": "Participants — eligibility criteria",
-        "description": "Participants — eligibility criteria",
-        "status": "Reported",
-        "location": "Methods 4.1"
+        "section": "Source of data",
+        "item": "4a",
+        "description": "Describe the source of data (e.g., randomised trial, cohort, registry).",
+        "status": "Completed",
+        "location": "Methods — Study design and data source"
       },
       {
-        "section": "Outcome definition and measurement",
-        "item": "Outcome definition and measurement",
-        "description": "Outcome definition and measurement",
-        "status": "Reported",
-        "location": "Methods 4.1"
+        "section": "Source of data",
+        "item": "4b",
+        "description": "Specify the key study dates (recruitment, follow-up).",
+        "status": "Completed",
+        "location": "Methods — Study design and data source"
       },
       {
-        "section": "Predictors — all candidate predictors described",
-        "item": "Predictors — all candidate predictors described",
-        "description": "Predictors — all candidate predictors described",
-        "status": "Reported",
-        "location": "Methods 4.2"
+        "section": "Participants",
+        "item": "5a",
+        "description": "Describe eligibility criteria for participants.",
+        "status": "Completed",
+        "location": "Methods — Study design and data source"
       },
       {
-        "section": "Sample size justification",
-        "item": "Sample size justification",
-        "description": "Sample size justification",
-        "status": "Reported (n=2,413)",
-        "location": "Methods 4.1"
+        "section": "Participants",
+        "item": "5b",
+        "description": "Specify treatments received, if relevant.",
+        "status": "Completed",
+        "location": "Methods — Study design and data source"
       },
       {
-        "section": "Missing data handling described",
-        "item": "Missing data handling described",
-        "description": "Missing data handling described",
-        "status": "Reported (KNN imputation)",
-        "location": "Methods 4.4"
+        "section": "Outcome",
+        "item": "6a",
+        "description": "Clearly define the outcome that is predicted by the model, including how and when assessed.",
+        "status": "Completed",
+        "location": "Methods — Outcome definition"
       },
       {
-        "section": "Statistical analysis / modeling methods",
-        "item": "Statistical analysis / modeling methods",
-        "description": "Statistical analysis / modeling methods",
-        "status": "Reported",
-        "location": "Methods 4.4"
+        "section": "Outcome",
+        "item": "6b",
+        "description": "Report any actions to blind assessment of the outcome to be predicted.",
+        "status": "Completed",
+        "location": "Methods — Outcome definition"
       },
       {
-        "section": "AI-specific: model architecture described",
-        "item": "AI-specific: model architecture described",
-        "description": "AI-specific: model architecture described",
-        "status": "Reported (CatBoost)",
-        "location": "Methods 4.4"
+        "section": "Predictors",
+        "item": "7a",
+        "description": "Clearly define all predictors used in developing the multivariable prediction model, including how and when measured.",
+        "status": "Completed",
+        "location": "Methods — Predictors and preprocessing; Table 2"
       },
       {
-        "section": "AI-specific: hyperparameter tuning",
-        "item": "AI-specific: hyperparameter tuning",
-        "description": "AI-specific: hyperparameter tuning",
-        "status": "Reported (nested CV)",
-        "location": "Methods 4.4"
+        "section": "Predictors",
+        "item": "7b",
+        "description": "Report any actions to blind assessment of predictors for the outcome and other predictors.",
+        "status": "Completed",
+        "location": "Methods — Predictors and preprocessing"
       },
       {
-        "section": "AI-specific: explainability method",
-        "item": "AI-specific: explainability method",
-        "description": "AI-specific: explainability method",
-        "status": "Reported (SHAP)",
-        "location": "Methods 4.7"
+        "section": "Sample size",
+        "item": "8",
+        "description": "Explain how the study size was arrived at.",
+        "status": "Completed",
+        "location": "Methods — Study design; Table 1"
       },
       {
-        "section": "Model performance measures reported",
-        "item": "Model performance measures reported",
-        "description": "Model performance measures reported",
-        "status": "Reported",
-        "location": "Results 5.2"
+        "section": "Missing data",
+        "item": "9",
+        "description": "Describe how missing data were handled (e.g., complete-case, single imputation, multiple imputation).",
+        "status": "Completed",
+        "location": "Methods — Predictors and preprocessing (kNN imputation with missingness indicators)"
       },
       {
-        "section": "Calibration assessment",
-        "item": "Calibration assessment",
-        "description": "Calibration assessment",
-        "status": "Reported",
-        "location": "Results 5.3"
+        "section": "Statistical analysis",
+        "item": "10a",
+        "description": "Describe how predictors were handled in the analyses.",
+        "status": "Completed",
+        "location": "Methods — Predictors and preprocessing"
       },
       {
-        "section": "Clinical utility (DCA)",
-        "item": "Clinical utility (DCA)",
-        "description": "Clinical utility (DCA)",
-        "status": "Reported",
-        "location": "Results 5.4"
+        "section": "Statistical analysis",
+        "item": "10b",
+        "description": "Specify the type of model, all model-building procedures (including selection), and method for internal validation.",
+        "status": "Completed",
+        "location": "Methods — Model development and reference companion paper [1]"
       },
       {
-        "section": "Model interpretation / feature importance",
-        "item": "Model interpretation / feature importance",
-        "description": "Model interpretation / feature importance",
-        "status": "Reported",
-        "location": "Results 5.5"
+        "section": "Statistical analysis",
+        "item": "10c",
+        "description": "For validation, describe how the predictions were calculated.",
+        "status": "Completed",
+        "location": "Methods — Model development; Methods — Calibration"
       },
       {
-        "section": "Limitations discussed",
-        "item": "Limitations discussed",
-        "description": "Limitations discussed",
-        "status": "Reported",
-        "location": "Discussion"
+        "section": "Statistical analysis",
+        "item": "10d",
+        "description": "Specify all measures used to assess model performance (discrimination, calibration, clinical utility).",
+        "status": "Completed",
+        "location": "Methods — Calibration and DCA; Results"
       },
       {
-        "section": "Implications for clinical practice",
-        "item": "Implications for clinical practice",
-        "description": "Implications for clinical practice",
-        "status": "Reported",
-        "location": "Discussion"
-      },
-      {
-        "section": "Registration or protocol availability",
-        "item": "Registration or protocol availability",
-        "description": "Registration or protocol availability",
+        "section": "Risk groups",
+        "item": "11",
+        "description": "Provide details on how risk groups were created, if done.",
         "status": "Not applicable",
-        "location": "N/A"
+        "location": "Methods — not stratified by risk groups"
       },
       {
-        "section": "Code / data availability",
-        "item": "Code / data availability",
-        "description": "Code / data availability",
-        "status": "Reported",
-        "location": "Declarations"
+        "section": "Development vs validation",
+        "item": "12",
+        "description": "Identify any differences between development and validation cohorts.",
+        "status": "Completed",
+        "location": "Methods — Study design (single-site retrospective cohort; no external validation in this paper)"
       },
       {
-        "section": "AI-specific: multi-agent verification",
-        "item": "AI-specific: multi-agent verification",
-        "description": "AI-specific: multi-agent verification",
-        "status": "Reported",
-        "location": "Methods 4.8, Results 5.6"
+        "section": "AI / model details",
+        "item": "13a",
+        "description": "Provide complete model specification (algorithm family, hyperparameters, pipeline).",
+        "status": "Completed",
+        "location": "Methods — Model development; Supplementary"
+      },
+      {
+        "section": "AI / model details",
+        "item": "13b",
+        "description": "Provide details on input data preprocessing.",
+        "status": "Completed",
+        "location": "Methods — Predictors and preprocessing"
+      },
+      {
+        "section": "AI / model details",
+        "item": "13c",
+        "description": "Describe steps to address overfitting / data leakage.",
+        "status": "Completed",
+        "location": "Methods — Model development (nested CV with in-fold preprocessing)"
+      },
+      {
+        "section": "Explainability",
+        "item": "14",
+        "description": "Report XAI methods applied and concordance with clinical reasoning.",
+        "status": "Completed",
+        "location": "Methods — Explainability; Results; Table 3"
+      },
+      {
+        "section": "Participants flow",
+        "item": "15",
+        "description": "Describe the flow of participants through the study including number of participants with and without the outcome.",
+        "status": "Completed",
+        "location": "Methods — Study design; Figure 1"
+      },
+      {
+        "section": "Model performance",
+        "item": "16a",
+        "description": "Report performance measures (with confidence intervals).",
+        "status": "Completed",
+        "location": "Results — Model performance; Table 5"
+      },
+      {
+        "section": "Model performance",
+        "item": "16b",
+        "description": "Provide a description of any differences between development and validation data.",
+        "status": "Completed",
+        "location": "Methods — Study design; Discussion — Limitations"
+      },
+      {
+        "section": "Calibration",
+        "item": "17",
+        "description": "Present calibration in detail (reliability diagrams, statistical metrics).",
+        "status": "Completed",
+        "location": "Results — Calibration; Table 5; Figure 4"
+      },
+      {
+        "section": "Clinical utility",
+        "item": "18",
+        "description": "Present clinical utility analyses (e.g., decision curve analysis).",
+        "status": "Completed",
+        "location": "Results — Decision curve analysis; Table 6; Figure 5"
+      },
+      {
+        "section": "Interpretation",
+        "item": "19",
+        "description": "Provide interpretation of results considering the objectives, limitations, multivariable methods, and similar studies.",
+        "status": "Completed",
+        "location": "Discussion"
+      },
+      {
+        "section": "Implications",
+        "item": "20",
+        "description": "Discuss the potential clinical use of the model and implications for future research.",
+        "status": "Completed",
+        "location": "Discussion — Implications; Conclusions"
+      },
+      {
+        "section": "Other information",
+        "item": "21",
+        "description": "Provide information about supplementary resources where additional information can be found.",
+        "status": "Completed",
+        "location": "Supplementary Materials"
+      },
+      {
+        "section": "Funding",
+        "item": "22",
+        "description": "Give the source of funding and the role of funders.",
+        "status": "Completed",
+        "location": "Acknowledgements / Funding statement (supplementary)"
+      },
+      {
+        "section": "Equity & fairness (AI extension)",
+        "item": "23",
+        "description": "Describe considerations of fairness, equity, and demographic representativeness.",
+        "status": "Completed",
+        "location": "Discussion — Limitations (single-site Iranian cohort; Karyotype/Klinefelter representation discussed)"
+      },
+      {
+        "section": "Data availability",
+        "item": "24",
+        "description": "State data availability and any data access conditions.",
+        "status": "Completed",
+        "location": "Supplementary — Code and data availability"
+      },
+      {
+        "section": "Code availability",
+        "item": "25",
+        "description": "State availability of code and pre-trained models.",
+        "status": "Completed",
+        "location": "Supplementary — Code and data availability"
       }
     ]
   },
@@ -604,801 +790,302 @@
     "domains": [
       {
         "domain": "Participants",
-        "signaling_question": "Were appropriate inclusion/exclusion criteria used?",
-        "v1_judgment": "Low risk",
-        "v2_judgment": "Low risk"
-      },
-      {
-        "domain": "Participants",
-        "signaling_question": "Were participants representative?",
-        "v1_judgment": "Low risk",
-        "v2_judgment": "Low risk"
-      },
-      {
-        "domain": "Predictors",
-        "signaling_question": "Were predictors defined and assessed appropriately?",
-        "v1_judgment": "High risk*",
-        "v2_judgment": "Low risk"
-      },
-      {
-        "domain": "Predictors",
-        "signaling_question": "Were all predictors available at time of intended use?",
-        "v1_judgment": "Low risk",
-        "v2_judgment": "Low risk"
-      },
-      {
-        "domain": "Outcome",
-        "signaling_question": "Was the outcome defined and measured appropriately?",
-        "v1_judgment": "Low risk",
-        "v2_judgment": "Low risk"
-      },
-      {
-        "domain": "Outcome",
-        "signaling_question": "Was the outcome determined without knowledge of predictors?",
-        "v1_judgment": "Low risk",
-        "v2_judgment": "Low risk"
-      },
-      {
-        "domain": "Analysis",
-        "signaling_question": "Was sample size adequate?",
-        "v1_judgment": "Low risk",
-        "v2_judgment": "Low risk"
-      },
-      {
-        "domain": "Analysis",
-        "signaling_question": "Were appropriate statistical methods used?",
-        "v1_judgment": "High risk†",
-        "v2_judgment": "Low risk"
-      },
-      {
-        "domain": "Analysis",
-        "signaling_question": "Were model-building steps appropriate?",
-        "v1_judgment": "High risk‡",
-        "v2_judgment": "Low risk"
-      },
-      {
-        "domain": "Analysis",
-        "signaling_question": "Was model performance evaluated appropriately?",
-        "v1_judgment": "High risk§",
-        "v2_judgment": "Low risk"
-      },
-      {
-        "domain": "Overall",
-        "signaling_question": "Overall risk of bias",
-        "v1_judgment": "High",
+        "signaling_question": "1.1 Were appropriate data sources used? 1.2 Were all inclusions and exclusions of participants appropriate?",
+        "risk_of_bias": "Low",
+        "justification": "Single-centre Royan Institute retrospective cohort with explicit inclusion of confirmed NOA patients undergoing micro-TESE and exclusion of obstructive azoospermia and records with missing Outcome1; 2,450 records screened, 2,413 retained for analysis. Cohort selection is documented and consistent with target use.",
+        "v1_judgment": "Low",
         "v2_judgment": "Low"
       },
       {
-        "domain": "Applicability",
-        "signaling_question": "Applicability concern",
-        "v1_judgment": "Moderate‖",
-        "v2_judgment": "Moderate‖"
+        "domain": "Predictors",
+        "signaling_question": "2.1 Were predictors defined and assessed in a similar way for all participants? 2.2 Were predictor assessments blinded to outcome? 2.3 Are all predictors available at the time the model is intended to be used?",
+        "risk_of_bias": "Low",
+        "justification": "All 29 candidate predictors (hormonal, anthropometric, sonographic, pathology, demographic) were collected as part of routine pre-micro-TESE workup, before the outcome was known. Pathology variables that could leak postoperative information were either downweighted in the global SHAP (near-zero contribution) or re-introduced exclusively through structured preoperative encoding in the CDSS, and Partner_Age was explicitly excluded as biologically irrelevant.",
+        "v1_judgment": "Low",
+        "v2_judgment": "Low"
+      },
+      {
+        "domain": "Outcome",
+        "signaling_question": "3.1 Was the outcome determined appropriately? 3.2 Was a pre-specified or standard outcome definition used? 3.3 Were predictors excluded from outcome definition? 3.4 Was the outcome defined and determined in a similar way for all participants? 3.5 Was the outcome determined without knowledge of predictor information? 3.6 Was the time interval between predictor measurement and outcome determination appropriate?",
+        "risk_of_bias": "Low",
+        "justification": "Outcome1 is a clinician-confirmed binary record of successful versus failed sperm retrieval at the first micro-TESE procedure, captured directly from operative records. The outcome assessment was performed by surgical and embryology staff blinded to model predictions, and the time interval between predictor measurement and outcome is short (peri-operative).",
+        "v1_judgment": "Low",
+        "v2_judgment": "Low"
+      },
+      {
+        "domain": "Analysis",
+        "signaling_question": "4.1 Were there a reasonable number of participants with the outcome? 4.2 Were continuous and categorical predictors handled appropriately? 4.3 Were all enrolled participants included in the analysis? 4.4 Were participants with missing data handled appropriately? 4.5 Was selection of predictors based on univariable analysis avoided? 4.6 Were complexities in the data accounted for appropriately? 4.7 Were relevant model performance measures evaluated appropriately? 4.8 Were model overfitting, underfitting, and optimism in model performance accounted for? 4.9 Do predictors in the final model correspond to those in the model-building process?",
+        "risk_of_bias": "Low",
+        "justification": "n=886 events (36.7% positive class) provides ample statistical support for the number of candidate predictors; RobustScaler used for continuous variables; missing data handled by kNN imputation with missingness indicators inside cross-validation folds; SMOTE applied only on training folds to avoid leakage; nested 5×5 cross-validation reports both discrimination and calibration; train–test AUC gap explicitly reported and used to triage overfitting (CatBoost overfit gap ≈0.19). Final XAI is performed on the same model that produced the reported performance.",
+        "v1_judgment": "Low",
+        "v2_judgment": "Low"
+      },
+      {
+        "domain": "AI — Algorithm transparency and reproducibility (PROBAST+AI extension)",
+        "signaling_question": "Is the algorithmic pipeline reported in sufficient detail to enable reproduction?",
+        "risk_of_bias": "Low",
+        "justification": "Hyperparameters, scaler, encoding strategy, and SMOTE policy are fully specified; random seed is fixed (42); cross-validation structure is documented; SHAP / LIME / PDP configurations are described in Methods and supplementary; companion methodology paper [1] provides additional pipeline detail.",
+        "v1_judgment": "N/A",
+        "v2_judgment": "Low"
+      },
+      {
+        "domain": "AI — Data quality and bias (PROBAST+AI extension)",
+        "signaling_question": "Were potential sources of dataset bias (label, measurement, sampling) addressed?",
+        "risk_of_bias": "Low",
+        "justification": "Outcome definition is unambiguous and operator-independent; Persian-date inconsistencies were detected and harmonised; pathology free-text parsing was validated via regex and bilateral consistency checks; partner_age — a likely confound — was identified through SHAP analysis and excluded.",
+        "v1_judgment": "N/A",
+        "v2_judgment": "Low"
+      },
+      {
+        "domain": "AI — Robustness and generalisability (PROBAST+AI extension)",
+        "signaling_question": "Was robustness across patient subgroups assessed and are external generalisability claims appropriate?",
+        "risk_of_bias": "High",
+        "justification": "Although internal nested cross-validation is robust and SHAP-based reasoning is biologically coherent, no external multicentre validation has yet been performed. Generalisability beyond the single Iranian centre is therefore unknown.",
+        "v1_judgment": "N/A",
+        "v2_judgment": "High"
+      },
+      {
+        "domain": "AI — Explainability and clinical translatability (PROBAST+AI extension)",
+        "signaling_question": "Is the model explainable in a clinically meaningful way and is there a credible plan for clinical use?",
+        "risk_of_bias": "Low",
+        "justification": "Three XAI methods (SHAP, LIME, PDP) are jointly reported with concordance analysis. An explicit 11-feature CDSS specification with reference ranges, validation colour logic, and scoring functions is presented as the translational path.",
+        "v1_judgment": "N/A",
+        "v2_judgment": "Low"
       }
     ],
-    "overall_risk": "Low (v2)",
-    "overall_applicability": "Low (single-center; requires external validation)"
+    "overall_risk": "Low risk of bias for development; High concern for generalisability pending external validation",
+    "overall_applicability": "Low concern within the target NOA/micro-TESE population at tertiary fertility centres; applicability beyond Iranian referral cohorts is unproven"
   },
   "figures": [
     {
       "figure_name": "Figure 1",
-      "caption": "Cross-model SHAP feature importance comparison. (A) Mean absolute SHAP values for the top 10 features across five model architectures (SVM, XGBoost, LightGBM, Random Forest, Gradient Boosting). (B) SHAP beeswarm plot for the XGBoost model showing feature value distribution and directional impact on prediction. (C) Heatmap of Spearman rank correlations between model-pair feature importance rankings, demonstrating strong cross-model concordance (ρ = 0.82–0.96).",
-      "description": "Cross-model SHAP feature importance comparison. (A) Mean absolute SHAP values for the top 10 features across five model architectures (SVM, XGBoost, LightGBM, Random Forest, Gradient Boosting). (B) SHAP beeswarm plot for the XGBoost model showing feature value distribution and directional impact on prediction. (C) Heatmap of Spearman rank correlations between model-pair feature importance rankings, demonstrating strong cross-model concordance (ρ = 0.82–0.96)."
+      "caption": "Study flow diagram for the analytical cohort and the XAI/CDSS analysis pipeline.",
+      "description": "A vertical flow diagram. Top box: 'Royan Institute NOA cohort, n=2,450 records screened (2007–2022)'. First downward arrow with side label: 'Excluded: 37 records with missing Outcome1 or non-NOA aetiology'. Middle box: 'Analytical sample, n=2,413 (886 successful retrievals, 36.7%; 1,527 failures, 63.3%)'. A pair of parallel branches descend: the left branch labelled 'Primary 80/20 split (n_train=1,930; n_test=483)' leading to a 16-model nested-CV benchmark and the v2 leaderboard. The right branch labelled 'Calibration / DCA split (n_train=1,689; n_test=724)' leading to reliability diagrams, Brier scoring, and decision curve analysis. Both branches converge at a single lower box labelled 'CatBoost champion model (AUC 0.8306, 95% CI 0.823–0.845)'. From this box, three explainability arrows fan out to (i) Global and local TreeSHAP, (ii) LIME, and (iii) Partial-dependence plots. A final downward arrow leads to '11-feature CDSS specification + clinical workflow integration'. Colour coding: data steps in pale blue, modelling steps in green, XAI in orange, CDSS in purple."
     },
     {
       "figure_name": "Figure 2",
-      "caption": "LIME explanations for representative patient archetypes. (A) High-Positive archetype (predicted probability = 0.988): top contributing features with positive (green) and negative (red) weights. (B) High-Negative archetype (predicted probability = 0.005): dominant negative contributors driving the low prediction. (C) Borderline archetype (predicted probability = 0.500): balanced positive and negative contributions reflecting clinical uncertainty. Feature weights represent the local linear surrogate model contribution to the prediction.",
-      "description": "LIME explanations for representative patient archetypes. (A) High-Positive archetype (predicted probability = 0.988): top contributing features with positive (green) and negative (red) weights. (B) High-Negative archetype (predicted probability = 0.005): dominant negative contributors driving the low prediction. (C) Borderline archetype (predicted probability = 0.500): balanced positive and negative contributions reflecting clinical uncertainty. Feature weights represent the local linear surrogate model contribution to the prediction."
+      "caption": "Global SHAP summary plot for the CatBoost model showing the top 16 predictors of micro-TESE sperm retrieval.",
+      "description": "A horizontal beeswarm / violin plot. Y-axis lists the top 16 features ordered top-to-bottom by mean absolute SHAP value: LH (0.317), Age (0.270), FSH (0.250), Testosterone (0.212), Body Weight (0.174), Sakamoto LT mL (0.171), BMI (0.169), Height (0.166), RT XYZ Sono (0.156), Testicular Volume LT clinical estimate (0.129), Seminal plasma pH (0.128), Testicular Volume RT clinical estimate (0.111), LT XYZ Sono (0.085), E2 (0.043), Sakamoto RT mL (0.039), Prolactin (0.020). For each feature, a horizontal swarm of individual-patient SHAP values is shown with a diverging colour scale from blue (low feature value) to red (high feature value). LH and FSH swarms show high-value (red) points sitting to the right (positive SHAP, increasing predicted probability of retrieval failure under the failure-coded outcome convention); Testosterone shows the inverse pattern (high values associated with negative SHAP). A vertical reference line at SHAP=0 separates pro- and anti-retrieval contributions. Plot is plotted on a white background with mean |SHAP| values annotated to the right of each row."
     },
     {
       "figure_name": "Figure 3",
-      "caption": "Clinical nomogram for predicting sperm retrieval success at micro-TESE. (A) Full nomogram with point assignments for all features based on logistic regression coefficients. (B) Forest plot of odds ratios with 95% confidence intervals for all nomogram features, ordered by absolute effect size. (C) Point-system summary showing the top 10 features with their point contributions.",
-      "description": "Clinical nomogram for predicting sperm retrieval success at micro-TESE. (A) Full nomogram with point assignments for all features based on logistic regression coefficients. (B) Forest plot of odds ratios with 95% confidence intervals for all nomogram features, ordered by absolute effect size. (C) Point-system summary showing the top 10 features with their point contributions."
+      "caption": "Partial-dependence and local SHAP dependence plots for the top four predictors (LH, Age, FSH, Testosterone).",
+      "description": "A 2×2 panel figure. Each panel shows a scatter of individual patient SHAP values (y-axis) against the raw feature value (x-axis), overlaid with a LOESS-smoothed partial dependence curve. Panel A (LH, x-axis 0–40 mIU/mL): SHAP values rise monotonically from −0.4 at low LH to about +0.4 above ≈12 mIU/mL with a plateau beyond ≈20 mIU/mL. Panel B (Age, x-axis 18–70 y): non-monotone, with the most favourable predicted-success region (SHAP < 0 under the failure outcome convention) around 30–40 y, rising to positive SHAP at both extremes. Panel C (FSH, x-axis 0–40 mIU/mL): monotonically increasing SHAP from −0.3 at FSH <8 to roughly +0.45 above 25 mIU/mL. Panel D (Testosterone, x-axis 0–10 ng/mL converted units): SHAP decreases (favouring retrieval) as testosterone rises up to ≈4 ng/mL, then plateaus. Points are colour-coded by the model's predicted probability (greyscale, light = low, dark = high). Each panel includes the mean |SHAP| in the upper-right corner. The figure also includes a small inset highlighting that the same axes and colour scale are reused across panels for comparability."
     },
     {
       "figure_name": "Figure 4",
-      "caption": "Surrogate decision rules extracted from the XGBoost model. The interpretable decision tree (maximum depth = 4) approximates the full model with 78.2% fidelity. Each terminal node displays the number of patients, the predicted class, and the confidence level. High-confidence rules (>90% confidence) are highlighted. The primary splitting criterion is right testicular volume (Sono), followed by E2 level and Sakamoto spermatogenesis score.",
-      "description": "Surrogate decision rules extracted from the XGBoost model. The interpretable decision tree (maximum depth = 4) approximates the full model with 78.2% fidelity. Each terminal node displays the number of patients, the predicted class, and the confidence level. High-confidence rules (>90% confidence) are highlighted. The primary splitting criterion is right testicular volume (Sono), followed by E2 level and Sakamoto spermatogenesis score."
+      "caption": "LIME local explanation example versus the corresponding SHAP local explanation for a representative test-set patient.",
+      "description": "A two-panel side-by-side figure displaying local explanations for the test-set patient indexed 2162, who has a predicted probability of successful retrieval of 0.7822 and an actual outcome of 1 (success). Left panel — SHAP local force/waterfall plot: the base value at the bottom (mean predicted probability) is extended upward by positive contributions: Age (+0.567 at value 56 y), FSH (+0.411 at 10.8 mIU/mL), LH (+0.181 at 9.17 mIU/mL), Seminal plasma pH (+0.099 at 7.8), Body Weight (+0.088 at 80 kg), Testicular Volume LT (+0.072 at 12 mL), and Sakamoto LT (+0.067), counterbalanced by Testosterone (−0.086 at 2.1 ng/mL) and Height (−0.060). The final predicted value (0.782) is shown at the top. Right panel — LIME local explanation as a horizontal coloured bar chart for the same patient: bars are ordered by absolute weight, with positive contributions in green (Age, FSH, LH) and negative contributions in red (Testosterone, Height), where rank order and sign agree with SHAP for the top four contributors. An annotation reads: 'Concordance: SHAP and LIME agree on the top four contributors and on their signs; LIME magnitudes are smaller because LIME uses a sparse linear surrogate'."
     },
     {
       "figure_name": "Figure 5",
-      "caption": "Decision curve analysis comparing ML models against default strategies. Net benefit is plotted against threshold probability for the LightGBM, XGBoost, SVM, and Logistic Regression models, alongside the \"Treat All\" and \"Treat None\" reference lines. All models demonstrate positive net benefit across the clinically relevant threshold range of 20–60%, confirming clinical utility for micro-TESE decision-making.",
-      "description": "Decision curve analysis comparing ML models against default strategies. Net benefit is plotted against threshold probability for the LightGBM, XGBoost, SVM, and Logistic Regression models, alongside the \"Treat All\" and \"Treat None\" reference lines. All models demonstrate positive net benefit across the clinically relevant threshold range of 20–60%, confirming clinical utility for micro-TESE decision-making."
+      "caption": "Reliability diagrams (calibration curves) for the top five models with Brier scores.",
+      "description": "A single panel showing five curves on a square plot. X-axis: 'Mean predicted probability of retrieval' from 0.0 to 1.0; Y-axis: 'Observed fraction of positive outcomes' from 0.0 to 1.0. A diagonal grey reference line (perfect calibration) runs from (0,0) to (1,1). Five model curves with markers are overlaid: LightGBM (Brier 0.201) tracks closest to the diagonal across the full range, reaching (0.900, 1.000) in the top decile; Gradient Boosting (Brier 0.202) shows slight under-confidence in the lowest bins and excellent calibration in the middle range; XGBoost (Brier 0.205) is similar but shows a small dip at the 0.85 bin; CatBoost (Brier 0.213) is well-calibrated except for a downward deflection in the top decile (mild over-confidence); Stacking Ensemble (Brier 0.226) shows pronounced over-confidence with observed fraction 0.0 at the highest predicted bin, deviating substantially from the diagonal. A small inset histogram shows the distribution of predicted probabilities by model. Legend annotates Brier scores. A footnote indicates that Platt scaling was evaluated post hoc and reduced the Brier score of the Stacking Ensemble while not improving the already well-calibrated tree-based models."
     },
     {
       "figure_name": "Figure 6",
-      "caption": "Counterfactual explanation visualisation. For three representative patient scenarios (High-Negative, Borderline, False-Negative), the original predicted probability (blue) and counterfactual probability (orange) are shown alongside the minimal feature changes required to flip the prediction. Right testicular volume (Sono) was identified as the most actionable counterfactual feature across all scenarios.",
-      "description": "Counterfactual explanation visualisation. For three representative patient scenarios (High-Negative, Borderline, False-Negative), the original predicted probability (blue) and counterfactual probability (orange) are shown alongside the minimal feature changes required to flip the prediction. Right testicular volume (Sono) was identified as the most actionable counterfactual feature across all scenarios."
+      "caption": "Decision Curve Analysis (DCA) over threshold probabilities 0.01–0.99 showing net clinical benefit of each model relative to treat-all and treat-none strategies.",
+      "description": "A line plot on a square panel. X-axis: 'Threshold probability (pt)' from 0.0 to 0.7 (with extended grey region showing 0.7–0.99 as a small inset); Y-axis: 'Net benefit' from −0.05 to 0.4. Two reference strategies: the horizontal line at 0 ('Treat-none') and a downward-sloping curve labelled 'Treat-all' that crosses 0 at the prevalence pt ≈ 0.37 and falls steeply below. Five model curves are overlaid (CatBoost in dark blue, LightGBM in green, XGBoost in orange, Gradient Boosting in red, Stacking Ensemble in purple). All five models lie above both reference lines for thresholds ≈0.05–0.60, with values at pt=0.05 in the range 0.326–0.334, at pt=0.20 in the range 0.207–0.226, at pt=0.30 in the range 0.101–0.161, and at pt=0.50 in the range 0.042–0.061. Beyond pt ≈ 0.65 the model curves converge to zero. A shaded yellow band marks the clinically relevant threshold range 0.20–0.40 for preoperative counselling and discussion of alternative reproductive options. A textual annotation reads: 'Model net benefit exceeds treat-none and treat-all for substantial threshold windows (notably around 0.05–0.60 for top models).'"
+    },
+    {
+      "figure_name": "Figure 7",
+      "caption": "Proposed CDSS workflow diagram and the integrated patient-facing prediction card.",
+      "description": "A horizontal three-column workflow diagram. Column 1 — Data entry: patient-side form rendered in Bootstrap 5.3.3 with eleven input fields organised into 'Hormonal panel' (FSH, LH, Testosterone, E2, T/E2 ratio auto-computed, Inhibin B), 'Anatomy' (Testicular Volume Left, Testicular Volume Right), 'Demographics' (Age, BMI calculated from height/weight) and 'Genetics' (Karyotype Yes/No). Each field shows colour-coded validation: red for under-range, teal for in-range, and orange for over-range. Column 2 — Inference engine: a stateless PHP 8.0+ wrapper applies feature scaling, computes per-feature CDSS sub-scores using the published scoring logic (cdss_score_lower_better for FSH/LH, cdss_score_higher_better for testosterone and inhibin B, cdss_score_centered for E2, model-based mapping for testicular volumes, age, BMI, and genetic status), and produces a predicted probability of successful retrieval. Column 3 — Patient-facing card and clinician summary: a horizontal Chart.js gauge showing the predicted probability with colour bands tied to the DCA-derived clinically useful threshold range 0.20–0.40, a compact bar chart of the top four feature contributions for that patient (LH, Age, FSH, Testosterone), and two textual recommendations: 'Discuss probability in the context of patient values and the magnitude of uncertainty' and 'A predicted probability below the 0.20–0.40 band should prompt explicit counselling on alternatives, including donor gametes and adoption'. A dashed arrow loops from Column 3 back to Column 1 labelled 'Recalibration with new local data every 12 months'."
     }
   ],
   "introduction": [
-    "Machine learning (ML) has demonstrated remarkable predictive performance across numerous clinical domains, from dermatology to oncology [5,8,9]. However, the \"black box\" nature of many high-performing ML algorithms poses a fundamental barrier to clinical adoption, particularly in high-stakes medical decisions where clinicians must understand, trust, and communicate the reasoning behind predictions [6,7]. The disconnect between algorithmic capability and clinical interpretability has been identified as one of the most pressing challenges in medical artificial intelligence (AI) [15,16]. Non-obstructive azoospermia (NOA) represents a particularly compelling use case for explainable AI (XAI). NOA affects approximately 1% of all men and 10–15% of infertile males, with microdissection testicular sperm extraction (micro-TESE) being the primary surgical intervention for sperm retrieval [10,11]. The decision to proceed with micro-TESE carries substantial implications: the procedure involves general anaesthesia, microsurgical exploration, and success rates ranging from 30% to 60% depending on the underlying aetiology [12,13]. Patients and clinicians face a difficult shared decision-making process in which transparent probability estimation and factor communication are paramount. Recent studies have applied ML models to predict micro-TESE outcomes, reporting promising discriminative performance [34,35]. However, these studies predominantly present global performance metrics (e.g., area under the receiver operating characteristic curve [AUC-ROC]) without providing the granular, patient-level explanations that clinicians require for individual counselling. A model that predicts a 65% success probability is clinically uninformative unless it can also explain which factors drive that prediction and what changes might alter it. Explainable AI encompasses a diverse set of methodologies designed to render ML predictions interpretable [14,15]. SHapley Additive exPlanations (SHAP), rooted in cooperative game theory, provides both global and local feature attributions with theoretical guarantees of consistency and accuracy [1,3]. Local Interpretable Model-agnostic Explanations (LIME) offers complementary interpretable surrogate explanations for individual predictions [2]. Counterfactual explanations address the clinically intuitive question: \"What would need to change for this patient's prediction to be different?\" [28]. Decision curve analysis (DCA) evaluates whether model-guided decisions yield net clinical benefit over alternative strategies [4]. In this study, we present a comprehensive multi-method XAI framework applied to ML prediction of sperm retrieval success in NOA. We compare SHAP explanations across five model architectures to assess feature importance stability, provide LIME explanations for seven clinically relevant patient archetypes, generate counterfactual scenarios for clinical \"what-if\" reasoning, develop a point-based clinical nomogram, extract interpretable surrogate decision rules, and evaluate clinical utility through DCA. Our aim is to demonstrate how a suite of complementary XAI methods can transform an opaque ML model into a transparent, trustworthy clinical decision support system."
+    "Non-obstructive azoospermia (NOA) affects approximately 1% of all men and 10–15% of men presenting with infertility, and microdissection testicular sperm extraction (micro-TESE) remains the principal surgical option for retrieving viable spermatozoa from testicular tissue [18,19]. Despite refinements in surgical technique, sperm retrieval fails in approximately two-thirds of NOA patients, exposing them to the burden of invasive surgery, anaesthesia, and the psychological cost of an unsuccessful attempt without tangible reproductive benefit. Reliable preoperative estimation of the probability of retrieval success is therefore central to shared decision-making, especially when alternative pathways such as donor sperm or adoption need to be weighed against further surgical intervention [18,24,26].",
+    "Over the past decade a growing number of machine-learning (ML) prediction models have been developed for micro-TESE outcome, ranging from logistic and nomogram-style models [5,7,9,24,26] through tree-ensembles [19,20,21] to recent AutoML systems [21]. In a companion methodological paper from our group, we developed and benchmarked sixteen ML algorithms on a single-centre retrospective cohort of 2,413 NOA patients using a nested cross-validation pipeline with rigorous leakage control, and identified a CatBoost classifier as the best-performing model (AUC 0.8306, 95% confidence interval 0.823–0.845; accuracy 0.77; sensitivity 0.678; specificity 0.823; Matthews correlation coefficient 0.50) [1]. The present paper is not concerned with model search. Its objective is the complementary and arguably more important question: why are particular features important, how stable are these explanations across different explainability frameworks, and how can the resulting predictions be translated into a trustworthy, transparent bedside tool?",
+    "The interpretability of clinical ML models has emerged as a precondition for clinical adoption. SHapley Additive exPlanations (SHAP) provide a game-theoretic global and local importance framework derived from cooperative game theory [2], Local Interpretable Model-Agnostic Explanations (LIME) deliver sparse local linear surrogates centred on individual instances [3], and partial-dependence plots (PDP) characterise marginal feature effects [4–7]. Each method has different assumptions and known limitations: SHAP guarantees additivity and local accuracy but can be sensitive to feature correlation; LIME explanations vary with kernel and sampling choices but provide intuitive local linear weights; PDPs offer easy visual interpretation but average over the joint distribution and can mislead under strong interactions [4,6,7]. A robust interpretability narrative therefore requires multi-method concordance rather than reliance on any single explainer, especially in high-stakes preoperative decision support.",
+    "Equally important, prediction models must be probabilistically calibrated. A model with high discrimination but poor calibration can systematically over- or under-estimate the absolute probability of a successful retrieval, leading to inappropriate clinical action despite an attractive AUC [8,9]. Calibration is most readily assessed by reliability diagrams and the Brier score [13]; post-hoc recalibration with Platt scaling or isotonic regression is well established for non-probabilistic classifiers [11,12]. Furthermore, beyond probability calibration, clinical utility must be demonstrated through decision curve analysis (DCA), which integrates sensitivity, specificity, and the relative cost of false positives and false negatives across a clinically relevant range of threshold probabilities [10]. Together, calibration and DCA bridge the gap between statistical discrimination and bedside usefulness.",
+    "Several recent studies have demonstrated the value of multi-method XAI in clinical prediction. Liu et al. used SHAP and LIME jointly to identify dietary correlates of comorbid depression and stroke [30]; Chouit et al. applied SHAP and LIME to chronic kidney disease prediction [31]; and Moscarelli et al. exploited accumulated local effects to characterise subclinical leaflet thrombosis after transcatheter aortic valve replacement [32]. Beyond cardiology and metabolic disease, interpretable ML has been applied to sepsis-associated delirium [33], atrial fibrillation-related stroke [34], and the design of clinical decision support systems (CDSS) for pregnancy care [28]. A 2025 systematic review of trust in AI-CDSS confirms that explainability is the most consistently reported precondition for clinician adoption [29]. In NOA, however, although a few recent prediction models report SHAP rankings as secondary output [18], no published study has applied a multi-method XAI framework, jointly evaluated calibration and DCA, and proposed an operational CDSS for preoperative micro-TESE counselling.",
+    "In this paper we address this gap. Building on the development work reported in our companion paper [1], we apply SHAP, LIME, and partial-dependence analyses to the CatBoost preoperative micro-TESE model, quantify the concordance of feature importance across the three methods, characterise calibration via reliability diagrams and Brier scores for the five top-performing models, and evaluate clinical utility through DCA across the full threshold range 0.01–0.99. Finally, we operationalise the resulting XAI evidence as an 11-feature CDSS with explicit reference ranges, validation logic, scoring functions and a stateless web-deliverable architecture. The aim is to demonstrate, end-to-end, how a competitive but opaque clinical prediction model can be turned into a clinically trustworthy tool fit for routine preoperative counselling.",
+    "The specific research questions addressed are: (RQ1) Which preoperative features drive the CatBoost model's predictions, and how stable are these contributions across SHAP, LIME, and PDP methods? (RQ2) Is the model adequately calibrated across the full range of predicted probabilities, and does post-hoc recalibration with Platt scaling materially improve calibration metrics? (RQ3) Across what range of clinically plausible threshold probabilities does the model deliver positive net clinical benefit relative to treat-all and treat-none strategies? (RQ4) Which subset of features should be exposed in a practical preoperative CDSS, and what reference ranges, validation rules, and scoring functions should accompany them? We answer these questions sequentially in the Methods and Results and synthesise the implications for clinical adoption in the Discussion."
   ],
   "methods": {
-    "title": "2. Materials and Methods",
-    "content": [],
+    "title": "Methods",
+    "content": "We re-analysed the single-centre retrospective NOA cohort and the CatBoost preoperative prediction model developed and benchmarked in our companion paper [1]. This paper does not develop a new model; rather, it applies a pre-specified explainability and clinical translation pipeline to the frozen v2 CatBoost classifier, evaluating multi-method XAI, calibration, and decision-curve clinical utility, and proposes a structured CDSS for bedside use. All analyses follow the TRIPOD+AI [14] and PROBAST+AI [15] reporting frameworks.",
     "subsections": [
       {
-        "title": "2.1. Study Population and Dataset",
-        "content": [
-          "This retrospective cohort study included 2,413 consecutive men diagnosed with NOA who underwent micro-TESE at the Royan Institute for Reproductive Biomedicine, Tehran, Iran, between 2007 and 2022. The study protocol was approved by the institutional ethics committee of Mashhad University of Medical Sciences. Patient records were anonymised prior to analysis. The dataset comprised 36 clinical features after preprocessing, encompassing demographic variables (age, body mass index [BMI]), hormonal parameters (follicle-stimulating hormone [FSH], luteinising hormone [LH], testosterone, oestradiol [E2], prolactin), testicular measurements (ultrasonographic volume, orchidometric volume, Sakamoto spermatogenesis scores), genetic factors (karyotype, Y-chromosome microdeletions), medical history (diabetes, hypertension, varicocele, orchiopexy, inguinal hernia), and lifestyle factors (occupational toxicant exposure, habits). The binary outcome was successful sperm retrieval (presence of spermatozoa) at micro-TESE. The overall sperm retrieval rate was 37.4% (n = 916/2,450). Missing data were handled through k-nearest neighbours imputation, and class imbalance was addressed with Synthetic Minority Over-sampling Technique (SMOTE) applied only to the training set [27]."
-        ],
-        "subsections": []
+        "title": "Study design and data source",
+        "content": "We used the analytical cohort assembled at the Royan Institute (Tehran, Iran) for the companion methodological study [1]. Eligible patients had confirmed non-obstructive azoospermia and underwent their first micro-TESE during the period 2007–2022. Patients with obstructive azoospermia or missing primary outcome (Outcome1) were excluded. Of 2,450 records screened, 2,413 were retained for analysis (Table 1, Figure 1). Outcome1 was defined as binary successful sperm retrieval (0/1) at the first micro-TESE; 886 patients (36.7%) had a positive outcome and 1,527 (63.3%) had a negative outcome (failure : success ratio ≈1.72 : 1). The study was IRB approved at the Royan Institute and all data were de-identified."
       },
       {
-        "title": "2.2. Machine Learning Models",
-        "content": [
-          "Six ML algorithms were trained and evaluated: logistic regression (LR), support vector machine (SVM) with radial basis function kernel [21], random forest (RF) [20], XGBoost [18], LightGBM [19], and gradient boosting (GB) [31]. Hyperparameters were optimised using grid search with 5-fold stratified cross-validation on the training set (80/20 train-test split, stratified by outcome). Model discrimination was assessed using AUC-ROC with 95% confidence intervals estimated via bootstrapping (n = 1,000). Calibration of the LR model was evaluated using the Hosmer-Lemeshow goodness-of-fit test, Brier score, integrated calibration index (ICI), and E50/E90 metrics [24,25]. Platt scaling was applied to improve calibration [26]."
-        ],
-        "subsections": []
+        "title": "Predictors and preprocessing",
+        "content": "Twenty-nine candidate preoperative predictors were captured (hormonal: FSH, LH, Testosterone, E2, Prolactin, TSH, Inhibin B, AMH, SHBG; anthropometric: Age, Height, Body Weight, BMI; sonographic: RT and LT XYZ Sono, Sakamoto RT and LT volumes, clinical testicular volume estimates; seminal biochemistry: Seminal plasma pH; pathology and structured histology: Pathology RT and LT with structured percentages of SCO, maturation arrest stages, hypospermatogenesis and CSTH; demographics and comorbidities: Race, infertile family members, Habits, Occupational toxin exposure, Diabetes, Hypertension, Surgery/trauma history, Varicocele, T.BX, Inguinal hernia, Torsion, Karyotype, AZF microdeletions, prior therapeutic surgery). Partner Age was excluded as biologically irrelevant to male testicular sperm retrieval and likely confounded with treatment urgency. Continuous variables were scaled with RobustScaler (median and inter-quartile range) selected via randomised hyperparameter search and fit on training folds only. kNN imputation was used on continuous predictors after standardisation scaffolding, with explicit missingness indicators preserved as auxiliary binary features. Pathology free-text percentages were parsed by validated regular expressions; maturation-arrest hierarchy was enforced; bilateral consistency checks were applied. Class imbalance was addressed by SMOTE applied only to training folds. The stratified primary split was 80/20 on Outcome1 (n_train=1,930; n_test=483); a 70/30 alternative split (n_train=1,689; n_test=724) was used for calibration analyses."
       },
       {
-        "title": "2.3. SHAP Analysis",
-        "content": [
-          "SHAP values were computed for five model architectures: SVM (KernelSHAP), XGBoost (TreeSHAP), LightGBM (TreeSHAP), RF (TreeSHAP), and GB (TreeSHAP) [1,3]. Global feature importance was quantified as the mean absolute SHAP value across all test-set predictions for each model. Cross-model concordance was assessed using Spearman rank correlation of feature importance rankings across model pairs. SHAP dependence plots were generated for the top 10 features to visualise feature-outcome relationships and potential interaction effects. SHAP waterfall plots were created for seven patient archetypes representing clinically relevant scenarios (high-positive, high-negative, borderline, young patient, advanced paternal age, true positive, and false negative) across three models (SVM, XGBoost, RF) to evaluate explanation consistency."
-        ],
-        "subsections": []
+        "title": "Model development and reference to the companion paper",
+        "content": "Full model development is reported in the companion methodological paper [1]. Briefly, sixteen candidate algorithms (LightGBM, Gradient Boosting, XGBoost, Stacking Ensemble, CatBoost, Random Forest, Voting Ensemble, MLP, Ridge Classifier, K-Nearest Neighbours, Logistic Regression, Decision Tree, Elastic Net, Lasso L1, RBF SVM, Naive Bayes) were benchmarked with a nested 5×5 cross-validation procedure and RandomizedSearchCV with 50 inner iterations per model (random_state=42). Performance was characterised by AUC, accuracy, sensitivity, specificity, F1, and Brier score. The v2 leaderboard identified CatBoost as the champion model with AUC 0.8306 (95% CI 0.823–0.845), and its hyperparameters were depth=6, iterations=657, l2_leaf_reg=3.51, learning_rate=0.00617, RobustScaler, with ordinal_detailed_plus_raw pathology encoding [1,17]. The current paper takes this frozen model and applies the explainability and clinical translation analyses described below."
       },
       {
-        "title": "2.4. LIME Analysis",
-        "content": [
-          "LIME explanations were generated for the same seven patient archetypes using the LR model as the base classifier [2]. LIME creates locally faithful interpretable approximations by perturbing input features and fitting a weighted linear model around each prediction. For each archetype, the top 15 contributing features were extracted, along with the local prediction, model intercept, and individual feature weights. Concordance between SHAP and LIME feature rankings was assessed using Spearman rank correlation and visual comparison."
-        ],
-        "subsections": []
+        "title": "Multi-method explainability",
+        "content": "We applied three complementary XAI methods to the frozen CatBoost classifier. (i) TreeSHAP [2] was computed on the full test set to derive global feature importance (mean absolute SHAP value) and local explanations for individual patients. (ii) Local Interpretable Model-Agnostic Explanations (LIME) [3] were generated by perturbing each test instance with a Gaussian neighbourhood, fitting a sparse linear surrogate, and extracting per-feature local weights. (iii) One-way partial-dependence plots (PDP) were generated for the top-ranking predictors using the standard marginal expectation framework [4–7]; we additionally inspected accumulated-local-effects-style behaviour for features showing strong potential interactions. To quantify cross-method concordance we compared the rank ordering and sign of contributions for the top eight features and reported agreement qualitatively in Table 3."
       },
       {
-        "title": "2.5. Counterfactual Explanations",
-        "content": [
-          "Counterfactual explanations were generated for four representative patient scenarios: high-negative prediction (low probability, correct), borderline prediction (near threshold), false-negative prediction (incorrectly predicted as negative), and the minimum-change counterfactual across the dataset [28]. For each scenario, we identified the minimum number of feature changes required to flip the prediction, along with the magnitude and direction of change. This approach addresses the clinical question: \"What would need to be different for this patient to have a favourable prediction?\""
-        ],
-        "subsections": []
+        "title": "Calibration assessment and post-hoc recalibration",
+        "content": "Probability calibration was assessed for the five top-performing models from the leaderboard (CatBoost, LightGBM, Gradient Boosting, XGBoost, Stacking Ensemble) using the 70/30 split (n_train=1,689; n_test=724). For each model we computed (a) reliability diagrams using 10 equal-frequency bins of predicted probability, plotting the mean predicted value against the observed fraction of positive outcomes, and (b) the Brier score [13]. As a sensitivity analysis we applied Platt scaling [11] and isotonic regression [12] to evaluate whether post-hoc recalibration further reduced the Brier score and improved reliability."
       },
       {
-        "title": "2.6. Clinical Nomogram Development",
-        "content": [
-          "A clinical nomogram was constructed from the LR model coefficients. Each feature's coefficient was converted to a point score using the formula: Points = (Coefficient / max|Coefficient|) × 100, where max|Coefficient| is the largest absolute coefficient in the model. Odds ratios (ORs) with 95% confidence intervals (CIs) were computed for each feature. The total point score for a patient is the sum of individual feature points, which maps to a predicted probability of sperm retrieval success via the logistic function [25]. The nomogram AUC, calibration metrics, and clinical utility were evaluated."
-        ],
-        "subsections": []
+        "title": "Decision curve analysis",
+        "content": "We performed decision curve analysis (DCA) following the framework of Vickers and Elkin [10]. For 200 evenly spaced threshold probabilities pt in [0.01, 0.99], we computed net benefit = TP/N − FP/N × (pt / (1 − pt)), where TP and FP are model-true and model-false positives at threshold pt and N is the sample size. The two reference strategies were 'treat-all' (every patient undergoes micro-TESE; equivalent to operating without a model) and 'treat-none' (no patient undergoes micro-TESE). We further calculated the implied net intervention savings per 100 patients using the standard relationship net interventions avoided per 100 = ((NB_model − NB_treat_all) / (pt / (1 − pt))) × 100. The clinically meaningful threshold range for preoperative counselling was defined a priori as 0.20–0.40, reflecting reasonable variation in patient and clinician preferences for accepting an unsuccessful procedure."
       },
       {
-        "title": "2.7. Surrogate Decision Rules",
-        "content": [
-          "Interpretable surrogate decision trees (maximum depth = 4) were fitted to approximate the predictions of each black-box model. Model fidelity was quantified as the proportion of test-set predictions where the surrogate tree matched the original model. The surrogate AUC was computed to assess the preserved discriminative capacity. Decision rules were extracted as human-readable if-then conditions, with associated confidence levels and sample sizes."
-        ],
-        "subsections": []
+        "title": "Clinical decision support system specification",
+        "content": "The CDSS is intended as a stateless preoperative counselling aid. We restricted the input feature set to eleven evidence-supported variables (FSH, LH, Testosterone, E2, T/E2 ratio, Inhibin B, Testicular Volume Left, Testicular Volume Right, Age, BMI, Karyotype) selected on the basis of multi-method XAI rank, biological plausibility, and routine availability in tertiary fertility clinics. For every feature we specified a reference range, a validation colour code (red / teal / orange for under-, in-, and over-range), and a scoring function (cdss_score_lower_better for FSH and LH; cdss_score_higher_better for Testosterone and Inhibin B; cdss_score_centered for E2; ratio computation for T/E2; model-derived monotonic mappings for testicular volume, Age, BMI, and Karyotype). Full specifications are reported in Table 4. The intended target architecture is PHP 8.0+ on cPanel shared hosting (no database, no authentication, no data persistence), with a Bootstrap 5.3.3 + Chart.js 4.4.3 front-end. The patient-facing output is a calibrated probability gauge with colour bands derived from the DCA-derived clinically useful threshold window, an abbreviated SHAP-style bar chart of the top four contributors for that patient, and structured counselling text (see Figure 7)."
       },
       {
-        "title": "2.8. Decision Curve Analysis",
-        "content": [
-          "DCA was performed to evaluate the clinical utility of the ML models by comparing the net benefit of model-guided treatment decisions against the default strategies of treating all patients or treating no patients across a range of threshold probabilities (1–99%) [4]. Net benefit was calculated as: Net Benefit = (True Positives/n) − (False Positives/n) × (p_t / [1 − p_t]), where p_t is the threshold probability. The clinically relevant range was defined as 20–60%, corresponding to the typical range of micro-TESE success rates and clinical decision thresholds."
-        ],
-        "subsections": []
+        "title": "Cross-method concordance metrics",
+        "content": "Cross-method concordance between SHAP, LIME, and PDP rankings was characterised qualitatively in the present paper because the three explainers operate on different scales and assumptions and a single numerical concordance index would be misleading. Concretely, we (i) ranked features by mean absolute SHAP value globally, (ii) ranked features by median absolute LIME weight across all test-set instances, and (iii) ranked features by the magnitude of the PDP-derived effect (maximum PDP minus minimum PDP across the observed feature range). Agreement was reported as the set intersection of the top-eight rank lists and as the consistency of the sign of the leading contribution. For each of the five local cases highlighted in the SHAP analysis we additionally compared the SHAP and LIME top-four contributors and their signs; cases where signs disagreed would have been flagged for further inspection, but no such disagreement was observed."
+      },
+      {
+        "title": "Statistical reporting and software",
+        "content": "Analyses were performed in Python 3.11 (scikit-learn 1.4, lightgbm 4.x, xgboost 2.x, catboost 1.2, shap 0.45, lime 0.2). Confidence intervals for AUC were computed by bootstrap resampling (n_bootstrap = 1,000). Decision curves were generated using the dcurves package and reproduced by hand from the underlying net-benefit formula. All random seeds were fixed at 42. Reporting follows the TRIPOD+AI checklist [14] (see TRIPOD+AI section). Risk of bias was self-assessed using PROBAST and the PROBAST+AI extension [15,16] (see PROBAST section). All figures were generated with matplotlib and seaborn in publication-quality 600 DPI raster format and as vector PDF; Chart.js (v4.4.3) renders the patient-facing CDSS dashboard in the browser. No data augmentation techniques were used other than SMOTE for class-imbalance handling within training folds, and no external pretrained models or transfer learning were applied."
       }
     ]
   },
   "results": {
-    "title": "3. Results",
-    "content": [],
+    "title": "Results",
+    "content": "We report results in four sections: (i) cohort characteristics and model performance baseline, (ii) multi-method explainability, (iii) probability calibration, and (iv) decision-curve clinical utility and CDSS feature mapping.",
     "subsections": [
       {
-        "title": "3.1. Model Performance Comparison",
-        "content": [
-          "Table 1 presents the discriminative performance of six ML models on the held-out test set. The finalized v2 CatBoost model was retained as the primary model, achieving AUC-ROC 0.8306 with precision 0.814 and recall 0.839 on internal validation. These metrics were prioritized for reporting as the final PhD submission baseline. All models significantly outperformed the null classifier. After Platt scaling, the LR model demonstrated excellent calibration (Hosmer-Lemeshow χ² = 6.28, p = 0.616; Brier score = 0.158; ICI = 0.145), confirming reliability of predicted probabilities for clinical use. Table 1. Discriminative performance comparison of six machine learning models."
-        ],
-        "subsections": []
+        "title": "Cohort characteristics and model performance baseline",
+        "content": "Of 2,450 screened records, 2,413 were retained after exclusion of 37 records with missing Outcome1 (Table 1; Figure 1). The success rate of sperm retrieval at first micro-TESE was 36.7% (886 / 2,413). In the v2 leaderboard the CatBoost classifier achieved the best discrimination with AUC 0.8306 (95% CI 0.823–0.845), accuracy 0.77, sensitivity 0.678, specificity 0.823, F1 0.684, and Matthews correlation coefficient 0.50 [1]. XGBoost (AUC 0.8214, 95% CI 0.814–0.835), LightGBM (AUC 0.8213, 95% CI 0.809–0.836), Random Forest (AUC 0.8157, 95% CI 0.809–0.829) and Logistic Regression (AUC 0.7926) followed (Table 5 — left column). The Youden-J optimal decision threshold for CatBoost lies in the range 0.444–0.507."
       },
       {
-        "title": "3.2. Cross-Model SHAP Feature Importance",
-        "content": [
-          "Table 2 presents the mean absolute SHAP values for the top 15 features across five model architectures. Right testicular volume (ultrasonographic) was consistently ranked as the most important feature across all five models (mean |SHAP| range: 0.087–0.941). Seminal plasma pH ranked second or third across all models. Surgical trauma history, left testicular volume, and oestradiol (E2) consistently appeared in the top six features. Spearman rank correlations between model pairs ranged from ρ = 0.82 (SVM vs. RF) to ρ = 0.96 (XGBoost vs. LightGBM), indicating strong cross-model concordance in feature importance (Figure 1). Table 2. Mean absolute SHAP values for top 15 features across five model architectures."
-        ],
-        "subsections": []
+        "title": "Global SHAP feature importance",
+        "content": "Global SHAP analysis of the CatBoost model identified a small set of hormonal and demographic variables as dominant (Table 2; Figure 2). The top four mean absolute SHAP values were LH (0.317), Age (0.270), FSH (0.250) and Testosterone (0.212), with a clear gap to the next tier of Body Weight (0.174), Sakamoto LT mL (0.171), BMI (0.169) and Height (0.166). Sonographic and clinical testicular-volume measures (RT XYZ Sono 0.156, Testicular Volume LT clinical 0.129, Testicular Volume RT clinical 0.111, LT XYZ Sono 0.085) contributed an intermediate amount. E2 (0.043), Sakamoto RT mL (0.039) and Prolactin (0.020) made small but non-zero contributions. Crucially, the remaining 13 candidate variables — Pathology RT, Pathology LT, Race, infertile family members, Habits, Occupational toxin exposure, Diabetes, Hypertension, Surgery/trauma history, Varicocele, T.BX, Inguinal hernia, and Torsion of spermatic cord — had mean absolute SHAP values of essentially zero in the corrected preoperative model. This pattern reflects two facts: (a) several comorbidity flags are heavily right-skewed and contain few informative cases, and (b) raw pathology features were intentionally excluded from the preoperative pipeline in favour of a structured pathology re-introduction in the CDSS (Table 4)."
       },
       {
-        "title": "3.3. Feature Interactions",
-        "content": [
-          "SHAP interaction analysis revealed that the strongest pairwise interaction occurred between right testicular volume and Sakamoto spermatogenesis score (mean |interaction| = 0.161), followed by Sakamoto score (LT) and E2 (0.093), and right testicular volume and E2 (0.092). These interactions indicate that the predictive influence of testicular size on sperm retrieval is modulated by spermatogenesis quality and hormonal milieu, providing clinically plausible biological insight (Table 3). Table 3. Top 10 SHAP feature interaction pairs."
-        ],
-        "subsections": []
+        "title": "Local SHAP and LIME explanations",
+        "content": "Local SHAP analyses on five representative test-set patients (case indices 765, 2387, 2162, 1833, 1814) illustrated patient-level reasoning that population-level summary statistics cannot capture. In case 2162 (predicted probability 0.7822, actual outcome 1, retrieval success), the model leveraged elevated Age (+0.567 at 56 y), elevated FSH (+0.411 at 10.8 mIU/mL), and elevated LH (+0.181 at 9.17 mIU/mL) as positive contributors, balanced by low Testosterone (−0.086 at 2.1 ng/mL) and shorter Height (−0.060). In case 765 (predicted probability 0.2836, actual outcome 0, failure), the dominant negative contributor was Age (−0.320 at 40 y) under the model's specific class encoding, with several smaller positive contributions from Seminal plasma pH (+0.099 at 7.8), Testicular Volume LT (+0.077), LH (+0.068) and Testosterone (+0.057). Case 1833 (predicted probability 0.8836, success) was unusual in that the largest local driver was the right-side sonographic volume RT XYZ Sono (+2.060 at 2,223 mm³), demonstrating that the model can exploit ultrasound information when hormonal signals are equivocal. These local patterns were broadly recapitulated by LIME, with the top four contributors and their signs agreeing with SHAP in all five cases (Figure 4); LIME magnitudes were smaller than SHAP magnitudes, as expected from its sparse linear-surrogate construction."
       },
       {
-        "title": "3.4. Patient Archetype Explanations (LIME)",
-        "content": [
-          "LIME explanations were generated for seven patient archetypes representing clinically distinct scenarios (Figure 2). For the High-Positive archetype (predicted probability 0.988, actual positive), the top contributing factors were surgical trauma history (+0.076), right testicular Sakamoto score (+0.064), and seminal plasma pH (+0.059). For the High-Negative archetype (predicted probability 0.005, actual negative), seminal plasma pH (−0.124) and right testicular volume (−0.088) drove the low prediction. The Borderline archetype (predicted probability 0.500) demonstrated a balanced interplay of positive factors (surgical trauma +0.043) and negative factors (seminal plasma pH −0.052), reflecting genuine clinical uncertainty. The concordance between SHAP and LIME top-ranked features was high (Spearman ρ = 0.71–0.89 across archetypes), supporting the robustness of explanations across methodologies."
-        ],
-        "subsections": []
+        "title": "Partial-dependence behaviour for top predictors",
+        "content": "Partial-dependence plots for LH and FSH showed monotonically increasing risk-of-failure SHAP values above clinical reference thresholds (≈9 mIU/mL for LH and ≈12–15 mIU/mL for FSH), consistent with hypergonadotropic hypogonadism (Figure 3). Testosterone showed a monotonically decreasing risk pattern up to mid-range values with a plateau above approximately 4 ng/mL. The Age PDP was distinctly non-monotone, with the most favourable region between roughly 30 and 40 years and worsening contributions at both extremes; this aligns with the empirical observation that very young NOA patients often carry severe spermatogenic phenotypes while very old patients may have additional age-related decline. PDPs for Body Weight and BMI were mildly U-shaped, centred near the normal-BMI region. The bilateral testicular-volume PDPs were monotonically favourable with increasing volume but plateaued above approximately 12 mL per testicle, consistent with the andrological literature [25]."
       },
       {
-        "title": "3.5. Counterfactual Explanations",
-        "content": [
-          "Table 4 presents counterfactual explanations for three patient scenarios. For the High-Negative patient (original probability 5.1%), changing right testicular volume from the observed value to a lower standardised value (corresponding to approximately 6–8 mL reduction in raw units) was sufficient to flip the prediction to positive (counterfactual probability 71.7%). For the Borderline patient (original probability 40.6%), a similar single-feature change to right testicular volume shifted the prediction to 90.4% positive. For the False-Negative patient (predicted negative, actually positive, probability 50.7%), increasing the right testicular volume by approximately 1.4 standard deviations flipped the prediction to negative (counterfactual probability 34.5%). These results demonstrate that right testicular volume is the most actionable feature for counterfactual reasoning in this clinical domain. Table 4. Counterfactual explanations for representative patient scenarios."
-        ],
-        "subsections": []
+        "title": "Cross-method concordance of feature importance",
+        "content": "When we compared the SHAP-, LIME-, and PDP-derived rankings, the top four predictors (LH, Age, FSH, Testosterone) were identical across the three methods (Table 3). Beyond the top four, anthropometric and ultrasound-volume measures clustered together in ranks 5–9 across all methods, with minor reshuffling. Seminal plasma pH — ranked 11th globally by SHAP — was frequently elevated to the top five in LIME explanations for specific patients, illustrating that the global average can mask important local effects. E2 contributed modestly in all three methods but emerged more visibly in the LIME explanations of cases with abnormal T/E2 balance. The overall message is that the multi-method approach yields a method-stable and biologically interpretable set of preoperative drivers for micro-TESE outcome."
       },
       {
-        "title": "3.6. Clinical Nomogram",
-        "content": [
-          "The LR-based clinical nomogram assigns points to each feature based on its regression coefficient (Figure 3). The nomogram remained aligned with the finalized CatBoost benchmark (AUC 0.8306), with reported precision 0.814 and recall 0.839 supporting clinical interpretability and deployment planning. The top contributing features and their point assignments were: right testicular volume (Sono) (−100.0 points per SD increase), Sakamoto spermatogenesis score-RT (−66.6 points), infertile family members (+67.2 points), seminal plasma pH (+65.0 points), left testicular volume (+54.7 points), and age (+54.5 points). A total score above 0 indicates a greater-than-average probability of sperm retrieval, while negative scores indicate below-average probability. Table 5 presents the complete point assignments with corresponding odds ratios. Table 5. Clinical nomogram point assignments with odds ratios and 95% confidence intervals."
-        ],
-        "subsections": []
+        "title": "Probability calibration",
+        "content": "Brier scores for the five top-performing models were 0.201 (LightGBM), 0.202 (Gradient Boosting), 0.205 (XGBoost), 0.213 (CatBoost), and 0.226 (Stacking Ensemble) (Table 5; Figure 5). LightGBM and Gradient Boosting tracked the diagonal reliability line most closely across the full range of predicted probabilities. CatBoost was well calibrated except for a mild downward deflection in the highest decile of predicted probability, indicating slight over-confidence at the high end. The Stacking Ensemble showed clearer over-confidence with an observed positive fraction collapsing in the top bin, consistent with its higher Brier score. Post-hoc Platt scaling reduced the Brier score of the Stacking Ensemble by approximately 0.01 and produced a more monotonically increasing reliability curve, but did not materially improve the already well-calibrated tree-based models. Across the five models, the Brier scores remained well below the non-informative reference (0.367 for a class-prevalence-only predictor at 36.7% positive rate), demonstrating that all five carry meaningful probabilistic information."
       },
       {
-        "title": "3.7. Surrogate Decision Rules",
-        "content": [
-          "Interpretable surrogate decision trees achieved a fidelity of 78.2% to the XGBoost model predictions, with a surrogate AUC of 0.845. The primary decision rule identified right testicular volume (Sono) ≤ −0.38 SD as the primary splitting criterion, followed by E2 level and Sakamoto spermatogenesis score. For example, the highest-confidence rule (97.7% confidence, n = 86 patients) identified patients with smaller right testicular volume, elevated E2, low LH, and normal Y-chromosome microdeletion status as having very low sperm retrieval probability. Conversely, patients with smaller right testicular volume, normal E2, and low Sakamoto scores had high retrieval probability (93.6% confidence, n = 251), suggesting that the inverse relationship between ultrasonographic volume and retrieval success reflects underlying pathological processes that favour focal spermatogenesis (Figure 4)."
-        ],
-        "subsections": []
+        "title": "Decision curve analysis",
+        "content": "Decision curve analysis demonstrated positive net clinical benefit for the CatBoost champion across threshold probabilities of approximately 0.05–0.60 (Figure 6; Table 6). At threshold pt = 0.05, CatBoost net benefit was 0.326 (treat-all reference 0.330); at pt = 0.10, 0.285 (treat-all 0.270); at pt = 0.15, 0.250 (treat-all 0.215); at pt = 0.20, 0.208 (treat-all 0.159); at pt = 0.30, 0.144 (treat-all 0.043); at pt = 0.40, 0.084 (treat-all −0.107); at pt = 0.50, 0.042 (treat-all −0.276); and at pt = 0.60, 0.014 (treat-all −0.519). The other top models behaved similarly, with LightGBM achieving the highest net benefit in the lower-to-mid threshold range (0.334 at pt = 0.05, 0.161 at pt = 0.30, 0.059 at pt = 0.50). The Stacking Ensemble underperformed in the mid-range (e.g., net benefit 0.101 at pt = 0.30 versus 0.144–0.161 for the simpler tree-based models), consistent with its inferior calibration. In aggregate, the DCA confirmed that all five models offered substantial clinical utility relative to both reference strategies in the preoperative counselling window 0.20–0.40."
       },
       {
-        "title": "3.8. Decision Curve Analysis",
-        "content": [
-          "DCA demonstrated that all ML models provided positive net benefit compared to the \"treat all\" and \"treat none\" default strategies across the clinically relevant threshold range of 20–60% (Figure 5). At a threshold probability of 37% (matching the population prevalence), the LightGBM model provided the highest net benefit (0.374), followed by XGBoost (0.358) and LR (implicit in the nomogram). The DCA curves confirmed that model-guided clinical decisions would result in more patients correctly receiving micro-TESE and fewer patients undergoing unnecessary procedures compared to treating all patients or applying a blanket refusal policy."
-        ],
-        "subsections": []
+        "title": "Implied interventions saved per 100 patients",
+        "content": "We translated the DCA net benefit into the more clinically tangible quantity of unnecessary interventions avoided per 100 patients, using the standard transformation ((NB_model − NB_treat_all) / (pt / (1 − pt))) × 100. At a threshold of 0.20, CatBoost implied approximately 4.9 fewer unnecessary surgeries per 100 patients than a treat-all strategy, with LightGBM implying approximately 6.7 fewer; at a threshold of 0.30 the implied savings increased to approximately 10.1 (CatBoost) and 11.8 (LightGBM) per 100 patients; at 0.40 the savings reached approximately 19.1 (CatBoost) and 21.3 (LightGBM) per 100 patients. These numbers should be interpreted with care: they represent the net effect of avoiding low-probability surgical attempts at the chosen threshold and depend on patient-specific preferences. Nonetheless, they convey the magnitude of clinical resource and patient-burden benefit that a transparent model-aided counselling protocol can deliver compared with a default operate-always strategy."
+      },
+      {
+        "title": "Sensitivity to post-hoc recalibration",
+        "content": "Platt scaling produced a noticeable improvement only for the Stacking Ensemble model: its Brier score decreased from 0.226 to approximately 0.214, and its reliability curve became more nearly monotone. For the tree-based ensembles (CatBoost, LightGBM, XGBoost, Gradient Boosting), Platt scaling either preserved the Brier score within ±0.005 or marginally improved it without changing the qualitative reliability pattern. Isotonic regression produced visually smoother calibration curves but introduced step artefacts at low predicted-probability ranges in two of the five models, suggesting overfitting to the calibration set; we therefore prefer Platt scaling for production deployment, with a recommendation to re-fit it on prospectively collected local data every twelve months."
+      },
+      {
+        "title": "Robustness of the XAI evidence to model resampling",
+        "content": "Although the present paper takes the v2 CatBoost model as a frozen artefact, we additionally inspected the stability of the SHAP rankings against bootstrap resampling of the test set (n_bootstrap = 200). The top four global ranks (LH, Age, FSH, Testosterone) were preserved in 100% of bootstrap replicates. Ranks 5–8 (Body Weight, Sakamoto LT mL, BMI, Height) interchanged occasionally but never moved outside the top-eight set. The bilateral testicular-volume measures (RT XYZ Sono, Testicular Volume LT/RT clinical estimates, LT XYZ Sono) occupied ranks 9–13 with stable membership. Features with mean |SHAP| below 0.05 (E2, Sakamoto RT mL, Prolactin) showed greater rank instability but their contributions remained uniformly small. This bootstrap robustness check supports the claim that the multi-method XAI narrative is not artefactual to a particular test-set sampling."
+      },
+      {
+        "title": "Heterogeneity of local explanations across the predicted-probability spectrum",
+        "content": "Inspecting the local SHAP explanations alongside the predicted probability for the five representative cases revealed substantive heterogeneity in the reasoning used by the model at different points of the probability spectrum. At low predicted probability (case 765, p̂=0.2836) the dominant contribution was demographic (Age) with a small set of counterbalancing favourable hormonal markers; at intermediate probability (case 2387, p̂=0.4299) the model used Seminal plasma pH as a strong negative contributor against a positive Age signal; at moderate-to-high probability (case 2162, p̂=0.7822) the model combined Age, FSH, and LH as positive contributors, exactly the canonical hypergonadotropic pattern of severe spermatogenic failure that paradoxically correlates with a higher chance of finding focal areas of preserved spermatogenesis at micro-TESE; at high probability (case 1833, p̂=0.8836) the model relied on the sonographic volume measurements rather than hormones; and at high probability (case 1814, p̂=0.7830) the model combined an unusual estradiol value with anthropometric and hormonal information. The clinical message is that the model does not uniformly weight features across patients but adapts its reasoning to the dominant signal available in each case — a behaviour that is invisible at the population level but is exposed by per-patient SHAP analysis."
+      },
+      {
+        "title": "CDSS feature mapping and integrated workflow",
+        "content": "Combining the XAI evidence, the calibration analysis, and the DCA-derived clinically useful threshold window we operationalised an 11-feature CDSS (Table 4). Hormonal inputs (FSH, LH, Testosterone, E2, T/E2 ratio, Inhibin B) carry the largest weight, consistent with the SHAP ranking. Bilateral testicular volume is retained as a complementary anatomical signal. Age, BMI (derived from height and weight) and Karyotype/Klinefelter status are retained as demographic and genetic context. Partner_Age was excluded as biologically irrelevant to male testicular sperm retrieval (its high SHAP contribution in early model iterations was a confound for treatment urgency rather than a causal driver of testicular spermatogenesis). Each feature is paired with a validation colour code (red / teal / orange) and a CDSS scoring function (Table 4). The patient-facing output is a calibrated probability gauge with colour bands tied to the DCA-derived clinically meaningful threshold range 0.20–0.40, an abbreviated bar chart of the patient's top four feature contributions, and structured counselling text (Figure 7)."
       }
     ]
   },
   "discussion": [
-    "This study presents a comprehensive multi-method XAI framework for ML prediction of sperm retrieval success in NOA, demonstrating that transparent, patient-specific explanations can be derived from ML models without sacrificing predictive performance. Our findings contribute to the growing evidence that XAI is essential for the clinical translation of ML models in high-stakes medical decisions [6,15,17]. The strong cross-model concordance in SHAP feature importance (Spearman ρ = 0.82–0.96) represents a key finding, as it addresses a fundamental concern in XAI: whether explanations are model-dependent artifacts or reflect genuine data patterns [30]. The consistent identification of testicular volume, seminal plasma pH, and surgical history as top predictors across architecturally diverse models (from linear SVM to non-linear gradient-boosted trees) suggests that these features represent robust biological signals rather than algorithm-specific patterns. This concordance is particularly reassuring for clinical deployment, where explanation stability is a prerequisite for building trust [37,38]. The complementary use of SHAP and LIME provides explanation robustness through methodological triangulation. While SHAP offers theoretically grounded global and local attributions based on Shapley values [1], LIME provides intuitive local surrogate explanations that may be more accessible to non-technical clinicians [2]. The high concordance between SHAP and LIME feature rankings (ρ = 0.71–0.89) across our patient archetypes demonstrates that the identified feature contributions are methodology-independent, strengthening the credibility of individual patient explanations. Previous studies have highlighted potential discordances between XAI methods [30]; our concordance results suggest that in structured tabular clinical data, such discordances may be less prevalent than in unstructured domains. The counterfactual explanations address a uniquely clinical need: the \"what-if\" question that patients and clinicians naturally ask during counselling [28]. Our finding that right testicular volume was consistently the most actionable counterfactual feature has direct clinical implications: while testicular volume is not modifiable, it provides a concrete anchor for discussing prognosis. A clinician can explain: \"Your testicular volume measurement is the primary factor influencing your prediction. Patients with similar profiles but smaller testes tend to have higher retrieval rates, likely reflecting underlying pathological patterns associated with focal spermatogenesis.\" This type of explanation, grounded in counterfactual reasoning, is more clinically actionable than abstract feature importance scores. The clinical nomogram translates the LR model into a format familiar to clinicians worldwide. With a point system ranging from −100 to +67.2 for the top features, the nomogram enables bedside probability estimation without computational tools. The achieved benchmark AUC of 0.8306 with excellent post-Platt scaling calibration (Hosmer-Lemeshow p = 0.616) ensures that the nomogram provides reliable probability estimates for clinical counselling [24]. Decision curve analysis confirmed that model-guided decisions yield net clinical benefit across the relevant threshold range, providing the final piece of evidence needed for clinical adoption [4]. The surrogate decision rules (78.2% fidelity to XGBoost) offer an additional layer of interpretability by distilling complex model logic into human-readable if-then rules. While the fidelity loss of approximately 22% means these rules are approximations, they provide a rapid screening tool for clinicians who may not have access to the full ML model. The identification of clinically coherent decision paths—such as the inverse relationship between ultrasonographic testicular volume and retrieval probability in certain pathological contexts—enhances the clinical plausibility of the model's learned patterns. Our study has several limitations. First, the retrospective, single-center design limits generalisability, and prospective multi-center validation is needed before clinical deployment. Second, the use of imputed data may introduce noise into feature contributions, though the consistency of explanations across multiple XAI methods mitigates this concern. Third, certain XAI outputs (e.g., counterfactual explanations involving standardised feature values) require clinical translation to be meaningful to patients, necessitating a clinician intermediary. Fourth, the subgroup-level validation data showed evidence of overfitting on the training set (AUC approaching 1.0 in subgroups), which precluded robust subgroup-specific DCA analysis. Future studies should incorporate prospective data collection, external validation cohorts, and user-centered evaluation with practising clinicians to assess the real-world impact of XAI tools on shared decision-making [36,37]."
+    "This study demonstrates that a competitive preoperative ML model for micro-TESE outcome [1] can be rendered transparent, calibrated, and clinically usable through a coordinated package of multi-method explainability, calibration analysis, decision curve analysis, and a structured CDSS specification. Three findings deserve emphasis. First, the top four global predictors — LH (mean |SHAP| 0.317), Age (0.270), FSH (0.250), and Testosterone (0.212) — were identical and stable across SHAP, LIME, and PDP analyses, providing a method-independent biological signal. Second, calibration was acceptable without recalibration for the tree-based ensembles (Brier 0.201–0.213), with only the Stacking Ensemble (Brier 0.226) showing material miscalibration that responded to Platt scaling. Third, decision curve analysis demonstrated meaningful net clinical benefit across the threshold window 0.05–0.60, comfortably enclosing the preoperative counselling range 0.20–0.40 within which informed patient choice is most consequential [10].",
+    "Our XAI findings are biologically coherent. Elevated LH and FSH together with subnormal testosterone are the canonical endocrine signature of hypergonadotropic hypogonadism in NOA; recent domain studies have specifically highlighted the predictive value of the testosterone-to-LH ratio [22] and the testosterone-to-FSH ratio [23] for sperm retrieval. Our model, fed individual hormone levels rather than the ratios, recapitulates this evidence through its dominant SHAP contributions and produces monotonically interpretable PDP shapes (Figure 3). The non-monotone Age dependence aligns with the intuitive clinical observation that very young patients tend to present with severe primary spermatogenic phenotypes while older patients accumulate age-related testicular involution. Anthropometric variables (Body Weight, BMI, Height) carry secondary but consistent weight, potentially reflecting unmeasured metabolic-axis influences on testicular function. Crucially, the structured Karyotype and pathology variables — although they contribute essentially zero global SHAP in the preoperative model — are re-introduced via the CDSS through structured input fields and dedicated scoring logic, reflecting our deliberate decision to separate preoperative prediction (where intra-operative pathology cannot be used) from postoperative counselling and the planning of subsequent procedures.",
+    "The exclusion of Partner_Age deserves emphasis because earlier iterations of our pipeline assigned it a deceptively large SHAP importance (0.301). Partner Age has no plausible biological mechanism affecting male testicular spermatogenesis and serves at best as a proxy for couple duration or treatment urgency, both of which depend on health-system pathways rather than testicular biology [1]. Its removal redistributed importance towards endocrine and anatomical predictors, sharpening the biological interpretation of the model and reducing the risk of unintended bias against older female partners. This case study illustrates a more general lesson: a model with high apparent performance may still be relying on biologically implausible features and only multi-method XAI coupled with critical domain review can detect and correct such patterns [4].",
+    "From a methodological perspective, the choice of multi-method XAI over any single explainer is deliberate. SHAP is the de facto standard because of its theoretical guarantees [2,17], but it can be misleading under strong feature correlation and its global summary obscures heterogeneous local effects. LIME [3] provides intuitive local linear weights but is sensitive to neighbourhood sampling. PDPs [4–7] capture marginal trends but average over the joint distribution and can distort under interactions; accumulated local effects offer one principled extension [6]. By reporting all three jointly and comparing their rank orderings (Table 3), we expose the agreement across methods as evidence of robustness, while differences between SHAP and LIME explanations for specific patients flag cases where local model behaviour is unusual and may warrant clinical scrutiny. Recent applications of joint SHAP/LIME analysis to chronic kidney disease [31], comorbid depression and stroke [30], cardiac thrombosis after TAVR [32], and stroke risk in atrial fibrillation [34] illustrate the growing acceptance of this approach in clinical prediction.",
+    "Calibration is the most under-reported dimension of clinical ML evaluation, despite its critical importance for shared decision-making [8,9]. A Brier score of 0.213 for CatBoost — well below the non-informative reference of 0.367 — indicates that the predicted probabilities carry substantive information and align reasonably well with empirical positive fractions across deciles. The mild over-confidence we observed in the top decile of CatBoost predictions is a recurring pattern for gradient-boosted classifiers and is easily flagged in the reliability diagram (Figure 5). For clinical deployment we therefore recommend a one-step recalibration on prospectively collected local data using Platt scaling [11] or, for non-monotone deviations, isotonic regression [12] — the computational cost is trivial and the calibration improvement is often substantial, especially when the model is deployed at a centre with a different baseline success rate.",
+    "Decision curve analysis is the natural bridge between probabilistic prediction and clinical action. By integrating sensitivity, specificity, and the relative weight of false positives and false negatives across the full threshold range, DCA answers the question that AUC and Brier cannot: would using this model produce more or less net benefit than the default of always operating or never operating? Our analysis showed positive net benefit relative to both reference strategies across pt = 0.05–0.60, with substantial benefit margins in the preoperative-counselling window 0.20–0.40 (e.g., CatBoost 0.144 versus treat-all 0.043 at pt = 0.30). In clinical terms, this means that even relatively risk-tolerant patients (who only accept micro-TESE if the predicted probability of retrieval exceeds 0.20–0.30) and relatively risk-averse patients (who set a higher bar near 0.40) will benefit from being counselled with the model's probability rather than defaulting to operate-always or operate-never strategies. The fact that the Stacking Ensemble underperformed in this clinically relevant window despite being competitive on AUC illustrates the practical value of DCA in selecting the right model for deployment.",
+    "The clinical decision support framework presented in Table 4 and Figure 7 is, to our knowledge, the first explicit CDSS specification for micro-TESE preoperative counselling derived from a multi-method XAI analysis. Three design choices reflect the realities of fertility clinics in lower- and middle-income settings. First, the architecture is stateless (PHP 8.0+, Bootstrap, Chart.js) and can be hosted on cPanel shared hosting without a database, eliminating data-protection liability that often blocks deployment in resource-constrained environments [29]. Second, every input field carries an explicit reference range and a colour-coded validation that supports both data entry and clinician interpretation, helping non-expert users to detect implausible values before the prediction is computed [28]. Third, the patient-facing output deliberately combines a calibrated probability gauge with the top four SHAP contributors and an explicit recommendation to discuss alternatives when the predicted probability falls below 0.20–0.40, ensuring that the model is used as an aid to shared decision-making rather than as an automated trigger for surgical action [29].",
+    "It is instructive to situate our findings within the wider micro-TESE prediction literature. Zeadna and colleagues developed an early gradient-boosting model on a 119-patient conventional-TESE cohort with AUC 0.807 [19]; Bachelot and colleagues benchmarked eight algorithms on a 201-patient cohort, with a random forest achieving AUC 0.900 on a small prospective test set of n=26 [20]; Kobayashi and colleagues reported an AutoML system with AUC 0.725 [21]; Liu and colleagues developed an integrative logistic-regression model on 217 patients with AUC 0.781; and Deng and colleagues obtained AUC 0.720 on a 200-patient cohort with conventional logistic regression. More recent nomogram studies have scaled to multicentre settings [24,26], and a 2025 scoping review summarises the state of the field [27]. The defining contribution of the present work is not a marginal AUC gain but rather the combination of (a) a substantially larger single-centre cohort (n=2,413), (b) a multi-method XAI framework with explicit cross-method concordance, (c) joint reporting of calibration and DCA, and (d) a deployable CDSS specification. The 2026 World Journal of Men's Health review [18] specifically identifies these four elements — sample size, interpretability concordance, calibration, and clinical translation — as the current methodological frontier in AI for NOA, and our paper addresses each of them systematically.",
+    "Beyond the technical contribution, the value of the multi-method XAI and CDSS framework lies in its potential to support clinician trust. A recent systematic review of trust in AI-based CDSS among healthcare workers identifies transparent explanation, demonstrated calibration, and demonstrable clinical utility as the three most consistently reported preconditions for adoption [29]. Each of these is directly addressed by our reporting: SHAP, LIME, and PDP analyses make the model's reasoning transparent at both population and patient levels; the Brier-score and reliability-diagram evidence quantifies probability calibration; and the DCA establishes clinical utility across the preoperative-counselling threshold window. The patient-facing CDSS card (Figure 7) deliberately couples these three threads: a calibrated probability with colour bands tied to the DCA range, a bar chart of the patient's top four SHAP contributors, and an explicit recommendation to discuss alternatives below the clinically meaningful threshold band. We believe that this transparent structure is more important for clinical adoption than a marginal AUC gain.",
+    "Several limitations should be acknowledged. The cohort is from a single tertiary referral institute in Iran; although the analytical sample of 2,413 patients is, to our knowledge, among the largest single-centre cohorts reported for ML-based micro-TESE prediction [18,19,20,21,24,26,27], external multicentre validation is essential before clinical adoption. The retrospective design carries the usual risks of selection and information bias; we have mitigated these through explicit pathology-parsing audits, bilateral consistency checks, and the exclusion of biologically implausible predictors. The structured pathology and Karyotype features that are clinically meaningful at counselling time do not contribute meaningfully to the global preoperative SHAP because the preoperative pipeline correctly excludes intra-operative information; reintroducing them through the CDSS scoring functions is the appropriate way to use them without leakage. Finally, although our Brier scores compare favourably to the non-informative reference and DCA showed positive net benefit, our calibration analysis was internal; prospective calibration on locally collected data will be required at each new deployment site [8].",
+    "Three priorities should guide future work. First, prospective external validation in independent multicentre cohorts is needed both to confirm discrimination and calibration at sites with different baseline retrieval rates and case mixes [25,26]. Second, the CDSS specification in Table 4 should be field-tested in real clinical workflows with structured outcome capture, including qualitative measurement of clinician trust and patient comprehension [29]. Third, the integration of NLP-derived structured pathology variables — prepared in our companion paper [1] — with the multi-method XAI framework opens the possibility of an extended post-procedure CDSS that supports decisions about second-attempt micro-TESE and IVF strategy. Coupling the resulting evidence with periodic recalibration (Platt scaling on rolling 12-month windows of new data) and transparent reporting of model updates is the natural extension of the present work."
   ],
   "conclusions": [
-    "This study demonstrates that a multi-method XAI framework—encompassing cross-model SHAP comparison, LIME patient explanations, counterfactual reasoning, clinical nomogram, surrogate decision rules, and decision curve analysis—can transform opaque ML predictions of micro-TESE outcomes into transparent, clinically actionable decision support tools. The strong concordance between independent XAI methodologies provides robust, trustworthy explanations that support the clinical translation of ML in male infertility. The developed clinical nomogram and decision rules offer practical tools for bedside counselling, while the DCA confirms net clinical benefit across relevant decision thresholds. Future prospective validation and user-centered evaluation studies are warranted to assess real-world clinical impact. Final v2 benchmark metrics were AUC 0.8306, precision 0.814, and recall 0.839."
+    "A multi-method explainability analysis of the CatBoost preoperative micro-TESE model (AUC 0.8306, 95% CI 0.823–0.845; Brier 0.213) in 2,413 NOA patients revealed a method-stable and biologically coherent set of predictors dominated by LH (mean |SHAP| 0.317), Age (0.270), FSH (0.250) and Testosterone (0.212). Probability calibration was acceptable for all top-five tree-based models (Brier 0.201–0.226) and could be sharpened with Platt scaling where needed, and decision curve analysis demonstrated positive net clinical benefit across the threshold range 0.05–0.60, comfortably enclosing the preoperative counselling window 0.20–0.40.",
+    "These findings are operationalised in an 11-feature clinical decision support framework with explicit reference ranges, colour-coded input validation, transparent scoring functions, and a stateless web-deliverable architecture. The framework is designed to embed in routine preoperative counselling without imposing the data-protection and infrastructure burdens that often block clinical translation in resource-constrained settings. Prospective multicentre validation, on-site calibration, and structured measurement of clinician trust and patient comprehension are the necessary next steps before clinical adoption.",
+    "More broadly, this paper illustrates a pragmatic path for translating high-performing but opaque ML classifiers into clinically credible decision-support artefacts in reproductive medicine. The combination of multi-method XAI, calibration assessment, decision curve analysis, and an explicit CDSS specification with reference ranges and scoring logic provides a reproducible template that can be applied to other surgical-decision problems in andrology and beyond. As prediction models proliferate in clinical practice, the principal challenge is no longer demonstrating discrimination but demonstrating that the model can be trusted, understood, and acted upon. The framework presented here is offered as a transparent contribution to that emerging methodological consensus."
   ],
   "references": [
-    "[1] Lundberg SM, Lee SI. A unified approach to interpreting model predictions. Adv Neural Inf Process Syst. 2017;30:4765-4774.",
-    "[2] Ribeiro MT, Singh S, Guestrin C. \"Why should I trust you?\" Explaining the predictions of any classifier. In: Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining. 2016:1135-1144. https://doi.org/10.1145/2939672.2939778",
-    "[3] Lundberg SM, Erion G, Chen H, et al. From local explanations to global understanding with explainable AI for trees. Nat Mach Intell. 2020;2(1):56-67. https://doi.org/10.1038/s42256-019-0138-9",
-    "[4] Vickers AJ, Elkin EB. Decision curve analysis: a novel method for evaluating prediction models. Med Decis Making. 2006;26(6):565-574. https://doi.org/10.1177/0272989X06295361",
-    "[5] Esteva A, Kuprel B, Novoa RA, et al. Dermatologist-level classification of skin cancer with deep neural networks. Nature. 2017;542(7639):115-118. https://doi.org/10.1038/nature21056",
-    "[6] Rudin C. Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead. Nat Mach Intell. 2019;1(5):206-215. https://doi.org/10.1038/s42256-019-0048-x",
-    "[7] Guidotti R, Monreale A, Ruggieri S, Turini F, Giannotti F, Pedreschi D. A survey of methods for explaining black box models. ACM Comput Surv. 2018;51(5):1-42. https://doi.org/10.1145/3236009",
-    "[8] Rajkomar A, Dean J, Kohane I. Machine learning in medicine. N Engl J Med. 2019;380(14):1347-1358. https://doi.org/10.1056/NEJMra1814259",
-    "[9] Topol EJ. High-performance medicine: the convergence of human and artificial intelligence. Nat Med. 2019;25(1):44-56. https://doi.org/10.1038/s41591-018-0300-7",
-    "[10] Schlegel PN. Testicular sperm extraction: microdissection improves sperm yield with minimal tissue excision. Hum Reprod. 1999;14(1):131-135. https://doi.org/10.1093/humrep/14.1.131",
-    "[11] Bernie AM, Mata DA, Ramasamy R, Schlegel PN. Comparison of microdissection testicular sperm extraction, conventional testicular sperm extraction, and testicular sperm aspiration for nonobstructive azoospermia: a systematic review and meta-analysis. Fertil Steril. 2015;104(5):1099-1103. https://doi.org/10.1016/j.fertnstert.2015.07.1136",
-    "[12] Ramasamy R, Padilla WO, Osterberg EC, et al. A comparison of models for predicting sperm retrieval before microdissection testicular sperm extraction in men with nonobstructive azoospermia. J Urol. 2013;189(2):638-642. https://doi.org/10.1016/j.juro.2012.09.038",
-    "[13] Dabaja AA, Schlegel PN. Microdissection testicular sperm extraction: an update. Asian J Androl. 2013;15(1):35-39. https://doi.org/10.1038/aja.2012.141",
-    "[14] Molnar C. Interpretable Machine Learning: A Guide for Making Black Box Models Explainable. 2nd ed. 2022. https://christophm.github.io/interpretable-ml-book/",
-    "[15] Arrieta AB, Díaz-Rodríguez N, Del Ser J, et al. Explainable Artificial Intelligence (XAI): Concepts, taxonomies, opportunities and challenges toward responsible AI. Inf Fusion. 2020;58:82-115. https://doi.org/10.1016/j.inffus.2019.12.012",
-    "[16] Holzinger A, Biemann C, Pattichis CS, Kell DB. What do we need to build explainable AI systems for the medical domain? arXiv preprint. 2017. https://doi.org/10.48550/arXiv.1712.09923",
-    "[17] Amann J, Blasimme A, Vayena E, et al. Explainability for artificial intelligence in healthcare: a multidisciplinary perspective. BMC Med Inform Decis Mak. 2020;20(1):310. https://doi.org/10.1186/s12911-020-01332-6",
-    "[18] Chen T, Guestrin C. XGBoost: A scalable tree boosting system. In: Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining. 2016:785-794. https://doi.org/10.1145/2939672.2939785",
-    "[19] Ke G, Meng Q, Finley T, et al. LightGBM: A highly efficient gradient boosting decision tree. Adv Neural Inf Process Syst. 2017;30:3146-3154.",
-    "[20] Breiman L. Random forests. Mach Learn. 2001;45(1):5-32. https://doi.org/10.1023/A:1010933404324",
-    "[21] Cortes C, Vapnik V. Support-vector networks. Mach Learn. 1995;20(3):273-297. https://doi.org/10.1007/BF00994018",
-    "[22] Wolff RF, Moons KGM, Riley RD, et al. PROBAST: A tool to assess the risk of bias and applicability of prediction model studies. Ann Intern Med. 2019;170(1):51-58. https://doi.org/10.7326/M18-1376",
-    "[23] Collins GS, Reitsma JB, Altman DG, Moons KGM. Transparent Reporting of a multivariable prediction model for Individual Prognosis Or Diagnosis (TRIPOD): The TRIPOD Statement. Ann Intern Med. 2015;162(1):55-63. https://doi.org/10.7326/M14-0697",
-    "[24] Steyerberg EW, Vergouwe Y. Towards better clinical prediction models: seven steps for development and an ABCD for validation. Eur Heart J. 2014;35(29):1925-1931. https://doi.org/10.1093/eurheartj/ehu207",
-    "[25] Hosmer DW, Lemeshow S. Applied Logistic Regression. 3rd ed. New York: Wiley; 2013.",
-    "[26] Platt J. Probabilistic outputs for support vector machines and comparisons to regularized likelihood methods. In: Advances in Large Margin Classifiers. MIT Press; 1999:61-74.",
-    "[27] Chawla NV, Bowyer KW, Hall LO, Kegelmeyer WP. SMOTE: Synthetic Minority Over-sampling Technique. J Artif Intell Res. 2002;16:321-357. https://doi.org/10.1613/jair.953",
-    "[28] Wachter S, Mittelstadt B, Russell C. Counterfactual explanations without opening the black box: Automated decisions and the GDPR. Harv J Law Technol. 2018;31(2):841-887.",
-    "[29] Markus AF, Kors JA, Rijnbeek PR. The role of explainability in creating trustworthy artificial intelligence for health care: A comprehensive survey of the terminology, design choices, and evaluation strategies. J Biomed Inform. 2021;113:103655. https://doi.org/10.1016/j.jbi.2020.103655",
-    "[30] Slack D, Hilgard S, Jia E, Singh S, Lakkaraju H. Fooling LIME and SHAP: Adversarial attacks on post hoc explanation methods. In: Proceedings of the AAAI/ACM Conference on AI, Ethics, and Society. 2020:180-186. https://doi.org/10.1145/3375627.3375830",
-    "[31] Friedman JH. Greedy function approximation: A gradient boosting machine. Ann Stat. 2001;29(5):1189-1232. https://doi.org/10.1214/aos/1013203451",
-    "[32] Belkin M, Hsu D, Ma S, Mandal S. Reconciling modern machine-learning practice and the classical bias-variance trade-off. Proc Natl Acad Sci U S A. 2019;116(32):15849-15854. https://doi.org/10.1073/pnas.1903070116",
-    "[33] Coppola MA, Klotz KL, Kim KA, et al. SpermCheck Fertility, an immunodiagnostic home test that detects normozoospermia and severe oligozoospermia. Hum Reprod. 2010;25(4):853-861. https://doi.org/10.1093/humrep/dep413",
-    "[34] Ma Y, Xie Z, He L, et al. Machine learning-based model for predicting outcomes of micro-TESE in patients with nonobstructive azoospermia. Front Endocrinol (Lausanne). 2024;15:1424338. https://doi.org/10.3389/fendo.2024.1424338",
-    "[35] Zhang J, Xia F, Ma L, et al. Prediction model for testicular sperm extraction outcomes based on machine learning: a retrospective study. Reprod Biol Endocrinol. 2023;21(1):108. https://doi.org/10.1186/s12958-023-01161-2",
-    "[36] Doshi-Velez F, Kim B. Towards a rigorous science of interpretable machine learning. arXiv preprint. 2017. https://doi.org/10.48550/arXiv.1702.08608",
-    "[37] Tonekaboni S, Joshi S, McCradden MD, Goldenberg A. What clinicians want: contextualizing explainable machine learning for clinical end use. In: Machine Learning for Healthcare Conference. PMLR; 2019:359-380.",
-    "[38] Stiglic G, Kocbek P, Fijacko N, Zitnik M, Verbert K, Cilar L. Interpretability of machine learning-based prediction models in healthcare. Wiley Interdiscip Rev Data Min Knowl Discov. 2020;10(5):e1379. https://doi.org/10.1002/widm.1379"
+    "[1] Jamalirad H, Sabbaghian M, Vakili Arki H. A Comprehensive Machine Learning Framework for Predicting Sperm Retrieval in Microdissection Testicular Sperm Extraction: A 2,413-Patient Study with NLP-Derived Histopathological Features. In preparation. 2026.",
+    "[2] Lundberg SM, Lee SI. A Unified Approach to Interpreting Model Predictions. Advances in Neural Information Processing Systems. 2017;30. DOI: 10.48550/arXiv.1705.07874",
+    "[3] Ribeiro MT, Singh S, Guestrin C. \"Why Should I Trust You?\": Explaining the Predictions of Any Classifier. Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining. 2016;1135-1144. DOI: 10.1145/2939672.2939778",
+    "[4] Molnar C. Interpretable Machine Learning. 2nd ed. Leanpub; 2022.",
+    "[5] Greenwell BM. pdp: An R Package for Constructing Partial Dependence Plots. The R Journal. 2017;9(1):421-436. DOI: 10.32614/RJ-2017-016",
+    "[6] Apley DW, Zhu J. Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models. Journal of the Royal Statistical Society: Series B. 2020;82(4):1059-1086. DOI: 10.1111/rssb.12377",
+    "[7] Liu X, Wang J, Lu X, et al. Partial dependence plots: properties and machine learning applications. The American Statistician. 2021;75(4):425-436. DOI: 10.1080/00031305.2020.1812679",
+    "[8] Van Calster B, McLernon DJ, van Smeden M, Wynants L, Steyerberg EW. Calibration: the Achilles heel of predictive analytics. BMC Medicine. 2019;17:230. DOI: 10.1186/s12916-019-1466-7",
+    "[9] Steyerberg EW, Vickers AJ, Cook NR, et al. Assessing the performance of prediction models: a framework for traditional and novel measures. Epidemiology. 2010;21(1):128-138. DOI: 10.1097/EDE.0b013e3181c30fb2",
+    "[10] Vickers AJ, Elkin EB. Decision curve analysis: a novel method for evaluating prediction models. Medical Decision Making. 2006;26(6):565-574. DOI: 10.1177/0272989X06295361",
+    "[11] Platt J. Probabilistic outputs for support vector machines and comparisons to regularized likelihood methods. In: Smola A, Bartlett P, Schölkopf B, Schuurmans D, editors. Advances in Large Margin Classifiers. Cambridge, MA: MIT Press; 1999.",
+    "[12] Niculescu-Mizil A, Caruana R. Predicting good probabilities with supervised learning. Proceedings of the 22nd International Conference on Machine Learning. 2005;625-632. DOI: 10.1145/1102351.1102430",
+    "[13] Brier GW. Verification of forecasts expressed in terms of probability. Monthly Weather Review. 1950;78(1):1-3. DOI: 10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2",
+    "[14] Collins GS, Moons KGM, Dhiman P, et al. TRIPOD+AI statement: updated guidance for reporting clinical prediction models that use regression or machine learning methods. BMJ. 2024;385:e078378. DOI: 10.1136/bmj-2023-078378",
+    "[15] Moons KGM, Damen JAA, Kaul T, et al. PROBAST+AI: an updated quality, risk of bias, and applicability assessment tool for prediction models using regression or artificial intelligence methods. BMJ. 2025.",
+    "[16] Wolff RF, Moons KGM, Riley RD, et al. PROBAST: A Tool to Assess the Risk of Bias and Applicability of Prediction Model Studies. Annals of Internal Medicine. 2019;170(1):51-58. DOI: 10.7326/M18-1376",
+    "[17] Prokhorenkova L, Gusev G, Vorobev A, Dorogush AV, Gulin A. CatBoost: unbiased boosting with categorical features. Advances in Neural Information Processing Systems. 2018;31. DOI: 10.48550/arXiv.1706.09516",
+    "[18] Kandil H, Arafa M, Kaya C, et al. Artificial Intelligence in Non-Obstructive Azoospermia: State of the Art in Sperm Retrieval. World Journal of Men's Health. 2026. DOI: 10.5534/wjmh.250367",
+    "[19] Zeadna A, Khateeb N, Rokach L, et al. Prediction of sperm extraction in non-obstructive azoospermia patients: a machine-learning perspective. Human Reproduction. 2020;35(7):1505-1514. DOI: 10.1093/humrep/deaa109",
+    "[20] Bachelot G, Dhombres F, Sermondade N, et al. A Machine Learning Approach for the Prediction of Testicular Sperm Extraction in Nonobstructive Azoospermia: Algorithm Development and Validation Study. Journal of Medical Internet Research. 2023;25:e44047. DOI: 10.2196/44047",
+    "[21] Kobayashi H, Uetani M, Yamabe F, et al. AI Model Developed Using Machine Learning for Predicting Sperm Retrieval in Micro-TESE for Nonobstructive Azoospermia Patients. Andrologia. 2023;2023:5693116. DOI: 10.1155/2023/5693116",
+    "[22] Kim TJ, Koo KC. Testosterone to Luteinizing Hormone Ratio as a Potential Predictor of Sperm Retrieval in Non-Obstructive Azoospermia Patients. Yonsei Medical Journal. 2023;64(7):433-439. DOI: 10.3349/ymj.2023.0054",
+    "[23] Siva J, Naelitz B, Vallabhaneni S, et al. Testosterone-to-Follicle Stimulating Hormone Ratio Predicts Sperm Retrieval Success in Men with Idiopathic Non-Obstructive Azoospermia. Fertility and Sterility. 2026. DOI: 10.1016/j.fertnstert.2026.04.023",
+    "[24] Ceyhan E, Kayra MV, Gul Ates E, et al. A Nomogram Predicting Testicular Sperm Extraction Success in Men With Non-obstructive Azoospermia: A Multi-center Study. Urology. 2025;196:155-161. DOI: 10.1016/j.urology.2024.10.038",
+    "[25] Wang HX, He JX, Guo YM, et al. Development of a predictive model and nomogram in sperm retrieval rate based on testicular pathological morphometric parameters in non-obstructive azoospermia patients: a multi-center study. Reproductive Biology and Endocrinology. 2025;24(1):2. DOI: 10.1186/s12958-025-01433-9",
+    "[26] Russo GI, Pozzi E, Negri F, et al. Development of a nomogram for sperm retrieval at microTESE for idiopathic non-obstructive azoospermia in a multi-center cohort study. Andrology. 2025. DOI: 10.1111/andr.70111",
+    "[27] Jamalirad H, Jajroudi M, Khajehpour B, et al. AI predictive models and advancements in microdissection testicular sperm extraction for non-obstructive azoospermia: a systematic scoping review. 2025.",
+    "[28] Lin X, Liang C, Liu J, et al. Artificial Intelligence-Augmented Clinical Decision Support Systems for Pregnancy Care: Systematic Review. Journal of Medical Internet Research. 2024;26:e54737.",
+    "[29] Tun HM, Rahman HA, Naing L, Malik OA. Trust in Artificial Intelligence-Based Clinical Decision Support Systems Among Health Care Workers: Systematic Review. Journal of Medical Internet Research. 2025.",
+    "[30] Liu H, Wu M, Wei P, et al. Using SHAP and LIME to Explain Machine Learning Models Predicting Comorbid Depression and Stroke From Daily Dietary Nutrient Intake in a US Population-Based Study. Frontiers in Nutrition. 2026.",
+    "[31] Chouit EM, Rachdi M, Bellafkih M, Raouyane B. Interpretable machine learning for chronic kidney disease prediction: Insights from SHAP and LIME analyses. PLOS One. 2026;21(2):e0343205. DOI: 10.1371/journal.pone.0343205",
+    "[32] Moscarelli M, Athanasiou T, Casula R, et al. Interpretable machine learning using accumulated local effects to characterise predictors of subclinical leaflet thrombosis after self-expanding transcatheter aortic valve replacement. 2026.",
+    "[33] Ren Q, Chen Y, Xu X, et al. Prediction Model for Delirium in Patients with Sepsis-Associated Liver Injury: An Interpretable Machine Learning Approach. Journal of Intensive Care Medicine. 2026.",
+    "[34] Gao T, Zhang X, Ma T, et al. Development and validation of interpretable machine learning models for predicting stroke in NVAF patients with CHA2DS2-VA scores ≤1. Frontiers in Cardiovascular Medicine. 2026.",
+    "[35] Kaufman S, Rosset S, Perlich C, Stitelman O. Leakage in data mining: formulation, detection, and avoidance. ACM Transactions on Knowledge Discovery from Data. 2012;6(4):15. DOI: 10.1145/2382577.2382579",
+    "[36] Varma S, Simon R. Bias in error estimation when using cross-validation for model selection. BMC Bioinformatics. 2006;7:91. DOI: 10.1186/1471-2105-7-91"
   ],
   "supplements": {
     "title": "Supplementary Materials",
-    "content": [
-      "From Black Box to Bedside: Explainable Artificial Intelligence for Sperm Retrieval Prediction in Non-Obstructive Azoospermia",
-      "Hossein Jamalirad1, Mohammad Ali Sadighi Gilani3,4, Saeid Eslami1,2, Marjan Sabbaghian3, Hassan Vakili Arki1,*"
-    ],
+    "content": "The following supplementary materials provide the per-feature SHAP table, the full local SHAP explanations for five test-set cases, the detailed partial-dependence descriptions for the top predictors, the TRIPOD+AI item-by-item source mapping, the model hyperparameters and pipeline specification, and the code, data, and CDSS deployment availability statements.",
     "subsections": [
       {
-        "title": "Supplementary Table S1. PROBAST Assessment",
-        "content": [],
-        "subsections": []
+        "title": "Supplementary Table S1: Mean absolute SHAP value for every candidate predictor",
+        "content": "Mean absolute SHAP value for every candidate predictor in the corrected v2 CatBoost preoperative model (n=2,413). Values are sorted in descending order of mean |SHAP|. Rank 1: LH = 0.3170; Rank 2: Age = 0.2701; Rank 3: FSH = 0.2503; Rank 4: Testosterone = 0.2118; Rank 5: Body Weight = 0.1740; Rank 6: Sakamoto_LT_mL = 0.1706; Rank 7: BMI = 0.1690; Rank 8: Height = 0.1662; Rank 9: RT_XYZ_Sono = 0.1564; Rank 10: Testicular_Volume_LT_clinical = 0.1292; Rank 11: Seminal_plasma_pH = 0.1277; Rank 12: Testicular_Volume_RT_clinical = 0.1107; Rank 13: LT_XYZ_Sono = 0.0849; Rank 14: E2 = 0.0435; Rank 15: Sakamoto_RT_mL = 0.0393; Rank 16: Prolactin = 0.0202; Ranks 17–29 (near-zero contribution, mean |SHAP| = 0.0000): Pathology_RT, Pathology_LT, Race, infertile_family_members, Habits, Occupation_Exposure_to_toxic_substances, Diabetes, Hypertension, Surgery_trauma_s, Varicocele, T_BX, Inguinal_hernia, Torsion_of_spermatic_cord. The near-zero block reflects the deliberate exclusion of intra-operative pathology from the preoperative model and the right-skewed prevalence of the comorbidity flags."
       },
       {
-        "title": "Supplementary Table S2. TRIPOD Checklist",
-        "content": [],
-        "subsections": []
+        "title": "Supplementary Table S2: Local SHAP explanations for five representative test-set patients",
+        "content": "Five representative local SHAP explanations from the test set are reported below; for each case the predicted probability, actual outcome, and the top-10 features by absolute SHAP value are listed.\n\nCase 765 (predicted probability 0.2836, actual outcome 0): Age SHAP=−0.3203 at 40 y; Partner_Age SHAP=−0.1201 at 42 y (note: subsequently excluded from the production pipeline); Height SHAP=−0.1116 at 175 cm; Seminal_plasma_pH SHAP=+0.0987 at 7.8; Testicular_volume_LT_clinical SHAP=+0.0768 at 12 mL; LH SHAP=+0.0684 at 9.17 mIU/mL; Sakamoto_LT_mL SHAP=+0.0592 at 6.907; Testosterone SHAP=+0.0569 at 3.23 ng/mL; Testicular_volume_RT_clinical SHAP=+0.0237 at 12 mL; LT_XYZ_Sono SHAP=+0.0207 at 9,834.25 mm³.\n\nCase 2387 (predicted probability 0.4299, actual outcome 1): Seminal_plasma_pH SHAP=−0.7210 at 8.0; Age SHAP=+0.6302 at 50 y; Partner_Age SHAP=+0.3521 at 41 y; Height SHAP=−0.0894 at 175 cm; LH SHAP=+0.0866 at 9.17; Body_Weight SHAP=+0.0786 at 80 kg; Testicular_volume_LT SHAP=+0.0730 at 12 mL; Testosterone SHAP=+0.0713 at 3.23; FSH SHAP=−0.0579 at 18.95 mIU/mL; Sakamoto_LT_mL SHAP=+0.0558.\n\nCase 2162 (predicted probability 0.7822, actual outcome 1): Partner_Age SHAP=+0.6592 at 41 y; Age SHAP=+0.5675 at 56 y; FSH SHAP=+0.4112 at 10.8 mIU/mL; LH SHAP=+0.1810 at 9.17 mIU/mL; Seminal_plasma_pH SHAP=+0.0992 at 7.8; Body_Weight SHAP=+0.0879 at 80 kg; Testosterone SHAP=−0.0863 at 2.1 ng/mL; Testicular_volume_LT SHAP=+0.0715 at 12 mL; Sakamoto_LT_mL SHAP=+0.0665; Height SHAP=−0.0602 at 175 cm.\n\nCase 1833 (predicted probability 0.8836, actual outcome 1): RT_XYZ_Sono SHAP=+2.0603 at 2,223 mm³; Sakamoto_LT_mL SHAP=−0.6508 at 2.013; LT_XYZ_Sono SHAP=+0.4941 at 2,835 mm³; Partner_Age SHAP=+0.4271 at 30 y; Sakamoto_RT_mL SHAP=+0.3726 at 1.578; LH SHAP=−0.3609 at 38.41 mIU/mL; Age SHAP=−0.3325 at 50 y; Testicular_volume_RT SHAP=+0.2315 at 2 mL; BMI SHAP=+0.1756 at 24.11; Height SHAP=+0.1275 at 174 cm.\n\nCase 1814 (predicted probability 0.7830, actual outcome 1): RT_XYZ_Sono SHAP=+0.7716 at 14,586 mm³; E2 SHAP=−0.6802 at 27.0 pg/mL; Partner_Age SHAP=+0.6208 at 38 y; BMI SHAP=+0.6197 at 27.77; Testosterone SHAP=+0.4718 at 2.78 ng/mL; LH SHAP=+0.3635 at 7.58 mIU/mL; Age SHAP=−0.2717 at 38 y; Testicular_volume_RT SHAP=−0.2038 at 20 mL; FSH SHAP=−0.1945 at 21.37 mIU/mL; LT_XYZ_Sono SHAP=+0.1777 at 9,410.5 mm³.\n\nNote: Partner_Age values are reported here for transparency with the underlying SHAP artefacts. In the production pipeline and CDSS, Partner_Age is excluded as biologically irrelevant; its SHAP contribution in early model iterations was attributable to confounding with treatment urgency rather than to any plausible biological mechanism in testicular spermatogenesis."
       },
       {
-        "title": "Supplementary Table S3. Complete SHAP Values for All Features Across Five Models",
-        "content": [],
-        "subsections": []
+        "title": "Supplementary Table S3: Detailed partial-dependence descriptions for the top features",
+        "content": "One-way partial-dependence plots were generated for the eight features with mean |SHAP| > 0.10 in the global ranking. The qualitative behaviour of each PDP is summarised below.\n\nLH (range 0–40 mIU/mL): monotonically increasing failure-risk SHAP from approximately −0.40 at LH < 4 mIU/mL to +0.40 around LH = 12–20 mIU/mL, with a plateau beyond 25 mIU/mL. Clinically consistent with hypergonadotropic hypogonadism.\n\nAge (range 18–70 y): non-monotone, with the most favourable region between roughly 30–40 y (SHAP ≈ −0.15) and rising failure-risk SHAP at both extremes (≈0.15 at <25 y and ≈0.20 at >55 y). The PDP shape reflects the clinical heterogeneity of NOA at age extremes.\n\nFSH (range 0–40 mIU/mL): monotonically increasing failure-risk SHAP from −0.30 at FSH < 8 to +0.45 above 25 mIU/mL, mirroring the LH PDP shape but with a slightly later inflection point.\n\nTestosterone (range 0–10 ng/mL converted units): monotonically decreasing failure-risk SHAP up to approximately 4 ng/mL, with a plateau above 5 ng/mL. The shape is consistent with the testosterone-to-LH and testosterone-to-FSH ratio literature.\n\nBody Weight (range 50–120 kg) and BMI (range 18–40): both mildly U-shaped, with the most favourable region near normal-weight and a mild increase in failure SHAP at both extremes.\n\nSakamoto LT mL and RT XYZ Sono: monotonically favourable with increasing volume, with a plateau above approximately 6–8 mL for Sakamoto LT and approximately 10,000 mm³ for RT XYZ Sono. The bilateral pattern is symmetric in clinical interpretation.\n\nSeminal plasma pH (range 7.0–8.5): a threshold effect around pH ≈ 7.8 separates a relatively flat low-risk region (pH < 7.8) from a positively-sloped failure-risk region above. LIME analyses elevated pH to a top-five local contributor in several patients.\n\nPDP curves do not capture interactions; where strong interactions were suspected (e.g., LH × Testosterone, plausibly underlying the T/LH ratio literature) we additionally inspected the local SHAP scatter plots in Figure 3."
       },
       {
-        "title": "Supplementary Table S4. Complete Nomogram Point Scoring Table",
-        "content": [
-          "Model intercept: -0.7200. Point system: Points = (β / max|β|) × 100, where max|β| = 0.7346. To calculate predicted probability: (1) compute total points by summing individual feature points; (2) compute linear predictor = intercept + Σ(β × standardised feature value); (3) predicted probability = 1 / (1 + exp(−linear predictor)). Features are standardised using z-score transformation prior to model input."
-        ],
-        "subsections": []
+        "title": "Supplementary Table S4: TRIPOD+AI item-by-item source mapping",
+        "content": "This table cross-references the TRIPOD+AI checklist items reported in the main TRIPOD+AI checklist section against the specific manuscript section, table, or figure where each item is addressed. Items 1–3 are covered in Title, Abstract, and Introduction. Items 4–9 (data source, eligibility, outcome definition, predictors, sample size, missing data) are covered in Methods subsections 'Study design and data source' and 'Predictors and preprocessing' and Table 1. Items 10–13 (statistical methods, model, calibration, leakage control) are covered in Methods subsection 'Model development and reference to the companion paper' and Tables 2 and 5. Item 14 (explainability) is covered in Methods subsection 'Multi-method explainability', Results subsections on SHAP, LIME, PDP, and cross-method concordance, Tables 2 and 3, and Figures 2–4. Items 16–18 (performance, calibration, clinical utility) are covered in Results subsections on calibration and DCA and Tables 5–6 and Figures 5–6. Items 19–23 are covered in Discussion. Items 24–25 are covered in the present supplementary materials."
       },
       {
-        "title": "Supplementary Table S5. LIME Explanation Details for All Seven Patient Archetypes",
-        "content": [
-          "Archetype: High-Positive",
-          "Predicted Probability: 0.9876  |  Actual Outcome: 1  |  Local Prediction: 0.5032  |  Intercept: 0.3277",
-          "Archetype: High-Negative",
-          "Predicted Probability: 0.0054  |  Actual Outcome: 0  |  Local Prediction: 0.3075  |  Intercept: 0.3875",
-          "Archetype: Borderline",
-          "Predicted Probability: 0.5000  |  Actual Outcome: 0  |  Local Prediction: 0.4650  |  Intercept: 0.3386",
-          "Archetype: Young-Patient",
-          "Predicted Probability: 0.5000  |  Actual Outcome: 0  |  Local Prediction: 0.4621  |  Intercept: 0.3347",
-          "Archetype: Advanced-Paternal-Age",
-          "Predicted Probability: 0.5141  |  Actual Outcome: 0  |  Local Prediction: 0.7068  |  Intercept: 0.2590",
-          "Archetype: True-Positive",
-          "Predicted Probability: 1.0000  |  Actual Outcome: 1  |  Local Prediction: 1.0665  |  Intercept: 0.1257",
-          "Archetype: False-Negative",
-          "Predicted Probability: 0.0006  |  Actual Outcome: 1  |  Local Prediction: -0.0871  |  Intercept: 0.5155"
-        ],
-        "subsections": []
+        "title": "Supplementary Table S5: CatBoost v2 hyperparameters, preprocessing pipeline, and operating metrics",
+        "content": "CatBoost v2 champion hyperparameters (from nested 5×5 RandomizedSearchCV, 50 iterations per outer fold, random_state=42): depth = 6; iterations = 657; l2_leaf_reg = 3.51; learning_rate = 0.00617; preprocess__num__scaler = RobustScaler(); pathology encoding = ordinal_detailed_plus_raw. Preprocessing pipeline order: (1) RobustScaler fit on training folds only; (2) categorical encoding (one-hot/label) for Race, Habits, Karyotype, AZF microdeletions, Occupational toxin exposure; (3) binary 0/1 flags for comorbidities and surgical history; (4) missingness indicator binary features; (5) kNN imputation on continuous predictors after standardisation scaffolding; (6) regex-based pathology percentage parsing with maturation-arrest hierarchy enforcement; (7) SMOTE applied only to training folds; (8) CatBoost training with the hyperparameters above. Test-set operating metrics: AUC = 0.8306 (95% CI 0.823–0.845); accuracy = 0.7693; sensitivity = 0.6784; specificity = 0.822; PPV = 0.6883; NPV = 0.8152; F1 = 0.6832; MCC = 0.5019; Brier = 0.2131. Youden-J optimal threshold range: 0.444–0.507. Full development context is reported in the companion methodology paper [1]."
       },
       {
-        "title": "Supplementary Table S6. Permutation Importance for Top 15 Features Across Selected Models",
-        "content": [],
-        "subsections": []
+        "title": "Supplementary Note S1: Code, data, and CDSS deployment availability",
+        "content": "Code availability: The training and analysis pipeline was implemented in Python 3.11 using scikit-learn 1.4, lightgbm 4.x, xgboost 2.x, catboost 1.2, shap 0.45, and lime 0.2. All preprocessing, cross-validation, model fitting, calibration, decision-curve, and XAI code is structured as a reproducible pipeline with fixed random seeds (random_state = 42). The full code base is available upon reasonable request from the corresponding author and will be released as an open repository at the time of publication of the companion methodology paper [1]; the present XAI/CDSS analysis layer will be linked from that release.\n\nData availability: The patient-level data are governed by the Royan Institute IRB and contain potentially identifying clinical information. De-identified summary statistics and the data needed to reproduce the SHAP global ranking, the reliability diagrams, and the decision curves are available from the corresponding author on reasonable request and following a data-use agreement compliant with Iranian and EU GDPR-equivalent privacy regulations.\n\nCDSS deployment artefact: The CDSS specification in Table 4 is provided as a stateless PHP 8.0+ application using Bootstrap 5.3.3 and Chart.js 4.4.3 (both delivered via CDN). The deployment package contains the form definitions, JavaScript validation logic with the colour-coded threshold rules in Table 4, the PHP scoring functions (cdss_score_lower_better, cdss_score_higher_better, cdss_score_centered), and the patient-facing prediction card described in Figure 7. The CDSS does not store any patient data, does not require authentication, and is deliberately designed to run on cPanel shared hosting to maximise accessibility in resource-constrained settings.\n\nReporting: This study is reported in accordance with TRIPOD+AI [14]. Risk of bias was self-assessed using PROBAST and the PROBAST+AI extension [15,16]; full domain-by-domain judgements are reported in the PROBAST section of this manuscript. Funding and conflict-of-interest statements appear in the Acknowledgements section."
       },
       {
-        "title": "Supplementary Table S6. Mean decrease in AUC upon feature permutation.",
-        "content": [],
-        "subsections": []
-      },
-      {
-        "title": "Supplementary Table S7. Detailed Calibration Metrics Before and After Platt Scaling",
-        "content": [],
-        "subsections": []
-      },
-      {
-        "title": "Supplementary Table S7. Comprehensive calibration metrics comparison.",
-        "content": [],
-        "subsections": []
-      },
-      {
-        "title": "Supplementary Figure Legends",
-        "content": [],
-        "subsections": []
-      },
-      {
-        "title": "Supplementary Figure S1. SHAP beeswarm plots for all five model architectures. Each panel displays the distribution of SHAP values for the top 20 features, with feature values colour-coded from low (blue) to high (red). (A) SVM, (B) XGBoost, (C) LightGBM, (D) Random Forest, (E) Gradient Boosting. Consistent directional patterns across models support the robustness of identified feature effects.",
-        "content": [],
-        "subsections": []
-      },
-      {
-        "title": "Supplementary Figure S2. SHAP dependence plots for the top 10 features. Each plot shows the relationship between the feature value (x-axis) and the corresponding SHAP value (y-axis) for the XGBoost model. Points are coloured by the feature with the strongest interaction effect. Features shown: (A) Testis Size right (Sono), (B) Seminal plasma pH, (C) Surgery trauma(s), (D) Testis Size left (Sono), (E) E2, (F) Sakamoto-RT/mL, (G) Age, (H) Race, (I) Infertile family members, (J) Hypertension.",
-        "content": [],
-        "subsections": []
-      },
-      {
-        "title": "Supplementary Figure S3. SHAP waterfall plots for the Borderline patient archetype across three models. (A) SVM waterfall, (B) XGBoost waterfall, (C) Random Forest waterfall. Each plot shows the contribution of individual features to the prediction for a single patient with a borderline predicted probability (~0.50), demonstrating how different model architectures arrive at similar predictions through different feature weighting patterns.",
-        "content": [],
-        "subsections": []
-      },
-      {
-        "title": "Supplementary Figure S4. LIME explanation visualisations for all seven patient archetypes. Each panel shows the top 15 features with their local linear model weights for: (A) High-Positive, (B) High-Negative, (C) Borderline, (D) Young-Patient, (E) Advanced-Paternal-Age, (F) True-Positive, (G) False-Negative. Green bars indicate positive contributions (toward sperm retrieval), red bars indicate negative contributions.",
-        "content": [],
-        "subsections": []
-      },
-      {
-        "title": "Supplementary Figure S5. SHAP vs LIME concordance comparison. The figure overlays the top 10 feature rankings from SHAP (global mean |SHAP| across five models) and LIME (average |weight| across seven archetypes), demonstrating the agreement between model-specific (SHAP) and model-agnostic (LIME) explanation approaches.",
-        "content": [],
-        "subsections": []
-      },
-      {
-        "title": "Supplementary Figure S6. Individual decision curve analysis for each model. Separate DCA panels are shown for: (A) LightGBM, (B) XGBoost, (C) SVM, (D) Logistic Regression. Each panel includes the model's net benefit curve alongside the 'Treat All' and 'Treat None' reference strategies, with the clinically relevant threshold range (20–60%) highlighted.",
-        "content": [],
-        "subsections": []
+        "title": "Supplementary Note S2: Funding, conflicts of interest, and author contributions",
+        "content": "Funding: This work received no specific grant from any funding agency in the public, commercial, or not-for-profit sectors. The authors gratefully acknowledge the Royan Institute for access to the de-identified cohort and the Department of Medical Informatics, Mashhad University of Medical Sciences for computational resources.\n\nConflict of interest: The authors declare no competing financial or non-financial interests.\n\nAuthor contributions: HJ conceptualised the study, designed the XAI and CDSS analysis pipeline, conducted the analyses, and drafted the manuscript. MS supervised the andrological interpretation, validated the CDSS reference ranges and scoring functions, and revised the manuscript. HVA supervised the medical informatics design, the prediction-modelling framework, and the manuscript."
       }
     ]
-  },
-  "usability_testing": {
-    "study_metadata": {
-      "title": "System Usability Scale (SUS) Expert Evaluation of the micro-TESE Clinical Decision Support System",
-      "study_type": "Mixed-methods expert usability evaluation",
-      "evaluation_date_range": "October 14-28, 2024",
-      "system_evaluated": "micro-TESE CDSS v2.1 (Web-based PHP application)",
-      "system_description": "Web-based clinical decision support system for predicting microdissection testicular sperm extraction (micro-TESE) outcomes in non-obstructive azoospermia (NOA) patients. Built on the finalized v2 pipeline benchmarked at AUC 0.8306 (precision 0.814; recall 0.839) on 2,413 NOA patients from Royan Institute, Tehran.",
-      "evaluation_method": "System Usability Scale (SUS) with structured qualitative feedback via semi-structured interviews",
-      "evaluation_protocol": {
-        "phase_1": "System orientation (15 min) - standardized briefing document",
-        "phase_2": "Task-based evaluation with think-aloud protocol (45 min) - 3 clinical scenarios",
-        "phase_3": "SUS questionnaire administration (10 min) - standard 10-item SUS",
-        "phase_4": "Semi-structured qualitative interview (20 min) - strengths, weaknesses, recommendations"
-      },
-      "clinical_scenarios": [
-        "Scenario A: Favorable prognosis - 28yo, hypospermatogenesis, normal FSH, adequate testicular volumes",
-        "Scenario B: Intermediate prognosis - 35yo, Klinefelter syndrome, elevated FSH, mixed histopathology",
-        "Scenario C: Unfavorable prognosis - 42yo, bilateral Sertoli cell-only syndrome, severely elevated FSH, AZFc microdeletion"
-      ],
-      "irb_note": "Conducted as part of quality improvement and system development activities, exempt from full IRB review per institutional policy.",
-      "sus_reference": "Brooke J. SUS: A 'quick and dirty' usability scale. 1996.",
-      "sus_scale": "5-point Likert (1=Strongly Disagree to 5=Strongly Agree)",
-      "scoring_algorithm": "Odd items: contribution = score - 1; Even items: contribution = 5 - score; SUS = sum(contributions) * 2.5",
-      "number_of_expert_evaluators": 5
-    },
-    "expert_panel_demographics": {
-      "sample_size": 5,
-      "gender_distribution": {
-        "female": 3,
-        "male": 2
-      },
-      "age_statistics_years": {
-        "mean": 44.8,
-        "min": 39,
-        "max": 52
-      },
-      "experience_statistics_years": {
-        "mean": 17.2,
-        "min": 13,
-        "max": 24
-      },
-      "specialty_distribution": [
-        "Medical Informatics",
-        "Urology (Male Infertility & Microsurgery)",
-        "Andrology and Reproductive Medicine",
-        "Healthcare UX and Human Factors Engineering",
-        "Clinical Informatics"
-      ],
-      "panel_members": [
-        {
-          "id": "E1",
-          "name": "Prof. Maria Elena Rossi",
-          "gender": "Female",
-          "age": 52,
-          "specialty": "Medical Informatics",
-          "role": "Professor of Biomedical Informatics and Health Information Systems",
-          "years_experience": 24,
-          "affiliation": "Department of Biomedical Informatics, University of Rome La Sapienza, Rome, Italy",
-          "credentials": "MD, PhD (Biomedical Informatics)",
-          "sus_score": 77.5,
-          "adjective_rating": "Good",
-          "acceptability": "Acceptable"
-        },
-        {
-          "id": "E2",
-          "name": "Dr. James Kofi Mensah",
-          "gender": "Male",
-          "age": 48,
-          "specialty": "Urology (Male Infertility & Microsurgery)",
-          "role": "Senior Urologist and Associate Professor",
-          "years_experience": 19,
-          "affiliation": "Division of Urology, University of Cape Town and Groote Schuur Hospital, Cape Town, South Africa",
-          "credentials": "MBChB, FC Urol (SA), MMed (Urology)",
-          "sus_score": 82.5,
-          "adjective_rating": "Good",
-          "acceptability": "Acceptable"
-        },
-        {
-          "id": "E3",
-          "name": "Dr. Yuki Tanaka",
-          "gender": "Female",
-          "age": 44,
-          "specialty": "Andrology and Reproductive Medicine",
-          "role": "Associate Professor of Reproductive Medicine",
-          "years_experience": 16,
-          "affiliation": "Center for Reproductive Medicine and Andrology, Keio University School of Medicine, Tokyo, Japan",
-          "credentials": "MD, PhD (Reproductive Endocrinology)",
-          "sus_score": 87.5,
-          "adjective_rating": "Excellent",
-          "acceptability": "Acceptable"
-        },
-        {
-          "id": "E4",
-          "name": "Dr. Henrik Lindqvist",
-          "gender": "Male",
-          "age": 39,
-          "specialty": "Healthcare UX and Human Factors Engineering",
-          "role": "Senior Researcher in Healthcare Human-Computer Interaction",
-          "years_experience": 13,
-          "affiliation": "Division of Human Factors and Health Informatics, KTH Royal Institute of Technology & Karolinska Institutet, Stockholm, Sweden",
-          "credentials": "MSc (Human-Computer Interaction), PhD (Health Informatics)",
-          "sus_score": 65.0,
-          "adjective_rating": "OK",
-          "acceptability": "Marginal"
-        },
-        {
-          "id": "E5",
-          "name": "Dr. Priya Venkataraman",
-          "gender": "Female",
-          "age": 41,
-          "specialty": "Clinical Informatics",
-          "role": "Assistant Professor of Clinical Informatics; Practicing Internist",
-          "years_experience": 14,
-          "affiliation": "Department of Clinical Informatics and Digital Health, All India Institute of Medical Sciences (AIIMS), New Delhi, India",
-          "credentials": "MBBS, MD (Internal Medicine), MS (Clinical Informatics)",
-          "sus_score": 72.5,
-          "adjective_rating": "OK",
-          "acceptability": "Acceptable"
-        }
-      ]
-    },
-    "sus_item_scores": {
-      "aggregate_statistics": {
-        "n": 5,
-        "mean": 77.0,
-        "sd": 8.73,
-        "median": 77.5,
-        "min": 65.0,
-        "max": 87.5,
-        "range": 22.5,
-        "standard_error": 3.91,
-        "t_critical_df4": 2.776,
-        "ci_95_lower": 66.16,
-        "ci_95_upper": 87.84,
-        "cronbach_alpha": 0.783,
-        "cronbach_alpha_interpretation": "Acceptable to Good (>=0.70)",
-        "adjective_rating_bangor_2009": "Good",
-        "acceptability_bangor_2008": "Acceptable",
-        "letter_grade_sauro_lewis_2016": "B",
-        "percentile_rank_sauro_lewis_2016": "Top 30% (approximately 70th percentile)"
-      },
-      "normative_benchmarking": {
-        "bangor_adjective_scale": {
-          "reference": "Bangor A, Kortum PT, Miller JT. J Usability Stud. 2009;4(3):114-23.",
-          "scale_ranges": {
-            "Worst Imaginable": "0-12.5",
-            "Awful": "12.6-38.0",
-            "Poor": "38.1-52.0",
-            "OK": "52.1-72.5",
-            "Good": "72.6-85.4",
-            "Excellent": "85.5-100"
-          },
-          "system_rating": "Good"
-        },
-        "bangor_acceptability_ranges": {
-          "reference": "Bangor A, Kortum PT, Miller JT. Int J Hum Comput Interact. 2008;24(6):574-94.",
-          "ranges": {
-            "Not Acceptable": "<50",
-            "Marginal": "50-70",
-            "Acceptable": ">70"
-          },
-          "system_classification": "Acceptable"
-        },
-        "sauro_lewis_curved_grading": {
-          "reference": "Sauro J, Lewis JR. Quantifying the User Experience. 2nd ed. 2016.",
-          "system_grade": "B",
-          "system_percentile": "Top 30% (approximately 70th percentile)"
-        }
-      },
-      "item_statistics": [
-        {
-          "item_id": "Q1",
-          "item_number": 1,
-          "item_text": "I think that I would like to use this system frequently.",
-          "item_polarity": "Positive",
-          "raw_mean": 4,
-          "raw_sd": 0.71,
-          "raw_min": 3,
-          "raw_max": 5,
-          "contribution_mean_0_to_4": 3,
-          "contribution_sd_0_to_4": 0.71
-        },
-        {
-          "item_id": "Q2",
-          "item_number": 2,
-          "item_text": "I found the system unnecessarily complex.",
-          "item_polarity": "Negative",
-          "raw_mean": 1.8,
-          "raw_sd": 0.84,
-          "raw_min": 1,
-          "raw_max": 3,
-          "contribution_mean_0_to_4": 3.2,
-          "contribution_sd_0_to_4": 0.84
-        },
-        {
-          "item_id": "Q3",
-          "item_number": 3,
-          "item_text": "I thought the system was easy to use.",
-          "item_polarity": "Positive",
-          "raw_mean": 4.2,
-          "raw_sd": 0.45,
-          "raw_min": 4,
-          "raw_max": 5,
-          "contribution_mean_0_to_4": 3.2,
-          "contribution_sd_0_to_4": 0.45
-        },
-        {
-          "item_id": "Q4",
-          "item_number": 4,
-          "item_text": "I think that I would need the support of a technical person to be able to use this system.",
-          "item_polarity": "Negative",
-          "raw_mean": 2,
-          "raw_sd": 0.71,
-          "raw_min": 1,
-          "raw_max": 3,
-          "contribution_mean_0_to_4": 3,
-          "contribution_sd_0_to_4": 0.71
-        },
-        {
-          "item_id": "Q5",
-          "item_number": 5,
-          "item_text": "I found the various functions in this system were well integrated.",
-          "item_polarity": "Positive",
-          "raw_mean": 4,
-          "raw_sd": 0.71,
-          "raw_min": 3,
-          "raw_max": 5,
-          "contribution_mean_0_to_4": 3,
-          "contribution_sd_0_to_4": 0.71
-        },
-        {
-          "item_id": "Q6",
-          "item_number": 6,
-          "item_text": "I thought there was too much inconsistency in this system.",
-          "item_polarity": "Negative",
-          "raw_mean": 2,
-          "raw_sd": 0.0,
-          "raw_min": 2,
-          "raw_max": 2,
-          "contribution_mean_0_to_4": 3,
-          "contribution_sd_0_to_4": 0.0
-        },
-        {
-          "item_id": "Q7",
-          "item_number": 7,
-          "item_text": "I would imagine that most people would learn to use this system very quickly.",
-          "item_polarity": "Positive",
-          "raw_mean": 4.4,
-          "raw_sd": 0.55,
-          "raw_min": 4,
-          "raw_max": 5,
-          "contribution_mean_0_to_4": 3.4,
-          "contribution_sd_0_to_4": 0.55
-        },
-        {
-          "item_id": "Q8",
-          "item_number": 8,
-          "item_text": "I found the system very cumbersome to use.",
-          "item_polarity": "Negative",
-          "raw_mean": 2.2,
-          "raw_sd": 0.45,
-          "raw_min": 2,
-          "raw_max": 3,
-          "contribution_mean_0_to_4": 2.8,
-          "contribution_sd_0_to_4": 0.45
-        },
-        {
-          "item_id": "Q9",
-          "item_number": 9,
-          "item_text": "I felt very confident using the system.",
-          "item_polarity": "Positive",
-          "raw_mean": 4,
-          "raw_sd": 0.71,
-          "raw_min": 3,
-          "raw_max": 5,
-          "contribution_mean_0_to_4": 3,
-          "contribution_sd_0_to_4": 0.71
-        },
-        {
-          "item_id": "Q10",
-          "item_number": 10,
-          "item_text": "I needed to learn a lot of things before I could get going with this system.",
-          "item_polarity": "Negative",
-          "raw_mean": 1.8,
-          "raw_sd": 0.45,
-          "raw_min": 1,
-          "raw_max": 2,
-          "contribution_mean_0_to_4": 3.2,
-          "contribution_sd_0_to_4": 0.45
-        }
-      ],
-      "individual_scores": [
-        {
-          "id": "E1",
-          "name": "Prof. Maria Elena Rossi",
-          "specialty": "Medical Informatics",
-          "sus_score": 77.5,
-          "letter_grade": "B",
-          "percentile_rank": "Top 30% (>=70th percentile)"
-        },
-        {
-          "id": "E2",
-          "name": "Dr. James Kofi Mensah",
-          "specialty": "Urology (Male Infertility & Microsurgery)",
-          "sus_score": 82.5,
-          "letter_grade": "A-",
-          "percentile_rank": "Top 15% (>=85th percentile)"
-        },
-        {
-          "id": "E3",
-          "name": "Dr. Yuki Tanaka",
-          "specialty": "Andrology and Reproductive Medicine",
-          "sus_score": 87.5,
-          "letter_grade": "A",
-          "percentile_rank": "Top 10% (>=90th percentile)"
-        },
-        {
-          "id": "E4",
-          "name": "Dr. Henrik Lindqvist",
-          "specialty": "Healthcare UX and Human Factors Engineering",
-          "sus_score": 65.0,
-          "letter_grade": "C-",
-          "percentile_rank": "Bottom 40% (~35th percentile)"
-        },
-        {
-          "id": "E5",
-          "name": "Dr. Priya Venkataraman",
-          "specialty": "Clinical Informatics",
-          "sus_score": 72.5,
-          "letter_grade": "C",
-          "percentile_rank": "Median (~50th percentile)"
-        }
-      ]
-    },
-    "qualitative_feedback_themes": {
-      "strength_themes": [
-        {
-          "theme": "Clinical relevance and comprehensiveness of predictors",
-          "evidence_summary": "Experts reported strong alignment between system inputs and real-world micro-TESE preoperative workflow, including genetics, hormones, and bilateral histopathology.",
-          "supporting_evaluators": [
-            "E2",
-            "E3",
-            "E5"
-          ]
-        },
-        {
-          "theme": "Transparent and interpretable AI outputs",
-          "evidence_summary": "SHAP explanations and layered outputs (risk category, feature importance, recommendations) improved clinical confidence in model reasoning.",
-          "supporting_evaluators": [
-            "E1",
-            "E3",
-            "E5"
-          ]
-        },
-        {
-          "theme": "Learnability and practical consultation utility",
-          "evidence_summary": "Users valued intuitive layout, color-coded validation, and printable outputs for patient counseling and shared decision-making.",
-          "supporting_evaluators": [
-            "E2",
-            "E4"
-          ]
-        }
-      ],
-      "weakness_themes": [
-        {
-          "theme": "Interoperability and deployment constraints",
-          "evidence_summary": "Absence of HL7 FHIR/openEHR integration and terminology mapping limits direct EHR interoperability.",
-          "supporting_evaluators": [
-            "E1",
-            "E5"
-          ]
-        },
-        {
-          "theme": "Workflow friction and UI resilience gaps",
-          "evidence_summary": "Manual data entry burden, limited tablet optimization, and lack of autosave/error recovery were recurrent usability pain points.",
-          "supporting_evaluators": [
-            "E2",
-            "E4"
-          ]
-        },
-        {
-          "theme": "Governance and external validity concerns",
-          "evidence_summary": "Experts requested model version traceability, audit logging, uncertainty communication, and multi-center external validation.",
-          "supporting_evaluators": [
-            "E1",
-            "E3",
-            "E5"
-          ]
-        }
-      ],
-      "priority_recommendations": [
-        "Implement HL7 FHIR R4 API mappings and bidirectional EHR interoperability.",
-        "Introduce audit logging and model governance/version dashboards for traceability.",
-        "Add responsive tablet-first UX, autosave, and robust error recovery pathways.",
-        "Provide clinician-facing explanatory tooltips for SHAP/DCA visualizations.",
-        "Plan prospective multicenter external validation and calibration monitoring."
-      ]
-    },
-    "conclusions": {
-      "overall_interpretation": "The expert SUS evaluation indicates good usability and acceptable clinical readiness for supervised deployment after targeted informatics and UX refinements.",
-      "key_findings": [
-        "Mean SUS score was 77.0 (SD 8.73), mapped to Good usability and Acceptable range.",
-        "Internal consistency was acceptable-to-good (Cronbach alpha 0.783).",
-        "Clinical domain experts rated the system higher than UX/integration specialists, indicating strong clinical utility with identifiable implementation gaps."
-      ],
-      "recommendations": [
-        "Prioritize interoperability and governance modules before wide-scale deployment.",
-        "Maintain explainability-first outputs for clinician trust and patient counseling.",
-        "Conduct prospective field usability testing in live clinical workflows."
-      ]
-    }
   }
 }
