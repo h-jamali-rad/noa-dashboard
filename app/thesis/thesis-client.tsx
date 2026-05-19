@@ -2,6 +2,8 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import {
   BookOpen,
   ChevronDown,
@@ -47,43 +49,119 @@ const CHAPTERS: ChapterInfo[] = [
 
 /* ──────────────────── Helpers ──────────────────── */
 
-/** Parse plain text into paragraphs, detecting headings by numbering patterns */
-function parseChapterContent(text: string) {
-  const lines = text.split('\n')
-  const elements: { type: 'h1' | 'h2' | 'h3' | 'h4' | 'p'; text: string; id?: string }[] = []
-
-  for (const raw of lines) {
-    const line = raw.trim()
-    if (!line) continue
-
-    // Chapter title line  e.g. "Chapter 1: Introduction"
-    if (/^Chapter\s+\d+[:\s]/i.test(line)) {
-      const id = line.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '')
-      elements.push({ type: 'h1', text: line, id })
-      continue
-    }
-
-    // Section  e.g. "1.1 Problem Statement"
-    if (/^\d+\.\d+\.\d+\.\d+\s/.test(line)) {
-      const id = line.match(/^[\d.]+/)?.[0]?.replace(/\./g, '-') ?? ''
-      elements.push({ type: 'h4', text: line, id: `sec-${id}` })
-    } else if (/^\d+\.\d+\.\d+\s/.test(line)) {
-      const id = line.match(/^[\d.]+/)?.[0]?.replace(/\./g, '-') ?? ''
-      elements.push({ type: 'h3', text: line, id: `sec-${id}` })
-    } else if (/^\d+\.\d+\s/.test(line)) {
-      const id = line.match(/^[\d.]+/)?.[0]?.replace(/\./g, '-') ?? ''
-      elements.push({ type: 'h2', text: line, id: `sec-${id}` })
-    } else {
-      // Regular paragraph
-      elements.push({ type: 'p', text: line })
-    }
-  }
-
-  return elements
-}
-
 function wordCount(text: string): number {
   return text.split(/\s+/).filter(Boolean).length
+}
+
+function countSections(text: string): number {
+  return text.split('\n').filter(l => /^#{1,4}\s/.test(l.trim()) || /^\d+\.\d+/.test(l.trim())).length
+}
+
+/* ──────────────────── Markdown renderer ──────────────────── */
+
+function MarkdownContent({ content }: { content: string }) {
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        h1: ({ children }) => (
+          <h2 className="font-display font-bold text-xl mt-8 mb-3 pb-2 border-b border-border scroll-mt-24">
+            {children}
+          </h2>
+        ),
+        h2: ({ children }) => (
+          <h3 className="font-display font-semibold text-lg mt-7 mb-2 text-foreground/90 scroll-mt-24">
+            {children}
+          </h3>
+        ),
+        h3: ({ children }) => (
+          <h4 className="font-display font-semibold text-base mt-5 mb-2 text-foreground/85 scroll-mt-24">
+            {children}
+          </h4>
+        ),
+        h4: ({ children }) => (
+          <h5 className="font-medium text-sm mt-4 mb-1.5 text-foreground/80 scroll-mt-24">
+            {children}
+          </h5>
+        ),
+        p: ({ children }) => (
+          <p className="text-foreground/80 leading-relaxed mb-3">
+            {children}
+          </p>
+        ),
+        strong: ({ children }) => (
+          <strong className="font-semibold text-foreground">{children}</strong>
+        ),
+        em: ({ children }) => (
+          <em className="italic text-foreground/75">{children}</em>
+        ),
+        ul: ({ children }) => (
+          <ul className="list-disc list-outside ml-5 space-y-1.5 mb-3 text-foreground/80">
+            {children}
+          </ul>
+        ),
+        ol: ({ children }) => (
+          <ol className="list-decimal list-outside ml-5 space-y-1.5 mb-3 text-foreground/80">
+            {children}
+          </ol>
+        ),
+        li: ({ children }) => (
+          <li className="leading-relaxed">{children}</li>
+        ),
+        table: ({ children }) => (
+          <div className="my-4 overflow-x-auto rounded-lg border border-border">
+            <table className="w-full text-xs border-collapse">
+              {children}
+            </table>
+          </div>
+        ),
+        thead: ({ children }) => (
+          <thead className="bg-muted/60 text-foreground font-semibold">
+            {children}
+          </thead>
+        ),
+        tbody: ({ children }) => (
+          <tbody className="divide-y divide-border">{children}</tbody>
+        ),
+        tr: ({ children }) => (
+          <tr className="hover:bg-muted/30 transition-colors">{children}</tr>
+        ),
+        th: ({ children }) => (
+          <th className="px-3 py-2 text-left text-xs font-semibold border-b border-border whitespace-nowrap">
+            {children}
+          </th>
+        ),
+        td: ({ children }) => (
+          <td className="px-3 py-2 text-xs text-foreground/80">
+            {children}
+          </td>
+        ),
+        blockquote: ({ children }) => (
+          <blockquote className="border-l-4 border-primary/40 pl-4 my-3 text-foreground/70 italic">
+            {children}
+          </blockquote>
+        ),
+        code: ({ children, className }) => {
+          const isInline = !className
+          if (isInline) {
+            return (
+              <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono text-foreground/90">
+                {children}
+              </code>
+            )
+          }
+          return (
+            <code className="block bg-muted p-3 rounded-lg text-xs font-mono overflow-x-auto my-3">
+              {children}
+            </code>
+          )
+        },
+        hr: () => <hr className="my-6 border-border" />,
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  )
 }
 
 /* ──────────────────── Components ──────────────────── */
@@ -144,8 +222,8 @@ function TOCSidebar({
 function ChapterSection({ chapter, data }: { chapter: ChapterInfo; data: ThesisData }) {
   const [expanded, setExpanded] = useState(false)
   const content = data[chapter.key] as string
-  const elements = parseChapterContent(content)
   const wc = wordCount(content)
+  const sections = countSections(content)
 
   return (
     <section id={`chapter-${chapter.num}`} className="scroll-mt-24">
@@ -159,7 +237,7 @@ function ChapterSection({ chapter, data }: { chapter: ChapterInfo; data: ThesisD
             Chapter {chapter.num}: {chapter.title}
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {wc.toLocaleString()} words • {elements.filter((e) => e.type !== 'p').length} sections
+            {wc.toLocaleString()} words • {sections} sections
           </p>
         </div>
         {expanded ? (
@@ -178,54 +256,8 @@ function ChapterSection({ chapter, data }: { chapter: ChapterInfo; data: ThesisD
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="rounded-b-lg border border-t-0 bg-card/50 px-6 py-6 sm:px-8 space-y-4 text-sm leading-relaxed">
-              {elements.map((el, i) => {
-                if (el.type === 'h1')
-                  return (
-                    <h2
-                      key={i}
-                      id={el.id}
-                      className="font-display font-bold text-xl mt-6 mb-2 scroll-mt-24"
-                    >
-                      {el.text}
-                    </h2>
-                  )
-                if (el.type === 'h2')
-                  return (
-                    <h3
-                      key={i}
-                      id={el.id}
-                      className="font-display font-semibold text-base mt-5 mb-1.5 text-foreground/90 scroll-mt-24"
-                    >
-                      {el.text}
-                    </h3>
-                  )
-                if (el.type === 'h3')
-                  return (
-                    <h4
-                      key={i}
-                      id={el.id}
-                      className="font-display font-medium text-sm mt-4 mb-1 text-foreground/80 scroll-mt-24"
-                    >
-                      {el.text}
-                    </h4>
-                  )
-                if (el.type === 'h4')
-                  return (
-                    <h5
-                      key={i}
-                      id={el.id}
-                      className="font-medium text-sm mt-3 mb-1 text-foreground/70 scroll-mt-24"
-                    >
-                      {el.text}
-                    </h5>
-                  )
-                return (
-                  <p key={i} className="text-foreground/80">
-                    {el.text}
-                  </p>
-                )
-              })}
+            <div className="rounded-b-lg border border-t-0 bg-card/50 px-6 py-6 sm:px-8 text-sm leading-relaxed prose-container">
+              <MarkdownContent content={content} />
             </div>
           </motion.div>
         )}
@@ -327,8 +359,8 @@ export default function ThesisClient({ data }: { data: ThesisData }) {
                 <Globe className="h-4 w-4 text-primary" />
                 <h2 className="font-display font-semibold text-lg">Abstract (English)</h2>
               </div>
-              <div className="text-sm leading-relaxed text-foreground/80 whitespace-pre-line">
-                {data.english_abstract}
+              <div className="text-sm leading-relaxed text-foreground/80">
+                <MarkdownContent content={data.english_abstract} />
               </div>
             </div>
           </section>
@@ -341,11 +373,11 @@ export default function ThesisClient({ data }: { data: ThesisData }) {
                 <h2 className="font-display font-semibold text-lg">Abstract (Persian)</h2>
               </div>
               <div
-                className="text-sm leading-loose text-foreground/80 whitespace-pre-line"
+                className="text-sm leading-loose text-foreground/80"
                 dir="rtl"
                 lang="fa"
               >
-                {data.persian_abstract}
+                <MarkdownContent content={data.persian_abstract} />
               </div>
             </div>
           </section>
@@ -355,24 +387,18 @@ export default function ThesisClient({ data }: { data: ThesisData }) {
             <div className="rounded-lg border bg-card px-6 py-5 space-y-3">
               <h2 className="font-display font-semibold text-lg">List of Abbreviations</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs">
-                {data.abbreviations.map((abbr, i) => {
-                  const label =
-                    typeof abbr === 'string'
-                      ? abbr
-                      : `${abbr.abbreviation} — ${abbr.full_form}`
-                  return (
-                    <div key={i} className="px-2 py-1 rounded hover:bg-accent/50 transition-colors">
-                      {typeof abbr === 'string' ? (
-                        abbr
-                      ) : (
-                        <>
-                          <span className="font-semibold">{abbr.abbreviation}</span>
-                          <span className="text-muted-foreground"> — {abbr.full_form}</span>
-                        </>
-                      )}
-                    </div>
-                  )
-                })}
+                {data.abbreviations.map((abbr, i) => (
+                  <div key={i} className="px-2 py-1 rounded hover:bg-accent/50 transition-colors">
+                    {typeof abbr === 'string' ? (
+                      abbr
+                    ) : (
+                      <>
+                        <span className="font-semibold">{abbr.abbreviation}</span>
+                        <span className="text-muted-foreground"> — {abbr.full_form}</span>
+                      </>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </section>
