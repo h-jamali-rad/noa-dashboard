@@ -268,3 +268,26 @@
   50% { box-shadow: 0 0 20px 6px rgba(139, 92, 246, 0.5); }
 }
 .animate-pulse-slow { animation: pulseSlow 3s ease-in-out infinite; }
+
+
+
+/* ─── Thesis academic prose styling ──────────────────────────── */
+.thesis-prose {
+  font-family: 'Georgia', 'Iowan Old Style', 'Palatino Linotype', 'Cambria',
+    'Source Serif Pro', 'Charter', serif;
+  color: hsl(var(--foreground));
+}
+.thesis-prose p { text-indent: 0; }
+.thesis-prose p + p { margin-top: 0; }
+.thesis-prose h2,
+.thesis-prose h3,
+.thesis-prose h4,
+.thesis-prose h5,
+.thesis-prose h6 {
+  font-family: 'Inter', 'Helvetica Neue', system-ui, sans-serif;
+  font-feature-settings: 'ss01', 'cv11';
+}
+.thesis-prose table { font-family: 'Inter', system-ui, sans-serif; }
+.thesis-prose strong { color: hsl(var(--foreground)); }
+.thesis-prose a { color: hsl(var(--primary)); text-decoration: underline; text-underline-offset: 2px; }
+.thesis-prose a:hover { color: hsl(var(--primary) / 0.8); }
