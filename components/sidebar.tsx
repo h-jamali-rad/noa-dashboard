@@ -27,6 +27,8 @@ import {
   Network,
   Mic,
   ClipboardCheck,
+  Trophy,
+  FileText,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -56,6 +58,8 @@ const PHASE_NAV: NavItem[] = [
 ]
 
 const EXTRA_NAV: NavItem[] = [
+  { href: '/model-showcase', label: 'Model Showcase', icon: Trophy, description: '16 ML architectures compared — CatBoost champion' },
+  { href: '/thesis', label: 'Thesis', icon: FileText, description: 'Full 5-chapter PhD dissertation with PDF export' },
   { href: '/architecture', label: 'AI Agent Architecture', icon: Network, description: 'Interactive multi-agent DAG system' },
   { href: '/virtual-defense', label: 'Virtual Defense', icon: Presentation, description: '4 expert panels with votes and critiques' },
   { href: '/post-defense-actions', label: 'Post-Defense Actions', icon: ClipboardList, description: 'Corrective actions log' },
