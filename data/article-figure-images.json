@@ -1,0 +1,58 @@
+{
+  "article-a": [
+    {
+      "figureIndex": 0,
+      "imagePath": "/images/prisma_paper_a.png"
+    },
+    {
+      "figureIndex": 1,
+      "imagePath": "/images/training/roc_curves_top_models_comparison.png"
+    },
+    {
+      "figureIndex": 2,
+      "imagePath": "/images/validation/calibration_plots.png"
+    },
+    {
+      "figureIndex": 3,
+      "imagePath": "/images/xai/decision_curve_analysis.png"
+    },
+    {
+      "figureIndex": 4,
+      "imagePath": "/images/xai/shap_comparison_top5.png"
+    },
+    {
+      "figureIndex": 5,
+      "imagePath": "/images/validation/bootstrap_ci_comparison.png"
+    }
+  ],
+  "article-b": [
+    {
+      "figureIndex": 0,
+      "imagePath": "/images/prisma_paper_b.png"
+    },
+    {
+      "figureIndex": 1,
+      "imagePath": "/images/xai/shap_beeswarm_XGBoost.png"
+    },
+    {
+      "figureIndex": 2,
+      "imagePath": "/images/xai/shap_dependence_Age.png"
+    },
+    {
+      "figureIndex": 3,
+      "imagePath": "/images/xai/shap_vs_lime_comparison.png"
+    },
+    {
+      "figureIndex": 4,
+      "imagePath": "/images/xai/calibration_CatBoost_adjusted.png"
+    },
+    {
+      "figureIndex": 5,
+      "imagePath": "/images/xai/decision_curve_analysis.png"
+    },
+    {
+      "figureIndex": 6,
+      "imagePath": "/images/xai/clinical_rules_summary.png"
+    }
+  ]
+}

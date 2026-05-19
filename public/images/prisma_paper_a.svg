@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1016" width="900" height="1016" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1B2631"/>
+    </marker>
+    <marker id="arrow_dashed" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5D6D7E"/>
+    </marker>
+  </defs>
+  <text x="450.0" y="40.0" text-anchor="middle" font-size="20" font-weight="bold" fill="#0B3D91">Paper A — PRISMA-Style Study Flow (Micro-TESE ML Framework)</text>
+  <text x="450.0" y="74" text-anchor="middle" font-size="12" fill="#566573">Royan Institute NOA cohort (2007–2022)</text>
+  <rect x="54.0" y="88.0" width="16.0" height="16.0" rx="3" ry="3" fill="#D6EAF8" stroke="#1B2631" stroke-width="1.2"/>
+  <text x="78.0" y="101.0" font-size="12" fill="#1B2631">Data / cohort</text>
+  <rect x="185.8" y="88.0" width="16.0" height="16.0" rx="3" ry="3" fill="#D5F5E3" stroke="#1B2631" stroke-width="1.2"/>
+  <text x="209.8" y="101.0" font-size="12" fill="#1B2631">Modelling</text>
+  <rect x="291.2" y="88.0" width="16.0" height="16.0" rx="3" ry="3" fill="#FCF3CF" stroke="#1B2631" stroke-width="1.2"/>
+  <text x="315.2" y="101.0" font-size="12" fill="#1B2631">Annotation</text>
+  <rect x="230.0" y="120.0" width="440.0" height="89.0" rx="10" ry="10" fill="#D6EAF8" stroke="#1B2631" stroke-width="1.8"/>
+  <text x="450.0" y="149.0" text-anchor="middle" font-size="16" font-weight="bold" fill="#1B2631">
+    <tspan x="450.0" dy="0">Identification</tspan>
+  </text>
+  <text x="450.0" y="172.0" text-anchor="middle" font-size="14" font-weight="normal" fill="#1B2631">
+    <tspan x="450.0" dy="0">Royan Institute NOA cohort: n = 2,450 consecutive</tspan>
+    <tspan x="450.0" dy="17">patients screened (2007–2022)</tspan>
+  </text>
+  <line x1="450.0" y1="213.0" x2="450.0" y2="263.0" stroke="#1B2631" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <rect x="694.0" y="205.0" width="182.0" height="140.0" rx="10" ry="10" fill="#FCF3CF" stroke="#7D6608" stroke-width="1.8"/>
+  <text x="785.0" y="234.0" text-anchor="middle" font-size="16" font-weight="bold" fill="#1B2631">
+    <tspan x="785.0" dy="0">Exclusion</tspan>
+  </text>
+  <text x="785.0" y="257.0" text-anchor="middle" font-size="14" font-weight="normal" fill="#1B2631">
+    <tspan x="785.0" dy="0">Excluded: 37</tspan>
+    <tspan x="785.0" dy="17">records lacking the</tspan>
+    <tspan x="785.0" dy="17">primary outcome</tspan>
+    <tspan x="785.0" dy="17">(Outcome1 — sperm</tspan>
+    <tspan x="785.0" dy="17">retrieval status)</tspan>
+  </text>
+  <line x1="450.0" y1="237.0" x2="690.0" y2="237.0" stroke="#5D6D7E" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <rect x="230.0" y="265.0" width="440.0" height="72.0" rx="10" ry="10" fill="#D6EAF8" stroke="#1B2631" stroke-width="1.8"/>
+  <text x="450.0" y="294.0" text-anchor="middle" font-size="16" font-weight="bold" fill="#1B2631">
+    <tspan x="450.0" dy="0">Analytical sample</tspan>
+  </text>
+  <text x="450.0" y="317.0" text-anchor="middle" font-size="14" font-weight="normal" fill="#1B2631">
+    <tspan x="450.0" dy="0">Analytical cohort: n = 2,413 patients</tspan>
+  </text>
+  <line x1="450.0" y1="341.0" x2="450.0" y2="377.0" stroke="#1B2631" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <rect x="230.0" y="379.0" width="208.0" height="89.0" rx="10" ry="10" fill="#D6EAF8" stroke="#1B2631" stroke-width="1.8"/>
+  <text x="334.0" y="408.0" text-anchor="middle" font-size="16" font-weight="bold" fill="#1B2631">
+    <tspan x="334.0" dy="0">Outcome stratum</tspan>
+  </text>
+  <text x="334.0" y="431.0" text-anchor="middle" font-size="14" font-weight="normal" fill="#1B2631">
+    <tspan x="334.0" dy="0">886 successful</tspan>
+    <tspan x="334.0" dy="17">retrievals (36.7%)</tspan>
+  </text>
+  <rect x="462.0" y="379.0" width="208.0" height="106.0" rx="10" ry="10" fill="#D6EAF8" stroke="#1B2631" stroke-width="1.8"/>
+  <text x="566.0" y="408.0" text-anchor="middle" font-size="16" font-weight="bold" fill="#1B2631">
+    <tspan x="566.0" dy="0">Outcome stratum</tspan>
+  </text>
+  <text x="566.0" y="431.0" text-anchor="middle" font-size="14" font-weight="normal" fill="#1B2631">
+    <tspan x="566.0" dy="0">1,527 failures (63.3%);</tspan>
+    <tspan x="566.0" dy="17">class-imbalance ratio ≈</tspan>
+    <tspan x="566.0" dy="17">1.72 : 1</tspan>
+  </text>
+  <line x1="438.0" y1="432.0" x2="462.0" y2="432.0" stroke="#5D6D7E" stroke-width="1.2" stroke-dasharray="3,3"/>
+  <path d="M 334.0,487.0 L 334.0,515.0 L 450.0,515.0 L 450.0,533.0" fill="none" stroke="#1B2631" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <path d="M 566.0,487.0 L 566.0,515.0 L 450.0,515.0 L 450.0,533.0" fill="none" stroke="#1B2631" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <rect x="230.0" y="535.0" width="208.0" height="89.0" rx="10" ry="10" fill="#D6EAF8" stroke="#1B2631" stroke-width="1.8"/>
+  <text x="334.0" y="564.0" text-anchor="middle" font-size="16" font-weight="bold" fill="#1B2631">
+    <tspan x="334.0" dy="0">Attempt type</tspan>
+  </text>
+  <text x="334.0" y="587.0" text-anchor="middle" font-size="14" font-weight="normal" fill="#1B2631">
+    <tspan x="334.0" dy="0">2,234 primary</tspan>
+    <tspan x="334.0" dy="17">micro-TESE (91.2%)</tspan>
+  </text>
+  <rect x="462.0" y="535.0" width="208.0" height="89.0" rx="10" ry="10" fill="#D6EAF8" stroke="#1B2631" stroke-width="1.8"/>
+  <text x="566.0" y="564.0" text-anchor="middle" font-size="16" font-weight="bold" fill="#1B2631">
+    <tspan x="566.0" dy="0">Attempt type</tspan>
+  </text>
+  <text x="566.0" y="587.0" text-anchor="middle" font-size="14" font-weight="normal" fill="#1B2631">
+    <tspan x="566.0" dy="0">216 salvage attempts</tspan>
+    <tspan x="566.0" dy="17">(8.8%)</tspan>
+  </text>
+  <path d="M 334.0,626.0 L 334.0,654.0 L 450.0,654.0 L 450.0,672.0" fill="none" stroke="#1B2631" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <path d="M 566.0,626.0 L 566.0,654.0 L 450.0,654.0 L 450.0,672.0" fill="none" stroke="#1B2631" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <rect x="230.0" y="674.0" width="208.0" height="106.0" rx="10" ry="10" fill="#D6EAF8" stroke="#1B2631" stroke-width="1.8"/>
+  <text x="334.0" y="703.0" text-anchor="middle" font-size="16" font-weight="bold" fill="#1B2631">
+    <tspan x="334.0" dy="0">Stratified 80 / 20</tspan>
+    <tspan x="334.0" dy="17">split</tspan>
+  </text>
+  <text x="334.0" y="743.0" text-anchor="middle" font-size="14" font-weight="normal" fill="#1B2631">
+    <tspan x="334.0" dy="0">Training n = 1,930;</tspan>
+    <tspan x="334.0" dy="17">Test n = 483</tspan>
+  </text>
+  <rect x="462.0" y="674.0" width="208.0" height="123.0" rx="10" ry="10" fill="#D6EAF8" stroke="#1B2631" stroke-width="1.8"/>
+  <text x="566.0" y="703.0" text-anchor="middle" font-size="16" font-weight="bold" fill="#1B2631">
+    <tspan x="566.0" dy="0">Alternative ~70 /</tspan>
+    <tspan x="566.0" dy="17">30 split</tspan>
+  </text>
+  <text x="566.0" y="743.0" text-anchor="middle" font-size="14" font-weight="normal" fill="#1B2631">
+    <tspan x="566.0" dy="0">Training 1,689 / Test</tspan>
+    <tspan x="566.0" dy="17">724 for calibration</tspan>
+    <tspan x="566.0" dy="17">analyses</tspan>
+  </text>
+  <rect x="694.0" y="674.0" width="182.0" height="157.0" rx="10" ry="10" fill="#FCF3CF" stroke="#7D6608" stroke-width="1.8"/>
+  <text x="785.0" y="703.0" text-anchor="middle" font-size="16" font-weight="bold" fill="#1B2631">
+    <tspan x="785.0" dy="0">Variable</tspan>
+    <tspan x="785.0" dy="17">handling</tspan>
+  </text>
+  <text x="785.0" y="743.0" text-anchor="middle" font-size="14" font-weight="normal" fill="#1B2631">
+    <tspan x="785.0" dy="0">9 variables removed</tspan>
+    <tspan x="785.0" dy="17">for 100 %</tspan>
+    <tspan x="785.0" dy="17">missingness;</tspan>
+    <tspan x="785.0" dy="17">Partner Age</tspan>
+    <tspan x="785.0" dy="17">excluded a priori</tspan>
+  </text>
+  <line x1="670.0" y1="735.5" x2="690.0" y2="735.5" stroke="#5D6D7E" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <path d="M 334.0,833.0 L 334.0,863.0 L 450.0,863.0 L 450.0,889.0" fill="none" stroke="#1B2631" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <path d="M 566.0,833.0 L 566.0,863.0 L 450.0,863.0 L 450.0,889.0" fill="none" stroke="#1B2631" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <rect x="230.0" y="891.0" width="440.0" height="89.0" rx="10" ry="10" fill="#D5F5E3" stroke="#1B2631" stroke-width="1.8"/>
+  <text x="450.0" y="920.0" text-anchor="middle" font-size="16" font-weight="bold" fill="#1B2631">
+    <tspan x="450.0" dy="0">Modelling &amp; model selection</tspan>
+  </text>
+  <text x="450.0" y="943.0" text-anchor="middle" font-size="14" font-weight="normal" fill="#1B2631">
+    <tspan x="450.0" dy="0">16-model nested cross-validation benchmark → CatBoost</tspan>
+    <tspan x="450.0" dy="17">v2 selected as champion (AUC = 0.8306)</tspan>
+  </text>
+</svg>

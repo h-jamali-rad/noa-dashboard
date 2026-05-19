@@ -6,6 +6,9 @@ import { Download, FileJson, Mail, MessageSquarePlus, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { sendCommentNotification } from './email-notify'
 import AIAssistWrapper from '@/components/ai-assist-wrapper'
+import ImageLightbox, { type LightboxImage } from '@/components/image-lightbox'
+import Image from 'next/image'
+import figureImagesMap from '@/data/article-figure-images.json'
 
 type Primitive = string | number | null | undefined
 
@@ -252,6 +255,21 @@ export default function ArticlePreviewClient({
   const [draft, setDraft] = useState<CommentDraft | null>(null)
   const [authorName, setAuthorName] = useState('')
   const [commentText, setCommentText] = useState('')
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+
+  /* Build lightbox-compatible images array for this article's figures */
+  const figureImageEntries = (figureImagesMap as Record<string, { figureIndex: number; imagePath: string }[]>)[articleId] ?? []
+  const lightboxImages: LightboxImage[] = useMemo(() => {
+    if (!articleData.figures) return []
+    return articleData.figures.map((fig, idx) => {
+      const entry = figureImageEntries.find(e => e.figureIndex === idx)
+      return {
+        publicPath: entry?.imagePath ?? '',
+        altText: fig.figure_name || `Figure ${idx + 1}`,
+        caption: fig.caption ?? fig.description ?? '',
+      }
+    }).filter(img => img.publicPath !== '')
+  }, [articleData.figures, figureImageEntries])
 
   const commentsByParagraph = useMemo(() => {
     const map = new Map<string, ArticleComment[]>()
@@ -709,32 +727,62 @@ export default function ArticlePreviewClient({
       </div>
 
       {articleData.tables && articleData.tables.length > 0 && (
-        <AIAssistWrapper id={`${articleId}-tables`}>
         <section className="space-y-3">
           <h2 className="text-2xl font-semibold tracking-tight">Results Tables</h2>
           <div className="space-y-4">
-            {articleData.tables.map((table) => (
-              <StyledTable key={table.table_name} table={table} />
+            {articleData.tables.map((table, tblIdx) => (
+              <AIAssistWrapper key={table.table_name} id={`${articleId}-table-${tblIdx + 1}`}>
+                <StyledTable table={table} />
+              </AIAssistWrapper>
             ))}
           </div>
         </section>
-        </AIAssistWrapper>
       )}
 
       {articleData.figures && articleData.figures.length > 0 && (
-        <AIAssistWrapper id={`${articleId}-figures`}>
         <section className="space-y-3 rounded-xl border border-border/60 bg-card p-5">
           <h2 className="text-2xl font-semibold tracking-tight">Figures</h2>
-          <ul className="space-y-2">
-            {articleData.figures.map((figure, index) => (
-              <li key={`${figure.figure_name}-${index}`} className="rounded-md border border-border/50 bg-background/30 px-4 py-3 text-sm">
-                <p className="font-semibold">{figure.figure_name}</p>
-                <p className="mt-1 text-muted-foreground">{figure.caption ?? figure.description}</p>
-              </li>
-            ))}
-          </ul>
+          <div className="space-y-4">
+            {articleData.figures.map((figure, index) => {
+              const imgEntry = figureImageEntries.find(e => e.figureIndex === index)
+              const lbIdx = lightboxImages.findIndex(img => img.publicPath === imgEntry?.imagePath)
+              return (
+                <AIAssistWrapper key={`${figure.figure_name}-${index}`} id={`${articleId}-figure-${index + 1}`}>
+                  <div className="rounded-md border border-border/50 bg-background/30 px-4 py-3">
+                    <p className="font-semibold text-sm">{figure.figure_name || `Figure ${index + 1}`}</p>
+                    {imgEntry?.imagePath && (
+                      <button
+                        type="button"
+                        className="mt-2 block w-full cursor-pointer overflow-hidden rounded-lg border border-border/40 transition-shadow hover:shadow-lg"
+                        onClick={() => lbIdx >= 0 && setLightboxIndex(lbIdx)}
+                        aria-label={`Enlarge ${figure.figure_name || `Figure ${index + 1}`}`}
+                      >
+                        <Image
+                          src={imgEntry.imagePath}
+                          alt={figure.figure_name || `Figure ${index + 1}`}
+                          width={800}
+                          height={500}
+                          className="h-auto w-full object-contain"
+                        />
+                      </button>
+                    )}
+                    <p className="mt-2 text-sm text-muted-foreground">{figure.caption ?? figure.description}</p>
+                  </div>
+                </AIAssistWrapper>
+              )
+            })}
+          </div>
         </section>
-        </AIAssistWrapper>
+      )}
+
+      {/* Lightbox for article figures */}
+      {lightboxImages.length > 0 && (
+        <ImageLightbox
+          images={lightboxImages}
+          index={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onIndexChange={setLightboxIndex}
+        />
       )}
 
       {articleData.tripod_ai_checklist?.items && articleData.tripod_ai_checklist.items.length > 0 && (
