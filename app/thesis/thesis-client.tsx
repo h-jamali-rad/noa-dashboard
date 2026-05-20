@@ -55,6 +55,179 @@ const CHAPTERS: ChapterInfo[] = [
   { key: 'chapter_5_discussion', num: 5, title: 'Discussion & Conclusion', icon: '💡' },
 ]
 
+/* ──────────────────── Figure definitions ──────────────────── */
+/*
+ * Each figure is placed AFTER its target section's content (just before
+ * the next sub-section heading or the end of the chapter). MUMS formatting:
+ *   - numbered "Figure C-N" where C = chapter, N = sequence within chapter
+ *   - caption sits BELOW the figure, italic, 2pt smaller than body text
+ *   - >= 2 blank lines of vertical padding around the figure block
+ *   - each figure is referenced in the surrounding text before it appears
+ */
+interface ThesisFigure {
+  chapter: number
+  section: string // e.g. "3.3" — figure is rendered after this section
+  figNum: string  // e.g. "3-1"
+  src: string     // path under public/, e.g. /images/foo.png
+  caption: string
+}
+
+const THESIS_FIGURES: ThesisFigure[] = [
+  // ── Chapter 3 — Materials and Methods ─────────────────────
+  {
+    chapter: 3,
+    section: '3.3',
+    figNum: '3-1',
+    src: '/images/prisma_paper_a.png',
+    caption:
+      'PRISMA 2020 flow diagram for the systematic literature search of micro-TESE outcome predictors (Paper A). The diagram reports records identified, screened, assessed for eligibility, and included in the synthesis.',
+  },
+  {
+    chapter: 3,
+    section: '3.3',
+    figNum: '3-2',
+    src: '/images/prisma_paper_b.png',
+    caption:
+      'PRISMA 2020 flow diagram for the systematic literature search of machine-learning-based micro-TESE prediction studies (Paper B). The diagram reports records identified, screened, assessed for eligibility, and included.',
+  },
+  {
+    chapter: 3,
+    section: '3.7',
+    figNum: '3-3',
+    src: '/images/preprocessing/learning_curve.png',
+    caption:
+      'Representative learning curve over the training cohort. The plot shows training and cross-validated AUC as a function of sample size and informs the discussion of bias-variance trade-offs during model development.',
+  },
+
+  // ── Chapter 4 — Results ───────────────────────────────────
+  {
+    chapter: 4,
+    section: '4.3',
+    figNum: '4-1',
+    src: '/images/training/roc_curves_all_models.png',
+    caption:
+      'Receiver Operating Characteristic (ROC) curves for the full 16-model benchmark on the held-out test cohort. Each curve corresponds to one candidate algorithm; the diagonal indicates a non-informative classifier.',
+  },
+  {
+    chapter: 4,
+    section: '4.3',
+    figNum: '4-2',
+    src: '/images/training/precision_recall_curves_all_models.png',
+    caption:
+      'Precision-Recall curves for the full 16-model benchmark on the held-out test cohort. PR curves emphasise positive-class behaviour under the observed class imbalance of approximately 1.72:1.',
+  },
+  {
+    chapter: 4,
+    section: '4.3',
+    figNum: '4-3',
+    src: '/images/validation/model_performance_comparison.png',
+    caption:
+      'Multi-metric model performance comparison across all 16 candidate models. Metrics shown include AUC-ROC, AUC-PR, accuracy, F1, sensitivity, and specificity on the held-out test cohort.',
+  },
+  {
+    chapter: 4,
+    section: '4.3',
+    figNum: '4-4',
+    src: '/images/validation/top5_radar_comparison.png',
+    caption:
+      'Radar chart of the top five models (CatBoost v2, XGBoost v2, LightGBM v2, Gradient Boosting v2, Stacking Ensemble) across seven complementary performance metrics.',
+  },
+
+  {
+    chapter: 4,
+    section: '4.4',
+    figNum: '4-5',
+    src: '/images/xai/roc_top5_with_CI.png',
+    caption:
+      'ROC curves for the top five v2 models with 95% bootstrap confidence intervals. CatBoost v2 achieved the highest mean AUC with the narrowest confidence band.',
+  },
+  {
+    chapter: 4,
+    section: '4.4',
+    figNum: '4-6',
+    src: '/images/validation/confusion_matrix_CatBoost.png',
+    caption:
+      'Confusion matrix for the champion CatBoost v2 model evaluated at the operating point selected to optimise the F1-score on the held-out test cohort.',
+  },
+  {
+    chapter: 4,
+    section: '4.4',
+    figNum: '4-7',
+    src: '/images/validation/bootstrap_auc_distributions.png',
+    caption:
+      'Bootstrap distributions of test-set AUC for the top five v2 models (1000 resamples). Distributions support pairwise comparisons and characterise the stability of each estimate.',
+  },
+  {
+    chapter: 4,
+    section: '4.4',
+    figNum: '4-8',
+    src: '/images/validation/nested_cv_comparison.png',
+    caption:
+      'Nested 5x5 cross-validation comparison of the top five v2 models. Box plots show the distribution of outer-fold AUC scores, providing an unbiased estimate of generalisation performance.',
+  },
+
+  {
+    chapter: 4,
+    section: '4.5',
+    figNum: '4-9',
+    src: '/images/xai/shap_comparison_top5.png',
+    caption:
+      'SHAP global feature importance across the top five v2 models. Mean absolute SHAP values rank predictors by their average contribution to the model output.',
+  },
+  {
+    chapter: 4,
+    section: '4.5',
+    figNum: '4-10',
+    src: '/images/xai/shap_heatmap_top5.png',
+    caption:
+      'SHAP heatmap of the top five v2 models against the top 20 predictors. Rows are models, columns are features; cell colour encodes the standardised mean absolute SHAP value.',
+  },
+
+  {
+    chapter: 4,
+    section: '4.8',
+    figNum: '4-11',
+    src: '/images/validation/calibration_plots.png',
+    caption:
+      'Calibration curves (reliability diagrams) for the top v2 models before and after Platt/isotonic recalibration. The 45-degree dashed line represents perfect calibration.',
+  },
+  {
+    chapter: 4,
+    section: '4.9',
+    figNum: '4-12',
+    src: '/images/validation/decision_curve_analysis.png',
+    caption:
+      'Decision curve analysis for the champion CatBoost v2 model versus the treat-all and treat-none strategies over the clinically relevant threshold range (10-60%).',
+  },
+
+  {
+    chapter: 4,
+    section: '4.11',
+    figNum: '4-13',
+    src: '/images/xai/nomogram_full.png',
+    caption:
+      'Clinical nomogram derived from the CatBoost v2 model. Each predictor contributes a point score; total points are mapped to the predicted probability of successful micro-TESE retrieval.',
+  },
+  {
+    chapter: 4,
+    section: '4.11',
+    figNum: '4-14',
+    src: '/images/xai/fairness_analysis.png',
+    caption:
+      'Fairness analysis of the CatBoost v2 model across patient subgroups (age, body mass index, etiological category). Performance metrics include AUC, sensitivity, specificity, and demographic parity differences.',
+  },
+
+  // ── Chapter 5 — Discussion ────────────────────────────────
+  {
+    chapter: 5,
+    section: '5.6',
+    figNum: '5-1',
+    src: '/images/xai/cost_benefit_analysis.png',
+    caption:
+      'Cost-benefit analysis comparing the CatBoost v2 model-guided strategy against the conventional treat-all policy at clinically realistic prevalence and net-benefit weights. Positive curves favour the model-guided strategy.',
+  },
+]
+
 /* ──────────────────── Helpers ──────────────────── */
 function wordCount(text: string): number {
   return text.split(/\s+/).filter(Boolean).length
@@ -73,11 +246,51 @@ function countSections(text: string): number {
  * markdown headings. Chapters 1 & 2 in the JSON use the plain style;
  * chapters 3-5 already use `## / ###`. This keeps both routes consistent.
  */
-function normaliseChapterMarkdown(raw: string, chapterNum: number): string {
+function normaliseChapterMarkdown(
+  raw: string,
+  chapterNum: number,
+  figures?: ThesisFigure[]
+): string {
   const lines = raw.split('\n')
   const out: string[] = []
   let inFence = false
   let inTable = false
+
+  // Section-id -> ordered list of figures to inject AFTER that section's content
+  const figMap = new Map<string, ThesisFigure[]>()
+  if (figures) {
+    for (const f of figures) {
+      if (f.chapter !== chapterNum) continue
+      if (!figMap.has(f.section)) figMap.set(f.section, [])
+      figMap.get(f.section)!.push(f)
+    }
+  }
+  const flushedSections = new Set<string>()
+
+  // Current section we are accumulating content under (e.g. "3.3").
+  let currentSection: string | null = null
+
+  // Extract section id from a section heading line like "3.3 Title".
+  const sectionIdOf = (headingText: string): string | null => {
+    const m = /^(\d+\.\d+)(?!\.)\s+\S/.exec(headingText.trim())
+    return m ? m[1] : null
+  }
+
+  // Emit FIG marker lines for the currently-open section before we close it
+  // (either because a new section is starting or we reached end of input).
+  const flushFigures = (sec: string | null) => {
+    if (!sec || flushedSections.has(sec)) return
+    const figs = figMap.get(sec)
+    if (!figs || figs.length === 0) return
+    out.push('')
+    for (const f of figs) {
+      // Marker: [[FIG:figNum|src|caption]] — pipe is reserved
+      const safeCaption = f.caption.replace(/\|/g, '/')
+      out.push(`[[FIG:${f.figNum}|${f.src}|${safeCaption}]]`)
+    }
+    out.push('')
+    flushedSections.add(sec)
+  }
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]
@@ -125,6 +338,9 @@ function normaliseChapterMarkdown(raw: string, chapterNum: number): string {
         continue
       }
       if (/^\d+\.\d+\s+\S/.test(headingText)) {
+        // Section heading — flush figures of PREVIOUS section first.
+        flushFigures(currentSection)
+        currentSection = sectionIdOf(headingText)
         out.push(`## ${headingText}`)
         continue
       }
@@ -150,12 +366,17 @@ function normaliseChapterMarkdown(raw: string, chapterNum: number): string {
     }
     // "X.X ..." → h2 (level-1 in TOC)
     if (/^\d+\.\d+\s+\S/.test(trimmed)) {
+      flushFigures(currentSection)
+      currentSection = sectionIdOf(trimmed)
       out.push(`## ${trimmed}`)
       continue
     }
 
     out.push(line)
   }
+
+  // Flush trailing figures for the last open section
+  flushFigures(currentSection)
 
   return out.join('\n')
 }
@@ -735,6 +956,131 @@ function parseMarkdownTable(lines: string[]): { head: string[]; body: string[][]
   return { head, body }
 }
 
+/**
+ * Render an embedded figure with a MUMS-style caption underneath.
+ *   - 2 blank lines of vertical padding above and below the figure block
+ *   - figure centred horizontally, scaled to fit content width and ≤ 60 % page H
+ *   - caption italic, centred, 2 pt smaller than body text, bold "Figure C-N:" label
+ *   - if not enough space remains on the current page, the whole block is moved
+ *     onto a new page so the figure and its caption are never split
+ */
+function drawFigure(
+  ctx: PdfContext,
+  img: HTMLImageElement | null,
+  figNum: string,
+  caption: string
+) {
+  const captionFontSize = Math.max(8, ctx.bodyFontSize - 2)
+  const captionLineH = captionFontSize * 1.35
+  const padBefore = ctx.bodyFontSize * ctx.lineHeight * 2 // ~2 blank lines
+  const padAfter = ctx.bodyFontSize * ctx.lineHeight * 2
+
+  // Compute layout
+  const maxImgW = ctx.contentW
+  const maxImgH = (ctx.pageH - ctx.margin.top - ctx.margin.bottom) * 0.6
+
+  let drawW = maxImgW
+  let drawH = maxImgH
+
+  if (img && img.naturalWidth > 0 && img.naturalHeight > 0) {
+    const aspect = img.naturalWidth / img.naturalHeight
+    // Fit width first
+    drawW = maxImgW
+    drawH = drawW / aspect
+    if (drawH > maxImgH) {
+      drawH = maxImgH
+      drawW = drawH * aspect
+    }
+  } else {
+    // Placeholder if image failed to load
+    drawW = Math.min(maxImgW, 360)
+    drawH = 220
+  }
+
+  // Estimate caption block height (wrap conservatively)
+  ctx.doc.setFont('times', 'italic')
+  ctx.doc.setFontSize(captionFontSize)
+  const captionFull = sanitiseForPdf(`Figure ${figNum}: ${caption}`)
+  const captionLines = ctx.doc.splitTextToSize(captionFull, ctx.contentW)
+  const captionH = captionLines.length * captionLineH
+
+  const blockH = padBefore + drawH + 6 + captionH + padAfter
+
+  // Move to next page if no room
+  const usable = ctx.pageH - ctx.margin.bottom - ctx.cursorY
+  if (blockH > usable && drawH + captionH + 12 < ctx.pageH - ctx.margin.top - ctx.margin.bottom) {
+    const current = ctx.pageNumberMap.get(ctx.doc.getNumberOfPages())
+    newPage(ctx, current?.type ?? 'arabic')
+  } else {
+    // Insert blank-line padding above
+    ctx.cursorY += padBefore
+  }
+
+  // Centre horizontally
+  const x = ctx.margin.left + (ctx.contentW - drawW) / 2
+
+  if (img && img.naturalWidth > 0 && img.naturalHeight > 0) {
+    try {
+      const dataUrl = imageToDataURL(img, 'PNG')
+      ctx.doc.addImage(dataUrl, 'PNG', x, ctx.cursorY, drawW, drawH)
+    } catch {
+      // Fallback box if PNG conversion fails
+      ctx.doc.setDrawColor(180)
+      ctx.doc.setLineWidth(0.4)
+      ctx.doc.rect(x, ctx.cursorY, drawW, drawH)
+    }
+  } else {
+    // Placeholder rectangle
+    ctx.doc.setDrawColor(180)
+    ctx.doc.setFillColor(245, 245, 245)
+    ctx.doc.rect(x, ctx.cursorY, drawW, drawH, 'FD')
+    ctx.doc.setTextColor(140)
+    ctx.doc.setFont('times', 'italic')
+    ctx.doc.setFontSize(captionFontSize)
+    ctx.doc.text(
+      '[Figure not available]',
+      ctx.margin.left + ctx.contentW / 2,
+      ctx.cursorY + drawH / 2,
+      { align: 'center' }
+    )
+    ctx.doc.setTextColor(0)
+  }
+  ctx.cursorY += drawH + 6
+
+  // Caption below
+  ctx.doc.setFont('times', 'italic')
+  ctx.doc.setFontSize(captionFontSize)
+  ctx.doc.setTextColor(50)
+  for (let li = 0; li < captionLines.length; li++) {
+    const ln = captionLines[li]
+    if (li === 0) {
+      // Bold "Figure C-N:" prefix, italic for rest of caption
+      const prefix = `Figure ${figNum}: `
+      const prefixW = ctx.doc.getTextWidth(prefix)
+      const restW = ctx.doc.getTextWidth(ln.slice(prefix.length))
+      const total = prefixW + restW
+      const startX = ctx.margin.left + (ctx.contentW - total) / 2
+      ctx.doc.setFont('times', 'bold')
+      ctx.doc.text(prefix, startX, ctx.cursorY + captionFontSize * 0.85)
+      ctx.doc.setFont('times', 'italic')
+      ctx.doc.text(
+        ln.slice(prefix.length),
+        startX + prefixW,
+        ctx.cursorY + captionFontSize * 0.85
+      )
+    } else {
+      ctx.doc.text(ln, ctx.margin.left + ctx.contentW / 2, ctx.cursorY + captionFontSize * 0.85, {
+        align: 'center',
+      })
+    }
+    ctx.cursorY += captionLineH
+  }
+  ctx.doc.setTextColor(0)
+
+  // Trailing padding
+  ctx.cursorY += padAfter
+}
+
 function drawTable(
   ctx: PdfContext,
   autoTable: any,
@@ -819,7 +1165,11 @@ function renderMarkdownBlock(
   ctx: PdfContext,
   autoTable: any,
   rawText: string,
-  options: { sectionPrefix?: string; recordSections?: boolean } = {}
+  options: {
+    sectionPrefix?: string
+    recordSections?: boolean
+    figureImages?: Map<string, HTMLImageElement | null>
+  } = {}
 ) {
   const lines = rawText.split('\n')
   let i = 0
@@ -831,6 +1181,17 @@ function renderMarkdownBlock(
 
     // Skip blank lines (paragraph separators are handled by spacingAfter)
     if (trimmed === '') {
+      i += 1
+      continue
+    }
+
+    // Embedded figure marker: [[FIG:figNum|src|caption]]
+    const figMatch = /^\[\[FIG:([^|]+)\|([^|]+)\|(.+)\]\]$/.exec(trimmed)
+    if (figMatch) {
+      const figNum = figMatch[1]
+      const caption = figMatch[3]
+      const img = options.figureImages?.get(figNum) ?? null
+      drawFigure(ctx, img, figNum, caption)
       i += 1
       continue
     }
@@ -1011,6 +1372,19 @@ async function generateThesisPDF(
     loadImage('/royan_logo.png').catch(() => null),
   ])
 
+  setProgress('Loading figures…')
+  const figureImages = new Map<string, HTMLImageElement | null>()
+  await Promise.all(
+    THESIS_FIGURES.map(async (f) => {
+      try {
+        const img = await loadImage(f.src)
+        figureImages.set(f.figNum, img)
+      } catch {
+        figureImages.set(f.figNum, null)
+      }
+    })
+  )
+
   const doc = new jsPDF({ unit: 'pt', format: 'a4', compress: true })
   const pageW = doc.internal.pageSize.getWidth()
   const pageH = doc.internal.pageSize.getHeight()
@@ -1138,29 +1512,29 @@ async function generateThesisPDF(
   doc.text('Hossein JamaliRad', pageW / 2, y, { align: 'center' })
   y += 28
 
-  // Supervisors
+  // Supervisors (اساتید راهنما)
   doc.setFont('times', 'italic')
   doc.setFontSize(11)
   doc.text('Supervisors', pageW / 2, y, { align: 'center' })
-  y += 15
+  y += 14
   doc.setFont('times', 'bold')
-  doc.setFontSize(12)
-  doc.text('Dr. Hasan Vakili', pageW / 2, y, { align: 'center' })
-  y += 15
+  doc.setFontSize(11.5)
+  doc.text('Dr. Hassan Vakili Arki', pageW / 2, y, { align: 'center' })
+  y += 14
   doc.text('Dr. Marjan Sabbaghian', pageW / 2, y, { align: 'center' })
+  y += 14
+  doc.text('Dr. Saeid Eslami', pageW / 2, y, { align: 'center' })
   y += 22
 
-  // Advisors
+  // Advisor (استاد مشاور)
   doc.setFont('times', 'italic')
   doc.setFontSize(11)
-  doc.text('Advisors', pageW / 2, y, { align: 'center' })
-  y += 15
+  doc.text('Advisor', pageW / 2, y, { align: 'center' })
+  y += 14
   doc.setFont('times', 'bold')
-  doc.setFontSize(12)
-  doc.text('Dr. Pouria Gilani', pageW / 2, y, { align: 'center' })
-  y += 15
-  doc.text('Dr. Amir Eslami', pageW / 2, y, { align: 'center' })
-  y += 28
+  doc.setFontSize(11.5)
+  doc.text('Dr. Mohammad Ali Sadighi Gilani', pageW / 2, y, { align: 'center' })
+  y += 24
 
   // Partner institutions: Medical Informatics + Royan logos side by side at bottom
   const bottomY = pageH - margin.bottom - 95
@@ -1294,9 +1668,15 @@ async function generateThesisPDF(
   setProgress('Adding List of Figures…')
   ctx.sectionStarts.push({ label: 'List of Figures', page: doc.getNumberOfPages() + 1, level: 0 })
   drawHeading(ctx, 'List of Figures', 1)
-  if (data.list_of_figures && data.list_of_figures.length > 0) {
-    for (const f of data.list_of_figures) {
-      drawParagraph(ctx, f, { fontSize: 10.5, align: 'left', spacingAfter: 4 })
+  if (THESIS_FIGURES.length > 0) {
+    for (const f of THESIS_FIGURES) {
+      // Take only the first sentence of the caption for the list of figures
+      const shortCaption = f.caption.split(/(?<=[.!?])\s+/)[0]
+      drawParagraph(ctx, `Figure ${f.figNum}: ${shortCaption}`, {
+        fontSize: 10.5,
+        align: 'left',
+        spacingAfter: 4,
+      })
     }
   } else {
     drawParagraph(ctx, '(No figures listed.)', { italic: true })
@@ -1431,13 +1811,13 @@ async function generateThesisPDF(
     ctx.cursorY += 8
     drawHeading(ctx, ch.title, 2)
     ctx.cursorY += 6
-    const normalised = normaliseChapterMarkdown(data[ch.key] as string, ch.num)
+    const normalised = normaliseChapterMarkdown(data[ch.key] as string, ch.num, THESIS_FIGURES)
     // Strip the first heading we already drew if it matches (handles #, ##, ###…)
     const stripped = normalised.replace(
       new RegExp(`^#{1,6}\\s+Chapter\\s+${ch.num}\\s*:[^\\n]*\\n+`, 'i'),
       ''
     )
-    renderMarkdownBlock(ctx, autoTable, stripped, { recordSections: true })
+    renderMarkdownBlock(ctx, autoTable, stripped, { recordSections: true, figureImages })
   }
 
   /* ── 10. REFERENCES ──────────────────────────────────── */
