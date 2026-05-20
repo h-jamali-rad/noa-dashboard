@@ -160,14 +160,6 @@ const THESIS_FIGURES: ThesisFigure[] = [
     chapter: 4,
     section: '4.4',
     figNum: '4-7',
-    src: '/images/xai/roc_top5_with_CI.png',
-    caption:
-      'ROC curves of the top five v2 models with shaded 95% bootstrap confidence bands obtained from 1,000 resamples of the held-out test cohort. CatBoost v2 not only attained the highest mean AUC (0.8306) but also the narrowest CI (0.7845–0.8767), indicating both superior discrimination and the most stable point estimate.',
-  },
-  {
-    chapter: 4,
-    section: '4.4',
-    figNum: '4-8',
     src: '/images/validation/confusion_matrix_CatBoost.png',
     caption:
       'Confusion matrix for the champion CatBoost v2 model evaluated on the held-out test cohort at the F1-optimal probability threshold. True-positive, false-positive, false-negative and true-negative cells are reported with both absolute counts and row-normalised proportions, supporting the sensitivity (0.678), specificity (0.822) and PPV (0.688) reported in the abstract.',
@@ -175,7 +167,7 @@ const THESIS_FIGURES: ThesisFigure[] = [
   {
     chapter: 4,
     section: '4.4',
-    figNum: '4-9',
+    figNum: '4-8',
     src: '/images/validation/nested_cv_comparison.png',
     caption:
       'Nested 5×5 cross-validation comparison of the top five v2 models. The outer 5-fold loop estimates generalisation error while the inner 5-fold loop performs Bayesian hyper-parameter search (50 iterations per model per fold). Box plots show the distribution of outer-fold AUC values, providing an unbiased estimate that is not subject to model-selection bias. CatBoost v2 maintains the highest median and one of the narrowest interquartile ranges.',
@@ -183,7 +175,7 @@ const THESIS_FIGURES: ThesisFigure[] = [
   {
     chapter: 4,
     section: '4.4',
-    figNum: '4-10',
+    figNum: '4-9',
     src: '/images/validation/bootstrap_ci_comparison.png',
     caption:
       'Bootstrap 95% confidence intervals for the test-set AUC of the top five v2 models, derived from 1,000 resamples with replacement of the held-out test cohort. CatBoost v2 (AUC 0.8306, CI 0.7845–0.8767) has the highest lower bound, supporting its selection as the deployment model.',
@@ -191,15 +183,15 @@ const THESIS_FIGURES: ThesisFigure[] = [
   {
     chapter: 4,
     section: '4.4',
-    figNum: '4-11',
+    figNum: '4-10',
     src: '/images/validation/bootstrap_auc_distributions.png',
     caption:
-      'Bootstrap distributions of test-set AUC for the top five v2 models (1,000 resamples). The kernel density estimates allow pairwise visual comparison of distributional overlap and complement the point CIs reported in Figure 4-10; the limited overlap between CatBoost v2 and the next-best models corroborates the rank order obtained by nested cross-validation.',
+      'Bootstrap distributions of test-set AUC for the top five v2 models (1,000 resamples). The kernel density estimates allow pairwise visual comparison of distributional overlap and complement the point CIs reported in Figure 4-9; the limited overlap between CatBoost v2 and the next-best models corroborates the rank order obtained by nested cross-validation.',
   },
   {
     chapter: 4,
     section: '4.4',
-    figNum: '4-12',
+    figNum: '4-11',
     src: '/images/validation/learning_curves_all_models.png',
     caption:
       'Learning curves for all 16 candidate models on the n=2,413 cohort. Training-set and 5-fold cross-validated AUC are plotted as a function of training sample size. The plateau of the cross-validation curve for the boosting family at the full sample size confirms convergence and indicates that the marginal gain from additional data would be modest.',
@@ -207,7 +199,7 @@ const THESIS_FIGURES: ThesisFigure[] = [
   {
     chapter: 4,
     section: '4.4',
-    figNum: '4-13',
+    figNum: '4-12',
     src: '/images/validation/learning_curves_bias_variance.png',
     caption:
       'Bias-variance decomposition derived from the learning curves of the top five v2 models. The gap between training and cross-validation AUC quantifies variance, while the deviation of the training curve from a perfect AUC of 1.0 quantifies bias. CatBoost v2 sits in the favourable low-bias, low-variance regime that motivated its selection as the champion deployment model.',
@@ -215,7 +207,7 @@ const THESIS_FIGURES: ThesisFigure[] = [
   {
     chapter: 4,
     section: '4.4',
-    figNum: '4-14',
+    figNum: '4-13',
     src: '/images/validation/stability_comparison.png',
     caption:
       'Cross-seed stability comparison of the top five v2 models. Each model was retrained with 30 distinct random seeds for the train/test split and stratified cross-validation; box plots summarise the resulting AUC distributions. The compactness of the CatBoost v2 box indicates that the reported performance is robust to seed selection and not an artefact of a fortuitous split.',
@@ -223,15 +215,15 @@ const THESIS_FIGURES: ThesisFigure[] = [
   {
     chapter: 4,
     section: '4.4',
-    figNum: '4-15',
+    figNum: '4-14',
     src: '/images/validation/stability_seeds_boxplot.png',
     caption:
-      'Per-model seed-stability boxplots for all 16 candidates, complementing the focused comparison in Figure 4-14. Wider boxes (e.g. SVM, Naive Bayes) indicate sensitivity of the algorithm to data partitioning, whereas the gradient-boosting family demonstrates seed-invariance — an essential property for clinical deployment where the deployed model must behave deterministically.',
+      'Per-model seed-stability boxplots for all 16 candidates, complementing the focused comparison in Figure 4-13. Wider boxes (e.g. SVM, Naive Bayes) indicate sensitivity of the algorithm to data partitioning, whereas the gradient-boosting family demonstrates seed-invariance — an essential property for clinical deployment where the deployed model must behave deterministically.',
   },
   {
     chapter: 4,
     section: '4.4',
-    figNum: '4-16',
+    figNum: '4-15',
     src: '/images/validation/robustness_heatmap.png',
     caption:
       'Robustness heatmap showing the relative AUC degradation of each candidate model under a battery of perturbations: feature dropout, additive Gaussian noise on continuous features, randomised categorical encoding, and missingness injection at 5/10/20% rates. Lower (greener) values indicate greater robustness; CatBoost v2 again ranks at the top, supporting its candidacy for real-world clinical use where input quality is heterogeneous.',
@@ -239,7 +231,7 @@ const THESIS_FIGURES: ThesisFigure[] = [
   {
     chapter: 4,
     section: '4.4',
-    figNum: '4-17',
+    figNum: '4-16',
     src: '/images/validation/robustness_noise_degradation.png',
     caption:
       'AUC degradation of the top five v2 models as a function of additive Gaussian noise on the continuous predictors (σ = 0.05, 0.10, 0.20, 0.30 in standardised units). CatBoost v2 retains a graceful, near-linear degradation, in contrast to the steeper drop observed for the kernel and neural models, suggesting that measurement error on hormonal and anthropometric inputs will not catastrophically impair real-world performance.',
@@ -247,7 +239,7 @@ const THESIS_FIGURES: ThesisFigure[] = [
   {
     chapter: 4,
     section: '4.4',
-    figNum: '4-18',
+    figNum: '4-17',
     src: '/images/validation/overfitting_analysis.png',
     caption:
       'Overfitting analysis comparing the train–test AUC gap of all 16 candidate models. Models above the diagonal exhibit positive train–test gaps indicative of overfitting; the gradient-boosting family with early-stopping regularisation (and CatBoost v2 in particular) sits near the diagonal, confirming that the Bayesian hyper-parameter search effectively prevented over-fitting under the nested 5×5 protocol.',
@@ -255,17 +247,17 @@ const THESIS_FIGURES: ThesisFigure[] = [
   {
     chapter: 4,
     section: '4.4',
-    figNum: '4-19',
+    figNum: '4-18',
     src: '/images/validation/5fold_auc_heatmap.png',
     caption:
-      'Per-fold AUC heatmap for the 5-fold stratified outer cross-validation of all 16 candidate models. Each cell encodes the AUC achieved on the held-out outer fold (columns) by a given model (rows). The horizontal uniformity of the CatBoost v2 row reinforces the fold-to-fold stability evidence presented in Figure 4-14.',
+      'Per-fold AUC heatmap for the 5-fold stratified outer cross-validation of all 16 candidate models. Each cell encodes the AUC achieved on the held-out outer fold (columns) by a given model (rows). The horizontal uniformity of the CatBoost v2 row reinforces the fold-to-fold stability evidence presented in Figure 4-13.',
   },
 
   // ── §4.8  Model Calibration Results ──
   {
     chapter: 4,
     section: '4.8',
-    figNum: '4-20',
+    figNum: '4-19',
     src: '/images/validation/calibration_plots.png',
     caption:
       'Calibration curves (reliability diagrams) for the top v2 models before and after Platt scaling / isotonic recalibration. The 45° dashed line represents perfect calibration. After isotonic recalibration, CatBoost v2 attained a Brier score consistent with the abstract figures and a calibration slope close to unity, confirming that the predicted probabilities can be interpreted as well-calibrated risks suitable for clinical decision making.',
@@ -275,7 +267,7 @@ const THESIS_FIGURES: ThesisFigure[] = [
   {
     chapter: 4,
     section: '4.9',
-    figNum: '4-21',
+    figNum: '4-20',
     src: '/images/validation/decision_curve_analysis.png',
     caption:
       'Decision Curve Analysis (DCA) for the champion CatBoost v2 model against the treat-all and treat-none reference strategies across the clinically relevant probability threshold range (10–60%). The CatBoost v2 curve dominates both reference strategies over the entire range, demonstrating positive net benefit for any plausible patient or clinician preference and supporting the model as a clinically actionable predictive tool.',
@@ -883,11 +875,19 @@ async function loadImage(src: string): Promise<HTMLImageElement> {
 }
 
 function imageToDataURL(img: HTMLImageElement, format: 'JPEG' | 'PNG' = 'PNG'): string {
+  const MAX_DIM = 2500
+  let w = img.naturalWidth
+  let h = img.naturalHeight
+  if (w > MAX_DIM || h > MAX_DIM) {
+    const scale = Math.min(MAX_DIM / w, MAX_DIM / h)
+    w = Math.round(w * scale)
+    h = Math.round(h * scale)
+  }
   const canvas = document.createElement('canvas')
-  canvas.width = img.naturalWidth
-  canvas.height = img.naturalHeight
+  canvas.width = w
+  canvas.height = h
   const ctx = canvas.getContext('2d')!
-  ctx.drawImage(img, 0, 0)
+  ctx.drawImage(img, 0, 0, w, h)
   return canvas.toDataURL(`image/${format.toLowerCase()}`, 0.92)
 }
 
