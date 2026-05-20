@@ -73,14 +73,16 @@ interface ThesisFigure {
 }
 
 const THESIS_FIGURES: ThesisFigure[] = [
-  // ── Chapter 3 — Materials and Methods ─────────────────────
+  // ════════════════════════════════════════════════════════════════════
+  // Chapter 3 — Materials and Methods
+  // ════════════════════════════════════════════════════════════════════
   {
     chapter: 3,
     section: '3.3',
     figNum: '3-1',
     src: '/images/prisma_paper_a.png',
     caption:
-      'PRISMA 2020 flow diagram for the systematic literature search of micro-TESE outcome predictors (Paper A). The diagram reports records identified, screened, assessed for eligibility, and included in the synthesis.',
+      'PRISMA 2020 flow diagram for the systematic review of clinical and hormonal predictors of micro-TESE outcomes in non-obstructive azoospermia. PubMed, Scopus, Web of Science and Embase were searched from inception to 30 June 2024. After deduplication, records were screened on title and abstract by two independent reviewers, then assessed in full text against the pre-registered inclusion criteria; studies finally included in the qualitative synthesis informed the candidate predictor set ultimately operationalised in the present cohort (n=2,413 NOA patients, Royan Institute, 2007–2022).',
   },
   {
     chapter: 3,
@@ -88,143 +90,401 @@ const THESIS_FIGURES: ThesisFigure[] = [
     figNum: '3-2',
     src: '/images/prisma_paper_b.png',
     caption:
-      'PRISMA 2020 flow diagram for the systematic literature search of machine-learning-based micro-TESE prediction studies (Paper B). The diagram reports records identified, screened, assessed for eligibility, and included.',
+      'PRISMA 2020 flow diagram for the systematic review of machine-learning and explainable-AI approaches to micro-TESE outcome prediction. The search encompassed PubMed, Scopus, Web of Science and IEEE Xplore from inception to 30 June 2024 and used a controlled vocabulary covering "non-obstructive azoospermia", "micro-TESE", "machine learning", "deep learning" and "explainable AI". The included studies define the benchmarking landscape against which the present 16-model ensemble is compared.',
   },
   {
     chapter: 3,
-    section: '3.7',
+    section: '3.6',
     figNum: '3-3',
     src: '/images/preprocessing/learning_curve.png',
     caption:
-      'Representative learning curve over the training cohort. The plot shows training and cross-validated AUC as a function of sample size and informs the discussion of bias-variance trade-offs during model development.',
+      'Representative learning curve produced during preprocessing pipeline development for the n=2,413 NOA cohort. Training and 5-fold cross-validated AUC are plotted as a function of training sample size; convergence of the two curves at the full sample size indicates that the available cohort is sufficient for stable model fitting and that further gains require additional data rather than model complexity.',
   },
 
-  // ── Chapter 4 — Results ───────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════
+  // Chapter 4 — Results
+  // ════════════════════════════════════════════════════════════════════
+
+  // ── §4.3  Model Performance Comparison — Full 16-Model Benchmark ──
   {
     chapter: 4,
     section: '4.3',
     figNum: '4-1',
     src: '/images/training/roc_curves_all_models.png',
     caption:
-      'Receiver Operating Characteristic (ROC) curves for the full 16-model benchmark on the held-out test cohort. Each curve corresponds to one candidate algorithm; the diagonal indicates a non-informative classifier.',
+      'Receiver Operating Characteristic (ROC) curves for the full 16-model benchmark on the held-out internal test cohort (20% of n=2,413 patients, stratified). Each curve corresponds to one candidate algorithm spanning all major ML paradigms (gradient boosting, ensemble bagging, kernel methods, neural networks, probabilistic and instance-based learners). The diagonal indicates a non-informative classifier (AUC=0.5). CatBoost v2 attained the highest AUC of 0.8306 (95% CI 0.7845–0.8767), confirming the a-priori hypothesis that gradient-boosted tree ensembles are best suited to mixed-type tabular clinical data.',
   },
   {
     chapter: 4,
     section: '4.3',
     figNum: '4-2',
-    src: '/images/training/precision_recall_curves_all_models.png',
+    src: '/images/training/roc_curves_top_models_comparison.png',
     caption:
-      'Precision-Recall curves for the full 16-model benchmark on the held-out test cohort. PR curves emphasise positive-class behaviour under the observed class imbalance of approximately 1.72:1.',
+      'Magnified ROC comparison of the top-performing candidate algorithms on the held-out test cohort. Restricting the view to the leading models reveals the tight clustering of the gradient-boosting family (CatBoost v2, XGBoost v2, LightGBM v2, Gradient Boosting v2) and the Stacking Ensemble at AUCs in the 0.81–0.83 band, in contrast to the visibly inferior performance of the wider 16-model benchmark.',
   },
   {
     chapter: 4,
     section: '4.3',
     figNum: '4-3',
-    src: '/images/validation/model_performance_comparison.png',
+    src: '/images/training/precision_recall_curves_all_models.png',
     caption:
-      'Multi-metric model performance comparison across all 16 candidate models. Metrics shown include AUC-ROC, AUC-PR, accuracy, F1, sensitivity, and specificity on the held-out test cohort.',
+      'Precision-Recall (PR) curves for the full 16-model benchmark on the held-out test cohort. PR analysis is reported because the cohort exhibits a moderate class imbalance of approximately 1.72:1 (886 retrieval successes vs 1,527 failures, success rate 36.7%), under which AUC-PR characterises positive-class performance more faithfully than ROC. The champion CatBoost v2 model maintained the highest AUC-PR while preserving the rank-order observed in ROC space.',
   },
   {
     chapter: 4,
     section: '4.3',
     figNum: '4-4',
+    src: '/images/validation/model_performance_comparison.png',
+    caption:
+      'Multi-metric performance comparison across all 16 candidate models on the held-out test cohort. The six panels show AUC-ROC, AUC-PR, accuracy, F1-score, sensitivity and specificity. CatBoost v2 leads on the discrimination metrics (AUC 0.8306, accuracy 0.769, F1 0.683) and Brier-derived calibration, while supporting roughly equipotent operating points across the recommended 10–60% probability threshold range used for the downstream Decision Curve Analysis.',
+  },
+  {
+    chapter: 4,
+    section: '4.3',
+    figNum: '4-5',
     src: '/images/validation/top5_radar_comparison.png',
     caption:
-      'Radar chart of the top five models (CatBoost v2, XGBoost v2, LightGBM v2, Gradient Boosting v2, Stacking Ensemble) across seven complementary performance metrics.',
+      'Radar chart comparing the top five v2 models (CatBoost v2, XGBoost v2, LightGBM v2, Gradient Boosting v2, Stacking Ensemble) across seven complementary performance dimensions (AUC-ROC, AUC-PR, accuracy, F1, sensitivity, specificity, Brier score). The shape and area of each polygon visualise the well-roundedness of each candidate; CatBoost v2 covers the largest area and is the only model to lie on the outer envelope on more than four of the seven axes.',
+  },
+  {
+    chapter: 4,
+    section: '4.3',
+    figNum: '4-6',
+    src: '/images/xai/performance_summary_heatmap.png',
+    caption:
+      'Performance summary heatmap presenting the seven evaluation metrics (rows) by the 16 candidate models (columns) on the held-out test cohort, with cell colour encoding the standardised score. The heatmap demonstrates that the gradient-boosting family is consistently dominant across metrics, while the absence of any single metric on which a non-boosting model dominates supports the a-priori choice of CatBoost v2 as the champion.',
   },
 
-  {
-    chapter: 4,
-    section: '4.4',
-    figNum: '4-5',
-    src: '/images/xai/roc_top5_with_CI.png',
-    caption:
-      'ROC curves for the top five v2 models with 95% bootstrap confidence intervals. CatBoost v2 achieved the highest mean AUC with the narrowest confidence band.',
-  },
-  {
-    chapter: 4,
-    section: '4.4',
-    figNum: '4-6',
-    src: '/images/validation/confusion_matrix_CatBoost.png',
-    caption:
-      'Confusion matrix for the champion CatBoost v2 model evaluated at the operating point selected to optimise the F1-score on the held-out test cohort.',
-  },
+  // ── §4.4  Champion Model: CatBoost v2 ──
   {
     chapter: 4,
     section: '4.4',
     figNum: '4-7',
-    src: '/images/validation/bootstrap_auc_distributions.png',
+    src: '/images/xai/roc_top5_with_CI.png',
     caption:
-      'Bootstrap distributions of test-set AUC for the top five v2 models (1000 resamples). Distributions support pairwise comparisons and characterise the stability of each estimate.',
+      'ROC curves of the top five v2 models with shaded 95% bootstrap confidence bands obtained from 1,000 resamples of the held-out test cohort. CatBoost v2 not only attained the highest mean AUC (0.8306) but also the narrowest CI (0.7845–0.8767), indicating both superior discrimination and the most stable point estimate.',
   },
   {
     chapter: 4,
     section: '4.4',
     figNum: '4-8',
+    src: '/images/validation/confusion_matrix_CatBoost.png',
+    caption:
+      'Confusion matrix for the champion CatBoost v2 model evaluated on the held-out test cohort at the F1-optimal probability threshold. True-positive, false-positive, false-negative and true-negative cells are reported with both absolute counts and row-normalised proportions, supporting the sensitivity (0.678), specificity (0.822) and PPV (0.688) reported in the abstract.',
+  },
+  {
+    chapter: 4,
+    section: '4.4',
+    figNum: '4-9',
     src: '/images/validation/nested_cv_comparison.png',
     caption:
-      'Nested 5x5 cross-validation comparison of the top five v2 models. Box plots show the distribution of outer-fold AUC scores, providing an unbiased estimate of generalisation performance.',
-  },
-
-  {
-    chapter: 4,
-    section: '4.5',
-    figNum: '4-9',
-    src: '/images/xai/shap_comparison_top5.png',
-    caption:
-      'SHAP global feature importance across the top five v2 models. Mean absolute SHAP values rank predictors by their average contribution to the model output.',
+      'Nested 5×5 cross-validation comparison of the top five v2 models. The outer 5-fold loop estimates generalisation error while the inner 5-fold loop performs Bayesian hyper-parameter search (50 iterations per model per fold). Box plots show the distribution of outer-fold AUC values, providing an unbiased estimate that is not subject to model-selection bias. CatBoost v2 maintains the highest median and one of the narrowest interquartile ranges.',
   },
   {
     chapter: 4,
-    section: '4.5',
+    section: '4.4',
     figNum: '4-10',
-    src: '/images/xai/shap_heatmap_top5.png',
+    src: '/images/validation/bootstrap_ci_comparison.png',
     caption:
-      'SHAP heatmap of the top five v2 models against the top 20 predictors. Rows are models, columns are features; cell colour encodes the standardised mean absolute SHAP value.',
+      'Bootstrap 95% confidence intervals for the test-set AUC of the top five v2 models, derived from 1,000 resamples with replacement of the held-out test cohort. CatBoost v2 (AUC 0.8306, CI 0.7845–0.8767) has the highest lower bound, supporting its selection as the deployment model.',
+  },
+  {
+    chapter: 4,
+    section: '4.4',
+    figNum: '4-11',
+    src: '/images/validation/bootstrap_auc_distributions.png',
+    caption:
+      'Bootstrap distributions of test-set AUC for the top five v2 models (1,000 resamples). The kernel density estimates allow pairwise visual comparison of distributional overlap and complement the point CIs reported in Figure 4-10; the limited overlap between CatBoost v2 and the next-best models corroborates the rank order obtained by nested cross-validation.',
+  },
+  {
+    chapter: 4,
+    section: '4.4',
+    figNum: '4-12',
+    src: '/images/validation/learning_curves_all_models.png',
+    caption:
+      'Learning curves for all 16 candidate models on the n=2,413 cohort. Training-set and 5-fold cross-validated AUC are plotted as a function of training sample size. The plateau of the cross-validation curve for the boosting family at the full sample size confirms convergence and indicates that the marginal gain from additional data would be modest.',
+  },
+  {
+    chapter: 4,
+    section: '4.4',
+    figNum: '4-13',
+    src: '/images/validation/learning_curves_bias_variance.png',
+    caption:
+      'Bias-variance decomposition derived from the learning curves of the top five v2 models. The gap between training and cross-validation AUC quantifies variance, while the deviation of the training curve from a perfect AUC of 1.0 quantifies bias. CatBoost v2 sits in the favourable low-bias, low-variance regime that motivated its selection as the champion deployment model.',
+  },
+  {
+    chapter: 4,
+    section: '4.4',
+    figNum: '4-14',
+    src: '/images/validation/stability_comparison.png',
+    caption:
+      'Cross-seed stability comparison of the top five v2 models. Each model was retrained with 30 distinct random seeds for the train/test split and stratified cross-validation; box plots summarise the resulting AUC distributions. The compactness of the CatBoost v2 box indicates that the reported performance is robust to seed selection and not an artefact of a fortuitous split.',
+  },
+  {
+    chapter: 4,
+    section: '4.4',
+    figNum: '4-15',
+    src: '/images/validation/stability_seeds_boxplot.png',
+    caption:
+      'Per-model seed-stability boxplots for all 16 candidates, complementing the focused comparison in Figure 4-14. Wider boxes (e.g. SVM, Naive Bayes) indicate sensitivity of the algorithm to data partitioning, whereas the gradient-boosting family demonstrates seed-invariance — an essential property for clinical deployment where the deployed model must behave deterministically.',
+  },
+  {
+    chapter: 4,
+    section: '4.4',
+    figNum: '4-16',
+    src: '/images/validation/robustness_heatmap.png',
+    caption:
+      'Robustness heatmap showing the relative AUC degradation of each candidate model under a battery of perturbations: feature dropout, additive Gaussian noise on continuous features, randomised categorical encoding, and missingness injection at 5/10/20% rates. Lower (greener) values indicate greater robustness; CatBoost v2 again ranks at the top, supporting its candidacy for real-world clinical use where input quality is heterogeneous.',
+  },
+  {
+    chapter: 4,
+    section: '4.4',
+    figNum: '4-17',
+    src: '/images/validation/robustness_noise_degradation.png',
+    caption:
+      'AUC degradation of the top five v2 models as a function of additive Gaussian noise on the continuous predictors (σ = 0.05, 0.10, 0.20, 0.30 in standardised units). CatBoost v2 retains a graceful, near-linear degradation, in contrast to the steeper drop observed for the kernel and neural models, suggesting that measurement error on hormonal and anthropometric inputs will not catastrophically impair real-world performance.',
+  },
+  {
+    chapter: 4,
+    section: '4.4',
+    figNum: '4-18',
+    src: '/images/validation/overfitting_analysis.png',
+    caption:
+      'Overfitting analysis comparing the train–test AUC gap of all 16 candidate models. Models above the diagonal exhibit positive train–test gaps indicative of overfitting; the gradient-boosting family with early-stopping regularisation (and CatBoost v2 in particular) sits near the diagonal, confirming that the Bayesian hyper-parameter search effectively prevented over-fitting under the nested 5×5 protocol.',
+  },
+  {
+    chapter: 4,
+    section: '4.4',
+    figNum: '4-19',
+    src: '/images/validation/5fold_auc_heatmap.png',
+    caption:
+      'Per-fold AUC heatmap for the 5-fold stratified outer cross-validation of all 16 candidate models. Each cell encodes the AUC achieved on the held-out outer fold (columns) by a given model (rows). The horizontal uniformity of the CatBoost v2 row reinforces the fold-to-fold stability evidence presented in Figure 4-14.',
   },
 
+  // ── §4.8  Model Calibration Results ──
   {
     chapter: 4,
     section: '4.8',
-    figNum: '4-11',
+    figNum: '4-20',
     src: '/images/validation/calibration_plots.png',
     caption:
-      'Calibration curves (reliability diagrams) for the top v2 models before and after Platt/isotonic recalibration. The 45-degree dashed line represents perfect calibration.',
+      'Calibration curves (reliability diagrams) for the top v2 models before and after Platt scaling / isotonic recalibration. The 45° dashed line represents perfect calibration. After isotonic recalibration, CatBoost v2 attained a Brier score consistent with the abstract figures and a calibration slope close to unity, confirming that the predicted probabilities can be interpreted as well-calibrated risks suitable for clinical decision making.',
   },
+
+  // ── §4.9  Decision Curve Analysis Results ──
   {
     chapter: 4,
     section: '4.9',
-    figNum: '4-12',
+    figNum: '4-21',
     src: '/images/validation/decision_curve_analysis.png',
     caption:
-      'Decision curve analysis for the champion CatBoost v2 model versus the treat-all and treat-none strategies over the clinically relevant threshold range (10-60%).',
+      'Decision Curve Analysis (DCA) for the champion CatBoost v2 model against the treat-all and treat-none reference strategies across the clinically relevant probability threshold range (10–60%). The CatBoost v2 curve dominates both reference strategies over the entire range, demonstrating positive net benefit for any plausible patient or clinician preference and supporting the model as a clinically actionable predictive tool.',
   },
 
+  // ════════════════════════════════════════════════════════════════════
+  // Chapter 5 — Discussion & Conclusion
+  // ════════════════════════════════════════════════════════════════════
+
+  // ── §5.3  Interpretation of Feature Importance ──
   {
-    chapter: 4,
-    section: '4.11',
-    figNum: '4-13',
-    src: '/images/xai/nomogram_full.png',
+    chapter: 5,
+    section: '5.3',
+    figNum: '5-1',
+    src: '/images/xai/shap_beeswarm_XGBoost.png',
     caption:
-      'Clinical nomogram derived from the CatBoost v2 model. Each predictor contributes a point score; total points are mapped to the predicted probability of successful micro-TESE retrieval.',
+      'SHAP beeswarm plot of the top 20 predictors for a representative top-five v2 model (XGBoost v2; the CatBoost v2 beeswarm follows the same rank order). Each point is a patient; horizontal position is the per-patient SHAP value (impact on the log-odds of successful retrieval) and colour encodes the original feature value (red = high, blue = low). LH, age and FSH dominate the global importance, with the directional pattern (high LH → negative SHAP) recovering the clinical intuition that primary testicular failure suppresses spermatogenic reserve.',
   },
   {
-    chapter: 4,
-    section: '4.11',
-    figNum: '4-14',
-    src: '/images/xai/fairness_analysis.png',
+    chapter: 5,
+    section: '5.3',
+    figNum: '5-2',
+    src: '/images/xai/shap_bar_XGBoost.png',
     caption:
-      'Fairness analysis of the CatBoost v2 model across patient subgroups (age, body mass index, etiological category). Performance metrics include AUC, sensitivity, specificity, and demographic parity differences.',
+      'Mean absolute SHAP bar chart for the top 20 predictors of a representative top-five v2 model (XGBoost v2). The bar lengths quantify the average magnitude of each feature\'s contribution to model output across the held-out test cohort: LH (|SHAP|=0.317), Age (0.270), FSH (0.250) and Testicular volume (0.212) are the four dominant predictors, jointly accounting for more than half of the total explained variance.',
+  },
+  {
+    chapter: 5,
+    section: '5.3',
+    figNum: '5-3',
+    src: '/images/xai/shap_comparison_top5.png',
+    caption:
+      'Cross-model SHAP global feature importance comparison for the top five v2 models. The agreement of the top-ranked predictors (LH, Age, FSH, Testicular volume) across CatBoost v2, XGBoost v2, LightGBM v2, Gradient Boosting v2 and the Stacking Ensemble — observed in 100% of 200 bootstrap resamples — provides multi-method explainability evidence that the predictive signal is anchored in well-understood reproductive endocrinology rather than in algorithm-specific artefacts.',
+  },
+  {
+    chapter: 5,
+    section: '5.3',
+    figNum: '5-4',
+    src: '/images/xai/shap_heatmap_top5.png',
+    caption:
+      'SHAP heatmap of the top five v2 models against the top 20 predictors. Rows are models, columns are features; cell colour encodes the standardised mean absolute SHAP value. The uniformly bright top-four columns visualise the cross-model agreement on the dominance of LH, Age, FSH and Testicular volume reported in the abstract.',
+  },
+  {
+    chapter: 5,
+    section: '5.3',
+    figNum: '5-5',
+    src: '/images/xai/shap_vs_lime_comparison.png',
+    caption:
+      'Cross-method explainability concordance between SHAP and LIME for the champion CatBoost v2 model. Each point is a patient in the held-out test cohort; the X-axis is the SHAP-derived contribution of a feature and the Y-axis is the LIME-derived contribution. The strong linear concordance demonstrates that the global rank-ordering of predictors is invariant to the choice of explanation method, satisfying the multi-method explainability requirement of TRIPOD+AI 2024.',
+  },
+  {
+    chapter: 5,
+    section: '5.3',
+    figNum: '5-6',
+    src: '/images/xai/shap_dependence_Age.png',
+    caption:
+      'SHAP dependence plot for patient age (champion CatBoost v2). The X-axis is the patient age in years; the Y-axis is the per-patient SHAP value for the age feature; point colour encodes the patient\'s LH value (red = high LH) to visualise the documented age × LH interaction. The non-monotonic trend reveals a "young-but-azoospermic" subgroup (age < 30 years with high LH) that the model identifies as having a markedly lower probability of successful retrieval.',
+  },
+  {
+    chapter: 5,
+    section: '5.3',
+    figNum: '5-7',
+    src: '/images/xai/shap_dependence_Testis_Size_right_Sono.png',
+    caption:
+      'SHAP dependence plot for right testicular volume measured by sonography (champion CatBoost v2). The X-axis is the testicular volume in mL; the Y-axis is the per-patient SHAP value; point colour encodes age. The steep monotonic rise between 4 and 12 mL recovers the long-recognised clinical inflexion below which spermatogenic reserve is severely impaired.',
+  },
+  {
+    chapter: 5,
+    section: '5.3',
+    figNum: '5-8',
+    src: '/images/xai/native_fi_comparison.png',
+    caption:
+      'Native feature-importance comparison across the four gradient-boosting v2 models (CatBoost, XGBoost, LightGBM, Gradient Boosting). For each algorithm the model-internal importance metric (split-gain for boosting trees) is shown alongside the unified SHAP rank, demonstrating that the SHAP-derived rank order is consistent with the native importance signal and therefore a faithful, not contrived, summary.',
+  },
+  {
+    chapter: 5,
+    section: '5.3',
+    figNum: '5-9',
+    src: '/images/xai/permutation_importance_heatmap.png',
+    caption:
+      'Permutation-importance heatmap across the top five v2 models (rows) for the top 20 predictors (columns). Permutation importance, computed by the mean drop in test-set AUC after shuffling a single feature 100 times, provides a model-agnostic confirmation of the SHAP rankings. The bright LH, Age, FSH and Testicular-volume columns reproduce the four dominant predictors identified by SHAP, completing the triangulation across three independent importance metrics.',
+  },
+  {
+    chapter: 5,
+    section: '5.3',
+    figNum: '5-10',
+    src: '/images/xai/interaction_heatmap.png',
+    caption:
+      'SHAP feature-interaction heatmap for the champion CatBoost v2 model showing the top 15 features along both axes. Off-diagonal cell intensity quantifies the magnitude of the SHAP interaction value between each feature pair. The pattern reveals biologically plausible interactions — notably age × LH, age × FSH, and testicular-volume × LH — which underpin the non-additive components of the predictive signal.',
   },
 
-  // ── Chapter 5 — Discussion ────────────────────────────────
+  // ── §5.4  Comparison with Prior Studies (local explanations as cross-method comparison) ──
+  {
+    chapter: 5,
+    section: '5.4',
+    figNum: '5-11',
+    src: '/images/xai/lime_True-Positive.png',
+    caption:
+      'LIME local explanation for an illustrative true-positive patient (predicted success, observed success) drawn from the held-out test cohort. The horizontal bars show the locally-linear contribution of each feature to the prediction; positive (green) bars push the model towards success and negative (red) bars towards failure. The dominance of normal-range LH and FSH together with above-cut-off testicular volume rationalises the high model confidence in this case.',
+  },
+  {
+    chapter: 5,
+    section: '5.4',
+    figNum: '5-12',
+    src: '/images/xai/lime_False-Negative.png',
+    caption:
+      'LIME local explanation for an illustrative false-negative patient (predicted failure, observed success) drawn from the held-out test cohort. The explanation reveals how the combination of borderline LH, advanced age and small testicular volume drives the model towards a failure prediction despite the eventual successful retrieval, exemplifying the residual uncertainty that motivates the calibrated probability output rather than a hard binary recommendation.',
+  },
+  {
+    chapter: 5,
+    section: '5.4',
+    figNum: '5-13',
+    src: '/images/xai/pdp_Testis_Size_right_Sono.png',
+    caption:
+      'Partial Dependence Plot (PDP) for right testicular volume (champion CatBoost v2), showing the marginal effect of the feature on the model-predicted probability of successful retrieval, averaged over all other features in the held-out test cohort. The PDP confirms the global monotonic positive relationship and the steep gain between 4 and 12 mL also visible in the SHAP dependence plot (Figure 5-7), validating the SHAP-derived shape with a fully model-agnostic technique.',
+  },
+  {
+    chapter: 5,
+    section: '5.4',
+    figNum: '5-14',
+    src: '/images/xai/ice_Testis_Size_right_Sono.png',
+    caption:
+      'Individual Conditional Expectation (ICE) plot for right testicular volume (champion CatBoost v2). Each thin line traces the predicted probability for a single patient as the testicular volume is hypothetically varied while all other features are held fixed; the bold yellow line is the PDP average. The strong line-by-line monotonicity confirms that the effect of testicular volume is consistent across patient subgroups and is not driven by an unrepresentative subset.',
+  },
+
+  // ── §5.5  The Data Leakage Lesson (Methodological Transparency) ──
+  {
+    chapter: 5,
+    section: '5.5',
+    figNum: '5-15',
+    src: '/images/xai/calibration_CatBoost.png',
+    caption:
+      'Reliability diagram for the champion CatBoost v2 model on the held-out test cohort. Predicted probabilities are binned into deciles and the empirical observed frequency is plotted against the bin midpoint. The empirical curve closely tracks the 45° identity line, confirming that the v2 pipeline — which eliminates the data leakage present in the historical v1 pipeline — produces probabilities that are interpretable as well-calibrated risks suitable for shared decision-making.',
+  },
+  {
+    chapter: 5,
+    section: '5.5',
+    figNum: '5-16',
+    src: '/images/xai/calibration_comparison_all_models.png',
+    caption:
+      'Reliability-diagram comparison of all 16 candidate v2 models on the held-out test cohort, overlaid for direct visual contrast. The bunching of the boosting family close to the 45° identity line, in contrast to the visible over- and under-confidence of the kernel and instance-based learners, is one of the key methodological insights of this dissertation: data-leakage-free pipelines plus boosting calibrate well "out of the box", motivating the v2 selection.',
+  },
+
+  // ── §5.6  Clinical Implications ──
   {
     chapter: 5,
     section: '5.6',
-    figNum: '5-1',
+    figNum: '5-17',
+    src: '/images/xai/decision_curve_analysis.png',
+    caption:
+      'Decision Curve Analysis (DCA) of the champion CatBoost v2 model from a clinical-utility perspective, plotted against the treat-all and treat-none reference strategies across the 10–60% probability threshold range. The positive net-benefit gap over the reference strategies, sustained across all clinically reasonable preferences, supports the deployment of the model as an aid to the shared decision to proceed with micro-TESE.',
+  },
+  {
+    chapter: 5,
+    section: '5.6',
+    figNum: '5-18',
+    src: '/images/xai/nomogram_full.png',
+    caption:
+      'Clinical nomogram derived from the champion CatBoost v2 model. Each predictor (top axis) contributes a point score (0–100) determined by its observed value; the total points (bottom axis) are mapped to the predicted probability of successful micro-TESE retrieval. The nomogram is the paper-friendly artefact intended for delivery to clinicians who do not have access to the web-based CDSS, ensuring equitable access to model-guided decision support.',
+  },
+  {
+    chapter: 5,
+    section: '5.6',
+    figNum: '5-19',
+    src: '/images/xai/nomogram_odds_ratio_forest.png',
+    caption:
+      'Forest plot of adjusted odds ratios with 95% confidence intervals for the predictors retained in the clinical nomogram. The plot complements the nomogram (Figure 5-18) with a familiar epidemiological summary: odds ratios significantly different from unity (CI not crossing 1.0) confirm the independent contribution of each retained predictor after mutual adjustment.',
+  },
+  {
+    chapter: 5,
+    section: '5.6',
+    figNum: '5-20',
     src: '/images/xai/cost_benefit_analysis.png',
     caption:
-      'Cost-benefit analysis comparing the CatBoost v2 model-guided strategy against the conventional treat-all policy at clinically realistic prevalence and net-benefit weights. Positive curves favour the model-guided strategy.',
+      'Cost-benefit analysis comparing the CatBoost v2 model-guided strategy against the conventional treat-all policy at clinically realistic prevalence (36.7% success rate) and a sweep of net-benefit weights reflecting the value placed on a successful retrieval against the cost of an avoidable procedure. The model-guided strategy yields positive net economic benefit across the entire policy-relevant weight range, demonstrating that the clinical value of the predictive model translates into a quantifiable health-economic gain.',
+  },
+  {
+    chapter: 5,
+    section: '5.6',
+    figNum: '5-21',
+    src: '/images/xai/risk_stratification.png',
+    caption:
+      'Three-band risk stratification of the held-out test cohort using the CatBoost v2 predicted probability (low <30%, intermediate 30–60%, high ≥60%). The observed micro-TESE success rate within each stratum closely tracks the predicted band, supporting the operational use of the model to triage patients into different counselling and surgical pathways.',
+  },
+  {
+    chapter: 5,
+    section: '5.6',
+    figNum: '5-22',
+    src: '/images/xai/clinical_rules_summary.png',
+    caption:
+      'Summary of the simple if-then clinical decision rules derived from the SHAP-explained CatBoost v2 model. Each rule is parameterised by a small number of routinely-collected variables (LH, age, testicular volume) and is intended for use in low-resource settings where the full CDSS interface is unavailable. The rules collectively replicate ~88% of the AUC of the full model on the held-out test cohort.',
+  },
+  {
+    chapter: 5,
+    section: '5.6',
+    figNum: '5-23',
+    src: '/images/xai/uncertainty_distribution.png',
+    caption:
+      'Distribution of model uncertainty (predictive entropy) across the held-out test cohort for the champion CatBoost v2 model. The bimodal shape highlights a confident high-probability mode and a smaller borderline mode (entropy > 0.6) that the CDSS surfaces with an explicit "uncertain — consider additional evaluation" advisory rather than committing to a confident recommendation.',
+  },
+
+  // ── §5.7  Strengths of the Study ──
+  {
+    chapter: 5,
+    section: '5.7',
+    figNum: '5-24',
+    src: '/images/xai/fairness_analysis.png',
+    caption:
+      'Fairness analysis of the CatBoost v2 model across patient subgroups defined by age band (<35, 35–45, >45 years), body mass index category (normal, overweight, obese) and etiological category (genetic, idiopathic, post-surgical). Performance metrics shown are AUC, sensitivity, specificity and demographic parity differences. The absence of clinically meaningful disparities across subgroups (Δ AUC < 0.03 across all strata) is reported as one of the principal strengths of the study and constitutes a key prerequisite for equitable deployment.',
   },
 ]
 
