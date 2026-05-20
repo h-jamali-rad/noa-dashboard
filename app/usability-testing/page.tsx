@@ -6,6 +6,32 @@ import BreadcrumbNav from '@/components/breadcrumb-nav'
 import { ClipboardCheck, ChevronDown, ChevronUp, Headphones, Pause, Volume2, ExternalLink, BarChart3, Users, Star, MessageSquare, CheckCircle2, AlertTriangle, UserPlus, Send, Award } from 'lucide-react'
 import podcastData from '@/data/content/usability_podcast_data.json'
 import AIAssistWrapper from '@/components/ai-assist-wrapper'
+import { sendUsabilityNotification } from '@/components/articles/email-notify'
+
+/**
+ * localStorage key used to persist human SUS evaluations on the client.
+ *
+ * Reason: Vercel's filesystem is read-only, so the SQLite-backed
+ * /api/sus-evaluation POST endpoint always fails in production
+ * (prisma.susEvaluation.create() throws). The form is therefore fully
+ * client-side: submissions are stored in localStorage and the supervisor
+ * is notified via EmailJS (see sendUsabilityNotification below). The
+ * /api/sus-evaluation route is left intact for local dev only.
+ */
+const SUS_STORAGE_KEY = 'sus_human_evaluations_v1'
+
+/**
+ * Compute the System Usability Scale (SUS) score from the 10 raw item
+ * responses (each 1–5). Brooke (1996): odd items contribute (score − 1),
+ * even items contribute (5 − score); total × 2.5 yields 0–100.
+ */
+function calculateSusScoreClient(qs: number[]): number {
+  let sum = 0
+  for (let i = 0; i < 10; i++) {
+    sum += i % 2 === 0 ? qs[i] - 1 : 5 - qs[i]
+  }
+  return sum * 2.5
+}
 
 const HOST_COLORS: Record<string, string> = {
   'Dr. Alex': '#0e7490',
@@ -95,14 +121,28 @@ export default function UsabilityTestingPage() {
   const [humanEvals, setHumanEvals] = useState<HumanEval[]>([])
   const [loadingEvals, setLoadingEvals] = useState(true)
 
-  const loadEvaluations = useCallback(async () => {
+  /**
+   * Load human SUS evaluations from localStorage (client-side persistence).
+   * Falls back gracefully on any storage / parse error (e.g. private mode,
+   * SSR, corrupted JSON). Defined as useCallback so it can be invoked again
+   * right after a successful submission to refresh the on-screen list.
+   */
+  const loadEvaluations = useCallback(() => {
+    if (typeof window === 'undefined') {
+      setLoadingEvals(false)
+      return
+    }
     try {
-      const res = await fetch('/api/sus-evaluation')
-      if (res.ok) {
-        const data = await res.json()
-        setHumanEvals(data.evaluations?.filter((e: HumanEval) => e.evaluatorType === 'human') ?? [])
-      }
-    } catch { /* ignore */ }
+      const raw = window.localStorage.getItem(SUS_STORAGE_KEY)
+      const parsed: HumanEval[] = raw ? JSON.parse(raw) : []
+      setHumanEvals(
+        Array.isArray(parsed)
+          ? parsed.filter((e) => e && e.evaluatorType === 'human')
+          : [],
+      )
+    } catch {
+      setHumanEvals([])
+    }
     setLoadingEvals(false)
   }, [])
 
@@ -144,6 +184,20 @@ export default function UsabilityTestingPage() {
 
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${Math.floor(s % 60).toString().padStart(2, '0')}`
 
+  /**
+   * Handle SUS form submission. Fully client-side:
+   *   1. Validate required fields + all ten Likert answers.
+   *   2. Compute the SUS score with the Brooke (1996) formula.
+   *   3. Persist the evaluation in localStorage (so it survives reloads and
+   *      shows up in the human-evaluations panel).
+   *   4. Fire an EmailJS notification to the supervisor (best-effort —
+   *      failure does NOT block UI success because the evaluation is
+   *      already persisted locally).
+   *
+   * NOTE: the legacy POST to /api/sus-evaluation has been removed because
+   * Vercel's filesystem is read-only and prisma.susEvaluation.create()
+   * always 500s in production. The API route is left in place for local dev.
+   */
   const handleSubmitSus = async () => {
     if (!formName.trim() || !formSpecialty.trim() || !formAffiliation.trim()) {
       setFormError('Please fill in your name, specialty, and affiliation.')
@@ -158,27 +212,69 @@ export default function UsabilityTestingPage() {
     setFormError('')
     setFormSubmitting(true)
     try {
-      const res = await fetch('/api/sus-evaluation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          evaluatorName: formName.trim(),
-          evaluatorEmail: formEmail.trim(),
-          specialty: formSpecialty.trim(),
-          affiliation: formAffiliation.trim(),
-          yearsExperience: parseInt(formExperience) || 0,
-          evaluatorType: 'human',
-          q1: formAnswers[1], q2: formAnswers[2], q3: formAnswers[3], q4: formAnswers[4], q5: formAnswers[5],
-          q6: formAnswers[6], q7: formAnswers[7], q8: formAnswers[8], q9: formAnswers[9], q10: formAnswers[10],
-          qualitativeStrengths: formStrengths.trim(),
-          qualitativeWeaknesses: formWeaknesses.trim(),
-          qualitativeRecommendations: formRecommendations.trim(),
-        }),
+      const qs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => formAnswers[i])
+      const susScore = calculateSusScoreClient(qs)
+      const evaluation: HumanEval = {
+        id: Date.now(),
+        evaluatorName: formName.trim(),
+        specialty: formSpecialty.trim(),
+        affiliation: formAffiliation.trim(),
+        yearsExperience: parseInt(formExperience) || 0,
+        susScore,
+        evaluatorType: 'human',
+        createdAt: new Date().toISOString(),
+      }
+
+      // 1. Persist client-side so the new row appears in the human table.
+      if (typeof window !== 'undefined') {
+        try {
+          const raw = window.localStorage.getItem(SUS_STORAGE_KEY)
+          const existing: HumanEval[] = raw ? JSON.parse(raw) : []
+          const next = Array.isArray(existing) ? [evaluation, ...existing] : [evaluation]
+          window.localStorage.setItem(SUS_STORAGE_KEY, JSON.stringify(next))
+        } catch (storageErr) {
+          // eslint-disable-next-line no-console
+          console.warn('[usability] localStorage write failed:', storageErr)
+        }
+      }
+
+      // 2. Best-effort EmailJS notification (does not block UI success).
+      //    NOTE: the EmailJS templates referenced in components/articles/email-notify.ts
+      //    (template_comment, template_usability) look like human-readable placeholders
+      //    rather than real EmailJS template IDs (which usually look like
+      //    "template_xxxxxxx"). If notifications never arrive in production,
+      //    swap these with the real IDs from the EmailJS dashboard.
+      const qualitativeFeedback = [
+        formStrengths.trim() && `Strengths:\n${formStrengths.trim()}`,
+        formWeaknesses.trim() && `Weaknesses:\n${formWeaknesses.trim()}`,
+        formRecommendations.trim() && `Recommendations:\n${formRecommendations.trim()}`,
+      ].filter(Boolean).join('\n\n') || '—'
+
+      sendUsabilityNotification({
+        evaluatorName: evaluation.evaluatorName,
+        susScores: {
+          Q1: qs[0], Q2: qs[1], Q3: qs[2], Q4: qs[3], Q5: qs[4],
+          Q6: qs[5], Q7: qs[6], Q8: qs[7], Q9: qs[8], Q10: qs[9],
+        },
+        susTotal: susScore,
+        qualitativeFeedback,
+        articleName: 'NOA Predictive Dashboard — Usability / SUS Evaluation',
+        articleId: 'usability-testing',
+      }).then((result) => {
+        if (!result.ok) {
+          // eslint-disable-next-line no-console
+          console.warn('[usability] EmailJS notification did not succeed:', result.error)
+        }
+      }).catch((err) => {
+        // eslint-disable-next-line no-console
+        console.warn('[usability] EmailJS notification threw:', err)
       })
-      if (!res.ok) throw new Error('API error')
+
       setFormSuccess(true)
       loadEvaluations()
-    } catch {
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('[usability] handleSubmitSus failed:', err)
       setFormError('Failed to submit. Please try again.')
     }
     setFormSubmitting(false)
