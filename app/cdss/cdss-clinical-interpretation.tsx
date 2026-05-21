@@ -437,8 +437,8 @@ const COLOR = {
   feedback: '#a78bfa', // violet-400 — Inhibin B / T feedback
   pulse: '#ef4444', // red-500 — pulse colour for over-active
   weak: '#94a3b8', // slate-400
-  label: '#cbd5e1',
-  labelSmall: '#94a3b8',
+  label: '#f1f5f9', // slate-100 — bright label for dark background
+  labelSmall: '#cbd5e1', // slate-300 — readable but slightly dimmer
   adipose: '#fbbf24', // amber-400
   rete: '#a3a3a3', // neutral-400 — rete testis network
   epididymis: '#94a3b8',
@@ -591,32 +591,37 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
 
   return (
     <svg
-      viewBox="0 0 400 500"
-      className="h-auto w-full max-w-[340px]"
+      viewBox="0 0 600 800"
+      className="h-auto w-full max-w-[500px]"
       role="img"
       aria-label="Hypothalamic-Pituitary-Gonadal axis schematic"
     >
+      {/* All content lives in a 400×500 coordinate space, then is uniformly */}
+      {/* scaled 1.5× into the 600×800 viewBox.  Defs go FIRST (outside the   */}
+      {/* scale group) so reference IDs are resolved at the SVG root level    */}
+      {/* — but the actual <use> renders inside the scaled group, so the     */}
+      {/* path geometry is scaled along with everything else.                */}
       <defs>
-        {/* Arrowheads */}
+        {/* Arrowheads — slightly larger at the new scale for visibility */}
         <marker
           id="ah-down"
-          markerWidth="6"
-          markerHeight="6"
-          refX="3"
-          refY="3"
+          markerWidth="8"
+          markerHeight="8"
+          refX="4"
+          refY="4"
           orient="auto"
         >
-          <path d="M0,0 L6,3 L0,6 Z" fill="currentColor" />
+          <path d="M0,0 L8,4 L0,8 Z" fill="currentColor" />
         </marker>
         <marker
           id="ah-pulse"
-          markerWidth="6"
-          markerHeight="6"
-          refX="3"
-          refY="3"
+          markerWidth="8"
+          markerHeight="8"
+          refX="4"
+          refY="4"
           orient="auto"
         >
-          <path d="M0,0 L6,3 L0,6 Z" fill={COLOR.pulse} />
+          <path d="M0,0 L8,4 L0,8 Z" fill={COLOR.pulse} />
         </marker>
         {/* Subtle gradient on brain (gives a hint of depth without flat fill) */}
         <radialGradient id="brain-grad" cx="50%" cy="40%" r="70%">
@@ -640,7 +645,7 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
             x2="0"
             y2="6"
             stroke={COLOR.pulse}
-            strokeWidth="0.9"
+            strokeWidth="1.2"
             opacity="0.5"
           />
         </pattern>
@@ -664,6 +669,12 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           fill="none"
         />
       </defs>
+
+      {/* 1.5× uniform scale group — content drawn in 400×500 coordinates */}
+      {/* but rendered into 600×800 viewBox space.  All subsequent paths, */}
+      {/* circles, ellipses, strokes, fontSizes and animateMotion paths   */}
+      {/* are auto-scaled by the renderer.                                */}
+      <g transform="scale(1.5)">
 
       {/* ============================================================== */}
       {/* BRAIN — top section                                            */}
@@ -691,14 +702,14 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           d="M140,55 Q160,42 180,55 Q200,42 220,55 Q240,42 260,55"
           fill="none"
           stroke={COLOR.brain}
-          strokeWidth="0.7"
+          strokeWidth="1.1"
           opacity="0.5"
         />
         <path
           d="M135,72 Q160,62 185,72 Q210,62 235,72 Q255,62 270,72"
           fill="none"
           stroke={COLOR.brain}
-          strokeWidth="0.7"
+          strokeWidth="1.1"
           opacity="0.4"
         />
 
@@ -725,9 +736,9 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           x="200"
           y="84"
           textAnchor="middle"
-          fontSize="9"
+          fontSize="15"
           fill={COLOR.label}
-          fontWeight="500"
+          fontWeight="600"
         >
           Hypothalamus
         </text>
@@ -760,7 +771,7 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
               x2="200"
               y2="143"
               stroke="#475569"
-              strokeWidth="0.6"
+              strokeWidth="1"
               opacity="0.6"
             />
           </g>
@@ -768,8 +779,9 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
         <text
           x="225"
           y="138"
-          fontSize="8"
-          fill={COLOR.labelSmall}
+          fontSize="14"
+          fill={COLOR.label}
+          fontWeight="600"
         >
           Pituitary
         </text>
@@ -797,7 +809,7 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           <text
             x="206"
             y="118"
-            fontSize="7.5"
+            fontSize="13"
             fontStyle="italic"
             fill={gnrhPulsing ? COLOR.pulse : COLOR.labelSmall}
           >
@@ -861,7 +873,7 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
         <text
           x="120"
           y="265"
-          fontSize="11"
+          fontSize="18"
           fill={fshPulsing ? COLOR.pulse : COLOR.fsh}
           fontWeight="700"
         >
@@ -892,7 +904,7 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
         <text
           x="270"
           y="265"
-          fontSize="11"
+          fontSize="18"
           fill={lhPulsing ? COLOR.pulse : COLOR.lh}
           fontWeight="700"
         >
@@ -935,24 +947,27 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
 
         {/* ----- Seminiferous tubules — coiled loops on left half ----- */}
         <g id="seminiferous-tubules" opacity={tubuleOpacity}>
-          {/* 5 looping tubules — drawn as gentle Bezier coils */}
+          {/* 8 looping tubules — drawn as gentle Bezier coils.            */}
+          {/* The first three are always rendered (even when sparse) so    */}
+          {/* the testis never looks empty.  Additional loops appear when  */}
+          {/* the spermatogenic compartment is intact (tubulesSparse=false)*/}
           <path
             d="M135,395 C145,388 155,395 160,402 C165,408 155,415 145,412 C135,409 130,402 135,395 Z"
             fill="none"
             stroke={tubuleStroke}
-            strokeWidth={tubulesSparse ? 0.9 : 1.5}
+            strokeWidth={tubulesSparse ? 0.9 : 1.6}
           />
           <path
             d="M125,418 C140,408 165,418 170,432 C173,440 158,448 142,440 C128,432 120,425 125,418 Z"
             fill="none"
             stroke={tubuleStroke}
-            strokeWidth={tubulesSparse ? 0.9 : 1.5}
+            strokeWidth={tubulesSparse ? 0.9 : 1.6}
           />
           <path
             d="M135,445 C150,438 175,448 175,460 C173,470 155,470 142,463 C132,457 128,450 135,445 Z"
             fill="none"
             stroke={tubuleStroke}
-            strokeWidth={tubulesSparse ? 0.9 : 1.5}
+            strokeWidth={tubulesSparse ? 0.9 : 1.6}
           />
           {!tubulesSparse && (
             <>
@@ -960,18 +975,39 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
                 d="M155,380 C170,375 188,385 187,398 C186,405 172,408 162,402 C152,396 150,386 155,380 Z"
                 fill="none"
                 stroke={tubuleStroke}
-                strokeWidth="1.5"
+                strokeWidth="1.6"
               />
               <path
                 d="M170,422 C188,418 205,428 200,442 C195,452 180,452 168,444 C158,436 158,425 170,422 Z"
                 fill="none"
                 stroke={tubuleStroke}
-                strokeWidth="1.5"
+                strokeWidth="1.6"
+              />
+              {/* Three additional coils for richer detail at this scale */}
+              <path
+                d="M115,388 C124,381 138,386 142,394 C144,400 134,406 126,403 C118,401 112,394 115,388 Z"
+                fill="none"
+                stroke={tubuleStroke}
+                strokeWidth="1.4"
+              />
+              <path
+                d="M158,418 C172,414 186,422 184,432 C181,440 168,440 158,434 C148,428 148,422 158,418 Z"
+                fill="none"
+                stroke={tubuleStroke}
+                strokeWidth="1.4"
+              />
+              <path
+                d="M180,392 C195,390 207,402 204,412 C200,418 188,418 182,410 C176,402 174,395 180,392 Z"
+                fill="none"
+                stroke={tubuleStroke}
+                strokeWidth="1.4"
               />
             </>
           )}
 
-          {/* ----- Sertoli cells — small dots along tubule walls ------ */}
+          {/* ----- Sertoli cells — small dots along tubule walls ------- */}
+          {/* Expanded from 11 → 18 to give a denser, more anatomically    */}
+          {/* convincing compartment at the higher rendered scale.        */}
           <g id="sertoli-cells">
             {[
               [148, 396],
@@ -985,12 +1021,19 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
               [168, 458],
               [180, 446],
               [185, 393],
+              [125, 400],
+              [132, 411],
+              [128, 425],
+              [138, 438],
+              [148, 460],
+              [172, 405],
+              [190, 415],
             ].map(([cx, cy], i) => (
               <circle
                 key={`sert-${i}`}
                 cx={cx}
                 cy={cy}
-                r={tubulesSparse ? 0.9 : 1.5}
+                r={tubulesSparse ? 0.9 : 1.7}
                 fill={sertoliColor}
                 opacity={tubulesSparse ? 0.6 : 1}
               />
@@ -1000,14 +1043,17 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
             x="155"
             y="480"
             textAnchor="middle"
-            fontSize="7.5"
-            fill={COLOR.labelSmall}
+            fontSize="13"
+            fill={COLOR.label}
+            fontWeight="600"
           >
             tubules · Sertoli
           </text>
         </g>
 
         {/* ----- Leydig clusters — between tubules on right half ------ */}
+        {/* Expanded from 10 → 14 triplets (= 42 cells total) for a       */}
+        {/* richer interstitial compartment at the higher scale.          */}
         <Pulse active={leydigPulse} duration={1.4}>
           <g id="leydig-cells" opacity={leydigOpacity}>
             {/* Small triangular clusters of 3 cells each */}
@@ -1022,11 +1068,15 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
               [255, 448],
               [225, 460],
               [248, 462],
+              [215, 405],
+              [270, 405],
+              [270, 442],
+              [218, 432],
             ].map(([cx, cy], i) => (
               <g key={`ley-${i}`}>
-                <circle cx={cx} cy={cy} r="2.2" fill={leydigColor} />
-                <circle cx={cx + 3.5} cy={cy + 1} r="2.0" fill={leydigColor} />
-                <circle cx={cx + 1.5} cy={cy + 3.5} r="2.0" fill={leydigColor} />
+                <circle cx={cx} cy={cy} r="2.4" fill={leydigColor} />
+                <circle cx={cx + 3.5} cy={cy + 1} r="2.2" fill={leydigColor} />
+                <circle cx={cx + 1.5} cy={cy + 3.5} r="2.2" fill={leydigColor} />
               </g>
             ))}
           </g>
@@ -1035,8 +1085,9 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           x="248"
           y="480"
           textAnchor="middle"
-          fontSize="7.5"
-          fill={COLOR.labelSmall}
+          fontSize="13"
+          fill={COLOR.label}
+          fontWeight="600"
         >
           Leydig (interstitium)
         </text>
@@ -1047,19 +1098,19 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
             d="M195,400 Q200,415 195,430 Q200,445 195,455"
             fill="none"
             stroke={COLOR.rete}
-            strokeWidth="0.8"
+            strokeWidth="1.1"
           />
           <path
             d="M205,400 Q200,415 205,430 Q200,445 205,455"
             fill="none"
             stroke={COLOR.rete}
-            strokeWidth="0.8"
+            strokeWidth="1.1"
           />
           <text
             x="200"
             y="395"
             textAnchor="middle"
-            fontSize="6.5"
+            fontSize="12"
             fill={COLOR.labelSmall}
             fontStyle="italic"
           >
@@ -1083,15 +1134,16 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
             d="M292,395 Q302,392 308,398 M289,405 Q300,402 310,408 M292,417 Q302,415 309,420"
             fill="none"
             stroke={COLOR.epididymis}
-            strokeWidth="0.7"
+            strokeWidth="1.1"
             opacity="0.7"
           />
           <text
             x="305"
             y="382"
             textAnchor="middle"
-            fontSize="7.5"
-            fill={COLOR.labelSmall}
+            fontSize="13"
+            fill={COLOR.label}
+            fontWeight="600"
           >
             epididymis
           </text>
@@ -1116,7 +1168,7 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           <text
             x="80"
             y="425"
-            fontSize="6.5"
+            fontSize="12"
             fill={COLOR.labelSmall}
             fontStyle="italic"
           >
@@ -1128,7 +1180,7 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           x="200"
           y="498"
           textAnchor="middle"
-          fontSize="10"
+          fontSize="16"
           fill={COLOR.label}
           fontWeight="600"
         >
@@ -1152,17 +1204,18 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
         />
         <text
           x="22"
-          y="270"
-          fontSize="8"
+          y="266"
+          fontSize="14"
           fill={inhibinStroke}
           fontStyle="italic"
+          fontWeight="600"
         >
           Inhibin B
         </text>
         <text
           x="22"
-          y="282"
-          fontSize="7"
+          y="284"
+          fontSize="12"
           fill={COLOR.labelSmall}
           fontStyle="italic"
         >
@@ -1182,18 +1235,18 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
         />
         <text
           x="350"
-          y="270"
-          fontSize="9"
+          y="266"
+          fontSize="15"
           fill={tStroke}
           fontStyle="italic"
-          fontWeight="600"
+          fontWeight="700"
         >
           T
         </text>
         <text
-          x="343"
-          y="282"
-          fontSize="7"
+          x="334"
+          y="284"
+          fontSize="12"
           fill={COLOR.labelSmall}
           fontStyle="italic"
         >
@@ -1247,7 +1300,7 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
             x={state.adipose === 'large' ? 58 : 60}
             y={state.adipose === 'large' ? 400 : 392}
             textAnchor="middle"
-            fontSize="7.5"
+            fontSize="13"
             fill={COLOR.adipose}
           >
             adipose
@@ -1257,7 +1310,7 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
               x={state.adipose === 'large' ? 58 : 60}
               y={state.adipose === 'large' ? 410 : 402}
               textAnchor="middle"
-              fontSize="6.5"
+              fontSize="12"
               fill={COLOR.adipose}
               fontStyle="italic"
             >
@@ -1284,7 +1337,7 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
             <text
               x="125"
               y="395"
-              fontSize="7"
+              fontSize="12"
               fill={COLOR.adipose}
               fontStyle="italic"
             >
@@ -1293,6 +1346,8 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           </g>
         </Pulse>
       )}
+
+      </g>{/* end scale(1.5) wrapper */}
     </svg>
   )
 }
@@ -1352,7 +1407,7 @@ function ConditionCard({ condition }: { condition: DetectedCondition }) {
       {/* Coloured left strip — instant visual severity cue */}
       <div className={`absolute left-0 top-0 h-full w-1 ${s.leftBar}`} />
 
-      <div className="grid grid-cols-1 gap-4 p-4 pl-5 md:grid-cols-[300px_1fr] md:gap-5">
+      <div className="grid grid-cols-1 gap-4 p-4 pl-5 md:grid-cols-[440px_1fr] md:gap-5">
         {/* ----- SVG diagram (left on md+, top on mobile) ----- */}
         <div className="flex items-start justify-center rounded-md border border-border/40 bg-background/40 p-2">
           <HpgAxisSvg state={condition.axisState} />
