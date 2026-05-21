@@ -42,6 +42,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
+import { mergeAxisStates, type AxisState } from './hpg-axis-3d'
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -85,26 +86,9 @@ const THRESHOLDS = {
 } as const
 
 // ---------------------------------------------------------------------------
-// Anatomical state machine — drives the SVG rendering
+// Anatomical state machine — drives the 3D rendering
+// (AxisState type is imported from `./hpg-axis-3d` — single source of truth)
 // ---------------------------------------------------------------------------
-
-type AxisState = {
-  hypothalamus: 'normal' | 'compensating' | 'faded'
-  gnrh: 'normal' | 'pulsing' | 'faded' | 'suppressed'
-  pituitary: 'normal' | 'compensating' | 'faded'
-  fsh: 'normal' | 'pulsing' | 'faded' | 'weak'
-  lh: 'normal' | 'pulsing' | 'faded' | 'weak'
-  testis: 'normal' | 'atrophic' | 'damaged' | 'faded'
-  tubules: 'normal' | 'damaged' | 'sparse'
-  sertoli: 'normal' | 'damaged'
-  leydig: 'normal' | 'damaged' | 'unresponsive'
-  testosterone: 'normal' | 'weak' | 'broken' | 'absent' | 'faded'
-  inhibinB: 'normal' | 'broken' | 'weak'
-  epididymis: 'normal' | 'faded'
-  vessels: 'normal' | 'faded'
-  adipose: 'none' | 'present' | 'large'
-  aromatase: 'none' | 'active'
-}
 
 const DEFAULT_AXIS: AxisState = {
   hypothalamus: 'normal',
@@ -482,7 +466,7 @@ const COLOR = {
 const HPGAxis3D = dynamic(() => import('./hpg-axis-3d'), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[460px] w-full items-center justify-center rounded-xl bg-slate-900">
+    <div className="flex h-full min-h-[400px] w-full items-center justify-center rounded-xl bg-slate-900">
       <div className="flex flex-col items-center gap-2">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-400 border-t-transparent" />
         <span className="text-xs font-medium text-slate-300">Loading 3D anatomy…</span>
@@ -546,95 +530,48 @@ function ConditionCard({ condition }: { condition: DetectedCondition }) {
       {/* Coloured left strip — instant visual severity cue */}
       <div className={`absolute left-0 top-0 h-full w-1 ${s.leftBar}`} />
 
-      <div className="grid grid-cols-1 gap-4 p-4 pl-5 md:grid-cols-[minmax(0,520px)_1fr] md:gap-5">
-        {/* ----- Interactive 3D anatomical diagram (left on md+, top on mobile) ----- */}
-        {/* The container is forced to a slate-900 dark background regardless */}
-        {/* of the page theme (light/dark) because the 3D scene was designed   */}
-        {/* against a dark medical-illustration backdrop and uses pure white   */}
-        {/* labels.  Without this, hormone-stream labels become invisible in   */}
-        {/* light mode (white-on-white).                                       */}
-        <div className="flex flex-col items-stretch rounded-md border border-slate-700/60 bg-slate-900 p-2">
-          <HPGAxis3D state={condition.axisState} />
-
-          {/* Color legend — explains the 3-state semantic colour system    */}
-          {/* used throughout the diagram (green=normal, amber=compensating, */}
-          {/* red=abnormal/dysfunctional).  Small dots match the actual SVG  */}
-          {/* stroke colours so users can map them at a glance.              */}
-          <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-[11px] font-semibold text-white">
-            <span className="inline-flex items-center gap-1.5">
-              <span
-                className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-white/30"
-                style={{ backgroundColor: '#22c55e' }}
-                aria-hidden
-              />
-              Normal
-            </span>
-            <span className="text-slate-500" aria-hidden>
-              |
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span
-                className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-white/30"
-                style={{ backgroundColor: '#f59e0b' }}
-                aria-hidden
-              />
-              Compensating
-            </span>
-            <span className="text-slate-500" aria-hidden>
-              |
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span
-                className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-white/30"
-                style={{ backgroundColor: '#ef4444' }}
-                aria-hidden
-              />
-              Abnormal / Dysfunctional
-            </span>
-          </div>
+      {/* Text-only card — the 3D atlas is rendered ONCE at the top-level     */}
+      {/* of the ClinicalInterpretation component (sticky on lg+), with its  */}
+      {/* state computed by merging axisStates of all detected conditions.   */}
+      <div className="space-y-3 p-4 pl-5">
+        <div className="flex items-center justify-between gap-2">
+          <h4 className="text-base font-semibold leading-tight">
+            {condition.name}
+          </h4>
+          <span
+            className={`inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${s.badge}`}
+          >
+            {s.label}
+          </span>
         </div>
 
-        {/* ----- Text panel ----- */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <h4 className="text-base font-semibold leading-tight">
-              {condition.name}
-            </h4>
-            <span
-              className={`inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${s.badge}`}
-            >
-              {s.label}
-            </span>
-          </div>
+        <p className="text-[13px] leading-relaxed text-foreground/85">
+          {condition.narrative}
+        </p>
 
-          <p className="text-[13px] leading-relaxed text-foreground/85">
-            {condition.narrative}
+        <div className="rounded-md border border-violet-500/20 bg-violet-500/5 px-3 py-2">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-violet-300/80">
+            Micro-TESE prognosis
           </p>
+          <p className="text-[12px] leading-relaxed text-foreground/80">
+            {condition.prognosis}
+          </p>
+        </div>
 
-          <div className="rounded-md border border-violet-500/20 bg-violet-500/5 px-3 py-2">
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-violet-300/80">
-              Micro-TESE prognosis
-            </p>
-            <p className="text-[12px] leading-relaxed text-foreground/80">
-              {condition.prognosis}
-            </p>
-          </div>
-
-          <div className="rounded-md border border-border/50 bg-muted/30 px-3 py-2">
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Triggered by
-            </p>
-            <ul className="space-y-0.5">
-              {condition.evidence.map((e) => (
-                <li
-                  key={e}
-                  className="font-mono text-[11px] tabular-nums text-foreground/90"
-                >
-                  • {e}
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div className="rounded-md border border-border/50 bg-muted/30 px-3 py-2">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+            Triggered by
+          </p>
+          <ul className="space-y-0.5">
+            {condition.evidence.map((e) => (
+              <li
+                key={e}
+                className="font-mono text-[11px] tabular-nums text-foreground/90"
+              >
+                • {e}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </motion.div>
@@ -811,6 +748,14 @@ export default function ClinicalInterpretation({
 }: ClinicalInterpretationProps) {
   const conditions = useMemo(() => detectConditions(vals), [vals])
 
+  // Merge axisStates across all detected conditions into one shared state
+  // for the single 3D atlas.  Picks the field-wise worst case so a patient
+  // with multiple overlapping conditions still sees a coherent diagram.
+  const mergedAxisState = useMemo(
+    () => mergeAxisStates(conditions.map((c) => c.axisState)),
+    [conditions]
+  )
+
   // No abnormalities → render nothing. Parent AnimatePresence handles the
   // fade-in/out of this entire block as the user edits values.
   if (conditions.length === 0) return null
@@ -846,17 +791,77 @@ export default function ClinicalInterpretation({
         </p>
       </div>
 
-      {/* Condition cards */}
-      <div className="space-y-3">
-        <AnimatePresence mode="popLayout" initial={false}>
-          {conditions.map((c) => (
-            <ConditionCard key={c.id} condition={c} />
-          ))}
-        </AnimatePresence>
-      </div>
+      {/* ----- 50 / 50 split: clinical text on the left, sticky 3D atlas */}
+      {/* on the right.  Stacks vertically on screens < lg (1024px).      */}
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+        {/* LEFT — clinical text panel (scrolls naturally) */}
+        <div className="space-y-3 lg:w-1/2 lg:min-w-0">
+          <AnimatePresence mode="popLayout" initial={false}>
+            {conditions.map((c) => (
+              <ConditionCard key={c.id} condition={c} />
+            ))}
+          </AnimatePresence>
 
-      {/* Scientific Basis */}
-      <ScientificBasis />
+          {/* Scientific Basis */}
+          <ScientificBasis />
+        </div>
+
+        {/* RIGHT — sticky 3D anatomical atlas */}
+        <div className="lg:sticky lg:top-4 lg:w-1/2 lg:self-start">
+          <div className="flex flex-col rounded-md border border-slate-700/60 bg-slate-900 p-2">
+            {/* Header */}
+            <div className="mb-2 flex items-center justify-between px-1">
+              <div>
+                <h4 className="text-[12px] font-semibold uppercase tracking-wide text-slate-200">
+                  Interactive HPG Axis Atlas
+                </h4>
+                <p className="text-[10px] text-slate-400">
+                  Hover any structure for details • Drag to rotate
+                </p>
+              </div>
+            </div>
+
+            {/* 3D scene — fills available height, never collapses */}
+            <div className="h-[calc(100vh-200px)] min-h-[500px] w-full overflow-hidden rounded">
+              <HPGAxis3D state={mergedAxisState} />
+            </div>
+
+            {/* Color legend */}
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-[11px] font-semibold text-white">
+              <span className="inline-flex items-center gap-1.5">
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-white/30"
+                  style={{ backgroundColor: '#22c55e' }}
+                  aria-hidden
+                />
+                Normal
+              </span>
+              <span className="text-slate-500" aria-hidden>
+                |
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-white/30"
+                  style={{ backgroundColor: '#f59e0b' }}
+                  aria-hidden
+                />
+                Compensating
+              </span>
+              <span className="text-slate-500" aria-hidden>
+                |
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-white/30"
+                  style={{ backgroundColor: '#ef4444' }}
+                  aria-hidden
+                />
+                Abnormal / Dysfunctional
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
