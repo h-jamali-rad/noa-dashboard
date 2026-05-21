@@ -16,6 +16,7 @@ import ShapWaterfall, { type ShapContribution } from './cdss-shap-waterfall'
 import ThresholdEqualizer from './cdss-threshold-equalizer'
 import BinaryOutcomeCard from './cdss-binary-outcome'
 import ModelInterpretation from './cdss-model-interpretation'
+import ClinicalInterpretation from './cdss-clinical-interpretation'
 // Cohort distribution data (n=2,413 NOA patients). The full JSON lives at
 // public/data/biomarker_distributions.json so it is also fetchable at
 // runtime; here we statically import it so the values arrays are bundled
@@ -503,6 +504,23 @@ export default function CdssForm() {
             />
 
             <ModelInterpretation contributions={result.contributions} />
+
+            {/* Clinical interpretation — only mounts when at least one
+                biomarker crosses an andrology cut-off. The component
+                renders nothing internally when nothing is abnormal, so
+                AnimatePresence here drives the entry/exit transition of
+                the *entire* panel as the user edits values. */}
+            <AnimatePresence>
+              <motion.div
+                key="clinical-interp"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+              >
+                <ClinicalInterpretation vals={vals} />
+              </motion.div>
+            </AnimatePresence>
           </>
         )}
       </div>
