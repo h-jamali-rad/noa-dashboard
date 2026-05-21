@@ -8,6 +8,21 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
+import BiomarkerDistributionChart, {
+  type BiomarkerDistribution,
+} from './biomarker-distribution-chart'
+import ShapWaterfall, { type ShapContribution } from './cdss-shap-waterfall'
+import ThresholdEqualizer from './cdss-threshold-equalizer'
+import BinaryOutcomeCard from './cdss-binary-outcome'
+import ModelInterpretation from './cdss-model-interpretation'
+// Cohort distribution data (n=2,413 NOA patients). The full JSON lives at
+// public/data/biomarker_distributions.json so it is also fetchable at
+// runtime; here we statically import it so the values arrays are bundled
+// and the KDE renders without a loading state.
+import biomarkerDistributionsJson from '@/public/data/biomarker_distributions.json'
+
+const BIOMARKER_DISTRIBUTIONS: Record<string, BiomarkerDistribution> =
+  biomarkerDistributionsJson as Record<string, BiomarkerDistribution>
 
 type NumField = {
   key: string
@@ -64,7 +79,9 @@ const BRIER_EXPLANATION =
 const BASE_SUCCESS_RATE = 0.367
 const CATBOOST_AUC = 0.8306
 const CATBOOST_CI = '0.823–0.845'
-const RETRIEVAL_THRESHOLD = 0.50  // 50% probability threshold for binary prediction
+// RETRIEVAL_THRESHOLD removed — superseded by the user-adjustable
+// ThresholdEqualizer slider, which is the single source of truth for the
+// LIKELY/UNLIKELY cutoff used by BinaryOutcomeCard.
 const WEIGHT_SUM = FEATURE_FIELDS.reduce((acc, f) => acc + f.weight, 0)
 
 const PATHOLOGY_SCORE: Record<string, number> = {
@@ -141,35 +158,12 @@ function getRiskTooltipText(probabilityPct: number, tier: RiskTier): string {
   return `With a ${p}% probability of successful sperm retrieval, this patient is categorized as high risk for an unfavorable outcome. Threshold <40% suggests poor candidacy; alternatives should be considered before surgery.`
 }
 
-/** Returns a zone label for the color bar */
-function getZone(value: number, field: NumField): 'below' | 'low' | 'normal' | 'high' | 'above' {
-  if (value < field.min) return 'below'
-  if (value > field.max) return 'above'
-  if (value >= field.q1 && value <= field.q3) return 'normal'
-  if (value < field.q1) return 'low'
-  return 'high'
-}
-
-function getZoneLabel(zone: 'below' | 'low' | 'normal' | 'high' | 'above'): string {
-  switch (zone) {
-    case 'below': return 'Out of Range (Below)'
-    case 'above': return 'Out of Range (Above)'
-    case 'low': return 'Below IQR'
-    case 'high': return 'Above IQR'
-    case 'normal': return 'Within IQR'
-  }
-}
-
-function getZoneColor(zone: 'below' | 'low' | 'normal' | 'high' | 'above'): string {
-  switch (zone) {
-    case 'below': return '#ef4444'  // red
-    case 'above': return '#f97316'  // orange
-    case 'low': return '#38bdf8'    // sky
-    case 'high': return '#f59e0b'   // amber
-    case 'normal': return '#10b981' // emerald
-  }
-}
-
+/**
+ * Tailwind input border colour reflecting where the user-entered value
+ * falls relative to the cohort's min/Q1/Q3/max. The biomarker chart below
+ * the input gives the richer signal; this keeps a fast at-a-glance cue
+ * directly on the field itself.
+ */
 function getInputClass(value: string | undefined, field: Pick<NumField, 'min' | 'q1' | 'q3' | 'max'>) {
   if (!value) return ''
   const v = Number(value)
@@ -181,52 +175,6 @@ function getInputClass(value: string | undefined, field: Pick<NumField, 'min' | 
   return 'border-sky-500 ring-1 ring-sky-400'
 }
 
-/** Color bar component showing value position relative to min/q1/q3/max */
-function RangeBar({ value, field }: { value: string | undefined; field: NumField }) {
-  const v = Number(value)
-  if (!value || Number.isNaN(v)) return null
-
-  const zone = getZone(v, field)
-  const zoneColor = getZoneColor(zone)
-  const zoneLabel = getZoneLabel(zone)
-
-  // Calculate indicator position as % of the bar
-  const fullRange = field.max - field.min
-  let pct: number
-  if (v <= field.min) pct = 0
-  else if (v >= field.max) pct = 100
-  else pct = ((v - field.min) / fullRange) * 100
-
-  // Segment widths (proportional to actual range)
-  const q1Pct = ((field.q1 - field.min) / fullRange) * 100
-  const iqrPct = ((field.q3 - field.q1) / fullRange) * 100
-  const q3Pct = ((field.max - field.q3) / fullRange) * 100
-
-  return (
-    <div className="mt-1.5 space-y-0.5">
-      <div className="relative h-2 w-full rounded-full overflow-hidden flex">
-        {/* Below Q1 */}
-        <div className="h-full bg-sky-400/50 dark:bg-sky-500/40" style={{ width: `${q1Pct}%` }} />
-        {/* IQR — normal range */}
-        <div className="h-full bg-emerald-400/50 dark:bg-emerald-500/40" style={{ width: `${iqrPct}%` }} />
-        {/* Above Q3 */}
-        <div className="h-full bg-amber-400/50 dark:bg-amber-500/40" style={{ width: `${q3Pct}%` }} />
-        {/* Indicator triangle */}
-        <div
-          className="absolute top-0 h-full w-0.5 rounded-full"
-          style={{ left: `${Math.min(Math.max(pct, 1), 99)}%`, backgroundColor: zoneColor }}
-        />
-      </div>
-      <div className="flex items-center justify-between">
-        <span className="text-[9px] font-medium" style={{ color: zoneColor }}>
-          {zone === 'below' || zone === 'above' ? '⚠ ' : ''}{zoneLabel}
-        </span>
-        <span className="text-[9px] text-muted-foreground/60">{field.min} — {field.max}</span>
-      </div>
-    </div>
-  )
-}
-
 
 export default function CdssForm() {
   const [vals, setVals] = useState<Record<string, string>>({})
@@ -234,7 +182,19 @@ export default function CdssForm() {
     RT_Pathology: [],
     LT_Pathology: [],
   })
-  const [result, setResult] = useState<{ p: number; tier: RiskTier } | null>(null)
+  // `result.contributions` is the SHAP-style per-feature decomposition of
+  // the logit (same numbers fed into the sigmoid in onSubmit). It is
+  // consumed by ShapWaterfall and ModelInterpretation; storing it on the
+  // result object means a re-render of either component cannot drift
+  // away from the displayed probability.
+  const [result, setResult] = useState<{
+    p: number
+    tier: RiskTier
+    contributions: ShapContribution[]
+  } | null>(null)
+  // User-adjustable decision threshold for the binary outcome card. The
+  // default 0.50 matches the Youden-aligned cutoff used in the thesis.
+  const [threshold, setThreshold] = useState(0.5)
 
   const togglePathology = (fieldKey: string, value: string) => {
     setPathology((prev) => {
@@ -257,25 +217,48 @@ export default function CdssForm() {
   }
 
   const onSubmit = () => {
+    // Per-feature contributions accumulated as we sum the weighted signal.
+    // We record *what each feature added to the logit* so the SHAP
+    // waterfall and the interpretation panel display exactly the same
+    // numbers the model used. (Biomarker contribution = field.weight ·
+    // normalised feature score; pathology contribution = the clamped
+    // aggregated pathology signal.)
+    const contributions: ShapContribution[] = []
+
     const weightedSignal = FEATURE_FIELDS.reduce((acc, field) => {
       const rawValue = Number(vals[field.key] ?? '')
       if (!Number.isFinite(rawValue)) return acc
       const featureScore = normalizeWithinBounds(rawValue, field)
-      return acc + field.weight * featureScore
+      const contribution = field.weight * featureScore
+      contributions.push({
+        key: field.key,
+        label: field.label,
+        contribution,
+      })
+      return acc + contribution
     }, 0)
 
     const pathologySelections = [...(pathology.RT_Pathology ?? []), ...(pathology.LT_Pathology ?? [])]
     const pathologySignalRaw = pathologySelections.reduce((acc, key) => acc + (PATHOLOGY_SCORE[key] ?? 0), 0)
     const pathologySignal = Math.max(-0.35, Math.min(0.35, pathologySignalRaw / 2))
 
+    // Aggregate the histopathology contribution into a single SHAP row so
+    // it's directly comparable to the biomarker rows. Only added when the
+    // clinician has actually selected at least one pathology pattern.
+    if (pathologySelections.length > 0 && pathologySignal !== 0) {
+      contributions.push({
+        key: 'pathology',
+        label: 'Histopathology',
+        contribution: pathologySignal,
+      })
+    }
+
     const normalizedSignal = weightedSignal / WEIGHT_SUM
     const logit = Math.log(BASE_SUCCESS_RATE / (1 - BASE_SUCCESS_RATE)) + 2.1 * normalizedSignal + pathologySignal
     const probability = sigmoid(logit)
     const pct = probability * 100
-    setResult({ p: pct, tier: getRiskTier(pct) })
+    setResult({ p: pct, tier: getRiskTier(pct), contributions })
   }
-
-  const retrievalPrediction = result ? result.p >= (RETRIEVAL_THRESHOLD * 100) : null
 
   return (
     <TooltipProvider>
@@ -298,7 +281,11 @@ export default function CdssForm() {
                 className={cn('placeholder:text-muted-foreground/30 placeholder:font-light', getInputClass(vals[f.key], f))}
                 type="number"
               />
-              <RangeBar value={vals[f.key]} field={f} />
+              <BiomarkerDistributionChart
+                value={vals[f.key]}
+                distribution={BIOMARKER_DISTRIBUTIONS[f.key]}
+                label={f.label}
+              />
             </div>
           ))}
         </div>
@@ -446,33 +433,40 @@ export default function CdssForm() {
               </Tooltip>
             </div>
 
-            {/* Binary sperm retrieval prediction */}
-            <div className="flex items-center justify-center">
-              <div className={cn(
-                'inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold',
-                retrievalPrediction
-                  ? 'border-emerald-400 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700'
-                  : 'border-red-400 bg-red-50 text-red-800 dark:bg-red-950/40 dark:text-red-300 dark:border-red-700'
-              )}>
-                <span className="text-lg">{retrievalPrediction ? '✓' : '✗'}</span>
-                <span>
-                  Sperm Retrieval Prediction: <strong>{retrievalPrediction ? '1 (Successful)' : '0 (Unsuccessful)'}</strong>
-                </span>
-              </div>
-            </div>
-
-            {/* Threshold explanation */}
-            <p className="text-center text-[11px] text-muted-foreground leading-relaxed">
-              Binary threshold: ≥50% → Predicted Successful (1) &nbsp;|&nbsp; &lt;50% → Predicted Unsuccessful (0)<br/>
-              <span className="text-muted-foreground/60">
-                Threshold selected at 0.50 (Youden-aligned default). Reported micro-TESE success rate: 46–54% across literature.
-              </span>
-            </p>
-
             <p className="text-center text-xs text-muted-foreground">
               Interpretation: <strong>higher probability = lower clinical risk</strong> for failed sperm retrieval.
             </p>
           </div>
+        )}
+
+        {/* Phase 2 explainability panels. Rendered as siblings below the
+            top-level probability card so the user can compare them
+            side-by-side with the headline number. Ordering is deliberate:
+            (1) SHAP waterfall = global "where did this number come from?",
+            (2) threshold equalizer = "what does this number mean for the
+            binary cutoff?", (3) binary outcome = the answer to (2),
+            (4) model interpretation = drill-down ranking for the curious. */}
+        {result && (
+          <>
+            <ShapWaterfall
+              baseRate={BASE_SUCCESS_RATE}
+              probability={result.p / 100}
+              contributions={result.contributions}
+            />
+
+            <ThresholdEqualizer
+              threshold={threshold}
+              onThresholdChange={setThreshold}
+              probability={result.p / 100}
+            />
+
+            <BinaryOutcomeCard
+              probability={result.p / 100}
+              threshold={threshold}
+            />
+
+            <ModelInterpretation contributions={result.contributions} />
+          </>
         )}
       </div>
     </TooltipProvider>
