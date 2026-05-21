@@ -533,12 +533,16 @@ function FlowingDots({
 // ---------------------------------------------------------------------------
 
 function HpgAxisSvg({ state }: { state: AxisState }) {
-  // ---- Derived visual props per anatomical group ----------------------
+  // -------------------------------------------------------------------------
+  // Derived visual props per anatomical group
+  // -------------------------------------------------------------------------
   // Each organ resolves to one of three semantic colours (green / amber / red)
   // depending on its state.  This is the central place where the abstract
-  // AxisState enum is mapped to actual SVG colours / stroke widths.
+  // AxisState enum is mapped to actual SVG colours / stroke widths.  We also
+  // derive human-readable status labels for the <title> hover tooltips.
+  // -------------------------------------------------------------------------
 
-  // ----- HYPOTHALAMUS -----
+  // ----- HYPOTHALAMUS -----------------------------------------------------
   const hypFaded = state.hypothalamus === 'faded'
   const hypCompensating = state.hypothalamus === 'compensating'
   const hypStroke = hypFaded
@@ -547,8 +551,13 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
       ? COLOR.compensating
       : COLOR.normal
   const hypStrokeWidth = hypCompensating ? 3 : 1.8
+  const hypStatus = hypCompensating
+    ? 'Compensating (↑drive)'
+    : hypFaded
+      ? 'Faded'
+      : 'Normal'
 
-  // ----- PITUITARY -----
+  // ----- PITUITARY --------------------------------------------------------
   const pitFaded = state.pituitary === 'faded'
   const pitCompensating = state.pituitary === 'compensating'
   const pitStroke = pitFaded
@@ -557,8 +566,13 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
       ? COLOR.compensating
       : COLOR.normal
   const pitStrokeWidth = pitCompensating ? 3 : 1.8
+  const pitStatus = pitCompensating
+    ? 'Compensating (↑FSH/LH output)'
+    : pitFaded
+      ? 'Faded'
+      : 'Normal'
 
-  // ----- GnRH ARROW -----
+  // ----- GnRH ARROW -------------------------------------------------------
   const gnrhPulsing = state.gnrh === 'pulsing'
   const gnrhFaded = state.gnrh === 'faded' || state.gnrh === 'suppressed'
   const gnrhColor = gnrhFaded
@@ -566,23 +580,24 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
     : gnrhPulsing
       ? COLOR.compensating
       : COLOR.normal
-  // GnRH pulsing means hypothalamus is firing harder → COMPENSATING (amber),
-  // not "broken" — so wide amber stroke + flowing dots, no red.
   const gnrhWidth = gnrhPulsing ? 3 : 2
 
-  // ----- FSH ARROW -----
+  // ----- FSH ARROW --------------------------------------------------------
   const fshPulsing = state.fsh === 'pulsing'
   const fshFaded = state.fsh === 'faded' || state.fsh === 'weak'
-  // FSH pulsing = pituitary overproducing FSH (primary testicular failure)
-  // → ABNORMAL (red), thick stroke 4-5px with flowing dots.
   const fshColor = fshFaded
     ? COLOR.weak
     : fshPulsing
       ? COLOR.abnormal
       : COLOR.normal
-  const fshWidth = fshPulsing ? 4.5 : fshFaded ? 1.2 : 2.5
+  const fshWidth = fshPulsing ? 4.5 : fshFaded ? 1.4 : 2.5
+  const fshStatus = fshPulsing
+    ? 'OVER-ACTIVE (↑↑) — pituitary hyper-secreting'
+    : fshFaded
+      ? 'Weak / Faded'
+      : 'Normal'
 
-  // ----- LH ARROW -----
+  // ----- LH ARROW ---------------------------------------------------------
   const lhPulsing = state.lh === 'pulsing'
   const lhFaded = state.lh === 'faded' || state.lh === 'weak'
   const lhColor = lhFaded
@@ -590,29 +605,35 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
     : lhPulsing
       ? COLOR.abnormal
       : COLOR.normal
-  const lhWidth = lhPulsing ? 4.5 : lhFaded ? 1.2 : 2.5
+  const lhWidth = lhPulsing ? 4.5 : lhFaded ? 1.4 : 2.5
+  const lhStatus = lhPulsing
+    ? 'OVER-ACTIVE (↑↑) — pituitary hyper-secreting'
+    : lhFaded
+      ? 'Weak / Faded'
+      : 'Normal'
 
-  // ----- TESTIS -----
-  const testisScale = state.testis === 'atrophic' ? 0.72 : 1
-  const testisStroke =
-    state.testis === 'damaged'
-      ? COLOR.abnormal
-      : state.testis === 'atrophic'
-        ? COLOR.compensating
-        : state.testis === 'faded'
-          ? COLOR.weak
-          : COLOR.normal
-  const testisStrokeWidth =
-    state.testis === 'damaged' ? 4 : state.testis === 'atrophic' ? 3 : 2
-  const testisFillOpacity =
-    state.testis === 'faded'
-      ? 0.35
-      : state.testis === 'damaged'
-        ? 0.55
-        : 1
+  // ----- TESTIS -----------------------------------------------------------
+  const testisAtrophic = state.testis === 'atrophic'
   const testisDamaged = state.testis === 'damaged'
+  const testisFaded = state.testis === 'faded'
+  const testisScale = testisAtrophic ? 0.7 : 1
+  const testisStroke = testisDamaged
+    ? COLOR.abnormal
+    : testisAtrophic
+      ? COLOR.compensating
+      : testisFaded
+        ? COLOR.weak
+        : COLOR.normal
+  const testisStrokeWidth = testisDamaged ? 4 : testisAtrophic ? 3 : 2
+  const testisStatus = testisDamaged
+    ? 'Damaged — primary failure'
+    : testisAtrophic
+      ? 'Atrophic (shrunken)'
+      : testisFaded
+        ? 'Faded'
+        : 'Normal volume / architecture'
 
-  // ----- TUBULES -----
+  // ----- TUBULES ----------------------------------------------------------
   const tubulesDamaged = state.tubules === 'damaged'
   const tubulesSparse = state.tubules === 'sparse'
   const tubuleStroke = tubulesDamaged
@@ -620,153 +641,172 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
     : tubulesSparse
       ? COLOR.compensating
       : COLOR.normal
-  const tubuleOpacity = tubulesDamaged ? 0.7 : tubulesSparse ? 0.6 : 1
   const tubuleWidth = tubulesDamaged ? 3 : 1.8
+  const tubuleLumenOpacity = tubulesDamaged ? 0.25 : tubulesSparse ? 0.4 : 0.55
 
-  // ----- SERTOLI -----
-  const sertoliColor =
-    state.sertoli === 'damaged' ? COLOR.abnormal : COLOR.sertoli
+  // ----- SERTOLI ----------------------------------------------------------
   const sertoliDamaged = state.sertoli === 'damaged'
+  const sertoliColor = sertoliDamaged ? COLOR.abnormal : COLOR.normal
+  const sertoliStatus = sertoliDamaged
+    ? 'Damaged — spermatogenic compartment failure'
+    : 'Normal columnar cells lining tubules'
 
-  // ----- LEYDIG -----
+  // ----- LEYDIG -----------------------------------------------------------
   const leydigDamaged =
     state.leydig === 'damaged' || state.leydig === 'unresponsive'
-  const leydigColor = leydigDamaged ? COLOR.abnormal : COLOR.leydig
-  const leydigOpacity = leydigDamaged ? 0.75 : 1
-  const leydigPulse = leydigDamaged
+  const leydigColor = leydigDamaged ? COLOR.weak : COLOR.normal
+  const leydigOpacity = leydigDamaged ? 0.55 : 1
+  const leydigStatus = leydigDamaged
+    ? state.leydig === 'unresponsive'
+      ? 'Unresponsive to LH (LH receptor failure)'
+      : 'Damaged — interstitial cell loss'
+    : 'Normal — interstitial T producers'
 
-  // ----- TESTOSTERONE FEEDBACK -----
-  // Normal: solid green arrow.  Broken: dashed red, pulsing visual.
-  // Weak/absent: faded.  This loop carries the "negative feedback" signal
-  // from Leydig back to hypothalamus.
+  // ----- TESTOSTERONE FEEDBACK -------------------------------------------
+  // 'broken' and 'absent' both render as a thick dashed-red severed feedback
+  // arrow (loop is functionally dysfunctional in both cases); 'absent' is
+  // rendered at slightly lower opacity to signal "substance gone" vs "loop
+  // blocked".  'weak' renders as a thin faded slate arrow.
   const tBroken = state.testosterone === 'broken'
-  const tStroke = tBroken
+  const tAbsent = state.testosterone === 'absent'
+  const tWeak = state.testosterone === 'weak'
+  const tDysfunctional = tBroken || tAbsent
+  const tStroke = tDysfunctional
     ? COLOR.abnormal
-    : state.testosterone === 'absent' || state.testosterone === 'weak'
+    : tWeak
       ? COLOR.weak
       : COLOR.normal
-  const tOpacity =
-    state.testosterone === 'absent'
-      ? 0.25
-      : state.testosterone === 'weak' || state.testosterone === 'faded'
-        ? 0.45
-        : 1
-  const tWidth = tBroken ? 3.5 : state.testosterone === 'normal' ? 2.2 : 1.4
-  const tDash = tBroken
-    ? '8 6'
-    : state.testosterone === 'weak'
-      ? '4 4'
-      : undefined
+  const tWidth = tDysfunctional ? 3.5 : state.testosterone === 'normal' ? 2.5 : 1.5
+  const tDash = tDysfunctional ? '10 6' : tWeak ? '4 4' : undefined
+  const tOpacity = tAbsent ? 0.6 : tWeak ? 0.5 : 1
+  const tStatus = tBroken
+    ? 'BROKEN feedback — low T cannot suppress GnRH'
+    : tAbsent
+      ? 'ABSENT feedback — testosterone production has failed'
+      : tWeak
+        ? 'Weak feedback'
+        : 'Intact negative feedback (T → hypothalamus)'
 
-  // ----- INHIBIN B FEEDBACK -----
+  // ----- INHIBIN B FEEDBACK -----------------------------------------------
   const inhibinBroken = state.inhibinB === 'broken'
-  const inhibinDash = inhibinBroken
-    ? '8 6'
-    : state.inhibinB === 'weak'
-      ? '4 4'
-      : undefined
-  const inhibinOpacity = inhibinBroken
-    ? 0.85
-    : state.inhibinB === 'weak'
-      ? 0.55
-      : 1
+  const inhibinWeak = state.inhibinB === 'weak'
   const inhibinStroke = inhibinBroken
     ? COLOR.abnormal
-    : state.inhibinB === 'weak'
+    : inhibinWeak
       ? COLOR.weak
       : COLOR.normal
-  const inhibinWidth = inhibinBroken ? 3.5 : 2.2
+  const inhibinWidth = inhibinBroken ? 3.5 : 2.5
+  const inhibinDash = inhibinBroken ? '10 6' : inhibinWeak ? '4 4' : undefined
+  const inhibinOpacity = inhibinBroken ? 0.95 : inhibinWeak ? 0.5 : 1
+  const inhibinStatus = inhibinBroken
+    ? 'BROKEN feedback — Sertoli loss removes pituitary brake on FSH'
+    : inhibinWeak
+      ? 'Weak feedback'
+      : 'Intact negative feedback (Inhibin B → pituitary)'
 
+  // -------------------------------------------------------------------------
+  // SVG render
+  // -------------------------------------------------------------------------
   return (
     <svg
-      viewBox="0 0 600 800"
-      className="h-auto w-full max-w-[500px]"
+      viewBox="0 0 700 900"
+      className="h-auto w-full max-w-[640px]"
       role="img"
-      aria-label="Hypothalamic-Pituitary-Gonadal axis schematic"
+      aria-label="Hypothalamic-Pituitary-Gonadal axis — detailed anatomical schematic"
     >
-      {/* All content lives in a 400×500 coordinate space, then is uniformly */}
-      {/* scaled 1.5× into the 600×800 viewBox.  Defs go FIRST (outside the   */}
-      {/* scale group) so reference IDs are resolved at the SVG root level    */}
-      {/* — but the actual <use> renders inside the scaled group, so the     */}
-      {/* path geometry is scaled along with everything else.                */}
+      {/* ===================================================================
+          DEFS — markers, gradients, patterns, reusable arrow paths
+          =================================================================== */}
       <defs>
-        {/* Arrowheads — one per semantic state colour so the head visually   */}
-        {/* matches the stroke colour without needing currentColor (currentColor*/}
-        {/* fights with fill on path elements inside scaled groups in Safari).  */}
+        {/* Tri-state arrowheads matched to stroke colour ------------------- */}
         <marker
           id="ah-normal"
-          markerWidth="8"
-          markerHeight="8"
-          refX="4"
-          refY="4"
+          markerWidth="10"
+          markerHeight="10"
+          refX="5"
+          refY="5"
           orient="auto"
         >
-          <path d="M0,0 L8,4 L0,8 Z" fill={COLOR.normal} />
+          <path d="M0,0 L10,5 L0,10 Z" fill={COLOR.normal} />
         </marker>
         <marker
           id="ah-compensating"
-          markerWidth="8"
-          markerHeight="8"
-          refX="4"
-          refY="4"
+          markerWidth="10"
+          markerHeight="10"
+          refX="5"
+          refY="5"
           orient="auto"
         >
-          <path d="M0,0 L8,4 L0,8 Z" fill={COLOR.compensating} />
+          <path d="M0,0 L10,5 L0,10 Z" fill={COLOR.compensating} />
         </marker>
         <marker
           id="ah-abnormal"
-          markerWidth="8"
-          markerHeight="8"
-          refX="4"
-          refY="4"
+          markerWidth="10"
+          markerHeight="10"
+          refX="5"
+          refY="5"
           orient="auto"
         >
-          <path d="M0,0 L8,4 L0,8 Z" fill={COLOR.abnormal} />
+          <path d="M0,0 L10,5 L0,10 Z" fill={COLOR.abnormal} />
         </marker>
         <marker
           id="ah-weak"
-          markerWidth="8"
-          markerHeight="8"
-          refX="4"
-          refY="4"
+          markerWidth="10"
+          markerHeight="10"
+          refX="5"
+          refY="5"
           orient="auto"
         >
-          <path d="M0,0 L8,4 L0,8 Z" fill={COLOR.weak} />
+          <path d="M0,0 L10,5 L0,10 Z" fill={COLOR.weak} />
         </marker>
-        {/* Legacy aliases retained for the aromatase / Inhibin / T fallbacks */}
+
+        {/* Legacy aliases retained for backwards-compat with adipose etc. */}
         <marker
           id="ah-down"
-          markerWidth="8"
-          markerHeight="8"
-          refX="4"
-          refY="4"
+          markerWidth="10"
+          markerHeight="10"
+          refX="5"
+          refY="5"
           orient="auto"
         >
-          <path d="M0,0 L8,4 L0,8 Z" fill={COLOR.normal} />
+          <path d="M0,0 L10,5 L0,10 Z" fill={COLOR.normal} />
         </marker>
         <marker
           id="ah-pulse"
-          markerWidth="8"
-          markerHeight="8"
-          refX="4"
-          refY="4"
+          markerWidth="10"
+          markerHeight="10"
+          refX="5"
+          refY="5"
           orient="auto"
         >
-          <path d="M0,0 L8,4 L0,8 Z" fill={COLOR.abnormal} />
+          <path d="M0,0 L10,5 L0,10 Z" fill={COLOR.abnormal} />
         </marker>
-        {/* Subtle gradient on brain (gives a hint of depth without flat fill) */}
-        <radialGradient id="brain-grad" cx="50%" cy="40%" r="70%">
-          <stop offset="0%" stopColor="#334155" stopOpacity="0.95" />
-          <stop offset="100%" stopColor="#0f172a" stopOpacity="1" />
+
+        {/* Brain fill — subtle vertical gradient for parenchymal depth ---- */}
+        <radialGradient id="brain-grad" cx="50%" cy="40%" r="65%">
+          <stop offset="0%" stopColor="#475569" stopOpacity="0.6" />
+          <stop offset="60%" stopColor="#334155" stopOpacity="0.45" />
+          <stop offset="100%" stopColor="#1e293b" stopOpacity="0.3" />
         </radialGradient>
+
+        {/* Testis fill — slightly warmer dark wash for visceral feel ------ */}
         <radialGradient id="testis-grad" cx="50%" cy="35%" r="75%">
-          <stop offset="0%" stopColor="#334155" stopOpacity="0.95" />
-          <stop offset="100%" stopColor="#0f172a" stopOpacity="1" />
+          <stop offset="0%" stopColor="#475569" stopOpacity="0.75" />
+          <stop offset="100%" stopColor="#1e293b" stopOpacity="0.9" />
         </radialGradient>
+
+        {/* Tunica double-line effect via pattern --------------------------- */}
+        <radialGradient id="tunica-grad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor={testisStroke} stopOpacity="0" />
+          <stop offset="92%" stopColor={testisStroke} stopOpacity="0" />
+          <stop offset="100%" stopColor={testisStroke} stopOpacity="0.45" />
+        </radialGradient>
+
+        {/* Hatch pattern for damaged tissue --------------------------------- */}
         <pattern
           id="damaged-hatch"
-          width="6"
-          height="6"
+          width="8"
+          height="8"
           patternUnits="userSpaceOnUse"
           patternTransform="rotate(45)"
         >
@@ -774,104 +814,162 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
             x1="0"
             y1="0"
             x2="0"
-            y2="6"
+            y2="8"
             stroke={COLOR.pulse}
-            strokeWidth="1.2"
-            opacity="0.5"
+            strokeWidth="1.4"
+            opacity="0.45"
           />
         </pattern>
 
-        {/* GnRH path — within the brain */}
-        <path
-          id="gnrh-path"
-          d="M200,90 Q200,110 200,135"
-          fill="none"
-        />
-        {/* FSH path — from pituitary to testis (curves left) */}
+        {/* Reusable hormone-flow paths -------------------------------------- */}
+        {/* GnRH — short curve along the portal vessels between hypothalamus  */}
+        {/* and anterior pituitary.                                            */}
+        <path id="gnrh-path" d="M350,178 Q345,205 350,228" fill="none" />
+
+        {/* FSH — gentle bezier descending on the LEFT side from anterior     */}
+        {/* pituitary down to the left pole of the testis (Sertoli compartment)*/}
         <path
           id="fsh-path"
-          d="M180,160 C140,220 130,300 150,370"
+          d="M325,272 C 260,330 220,440 255,565"
           fill="none"
         />
-        {/* LH path — from pituitary to testis (curves right) */}
+
+        {/* LH — mirror bezier on the RIGHT side, terminating near the Leydig */}
+        {/* (interstitial) compartment.                                         */}
         <path
           id="lh-path"
-          d="M220,160 C260,220 270,300 250,370"
+          d="M375,272 C 440,330 480,440 445,565"
           fill="none"
         />
       </defs>
 
-      {/* 1.5× uniform scale group — content drawn in 400×500 coordinates */}
-      {/* but rendered into 600×800 viewBox space.  All subsequent paths, */}
-      {/* circles, ellipses, strokes, fontSizes and animateMotion paths   */}
-      {/* are auto-scaled by the renderer.                                */}
-      <g transform="scale(1.5)">
+      {/* ===================================================================
+          1. BRAIN  —  sagittal cross-section, y: 20-290
+          =================================================================== */}
+      <g id="brain-region" opacity={hypFaded ? 0.75 : 1}>
+        <title>{`Brain (sagittal view) — controls HPG axis via hypothalamus. Currently: ${hypStatus}.`}</title>
 
-      {/* ============================================================== */}
-      {/* BRAIN — top section                                            */}
-      {/* ============================================================== */}
-      <g
-        id="brain"
-        opacity={hypFaded ? 0.7 : 1}
-      >
-        {/* Simplified cerebral outline — convex top, flat bottom.        */}
-        {/* The outline colour reflects HYPOTHALAMUS state because the   */}
-        {/* hypothalamus is the functional "centre of the brain" in this */}
-        {/* schematic.  Stroke widens to 3px when compensating to draw    */}
-        {/* attention to the increased drive.                             */}
+        {/* Cerebral cortex — convex top with smooth descending profile.     */}
+        {/* Sagittal silhouette: arching dome at the top, slight rear bulge   */}
+        {/* (occipital lobe), and tapering at the brain-stem outlet.           */}
         <path
-          d="M120,90
-             C 110,55  150,25  200,28
-             C 250,25  290,55  280,90
-             C 285,100 282,110 270,115
-             C 260,118 250,118 240,118
-             L 160,118
-             C 150,118 140,118 130,115
-             C 118,110 115,100 120,90 Z"
+          d="M 215,180
+             C 170,180 145,140 150,100
+             C 155,55  205,28  280,28
+             C 350,22  430,32  490,55
+             C 545,80  555,130 535,165
+             C 525,180 505,182 480,180
+             L 230,180
+             Z"
           fill="url(#brain-grad)"
-          stroke={hypStroke}
-          strokeWidth={hypStrokeWidth}
-        />
-        {/* Convolutions / sulci — purely decorative wavy line art */}
-        <path
-          d="M140,55 Q160,42 180,55 Q200,42 220,55 Q240,42 260,55"
-          fill="none"
-          stroke={hypStroke}
-          strokeWidth="1.2"
-          opacity="0.45"
-        />
-        <path
-          d="M135,72 Q160,62 185,72 Q210,62 235,72 Q255,62 270,72"
-          fill="none"
-          stroke={hypStroke}
-          strokeWidth="1.2"
-          opacity="0.35"
+          stroke="#ffffff"
+          strokeWidth="1.4"
+          opacity="0.95"
         />
 
-        {/* ----- Hypothalamus — small almond at base of brain ---------- */}
-        {/* Wrapped in a Framer Motion pulse when COMPENSATING: opacity   */}
-        {/* oscillates 1 → 0.5 → 1 at 1.2s — the "dramatic" visual cue.    */}
+        {/* Subtle cortical sulci — decorative wave lines suggesting gyri    */}
+        <path
+          d="M 175,90  Q 210,75 245,90 Q 280,75 315,90 Q 350,75 385,90 Q 420,75 455,90 Q 490,75 520,95"
+          fill="none"
+          stroke="#ffffff"
+          strokeWidth="1"
+          opacity="0.28"
+        />
+        <path
+          d="M 165,115 Q 205,102 245,115 Q 285,102 325,115 Q 365,102 405,115 Q 445,102 485,115 Q 515,108 530,118"
+          fill="none"
+          stroke="#ffffff"
+          strokeWidth="1"
+          opacity="0.22"
+        />
+        <path
+          d="M 175,148 Q 220,138 270,148 Q 320,138 370,148 Q 420,138 470,148 Q 505,142 520,150"
+          fill="none"
+          stroke="#ffffff"
+          strokeWidth="1"
+          opacity="0.18"
+        />
+
+        {/* Brain stem descending from the rear-base of the brain ---------- */}
+        <path
+          d="M 430,178
+             L 425,210
+             C 422,235 420,260 422,285
+             L 460,285
+             C 462,260 462,235 458,210
+             L 455,178
+             Z"
+          fill="url(#brain-grad)"
+          stroke="#ffffff"
+          strokeWidth="1.2"
+          opacity="0.85"
+        />
+        <text
+          x="478"
+          y="245"
+          fontSize="13"
+          fill={COLOR.label}
+          fontWeight="700"
+          fontStyle="italic"
+        >
+          brain stem
+        </text>
+
+        {/* Cerebellum — small lobed bulge at the back of the brain stem    */}
+        <path
+          d="M 460,180
+             C 490,180 510,200 510,225
+             C 510,250 488,265 465,260
+             C 450,255 448,235 452,215
+             C 454,200 456,190 460,180 Z"
+          fill="url(#brain-grad)"
+          stroke="#ffffff"
+          strokeWidth="1.1"
+          opacity="0.8"
+        />
+        {/* Cerebellar foliation */}
+        <path
+          d="M 462,200 Q 480,205 500,212 M 458,220 Q 478,225 502,232 M 460,240 Q 478,245 498,250"
+          fill="none"
+          stroke="#ffffff"
+          strokeWidth="0.9"
+          opacity="0.3"
+        />
+
+        {/* ---------------- HYPOTHALAMUS ---------------- */}
+        {/* Distinct nucleus region at the base of the brain.  Irregular   */}
+        {/* almond outline (not a perfect ellipse) representing the multiple*/}
+        {/* nuclei.  Wrapped in <Pulse> when COMPENSATING.                   */}
         <Pulse active={hypCompensating} duration={1.2} intensity={0.5}>
           <g id="hypothalamus">
-            <ellipse
-              cx="200"
-              cy="100"
-              rx="22"
-              ry="10"
+            <title>{`Hypothalamus — produces GnRH pulses that drive the anterior pituitary. Currently: ${hypStatus}.`}</title>
+            <path
+              d="M 305,148
+                 C 305,138 320,132 340,134
+                 C 360,132 380,136 392,142
+                 C 400,148 398,160 392,165
+                 C 380,172 358,174 340,172
+                 C 322,172 308,168 305,162
+                 C 302,156 303,150 305,148 Z"
               fill={COLOR.hypothalamus}
-              fillOpacity="0.85"
+              fillOpacity="0.88"
               stroke={hypStroke}
               strokeWidth={hypStrokeWidth}
             />
-            {/* Nuclei dots */}
-            <circle cx="192" cy="100" r="1.4" fill="#7f1d1d" />
-            <circle cx="200" cy="98" r="1.4" fill="#7f1d1d" />
-            <circle cx="208" cy="100" r="1.4" fill="#7f1d1d" />
+            {/* Neuron-cluster dots — represent supraoptic / paraventricular /
+                arcuate / preoptic nuclei.  6 dots spaced asymmetrically.    */}
+            <circle cx="320" cy="150" r="2.2" fill="#7f1d1d" />
+            <circle cx="335" cy="146" r="2.2" fill="#7f1d1d" />
+            <circle cx="350" cy="152" r="2.4" fill="#7f1d1d" />
+            <circle cx="365" cy="146" r="2.2" fill="#7f1d1d" />
+            <circle cx="378" cy="154" r="2.2" fill="#7f1d1d" />
+            <circle cx="345" cy="162" r="2" fill="#7f1d1d" />
+            <circle cx="362" cy="164" r="2" fill="#7f1d1d" />
           </g>
         </Pulse>
         <text
-          x="200"
-          y="84"
+          x="350"
+          y="124"
           textAnchor="middle"
           fontSize="15"
           fill={COLOR.label}
@@ -880,58 +978,113 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           Hypothalamus
         </text>
 
-        {/* ----- Pituitary — small oval hanging below ------------------ */}
-        <line
-          x1="200"
-          y1="110"
-          x2="200"
-          y2="125"
-          stroke={pitStroke}
-          strokeWidth="1.6"
-          opacity="0.8"
-        />
+        {/* ---------------- PORTAL VESSELS ---------------- */}
+        {/* Three thin wavy curves descending from the median eminence of   */}
+        {/* the hypothalamus into the anterior pituitary.  Subtle red/maroon */}
+        {/* fills the inner of each vessel.                                  */}
+        <g id="portal-vessels" opacity={state.vessels === 'faded' ? 0.45 : 1}>
+          <title>Hypothalamic–hypophyseal portal system — carries GnRH and other releasing hormones from the median eminence directly to the anterior pituitary.</title>
+          <path
+            d="M 330,175 Q 326,195 332,215 Q 336,228 332,238"
+            fill="none"
+            stroke={COLOR.vesselWall}
+            strokeWidth="2"
+            opacity="0.8"
+          />
+          <path
+            d="M 350,178 Q 348,200 354,220 Q 356,232 352,242"
+            fill="none"
+            stroke={COLOR.vesselBlood}
+            strokeWidth="2.2"
+            opacity="0.7"
+          />
+          <path
+            d="M 370,175 Q 374,195 368,215 Q 364,228 368,238"
+            fill="none"
+            stroke={COLOR.vesselWall}
+            strokeWidth="2"
+            opacity="0.8"
+          />
+          <text
+            x="295"
+            y="218"
+            fontSize="11"
+            fill={COLOR.label}
+            fontStyle="italic"
+            fontWeight="700"
+            opacity="0.85"
+          >
+            portal v.
+          </text>
+        </g>
+
+        {/* ---------------- ANTERIOR PITUITARY ---------------- */}
+        {/* Bean / kidney shape with a slight notch on the left side       */}
+        {/* representing the anterior-posterior division.  Inside: 9       */}
+        {/* gonadotroph circles representing FSH/LH-secreting cells.        */}
         <Pulse active={pitCompensating} duration={1.3} intensity={0.5}>
-          <g id="pituitary" opacity={pitFaded ? 0.6 : 1}>
-            <ellipse
-              cx="200"
-              cy="135"
-              rx="18"
-              ry="9"
+          <g id="pituitary" opacity={pitFaded ? 0.65 : 1}>
+            <title>{`Anterior Pituitary — gonadotrophs secrete FSH and LH in response to GnRH. Currently: ${pitStatus}.`}</title>
+            <path
+              d="M 310,238
+                 C 305,240 300,250 305,262
+                 C 310,275 325,278 345,275
+                 C 365,278 385,278 395,268
+                 C 402,260 400,250 395,243
+                 C 388,238 378,238 365,240
+                 C 352,238 340,238 328,238
+                 C 320,238 314,238 310,238 Z"
               fill={COLOR.pituitaryBody}
+              fillOpacity="0.92"
               stroke={pitStroke}
               strokeWidth={pitStrokeWidth}
             />
-            {/* Anterior / posterior division */}
-            <line
-              x1="200"
-              y1="127"
-              x2="200"
-              y2="143"
-              stroke="#475569"
-              strokeWidth="1"
+            {/* Anterior / posterior septum — subtle vertical line */}
+            <path
+              d="M 360,240 Q 360,255 360,272"
+              fill="none"
+              stroke="#64748b"
+              strokeWidth="0.9"
               opacity="0.6"
             />
+            {/* Gonadotroph cells — 9 small circles representing FSH/LH-     */}
+            {/* secreting cells.  Densely packed in the anterior lobe.        */}
+            <circle cx="320" cy="252" r="2.2" fill="#1e40af" />
+            <circle cx="328" cy="262" r="2.2" fill="#1e40af" />
+            <circle cx="338" cy="252" r="2.2" fill="#1e40af" />
+            <circle cx="345" cy="263" r="2.2" fill="#1e40af" />
+            <circle cx="335" cy="270" r="2.2" fill="#1e40af" />
+            <circle cx="350" cy="255" r="2" fill="#1e40af" />
+            <circle cx="370" cy="252" r="2.2" fill="#0e7490" />
+            <circle cx="380" cy="262" r="2.2" fill="#0e7490" />
+            <circle cx="388" cy="252" r="2.2" fill="#0e7490" />
+            <circle cx="378" cy="270" r="2" fill="#0e7490" />
           </g>
         </Pulse>
         <text
-          x="225"
-          y="138"
-          fontSize="14"
+          x="350"
+          y="298"
+          textAnchor="middle"
+          fontSize="15"
           fill={COLOR.label}
           fontWeight="700"
         >
-          Pituitary
+          Anterior Pituitary
         </text>
 
-        {/* ----- GnRH arrow — short, internal --------------------------- */}
-        {/* Pulsing GnRH = compensating hypothalamus → AMBER (not red).    */}
-        {/* The hypothalamus isn't broken, it's working harder.            */}
+        {/* ---------------- GnRH ARROW ---------------- */}
+        {/* Short arrow alongside the portal vessels.  Pulsing GnRH =        */}
+        {/* compensating hypothalamus → AMBER.  Flowing dots when active.    */}
         <g id="gnrh-arrow" opacity={gnrhFaded ? 0.4 : 1}>
-          <Pulse active={gnrhPulsing} duration={1.2} intensity={0.5}>
+          <title>{`GnRH — gonadotropin-releasing hormone pulses from hypothalamus → pituitary. Currently: ${
+            gnrhPulsing ? 'Compensating (↑pulse frequency)' : gnrhFaded ? 'Faded' : 'Normal'
+          }.`}</title>
+          <Pulse active={gnrhPulsing} duration={1.2} intensity={0.55}>
             <use
               href="#gnrh-path"
               stroke={gnrhColor}
               strokeWidth={gnrhWidth}
+              fill="none"
               markerEnd={`url(#${
                 gnrhFaded ? 'ah-weak' : gnrhPulsing ? 'ah-compensating' : 'ah-normal'
               })`}
@@ -939,15 +1092,15 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           </Pulse>
           <FlowingDots
             pathId="gnrh-path"
-            color={COLOR.compensating}
-            count={3}
-            duration={1.2}
-            active={gnrhPulsing}
-            radius={1.6}
+            color={gnrhPulsing ? COLOR.compensating : COLOR.normal}
+            count={gnrhPulsing ? 4 : 3}
+            duration={gnrhPulsing ? 1.2 : 2.2}
+            active={!gnrhFaded}
+            radius={1.8}
           />
           <text
-            x="206"
-            y="118"
+            x="392"
+            y="208"
             fontSize="13"
             fontStyle="italic"
             fill={COLOR.label}
@@ -958,48 +1111,19 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
         </g>
       </g>
 
-      {/* ============================================================== */}
-      {/* BLOODSTREAM CHANNEL — vessel running from pituitary to testis  */}
-      {/* ============================================================== */}
-      <g id="vessels" opacity={state.vessels === 'faded' ? 0.45 : 1}>
-        {/* Outer vessel walls — neutral slate (vessels themselves are    */}
-        {/* not "diseased", they're just the conduit for FSH/LH/T/etc.).  */}
-        <path
-          d="M192,160 C150,230 145,310 165,380"
-          fill="none"
-          stroke={COLOR.vesselWall}
-          strokeWidth="2.4"
-          opacity="0.6"
-        />
-        <path
-          d="M208,160 C250,230 255,310 235,380"
-          fill="none"
-          stroke={COLOR.vesselWall}
-          strokeWidth="2.4"
-          opacity="0.6"
-        />
-        {/* Inner blood tint */}
-        <path
-          d="M200,160 C200,250 200,320 200,380"
-          fill="none"
-          stroke={COLOR.vesselBlood}
-          strokeWidth="1"
-          opacity="0.35"
-        />
-      </g>
+      {/* ===================================================================
+          2. FSH / LH HORMONAL PATHWAYS — y: 280-500
+          =================================================================== */}
 
-      {/* ============================================================== */}
-      {/* FSH & LH ARROWS — flowing through vessel                        */}
-      {/* ============================================================== */}
-      {/* FSH (left curve).  Pulsing FSH = pituitary hyper-secreting due   */}
-      {/* to absent inhibin B feedback → ABNORMAL red, thick 4.5px stroke, */}
-      {/* wrapped in Pulse for opacity throb, with bright flowing dots.   */}
+      {/* FSH — bezier descending on the LEFT side ------------------------- */}
       <g id="fsh-arrow" opacity={fshFaded ? 0.4 : 1}>
-        <Pulse active={fshPulsing} duration={1.2} intensity={0.5}>
+        <title>{`FSH — follicle-stimulating hormone (pituitary → Sertoli cells). Currently: ${fshStatus}.`}</title>
+        <Pulse active={fshPulsing} duration={1.1} intensity={0.5}>
           <use
             href="#fsh-path"
             stroke={fshColor}
             strokeWidth={fshWidth}
+            fill="none"
             markerEnd={`url(#${
               fshFaded ? 'ah-weak' : fshPulsing ? 'ah-abnormal' : 'ah-normal'
             })`}
@@ -1008,14 +1132,14 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
         <FlowingDots
           pathId="fsh-path"
           color={fshColor}
-          count={fshPulsing ? 4 : 3}
-          duration={fshPulsing ? 1.4 : 2.4}
+          count={fshPulsing ? 5 : 3}
+          duration={fshPulsing ? 1.3 : 2.6}
           active={!fshFaded}
-          radius={fshPulsing ? 2.8 : 2}
+          radius={fshPulsing ? 3 : 2.2}
         />
         <text
-          x="120"
-          y="265"
+          x="190"
+          y="430"
           fontSize="18"
           fill={COLOR.label}
           fontWeight="700"
@@ -1024,13 +1148,15 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
         </text>
       </g>
 
-      {/* LH (right curve) — same logic as FSH */}
+      {/* LH — bezier descending on the RIGHT side ------------------------- */}
       <g id="lh-arrow" opacity={lhFaded ? 0.4 : 1}>
-        <Pulse active={lhPulsing} duration={1.2} intensity={0.5}>
+        <title>{`LH — luteinising hormone (pituitary → Leydig cells). Currently: ${lhStatus}.`}</title>
+        <Pulse active={lhPulsing} duration={1.1} intensity={0.5}>
           <use
             href="#lh-path"
             stroke={lhColor}
             strokeWidth={lhWidth}
+            fill="none"
             markerEnd={`url(#${
               lhFaded ? 'ah-weak' : lhPulsing ? 'ah-abnormal' : 'ah-normal'
             })`}
@@ -1039,14 +1165,14 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
         <FlowingDots
           pathId="lh-path"
           color={lhColor}
-          count={lhPulsing ? 4 : 3}
-          duration={lhPulsing ? 1.4 : 2.4}
+          count={lhPulsing ? 5 : 3}
+          duration={lhPulsing ? 1.3 : 2.6}
           active={!lhFaded}
-          radius={lhPulsing ? 2.8 : 2}
+          radius={lhPulsing ? 3 : 2.2}
         />
         <text
-          x="270"
-          y="265"
+          x="490"
+          y="430"
           fontSize="18"
           fill={COLOR.label}
           fontWeight="700"
@@ -1055,272 +1181,385 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
         </text>
       </g>
 
-      {/* ============================================================== */}
-      {/* TESTIS CROSS-SECTION                                            */}
-      {/* ============================================================== */}
-      <g
-        id="testis-group"
-        style={{
-          transformOrigin: '200px 420px',
-          transform: `scale(${testisScale})`,
-          transition: 'transform 0.4s ease-out',
-        }}
-        opacity={state.testis === 'faded' ? 0.55 : 1}
+      {/* ===================================================================
+          3. TESTIS — anatomical cross-section, y: 540-800
+          =================================================================== */}
+      <motion.g
+        id="testis-region"
+        animate={{ scale: testisScale }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+        style={{ transformOrigin: '350px 670px', transformBox: 'fill-box' }}
+        opacity={testisFaded ? 0.55 : 1}
       >
-        {/* Tunica albuginea — thick outer shell.  Colour reflects testis  */}
-        {/* state: NORMAL=green, ATROPHIC=amber (compensating), DAMAGED=red */}
-        {/* (with pulse). Stroke widens 2→4 px for damaged.                  */}
+        <title>{`Testis (cross-section) — site of spermatogenesis (tubules) and testosterone production (Leydig cells). Currently: ${testisStatus}.`}</title>
+
+        {/* ---- Tunica albuginea — thick outer shell --------------------- */}
+        {/* Slightly textured: solid colored ring + subtle gradient halo for */}
+        {/* a double-line effect, then a fill of the tunical capsule.       */}
         <Pulse active={testisDamaged} duration={1.2} intensity={0.5}>
           <ellipse
-            cx="200"
-            cy="420"
-            rx="95"
-            ry="58"
+            cx="350"
+            cy="670"
+            rx="135"
+            ry="105"
             fill="url(#testis-grad)"
             stroke={testisStroke}
             strokeWidth={testisStrokeWidth}
-            fillOpacity={testisFillOpacity}
           />
         </Pulse>
+        {/* Inner highlight — gives the "double-line" textbook tunica look */}
+        <ellipse
+          cx="350"
+          cy="670"
+          rx="129"
+          ry="99"
+          fill="none"
+          stroke={testisStroke}
+          strokeWidth="1.1"
+          opacity="0.5"
+        />
+        {/* Damaged hatch overlay */}
         {testisDamaged && (
           <ellipse
-            cx="200"
-            cy="420"
-            rx="95"
-            ry="58"
+            cx="350"
+            cy="670"
+            rx="135"
+            ry="105"
             fill="url(#damaged-hatch)"
           />
         )}
 
-        {/* ----- Seminiferous tubules — coiled loops on left half ----- */}
-        <g id="seminiferous-tubules" opacity={tubuleOpacity}>
-          {/* 8 looping tubules — drawn as gentle Bezier coils.            */}
-          {/* The first three are always rendered (even when sparse) so    */}
-          {/* the testis never looks empty.  Additional loops appear when  */}
-          {/* the spermatogenic compartment is intact (tubulesSparse=false)*/}
-          <path
-            d="M135,395 C145,388 155,395 160,402 C165,408 155,415 145,412 C135,409 130,402 135,395 Z"
-            fill="none"
-            stroke={tubuleStroke}
-            strokeWidth={tubulesSparse ? 1.0 : tubuleWidth}
-          />
-          <path
-            d="M125,418 C140,408 165,418 170,432 C173,440 158,448 142,440 C128,432 120,425 125,418 Z"
-            fill="none"
-            stroke={tubuleStroke}
-            strokeWidth={tubulesSparse ? 1.0 : tubuleWidth}
-          />
-          <path
-            d="M135,445 C150,438 175,448 175,460 C173,470 155,470 142,463 C132,457 128,450 135,445 Z"
-            fill="none"
-            stroke={tubuleStroke}
-            strokeWidth={tubulesSparse ? 1.0 : tubuleWidth}
-          />
-          {!tubulesSparse && (
-            <>
-              <path
-                d="M155,380 C170,375 188,385 187,398 C186,405 172,408 162,402 C152,396 150,386 155,380 Z"
-                fill="none"
-                stroke={tubuleStroke}
-                strokeWidth={tubuleWidth}
-              />
-              <path
-                d="M170,422 C188,418 205,428 200,442 C195,452 180,452 168,444 C158,436 158,425 170,422 Z"
-                fill="none"
-                stroke={tubuleStroke}
-                strokeWidth={tubuleWidth}
-              />
-              {/* Three additional coils for richer detail at this scale */}
-              <path
-                d="M115,388 C124,381 138,386 142,394 C144,400 134,406 126,403 C118,401 112,394 115,388 Z"
-                fill="none"
-                stroke={tubuleStroke}
-                strokeWidth={tubuleWidth - 0.2}
-              />
-              <path
-                d="M158,418 C172,414 186,422 184,432 C181,440 168,440 158,434 C148,428 148,422 158,418 Z"
-                fill="none"
-                stroke={tubuleStroke}
-                strokeWidth={tubuleWidth - 0.2}
-              />
-              <path
-                d="M180,392 C195,390 207,402 204,412 C200,418 188,418 182,410 C176,402 174,395 180,392 Z"
-                fill="none"
-                stroke={tubuleStroke}
-                strokeWidth={tubuleWidth - 0.2}
-              />
-            </>
-          )}
-
-          {/* ----- Sertoli cells — small dots along tubule walls ------- */}
-          {/* Expanded from 11 → 18 to give a denser, more anatomically    */}
-          {/* convincing compartment at the higher rendered scale.        */}
-          {/* When Sertoli compartment is damaged, dots flip to red AND   */}
-          {/* the entire group pulses (opacity 1 → 0.5 → 1).              */}
-          <Pulse active={sertoliDamaged} duration={1.2} intensity={0.5}>
-            <g id="sertoli-cells">
-              {[
-                [148, 396],
-                [152, 405],
-                [160, 410],
-                [140, 422],
-                [150, 432],
-                [165, 435],
-                [170, 422],
-                [155, 450],
-                [168, 458],
-                [180, 446],
-                [185, 393],
-                [125, 400],
-                [132, 411],
-                [128, 425],
-                [138, 438],
-                [148, 460],
-                [172, 405],
-                [190, 415],
-              ].map(([cx, cy], i) => (
-                <circle
-                  key={`sert-${i}`}
-                  cx={cx}
-                  cy={cy}
-                  r={tubulesSparse ? 1.0 : 1.8}
-                  fill={sertoliColor}
-                  opacity={tubulesSparse ? 0.7 : 1}
-                />
+        {/* ---- 6 SEMINIFEROUS TUBULES — coiled circular structures ----- */}
+        {/* Each tubule: outer wall circle + lighter inner lumen.            */}
+        {/* Arranged in a roughly 3×2 grid inside the tunica.                */}
+        {(() => {
+          // Stable list of tubule centres for deterministic rendering
+          const tubules: { cx: number; cy: number; r: number }[] = [
+            { cx: 295, cy: 625, r: 27 },
+            { cx: 350, cy: 615, r: 26 },
+            { cx: 405, cy: 625, r: 27 },
+            { cx: 290, cy: 710, r: 26 },
+            { cx: 350, cy: 720, r: 27 },
+            { cx: 410, cy: 710, r: 26 },
+          ]
+          // If sparse, render only the first 3 (top row) at reduced opacity
+          const visible = tubulesSparse ? tubules.slice(0, 3) : tubules
+          return (
+            <g id="seminiferous-tubules" opacity={tubulesSparse ? 0.65 : 1}>
+              <title>{`Seminiferous tubules — long coiled ducts where spermatogenesis occurs. Sertoli cells line the walls. Currently: ${
+                tubulesDamaged ? 'Damaged' : tubulesSparse ? 'Sparse' : 'Normal'
+              }.`}</title>
+              {visible.map((t, i) => (
+                <g key={`tub-${i}`}>
+                  {/* Tubule outer wall */}
+                  <circle
+                    cx={t.cx}
+                    cy={t.cy}
+                    r={t.r}
+                    fill="#0f172a"
+                    stroke={tubuleStroke}
+                    strokeWidth={tubuleWidth}
+                  />
+                  {/* Lumen — lighter inner circle */}
+                  <circle
+                    cx={t.cx}
+                    cy={t.cy}
+                    r={t.r - 9}
+                    fill="#1e293b"
+                    fillOpacity={tubuleLumenOpacity}
+                    stroke={tubuleStroke}
+                    strokeWidth="0.8"
+                    opacity="0.55"
+                  />
+                  {/* ---- Sertoli cells: 4 small columnar epithelial cells  */}
+                  {/* lining the inner wall (top / right / bottom / left).    */}
+                  {/* Each is a small rectangle pointing toward tubule centre.*/}
+                  <Pulse active={sertoliDamaged} duration={1.2} intensity={0.5}>
+                    <g id={`sertoli-${i}`}>
+                      <title>{`Sertoli cell (columnar epithelium lining tubule). ${sertoliStatus}.`}</title>
+                      {/* Top */}
+                      <rect
+                        x={t.cx - 2.5}
+                        y={t.cy - t.r + 2}
+                        width="5"
+                        height="11"
+                        rx="1"
+                        fill={sertoliColor}
+                        stroke={sertoliColor}
+                        strokeWidth="0.4"
+                      />
+                      {/* Right */}
+                      <rect
+                        x={t.cx + t.r - 13}
+                        y={t.cy - 2.5}
+                        width="11"
+                        height="5"
+                        rx="1"
+                        fill={sertoliColor}
+                        stroke={sertoliColor}
+                        strokeWidth="0.4"
+                      />
+                      {/* Bottom */}
+                      <rect
+                        x={t.cx - 2.5}
+                        y={t.cy + t.r - 13}
+                        width="5"
+                        height="11"
+                        rx="1"
+                        fill={sertoliColor}
+                        stroke={sertoliColor}
+                        strokeWidth="0.4"
+                      />
+                      {/* Left */}
+                      <rect
+                        x={t.cx - t.r + 2}
+                        y={t.cy - 2.5}
+                        width="11"
+                        height="5"
+                        rx="1"
+                        fill={sertoliColor}
+                        stroke={sertoliColor}
+                        strokeWidth="0.4"
+                      />
+                      {/* × marks overlay when damaged */}
+                      {sertoliDamaged && (
+                        <>
+                          <line
+                            x1={t.cx - 4}
+                            y1={t.cy - t.r + 4}
+                            x2={t.cx + 4}
+                            y2={t.cy - t.r + 12}
+                            stroke="#ffffff"
+                            strokeWidth="1.2"
+                          />
+                          <line
+                            x1={t.cx + 4}
+                            y1={t.cy - t.r + 4}
+                            x2={t.cx - 4}
+                            y2={t.cy - t.r + 12}
+                            stroke="#ffffff"
+                            strokeWidth="1.2"
+                          />
+                        </>
+                      )}
+                    </g>
+                  </Pulse>
+                </g>
               ))}
             </g>
-          </Pulse>
-          <text
-            x="155"
-            y="480"
-            textAnchor="middle"
-            fontSize="13"
-            fill={COLOR.label}
-            fontWeight="700"
-          >
-            tubules · Sertoli
-          </text>
-        </g>
+          )
+        })()}
 
-        {/* ----- Leydig clusters — between tubules on right half ------ */}
-        {/* Expanded from 10 → 14 triplets (= 42 cells total) for a       */}
-        {/* richer interstitial compartment at the higher scale.          */}
-        <Pulse active={leydigPulse} duration={1.4}>
+        {/* ---- LEYDIG CELLS — interstitial clusters --------------------- */}
+        {/* 4 clusters of 4-5 cells each (≈18 individual round cells).      */}
+        {/* Positioned in the gaps between tubules.  When unresponsive /     */}
+        {/* damaged: grayed-out + reduced opacity + pulse animation.         */}
+        <Pulse active={leydigDamaged} duration={1.4} intensity={0.55}>
           <g id="leydig-cells" opacity={leydigOpacity}>
-            {/* Small triangular clusters of 3 cells each */}
-            {[
-              [230, 395],
-              [248, 405],
-              [260, 392],
-              [220, 415],
-              [242, 425],
-              [262, 418],
-              [232, 440],
-              [255, 448],
-              [225, 460],
-              [248, 462],
-              [215, 405],
-              [270, 405],
-              [270, 442],
-              [218, 432],
-            ].map(([cx, cy], i) => (
-              <g key={`ley-${i}`}>
-                <circle cx={cx} cy={cy} r="2.4" fill={leydigColor} />
-                <circle cx={cx + 3.5} cy={cy + 1} r="2.2" fill={leydigColor} />
-                <circle cx={cx + 1.5} cy={cy + 3.5} r="2.2" fill={leydigColor} />
-              </g>
-            ))}
+            <title>{`Leydig cells — interstitial endocrine cells producing testosterone. ${leydigStatus}.`}</title>
+            {/* Cluster 1: left gap (between top-left and bottom-left tubules) */}
+            <g>
+              <circle cx="252" cy="668" r="3.6" fill={leydigColor} />
+              <circle cx="260" cy="660" r="3.4" fill={leydigColor} />
+              <circle cx="258" cy="676" r="3.4" fill={leydigColor} />
+              <circle cx="248" cy="678" r="3.2" fill={leydigColor} />
+              <circle cx="265" cy="668" r="3.2" fill={leydigColor} />
+            </g>
+            {/* Cluster 2: top-centre gap (between top tubules) */}
+            <g>
+              <circle cx="322" cy="623" r="3.4" fill={leydigColor} />
+              <circle cx="330" cy="618" r="3.2" fill={leydigColor} />
+              <circle cx="328" cy="632" r="3.4" fill={leydigColor} />
+              <circle cx="320" cy="635" r="3.2" fill={leydigColor} />
+            </g>
+            <g>
+              <circle cx="378" cy="618" r="3.4" fill={leydigColor} />
+              <circle cx="384" cy="625" r="3.2" fill={leydigColor} />
+              <circle cx="372" cy="630" r="3.4" fill={leydigColor} />
+              <circle cx="380" cy="635" r="3.2" fill={leydigColor} />
+            </g>
+            {/* Cluster 3: right gap */}
+            <g>
+              <circle cx="445" cy="668" r="3.6" fill={leydigColor} />
+              <circle cx="452" cy="660" r="3.4" fill={leydigColor} />
+              <circle cx="454" cy="676" r="3.4" fill={leydigColor} />
+              <circle cx="442" cy="678" r="3.2" fill={leydigColor} />
+              <circle cx="438" cy="668" r="3.2" fill={leydigColor} />
+            </g>
+            {/* Cluster 4: bottom-centre gap */}
+            <g>
+              <circle cx="322" cy="755" r="3.4" fill={leydigColor} />
+              <circle cx="330" cy="748" r="3.2" fill={leydigColor} />
+              <circle cx="328" cy="762" r="3.4" fill={leydigColor} />
+              <circle cx="318" cy="763" r="3.2" fill={leydigColor} />
+            </g>
+            <g>
+              <circle cx="378" cy="748" r="3.4" fill={leydigColor} />
+              <circle cx="384" cy="756" r="3.4" fill={leydigColor} />
+              <circle cx="372" cy="762" r="3.2" fill={leydigColor} />
+              <circle cx="380" cy="765" r="3.2" fill={leydigColor} />
+            </g>
+            {/* Cluster 5: small top-center cluster between upper tubules */}
+            <g>
+              <circle cx="350" cy="660" r="3.4" fill={leydigColor} />
+              <circle cx="358" cy="665" r="3.2" fill={leydigColor} />
+              <circle cx="343" cy="666" r="3.2" fill={leydigColor} />
+            </g>
           </g>
         </Pulse>
+
+        {/* Sertoli label (anchored to top-left tubule) */}
         <text
-          x="248"
-          y="480"
-          textAnchor="middle"
+          x="245"
+          y="595"
           fontSize="13"
           fill={COLOR.label}
           fontWeight="700"
         >
-          Leydig (interstitium)
+          Sertoli Cells
         </text>
+        <line
+          x1="290"
+          y1="598"
+          x2="295"
+          y2="605"
+          stroke={COLOR.label}
+          strokeWidth="1"
+          opacity="0.6"
+        />
 
-        {/* ----- Rete testis — small mediastinal network -------------- */}
-        <g id="rete-testis" opacity={0.7}>
+        {/* Leydig label (anchored to bottom cluster) */}
+        <text
+          x="245"
+          y="790"
+          fontSize="13"
+          fill={COLOR.label}
+          fontWeight="700"
+        >
+          Leydig Cells
+        </text>
+        <line
+          x1="290"
+          y1="786"
+          x2="320"
+          y2="765"
+          stroke={COLOR.label}
+          strokeWidth="1"
+          opacity="0.6"
+        />
+
+        {/* ---- RETE TESTIS — network of channels (right-centre) -------- */}
+        <g id="rete-testis" opacity="0.7">
+          <title>Rete testis — anastomosing channels collecting sperm from seminiferous tubules toward the epididymis.</title>
+          {/* Network of small interconnected lines forming a mesh */}
           <path
-            d="M195,400 Q200,415 195,430 Q200,445 195,455"
+            d="M 466,640 Q 472,660 466,680 Q 472,700 466,718"
             fill="none"
             stroke={COLOR.rete}
-            strokeWidth="1.1"
+            strokeWidth="1.4"
           />
           <path
-            d="M205,400 Q200,415 205,430 Q200,445 205,455"
+            d="M 475,640 Q 470,660 475,680 Q 470,700 475,718"
             fill="none"
             stroke={COLOR.rete}
-            strokeWidth="1.1"
+            strokeWidth="1.4"
+          />
+          <path
+            d="M 484,640 Q 478,660 484,680 Q 478,700 484,718"
+            fill="none"
+            stroke={COLOR.rete}
+            strokeWidth="1.4"
+          />
+          {/* Cross-connections */}
+          <path
+            d="M 464,650 L 486,650 M 464,675 L 486,675 M 464,700 L 486,700"
+            fill="none"
+            stroke={COLOR.rete}
+            strokeWidth="0.9"
+            opacity="0.65"
           />
           <text
-            x="200"
-            y="395"
-            textAnchor="middle"
+            x="500"
+            y="678"
             fontSize="12"
             fill={COLOR.label}
-            fontStyle="italic"
             fontWeight="700"
+            fontStyle="italic"
           >
-            rete
+            Rete Testis
           </text>
         </g>
 
-        {/* ----- Epididymis — comma-shaped along top right ------------ */}
+        {/* ---- EPIDIDYMIS — comma/crescent attached to top-right ------- */}
         <g
           id="epididymis"
           opacity={state.epididymis === 'faded' ? 0.5 : 1}
         >
+          <title>Epididymis — coiled tubular structure where sperm mature and are stored after leaving the rete testis.</title>
           <path
-            d="M285,388 C310,378 320,395 318,415 C315,430 305,435 295,425 C285,418 280,400 285,388 Z"
+            d="M 488,580
+               C 525,572 545,595 542,635
+               C 540,675 522,695 500,690
+               C 484,683 478,665 480,645
+               C 482,625 484,605 488,580 Z"
             fill="#1e293b"
             stroke={state.epididymis === 'faded' ? COLOR.weak : COLOR.normal}
-            strokeWidth="1.8"
+            strokeWidth="2"
           />
-          {/* Coil pattern */}
+          {/* Coil pattern showing convoluted tubule */}
           <path
-            d="M292,395 Q302,392 308,398 M289,405 Q300,402 310,408 M292,417 Q302,415 309,420"
+            d="M 498,595 Q 515,592 528,605
+               M 495,608 Q 515,605 530,620
+               M 494,624 Q 514,620 532,635
+               M 495,640 Q 514,638 530,650
+               M 497,656 Q 514,654 528,665
+               M 500,672 Q 514,670 526,680"
             fill="none"
             stroke={state.epididymis === 'faded' ? COLOR.weak : COLOR.normal}
             strokeWidth="1.3"
             opacity="0.7"
           />
+          {/* Connection from rete to epididymis (efferent ductules) */}
+          <path
+            d="M 486,635 Q 492,610 495,585"
+            fill="none"
+            stroke={state.epididymis === 'faded' ? COLOR.weak : COLOR.normal}
+            strokeWidth="1.2"
+            opacity="0.55"
+            strokeDasharray="2 2"
+          />
           <text
-            x="305"
-            y="382"
-            textAnchor="middle"
+            x="528"
+            y="572"
             fontSize="13"
             fill={COLOR.label}
             fontWeight="700"
           >
-            epididymis
+            Epididymis
           </text>
         </g>
 
-        {/* ----- Testicular vessels — running along the lateral side --- */}
-        <g id="testicular-vessels" opacity={state.vessels === 'faded' ? 0.4 : 0.75}>
+        {/* ---- Testicular artery / vein — running lateral to testis ---- */}
+        <g id="testicular-vessels" opacity={state.vessels === 'faded' ? 0.4 : 0.8}>
+          <title>Testicular artery and pampiniform plexus — blood supply and venous drainage.</title>
           <path
-            d="M105,400 Q95,420 100,450"
+            d="M 213,608 Q 200,640 208,690"
             fill="none"
             stroke="#dc2626"
-            strokeWidth="1.4"
-            opacity="0.7"
+            strokeWidth="1.6"
+            opacity="0.75"
           />
           <path
-            d="M112,402 Q102,422 107,450"
+            d="M 222,610 Q 210,640 218,692"
             fill="none"
             stroke="#1d4ed8"
-            strokeWidth="1.4"
-            opacity="0.7"
+            strokeWidth="1.6"
+            opacity="0.75"
           />
           <text
-            x="80"
-            y="425"
-            fontSize="12"
+            x="170"
+            y="650"
+            fontSize="11"
             fill={COLOR.label}
             fontStyle="italic"
             fontWeight="700"
@@ -1329,28 +1568,34 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           </text>
         </g>
 
+        {/* Testis title label */}
         <text
-          x="200"
-          y="498"
+          x="350"
+          y="810"
           textAnchor="middle"
-          fontSize="16"
+          fontSize="17"
           fill={COLOR.label}
           fontWeight="700"
         >
           Testis
         </text>
-      </g>
+      </motion.g>
 
-      {/* ============================================================== */}
-      {/* FEEDBACK LOOPS — curving outside the central column             */}
-      {/* ============================================================== */}
-      {/* Inhibin B: from Sertoli (left of testis) back up to pituitary.   */}
-      {/* When BROKEN, arrow is dashed red with pulse animation — clearly  */}
-      {/* signaling the feedback loop is failing.                          */}
+      {/* ===================================================================
+          4. FEEDBACK LOOPS — curving outside the central column
+          =================================================================== */}
+
+      {/* ---------------- INHIBIN B FEEDBACK ----------------               */}
+      {/* From Sertoli (left side of testis) up the LEFT side to pituitary. */}
+      {/* Long sweeping bezier well clear of the central anatomy.            */}
       <g id="inhibin-feedback" opacity={inhibinOpacity}>
+        <title>{`Inhibin B — Sertoli cells → anterior pituitary negative feedback. Suppresses FSH. ${inhibinStatus}.`}</title>
         <Pulse active={inhibinBroken} duration={1.2} intensity={0.4}>
           <path
-            d="M100,395 C40,330 30,200 60,145 Q100,128 178,140"
+            d="M 220,650
+               C 100,580 50,400 70,250
+               Q 110,225 250,238
+               L 305,245"
             fill="none"
             stroke={inhibinStroke}
             strokeWidth={inhibinWidth}
@@ -1358,173 +1603,181 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
             markerEnd={`url(#${
               inhibinBroken
                 ? 'ah-abnormal'
-                : state.inhibinB === 'weak'
+                : inhibinWeak
                   ? 'ah-weak'
                   : 'ah-normal'
             })`}
           />
         </Pulse>
         <text
-          x="22"
-          y="266"
+          x="34"
+          y="430"
           fontSize="14"
           fill={COLOR.label}
           fontStyle="italic"
           fontWeight="700"
         >
-          Inhibin B
+          Inhibin B (−)
         </text>
         <text
-          x="22"
-          y="284"
-          fontSize="12"
+          x="34"
+          y="448"
+          fontSize="11"
           fill={COLOR.label}
           fontStyle="italic"
           fontWeight="700"
+          opacity="0.85"
         >
-          (Sertoli → pit.)
+          Sertoli → pit.
         </text>
       </g>
 
-      {/* Testosterone: from Leydig (right of testis) back up to             */}
-      {/* hypothalamus.  Same broken-state visual: dashed red + pulse.        */}
+      {/* ---------------- TESTOSTERONE FEEDBACK ----------------           */}
+      {/* From Leydig (right side of testis) up the RIGHT side to           */}
+      {/* hypothalamus.  Long sweeping bezier on the far right.              */}
       <g id="testosterone-feedback" opacity={tOpacity}>
-        <Pulse active={tBroken} duration={1.2} intensity={0.4}>
+        <title>{`Testosterone — Leydig cells → hypothalamus negative feedback. Suppresses GnRH. ${tStatus}.`}</title>
+        <Pulse active={tDysfunctional} duration={1.2} intensity={0.4}>
           <path
-            d="M300,395 C370,330 380,200 350,135 Q320,108 222,100"
+            d="M 478,648
+               C 610,580 660,400 640,230
+               Q 600,148 450,144
+               L 395,150"
             fill="none"
             stroke={tStroke}
             strokeWidth={tWidth}
             strokeDasharray={tDash}
             markerEnd={`url(#${
-              tBroken
+              tDysfunctional
                 ? 'ah-abnormal'
-                : state.testosterone === 'weak' || state.testosterone === 'absent'
+                : tWeak
                   ? 'ah-weak'
                   : 'ah-normal'
             })`}
           />
         </Pulse>
         <text
-          x="350"
-          y="266"
-          fontSize="15"
+          x="608"
+          y="430"
+          fontSize="14"
           fill={COLOR.label}
           fontStyle="italic"
           fontWeight="700"
         >
-          T
+          T (−)
         </text>
         <text
-          x="334"
-          y="284"
-          fontSize="12"
+          x="590"
+          y="448"
+          fontSize="11"
           fill={COLOR.label}
           fontStyle="italic"
           fontWeight="700"
+          opacity="0.85"
         >
-          (Leydig → hyp.)
+          Leydig → hyp.
         </text>
       </g>
 
-      {/* ============================================================== */}
-      {/* OPTIONAL: ADIPOSE TISSUE (shown only for E2↑ or BMI↑)           */}
-      {/* ============================================================== */}
+      {/* ===================================================================
+          5. OPTIONAL: ADIPOSE TISSUE (shown for E2↑ or BMI↑)
+          =================================================================== */}
       {state.adipose !== 'none' && (
         <g id="adipose">
-          {/* Wavy blob along the left lower side */}
+          <title>Adipose tissue — peripheral aromatase converts testosterone to estradiol (E2). When excess body fat is present, this shunt increases E2, suppressing pituitary FSH/LH.</title>
+          {/* Wavy / blobby shape on the far right side */}
           <path
             d={
               state.adipose === 'large'
-                ? 'M30,360 Q25,340 45,330 Q70,322 85,340 Q95,358 80,375 Q60,390 40,382 Q25,378 30,360 Z'
-                : 'M40,358 Q40,344 55,340 Q72,338 80,352 Q82,368 68,374 Q50,376 42,370 Q38,365 40,358 Z'
+                ? 'M 565,420 Q 555,395 580,385 Q 612,378 632,400 Q 650,425 638,452 Q 620,478 590,478 Q 562,475 558,452 Q 555,440 565,420 Z'
+                : 'M 572,425 Q 570,408 590,402 Q 612,400 622,420 Q 628,440 615,452 Q 595,460 580,455 Q 568,447 572,425 Z'
             }
             fill={COLOR.adipose}
-            fillOpacity="0.4"
+            fillOpacity="0.35"
             stroke={COLOR.adipose}
-            strokeWidth="1"
+            strokeWidth="1.2"
           />
-          {/* Lipid droplet circles */}
+          {/* Lipid droplets — small circles inside the adipose blob */}
           {(state.adipose === 'large'
             ? [
-                [45, 350],
-                [60, 345],
-                [75, 355],
-                [55, 365],
-                [70, 370],
-                [40, 370],
+                [585, 410],
+                [605, 405],
+                [625, 418],
+                [610, 432],
+                [590, 442],
+                [570, 432],
+                [620, 450],
               ]
             : [
-                [55, 350],
-                [65, 358],
-                [72, 348],
+                [585, 420],
+                [605, 425],
+                [600, 442],
+                [580, 440],
               ]
           ).map(([cx, cy], i) => (
             <circle
               key={`lipid-${i}`}
               cx={cx}
               cy={cy}
-              r={state.adipose === 'large' ? 3.5 : 2.5}
+              r={state.adipose === 'large' ? 4 : 3}
               fill={COLOR.adipose}
               fillOpacity="0.55"
             />
           ))}
           <text
-            x={state.adipose === 'large' ? 58 : 60}
-            y={state.adipose === 'large' ? 400 : 392}
+            x={state.adipose === 'large' ? 598 : 600}
+            y={state.adipose === 'large' ? 500 : 485}
             textAnchor="middle"
             fontSize="13"
             fill={COLOR.label}
             fontWeight="700"
           >
-            adipose
+            Adipose Tissue
           </text>
           {state.aromatase === 'active' && (
             <text
-              x={state.adipose === 'large' ? 58 : 60}
-              y={state.adipose === 'large' ? 410 : 402}
+              x={state.adipose === 'large' ? 598 : 600}
+              y={state.adipose === 'large' ? 516 : 500}
               textAnchor="middle"
               fontSize="12"
               fill={COLOR.label}
               fontStyle="italic"
               fontWeight="700"
             >
-              aromatase
+              aromatase: T → E2
             </text>
           )}
         </g>
       )}
 
-      {/* Aromatase arrow — T from Leydig diverted to E2 in adipose.       */}
-      {/* This is a compensatory/abnormal shunt: amber colour reflects the */}
-      {/* metabolic re-routing rather than a clean broken state.            */}
+      {/* Aromatase arrow — T diverted to E2 in adipose tissue.              */}
+      {/* Compensatory shunt → AMBER colour (not red).                       */}
       {state.aromatase === 'active' && (
         <Pulse active duration={1.6}>
           <g id="aromatase-arrow">
+            <title>Aromatase shunt — peripheral aromatase converts testosterone to estradiol (E2), reducing free T and suppressing pituitary output.</title>
             <path
-              d="M195,420 Q140,395 90,365"
+              d="M 478,670 Q 540,560 580,470"
               fill="none"
               stroke={COLOR.compensating}
-              strokeWidth="2.5"
+              strokeWidth="2.8"
               strokeDasharray="6 4"
               markerEnd="url(#ah-compensating)"
               opacity="0.9"
             />
             <text
-              x="125"
-              y="395"
+              x="540"
+              y="555"
               fontSize="12"
               fill={COLOR.label}
               fontStyle="italic"
               fontWeight="700"
             >
-              T→E2
+              T → E2
             </text>
           </g>
         </Pulse>
       )}
-
-      </g>{/* end scale(1.5) wrapper */}
     </svg>
   )
 }
