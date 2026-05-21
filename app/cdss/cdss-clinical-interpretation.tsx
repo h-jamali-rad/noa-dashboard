@@ -417,31 +417,50 @@ function detectConditions(vals: Record<string, string>): DetectedCondition[] {
 }
 
 // ---------------------------------------------------------------------------
-// SVG palette — muted medical-illustration tones
+// SVG palette — clinical 3-state color system
+// --------------------------------------------------------------------------
+//   • NORMAL       (#22c55e green-500)   — organs, vessels, arrows functioning normally
+//   • COMPENSATING (#f59e0b amber-500)   — organs working overtime to maintain homeostasis
+//   • ABNORMAL     (#ef4444 red-500)     — broken / overactive pathways, dysfunctional organs
+//
+// All text labels render in pure white at fontWeight 700 for maximum contrast
+// on the dark anatomical card background.  Backgrounds/fills remain dark
+// (slate-800/900) so the colored outlines and arrows pop visually.
 // ---------------------------------------------------------------------------
 
 const COLOR = {
-  brain: '#94a3b8', // slate-400 — brain outline
+  // ----- 3-state semantic colors (NEW canonical palette) -----------------
+  normal: '#22c55e', // green-500 — healthy / functioning normally
+  compensating: '#f59e0b', // amber-500 — increased drive / compensation
+  abnormal: '#ef4444', // red-500   — broken, suppressed, or overactive
+
+  // ----- Anatomical-only tones (interior cell-level detail) --------------
   brainFill: '#1e293b', // slate-800 — dark fill (dark theme)
-  pituitary: '#cbd5e1', // slate-300
-  hypothalamus: '#fda4af', // rose-300 — soft pink
-  vessel: '#475569', // slate-600 — bloodstream channel
+  hypothalamus: '#fda4af', // rose-300 — soft pink (interior body)
+  pituitaryBody: '#cbd5e1', // slate-300 (interior body)
+  vesselWall: '#475569', // slate-600 — passive bloodstream wall
   vesselBlood: '#7f1d1d', // red-900 — venous tinge
-  testisOutline: '#cbd5e1', // slate-300 — tunica albuginea
   testisFill: '#1e293b', // dark fill
-  tubule: '#60a5fa', // blue-400 — Sertoli compartment
-  sertoli: '#3b82f6', // blue-500 — Sertoli dots
-  leydig: '#fb923c', // orange-400 — Leydig clusters
-  fsh: '#38bdf8', // sky-400
-  lh: '#f97316', // orange-500
-  feedback: '#a78bfa', // violet-400 — Inhibin B / T feedback
-  pulse: '#ef4444', // red-500 — pulse colour for over-active
-  weak: '#94a3b8', // slate-400
-  label: '#f1f5f9', // slate-100 — bright label for dark background
-  labelSmall: '#cbd5e1', // slate-300 — readable but slightly dimmer
-  adipose: '#fbbf24', // amber-400
+  sertoli: '#3b82f6', // blue-500 — Sertoli dots (normal interior)
+  leydig: '#fb923c', // orange-400 — Leydig clusters (normal interior)
   rete: '#a3a3a3', // neutral-400 — rete testis network
-  epididymis: '#94a3b8',
+  adipose: '#fbbf24', // amber-400 — adipose / aromatase activity
+
+  // ----- Text + utility --------------------------------------------------
+  label: '#ffffff', // pure white — universal label colour
+  labelSmall: '#ffffff', // pure white — annotations equally bold
+  weak: '#64748b', // slate-500 — desaturated outline for "faded" states
+
+  // ----- Backwards-compat aliases (still used by some props) --------------
+  brain: '#22c55e', // healthy brain default
+  pituitary: '#22c55e', // healthy pituitary default
+  testisOutline: '#22c55e', // healthy tunica default
+  tubule: '#22c55e', // healthy tubules default
+  fsh: '#22c55e', // healthy FSH arrow default
+  lh: '#22c55e', // healthy LH arrow default
+  feedback: '#22c55e', // healthy feedback arrow default
+  pulse: '#ef4444', // ABNORMAL alias — used widely as the "pulse colour"
+  epididymis: '#22c55e',
 }
 
 // ---------------------------------------------------------------------------
@@ -515,79 +534,148 @@ function FlowingDots({
 
 function HpgAxisSvg({ state }: { state: AxisState }) {
   // ---- Derived visual props per anatomical group ----------------------
+  // Each organ resolves to one of three semantic colours (green / amber / red)
+  // depending on its state.  This is the central place where the abstract
+  // AxisState enum is mapped to actual SVG colours / stroke widths.
+
+  // ----- HYPOTHALAMUS -----
   const hypFaded = state.hypothalamus === 'faded'
   const hypCompensating = state.hypothalamus === 'compensating'
+  const hypStroke = hypFaded
+    ? COLOR.weak
+    : hypCompensating
+      ? COLOR.compensating
+      : COLOR.normal
+  const hypStrokeWidth = hypCompensating ? 3 : 1.8
 
+  // ----- PITUITARY -----
   const pitFaded = state.pituitary === 'faded'
   const pitCompensating = state.pituitary === 'compensating'
+  const pitStroke = pitFaded
+    ? COLOR.weak
+    : pitCompensating
+      ? COLOR.compensating
+      : COLOR.normal
+  const pitStrokeWidth = pitCompensating ? 3 : 1.8
 
+  // ----- GnRH ARROW -----
   const gnrhPulsing = state.gnrh === 'pulsing'
   const gnrhFaded = state.gnrh === 'faded' || state.gnrh === 'suppressed'
+  const gnrhColor = gnrhFaded
+    ? COLOR.weak
+    : gnrhPulsing
+      ? COLOR.compensating
+      : COLOR.normal
+  // GnRH pulsing means hypothalamus is firing harder → COMPENSATING (amber),
+  // not "broken" — so wide amber stroke + flowing dots, no red.
+  const gnrhWidth = gnrhPulsing ? 3 : 2
 
+  // ----- FSH ARROW -----
   const fshPulsing = state.fsh === 'pulsing'
   const fshFaded = state.fsh === 'faded' || state.fsh === 'weak'
+  // FSH pulsing = pituitary overproducing FSH (primary testicular failure)
+  // → ABNORMAL (red), thick stroke 4-5px with flowing dots.
+  const fshColor = fshFaded
+    ? COLOR.weak
+    : fshPulsing
+      ? COLOR.abnormal
+      : COLOR.normal
+  const fshWidth = fshPulsing ? 4.5 : fshFaded ? 1.2 : 2.5
 
+  // ----- LH ARROW -----
   const lhPulsing = state.lh === 'pulsing'
   const lhFaded = state.lh === 'faded' || state.lh === 'weak'
+  const lhColor = lhFaded
+    ? COLOR.weak
+    : lhPulsing
+      ? COLOR.abnormal
+      : COLOR.normal
+  const lhWidth = lhPulsing ? 4.5 : lhFaded ? 1.2 : 2.5
 
-  const testisScale =
-    state.testis === 'atrophic' ? 0.72 : 1
+  // ----- TESTIS -----
+  const testisScale = state.testis === 'atrophic' ? 0.72 : 1
   const testisStroke =
     state.testis === 'damaged'
-      ? COLOR.pulse
-      : state.testis === 'faded'
-        ? COLOR.weak
-        : COLOR.testisOutline
+      ? COLOR.abnormal
+      : state.testis === 'atrophic'
+        ? COLOR.compensating
+        : state.testis === 'faded'
+          ? COLOR.weak
+          : COLOR.normal
+  const testisStrokeWidth =
+    state.testis === 'damaged' ? 4 : state.testis === 'atrophic' ? 3 : 2
   const testisFillOpacity =
     state.testis === 'faded'
       ? 0.35
       : state.testis === 'damaged'
         ? 0.55
         : 1
+  const testisDamaged = state.testis === 'damaged'
 
+  // ----- TUBULES -----
   const tubulesDamaged = state.tubules === 'damaged'
   const tubulesSparse = state.tubules === 'sparse'
-  const tubuleStroke = tubulesDamaged ? COLOR.pulse : COLOR.tubule
-  const tubuleOpacity = tubulesDamaged ? 0.5 : tubulesSparse ? 0.4 : 1
+  const tubuleStroke = tubulesDamaged
+    ? COLOR.abnormal
+    : tubulesSparse
+      ? COLOR.compensating
+      : COLOR.normal
+  const tubuleOpacity = tubulesDamaged ? 0.7 : tubulesSparse ? 0.6 : 1
+  const tubuleWidth = tubulesDamaged ? 3 : 1.8
 
-  const sertoliColor = state.sertoli === 'damaged' ? COLOR.pulse : COLOR.sertoli
+  // ----- SERTOLI -----
+  const sertoliColor =
+    state.sertoli === 'damaged' ? COLOR.abnormal : COLOR.sertoli
+  const sertoliDamaged = state.sertoli === 'damaged'
 
+  // ----- LEYDIG -----
   const leydigDamaged =
     state.leydig === 'damaged' || state.leydig === 'unresponsive'
-  const leydigColor = leydigDamaged ? COLOR.pulse : COLOR.leydig
-  const leydigOpacity = leydigDamaged ? 0.55 : 1
+  const leydigColor = leydigDamaged ? COLOR.abnormal : COLOR.leydig
+  const leydigOpacity = leydigDamaged ? 0.75 : 1
   const leydigPulse = leydigDamaged
 
-  // Testosterone feedback arc visual style
-  const tStroke =
-    state.testosterone === 'absent'
+  // ----- TESTOSTERONE FEEDBACK -----
+  // Normal: solid green arrow.  Broken: dashed red, pulsing visual.
+  // Weak/absent: faded.  This loop carries the "negative feedback" signal
+  // from Leydig back to hypothalamus.
+  const tBroken = state.testosterone === 'broken'
+  const tStroke = tBroken
+    ? COLOR.abnormal
+    : state.testosterone === 'absent' || state.testosterone === 'weak'
       ? COLOR.weak
-      : state.testosterone === 'broken'
-        ? COLOR.pulse
-        : COLOR.feedback
+      : COLOR.normal
   const tOpacity =
     state.testosterone === 'absent'
-      ? 0.15
+      ? 0.25
       : state.testosterone === 'weak' || state.testosterone === 'faded'
-        ? 0.4
+        ? 0.45
         : 1
-  const tWidth = state.testosterone === 'normal' ? 1.6 : 0.9
-  const tDash =
-    state.testosterone === 'broken' || state.testosterone === 'weak'
-      ? '4 3'
+  const tWidth = tBroken ? 3.5 : state.testosterone === 'normal' ? 2.2 : 1.4
+  const tDash = tBroken
+    ? '8 6'
+    : state.testosterone === 'weak'
+      ? '4 4'
       : undefined
 
-  // Inhibin B arc style
-  const inhibinDash =
-    state.inhibinB === 'broken' || state.inhibinB === 'weak' ? '4 3' : undefined
-  const inhibinOpacity =
-    state.inhibinB === 'broken'
-      ? 0.35
-      : state.inhibinB === 'weak'
-        ? 0.55
-        : 1
-  const inhibinStroke =
-    state.inhibinB === 'broken' ? COLOR.pulse : COLOR.feedback
+  // ----- INHIBIN B FEEDBACK -----
+  const inhibinBroken = state.inhibinB === 'broken'
+  const inhibinDash = inhibinBroken
+    ? '8 6'
+    : state.inhibinB === 'weak'
+      ? '4 4'
+      : undefined
+  const inhibinOpacity = inhibinBroken
+    ? 0.85
+    : state.inhibinB === 'weak'
+      ? 0.55
+      : 1
+  const inhibinStroke = inhibinBroken
+    ? COLOR.abnormal
+    : state.inhibinB === 'weak'
+      ? COLOR.weak
+      : COLOR.normal
+  const inhibinWidth = inhibinBroken ? 3.5 : 2.2
 
   return (
     <svg
@@ -602,7 +690,50 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
       {/* — but the actual <use> renders inside the scaled group, so the     */}
       {/* path geometry is scaled along with everything else.                */}
       <defs>
-        {/* Arrowheads — slightly larger at the new scale for visibility */}
+        {/* Arrowheads — one per semantic state colour so the head visually   */}
+        {/* matches the stroke colour without needing currentColor (currentColor*/}
+        {/* fights with fill on path elements inside scaled groups in Safari).  */}
+        <marker
+          id="ah-normal"
+          markerWidth="8"
+          markerHeight="8"
+          refX="4"
+          refY="4"
+          orient="auto"
+        >
+          <path d="M0,0 L8,4 L0,8 Z" fill={COLOR.normal} />
+        </marker>
+        <marker
+          id="ah-compensating"
+          markerWidth="8"
+          markerHeight="8"
+          refX="4"
+          refY="4"
+          orient="auto"
+        >
+          <path d="M0,0 L8,4 L0,8 Z" fill={COLOR.compensating} />
+        </marker>
+        <marker
+          id="ah-abnormal"
+          markerWidth="8"
+          markerHeight="8"
+          refX="4"
+          refY="4"
+          orient="auto"
+        >
+          <path d="M0,0 L8,4 L0,8 Z" fill={COLOR.abnormal} />
+        </marker>
+        <marker
+          id="ah-weak"
+          markerWidth="8"
+          markerHeight="8"
+          refX="4"
+          refY="4"
+          orient="auto"
+        >
+          <path d="M0,0 L8,4 L0,8 Z" fill={COLOR.weak} />
+        </marker>
+        {/* Legacy aliases retained for the aromatase / Inhibin / T fallbacks */}
         <marker
           id="ah-down"
           markerWidth="8"
@@ -611,7 +742,7 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           refY="4"
           orient="auto"
         >
-          <path d="M0,0 L8,4 L0,8 Z" fill="currentColor" />
+          <path d="M0,0 L8,4 L0,8 Z" fill={COLOR.normal} />
         </marker>
         <marker
           id="ah-pulse"
@@ -621,7 +752,7 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           refY="4"
           orient="auto"
         >
-          <path d="M0,0 L8,4 L0,8 Z" fill={COLOR.pulse} />
+          <path d="M0,0 L8,4 L0,8 Z" fill={COLOR.abnormal} />
         </marker>
         {/* Subtle gradient on brain (gives a hint of depth without flat fill) */}
         <radialGradient id="brain-grad" cx="50%" cy="40%" r="70%">
@@ -681,9 +812,13 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
       {/* ============================================================== */}
       <g
         id="brain"
-        opacity={hypFaded ? 0.55 : 1}
+        opacity={hypFaded ? 0.7 : 1}
       >
-        {/* Simplified cerebral outline — convex top, flat bottom */}
+        {/* Simplified cerebral outline — convex top, flat bottom.        */}
+        {/* The outline colour reflects HYPOTHALAMUS state because the   */}
+        {/* hypothalamus is the functional "centre of the brain" in this */}
+        {/* schematic.  Stroke widens to 3px when compensating to draw    */}
+        {/* attention to the increased drive.                             */}
         <path
           d="M120,90
              C 110,55  150,25  200,28
@@ -694,27 +829,29 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
              C 150,118 140,118 130,115
              C 118,110 115,100 120,90 Z"
           fill="url(#brain-grad)"
-          stroke={COLOR.brain}
-          strokeWidth="1.6"
+          stroke={hypStroke}
+          strokeWidth={hypStrokeWidth}
         />
         {/* Convolutions / sulci — purely decorative wavy line art */}
         <path
           d="M140,55 Q160,42 180,55 Q200,42 220,55 Q240,42 260,55"
           fill="none"
-          stroke={COLOR.brain}
-          strokeWidth="1.1"
-          opacity="0.5"
+          stroke={hypStroke}
+          strokeWidth="1.2"
+          opacity="0.45"
         />
         <path
           d="M135,72 Q160,62 185,72 Q210,62 235,72 Q255,62 270,72"
           fill="none"
-          stroke={COLOR.brain}
-          strokeWidth="1.1"
-          opacity="0.4"
+          stroke={hypStroke}
+          strokeWidth="1.2"
+          opacity="0.35"
         />
 
         {/* ----- Hypothalamus — small almond at base of brain ---------- */}
-        <Pulse active={hypCompensating} duration={1.2} intensity={0.55}>
+        {/* Wrapped in a Framer Motion pulse when COMPENSATING: opacity   */}
+        {/* oscillates 1 → 0.5 → 1 at 1.2s — the "dramatic" visual cue.    */}
+        <Pulse active={hypCompensating} duration={1.2} intensity={0.5}>
           <g id="hypothalamus">
             <ellipse
               cx="200"
@@ -723,8 +860,8 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
               ry="10"
               fill={COLOR.hypothalamus}
               fillOpacity="0.85"
-              stroke={hypCompensating ? COLOR.pulse : COLOR.hypothalamus}
-              strokeWidth="1.3"
+              stroke={hypStroke}
+              strokeWidth={hypStrokeWidth}
             />
             {/* Nuclei dots */}
             <circle cx="192" cy="100" r="1.4" fill="#7f1d1d" />
@@ -738,7 +875,7 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           textAnchor="middle"
           fontSize="15"
           fill={COLOR.label}
-          fontWeight="600"
+          fontWeight="700"
         >
           Hypothalamus
         </text>
@@ -749,20 +886,20 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           y1="110"
           x2="200"
           y2="125"
-          stroke={COLOR.brain}
-          strokeWidth="1.4"
-          opacity="0.7"
+          stroke={pitStroke}
+          strokeWidth="1.6"
+          opacity="0.8"
         />
-        <Pulse active={pitCompensating} duration={1.3} intensity={0.55}>
-          <g id="pituitary" opacity={pitFaded ? 0.5 : 1}>
+        <Pulse active={pitCompensating} duration={1.3} intensity={0.5}>
+          <g id="pituitary" opacity={pitFaded ? 0.6 : 1}>
             <ellipse
               cx="200"
               cy="135"
               rx="18"
               ry="9"
-              fill={COLOR.pituitary}
-              stroke={pitCompensating ? COLOR.pulse : COLOR.pituitary}
-              strokeWidth="1.3"
+              fill={COLOR.pituitaryBody}
+              stroke={pitStroke}
+              strokeWidth={pitStrokeWidth}
             />
             {/* Anterior / posterior division */}
             <line
@@ -781,26 +918,28 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           y="138"
           fontSize="14"
           fill={COLOR.label}
-          fontWeight="600"
+          fontWeight="700"
         >
           Pituitary
         </text>
 
         {/* ----- GnRH arrow — short, internal --------------------------- */}
-        <g
-          id="gnrh-arrow"
-          color={gnrhPulsing ? COLOR.pulse : COLOR.feedback}
-          opacity={gnrhFaded ? 0.35 : 1}
-        >
-          <use
-            href="#gnrh-path"
-            stroke={gnrhPulsing ? COLOR.pulse : COLOR.feedback}
-            strokeWidth={gnrhPulsing ? 2.3 : 1.4}
-            markerEnd={`url(#${gnrhPulsing ? 'ah-pulse' : 'ah-down'})`}
-          />
+        {/* Pulsing GnRH = compensating hypothalamus → AMBER (not red).    */}
+        {/* The hypothalamus isn't broken, it's working harder.            */}
+        <g id="gnrh-arrow" opacity={gnrhFaded ? 0.4 : 1}>
+          <Pulse active={gnrhPulsing} duration={1.2} intensity={0.5}>
+            <use
+              href="#gnrh-path"
+              stroke={gnrhColor}
+              strokeWidth={gnrhWidth}
+              markerEnd={`url(#${
+                gnrhFaded ? 'ah-weak' : gnrhPulsing ? 'ah-compensating' : 'ah-normal'
+              })`}
+            />
+          </Pulse>
           <FlowingDots
             pathId="gnrh-path"
-            color={COLOR.pulse}
+            color={COLOR.compensating}
             count={3}
             duration={1.2}
             active={gnrhPulsing}
@@ -811,7 +950,8 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
             y="118"
             fontSize="13"
             fontStyle="italic"
-            fill={gnrhPulsing ? COLOR.pulse : COLOR.labelSmall}
+            fill={COLOR.label}
+            fontWeight="700"
           >
             GnRH
           </text>
@@ -822,18 +962,19 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
       {/* BLOODSTREAM CHANNEL — vessel running from pituitary to testis  */}
       {/* ============================================================== */}
       <g id="vessels" opacity={state.vessels === 'faded' ? 0.45 : 1}>
-        {/* Outer vessel walls */}
+        {/* Outer vessel walls — neutral slate (vessels themselves are    */}
+        {/* not "diseased", they're just the conduit for FSH/LH/T/etc.).  */}
         <path
           d="M192,160 C150,230 145,310 165,380"
           fill="none"
-          stroke={COLOR.vessel}
+          stroke={COLOR.vesselWall}
           strokeWidth="2.4"
           opacity="0.6"
         />
         <path
           d="M208,160 C250,230 255,310 235,380"
           fill="none"
-          stroke={COLOR.vessel}
+          stroke={COLOR.vesselWall}
           strokeWidth="2.4"
           opacity="0.6"
         />
@@ -850,62 +991,64 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
       {/* ============================================================== */}
       {/* FSH & LH ARROWS — flowing through vessel                        */}
       {/* ============================================================== */}
-      {/* FSH (left curve) */}
-      <g
-        id="fsh-arrow"
-        color={fshPulsing ? COLOR.pulse : COLOR.fsh}
-        opacity={fshFaded ? 0.4 : 1}
-      >
-        <use
-          href="#fsh-path"
-          stroke={fshPulsing ? COLOR.pulse : COLOR.fsh}
-          strokeWidth={fshPulsing ? 2.6 : fshFaded ? 1.0 : 1.7}
-          markerEnd={`url(#${fshPulsing ? 'ah-pulse' : 'ah-down'})`}
-        />
+      {/* FSH (left curve).  Pulsing FSH = pituitary hyper-secreting due   */}
+      {/* to absent inhibin B feedback → ABNORMAL red, thick 4.5px stroke, */}
+      {/* wrapped in Pulse for opacity throb, with bright flowing dots.   */}
+      <g id="fsh-arrow" opacity={fshFaded ? 0.4 : 1}>
+        <Pulse active={fshPulsing} duration={1.2} intensity={0.5}>
+          <use
+            href="#fsh-path"
+            stroke={fshColor}
+            strokeWidth={fshWidth}
+            markerEnd={`url(#${
+              fshFaded ? 'ah-weak' : fshPulsing ? 'ah-abnormal' : 'ah-normal'
+            })`}
+          />
+        </Pulse>
         <FlowingDots
           pathId="fsh-path"
-          color={fshPulsing ? COLOR.pulse : COLOR.fsh}
-          count={3}
-          duration={2.4}
+          color={fshColor}
+          count={fshPulsing ? 4 : 3}
+          duration={fshPulsing ? 1.4 : 2.4}
           active={!fshFaded}
-          radius={fshPulsing ? 2.6 : 2}
+          radius={fshPulsing ? 2.8 : 2}
         />
         <text
           x="120"
           y="265"
           fontSize="18"
-          fill={fshPulsing ? COLOR.pulse : COLOR.fsh}
+          fill={COLOR.label}
           fontWeight="700"
         >
           FSH
         </text>
       </g>
 
-      {/* LH (right curve) */}
-      <g
-        id="lh-arrow"
-        color={lhPulsing ? COLOR.pulse : COLOR.lh}
-        opacity={lhFaded ? 0.4 : 1}
-      >
-        <use
-          href="#lh-path"
-          stroke={lhPulsing ? COLOR.pulse : COLOR.lh}
-          strokeWidth={lhPulsing ? 2.6 : lhFaded ? 1.0 : 1.7}
-          markerEnd={`url(#${lhPulsing ? 'ah-pulse' : 'ah-down'})`}
-        />
+      {/* LH (right curve) — same logic as FSH */}
+      <g id="lh-arrow" opacity={lhFaded ? 0.4 : 1}>
+        <Pulse active={lhPulsing} duration={1.2} intensity={0.5}>
+          <use
+            href="#lh-path"
+            stroke={lhColor}
+            strokeWidth={lhWidth}
+            markerEnd={`url(#${
+              lhFaded ? 'ah-weak' : lhPulsing ? 'ah-abnormal' : 'ah-normal'
+            })`}
+          />
+        </Pulse>
         <FlowingDots
           pathId="lh-path"
-          color={lhPulsing ? COLOR.pulse : COLOR.lh}
-          count={3}
-          duration={2.4}
+          color={lhColor}
+          count={lhPulsing ? 4 : 3}
+          duration={lhPulsing ? 1.4 : 2.4}
           active={!lhFaded}
-          radius={lhPulsing ? 2.6 : 2}
+          radius={lhPulsing ? 2.8 : 2}
         />
         <text
           x="270"
           y="265"
           fontSize="18"
-          fill={lhPulsing ? COLOR.pulse : COLOR.lh}
+          fill={COLOR.label}
           fontWeight="700"
         >
           LH
@@ -924,18 +1067,22 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
         }}
         opacity={state.testis === 'faded' ? 0.55 : 1}
       >
-        {/* Tunica albuginea — thick outer shell */}
-        <ellipse
-          cx="200"
-          cy="420"
-          rx="95"
-          ry="58"
-          fill="url(#testis-grad)"
-          stroke={testisStroke}
-          strokeWidth="2.4"
-          fillOpacity={testisFillOpacity}
-        />
-        {state.testis === 'damaged' && (
+        {/* Tunica albuginea — thick outer shell.  Colour reflects testis  */}
+        {/* state: NORMAL=green, ATROPHIC=amber (compensating), DAMAGED=red */}
+        {/* (with pulse). Stroke widens 2→4 px for damaged.                  */}
+        <Pulse active={testisDamaged} duration={1.2} intensity={0.5}>
+          <ellipse
+            cx="200"
+            cy="420"
+            rx="95"
+            ry="58"
+            fill="url(#testis-grad)"
+            stroke={testisStroke}
+            strokeWidth={testisStrokeWidth}
+            fillOpacity={testisFillOpacity}
+          />
+        </Pulse>
+        {testisDamaged && (
           <ellipse
             cx="200"
             cy="420"
@@ -955,19 +1102,19 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
             d="M135,395 C145,388 155,395 160,402 C165,408 155,415 145,412 C135,409 130,402 135,395 Z"
             fill="none"
             stroke={tubuleStroke}
-            strokeWidth={tubulesSparse ? 0.9 : 1.6}
+            strokeWidth={tubulesSparse ? 1.0 : tubuleWidth}
           />
           <path
             d="M125,418 C140,408 165,418 170,432 C173,440 158,448 142,440 C128,432 120,425 125,418 Z"
             fill="none"
             stroke={tubuleStroke}
-            strokeWidth={tubulesSparse ? 0.9 : 1.6}
+            strokeWidth={tubulesSparse ? 1.0 : tubuleWidth}
           />
           <path
             d="M135,445 C150,438 175,448 175,460 C173,470 155,470 142,463 C132,457 128,450 135,445 Z"
             fill="none"
             stroke={tubuleStroke}
-            strokeWidth={tubulesSparse ? 0.9 : 1.6}
+            strokeWidth={tubulesSparse ? 1.0 : tubuleWidth}
           />
           {!tubulesSparse && (
             <>
@@ -975,32 +1122,32 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
                 d="M155,380 C170,375 188,385 187,398 C186,405 172,408 162,402 C152,396 150,386 155,380 Z"
                 fill="none"
                 stroke={tubuleStroke}
-                strokeWidth="1.6"
+                strokeWidth={tubuleWidth}
               />
               <path
                 d="M170,422 C188,418 205,428 200,442 C195,452 180,452 168,444 C158,436 158,425 170,422 Z"
                 fill="none"
                 stroke={tubuleStroke}
-                strokeWidth="1.6"
+                strokeWidth={tubuleWidth}
               />
               {/* Three additional coils for richer detail at this scale */}
               <path
                 d="M115,388 C124,381 138,386 142,394 C144,400 134,406 126,403 C118,401 112,394 115,388 Z"
                 fill="none"
                 stroke={tubuleStroke}
-                strokeWidth="1.4"
+                strokeWidth={tubuleWidth - 0.2}
               />
               <path
                 d="M158,418 C172,414 186,422 184,432 C181,440 168,440 158,434 C148,428 148,422 158,418 Z"
                 fill="none"
                 stroke={tubuleStroke}
-                strokeWidth="1.4"
+                strokeWidth={tubuleWidth - 0.2}
               />
               <path
                 d="M180,392 C195,390 207,402 204,412 C200,418 188,418 182,410 C176,402 174,395 180,392 Z"
                 fill="none"
                 stroke={tubuleStroke}
-                strokeWidth="1.4"
+                strokeWidth={tubuleWidth - 0.2}
               />
             </>
           )}
@@ -1008,44 +1155,48 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           {/* ----- Sertoli cells — small dots along tubule walls ------- */}
           {/* Expanded from 11 → 18 to give a denser, more anatomically    */}
           {/* convincing compartment at the higher rendered scale.        */}
-          <g id="sertoli-cells">
-            {[
-              [148, 396],
-              [152, 405],
-              [160, 410],
-              [140, 422],
-              [150, 432],
-              [165, 435],
-              [170, 422],
-              [155, 450],
-              [168, 458],
-              [180, 446],
-              [185, 393],
-              [125, 400],
-              [132, 411],
-              [128, 425],
-              [138, 438],
-              [148, 460],
-              [172, 405],
-              [190, 415],
-            ].map(([cx, cy], i) => (
-              <circle
-                key={`sert-${i}`}
-                cx={cx}
-                cy={cy}
-                r={tubulesSparse ? 0.9 : 1.7}
-                fill={sertoliColor}
-                opacity={tubulesSparse ? 0.6 : 1}
-              />
-            ))}
-          </g>
+          {/* When Sertoli compartment is damaged, dots flip to red AND   */}
+          {/* the entire group pulses (opacity 1 → 0.5 → 1).              */}
+          <Pulse active={sertoliDamaged} duration={1.2} intensity={0.5}>
+            <g id="sertoli-cells">
+              {[
+                [148, 396],
+                [152, 405],
+                [160, 410],
+                [140, 422],
+                [150, 432],
+                [165, 435],
+                [170, 422],
+                [155, 450],
+                [168, 458],
+                [180, 446],
+                [185, 393],
+                [125, 400],
+                [132, 411],
+                [128, 425],
+                [138, 438],
+                [148, 460],
+                [172, 405],
+                [190, 415],
+              ].map(([cx, cy], i) => (
+                <circle
+                  key={`sert-${i}`}
+                  cx={cx}
+                  cy={cy}
+                  r={tubulesSparse ? 1.0 : 1.8}
+                  fill={sertoliColor}
+                  opacity={tubulesSparse ? 0.7 : 1}
+                />
+              ))}
+            </g>
+          </Pulse>
           <text
             x="155"
             y="480"
             textAnchor="middle"
             fontSize="13"
             fill={COLOR.label}
-            fontWeight="600"
+            fontWeight="700"
           >
             tubules · Sertoli
           </text>
@@ -1087,7 +1238,7 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           textAnchor="middle"
           fontSize="13"
           fill={COLOR.label}
-          fontWeight="600"
+          fontWeight="700"
         >
           Leydig (interstitium)
         </text>
@@ -1111,8 +1262,9 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
             y="395"
             textAnchor="middle"
             fontSize="12"
-            fill={COLOR.labelSmall}
+            fill={COLOR.label}
             fontStyle="italic"
+            fontWeight="700"
           >
             rete
           </text>
@@ -1126,15 +1278,15 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           <path
             d="M285,388 C310,378 320,395 318,415 C315,430 305,435 295,425 C285,418 280,400 285,388 Z"
             fill="#1e293b"
-            stroke={COLOR.epididymis}
-            strokeWidth="1.4"
+            stroke={state.epididymis === 'faded' ? COLOR.weak : COLOR.normal}
+            strokeWidth="1.8"
           />
           {/* Coil pattern */}
           <path
             d="M292,395 Q302,392 308,398 M289,405 Q300,402 310,408 M292,417 Q302,415 309,420"
             fill="none"
-            stroke={COLOR.epididymis}
-            strokeWidth="1.1"
+            stroke={state.epididymis === 'faded' ? COLOR.weak : COLOR.normal}
+            strokeWidth="1.3"
             opacity="0.7"
           />
           <text
@@ -1143,7 +1295,7 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
             textAnchor="middle"
             fontSize="13"
             fill={COLOR.label}
-            fontWeight="600"
+            fontWeight="700"
           >
             epididymis
           </text>
@@ -1169,8 +1321,9 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
             x="80"
             y="425"
             fontSize="12"
-            fill={COLOR.labelSmall}
+            fill={COLOR.label}
             fontStyle="italic"
+            fontWeight="700"
           >
             a./v.
           </text>
@@ -1182,7 +1335,7 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           textAnchor="middle"
           fontSize="16"
           fill={COLOR.label}
-          fontWeight="600"
+          fontWeight="700"
         >
           Testis
         </text>
@@ -1191,24 +1344,33 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
       {/* ============================================================== */}
       {/* FEEDBACK LOOPS — curving outside the central column             */}
       {/* ============================================================== */}
-      {/* Inhibin B: from Sertoli (left of testis) back up to pituitary */}
+      {/* Inhibin B: from Sertoli (left of testis) back up to pituitary.   */}
+      {/* When BROKEN, arrow is dashed red with pulse animation — clearly  */}
+      {/* signaling the feedback loop is failing.                          */}
       <g id="inhibin-feedback" opacity={inhibinOpacity}>
-        <path
-          d="M100,395 C40,330 30,200 60,145 Q100,128 178,140"
-          fill="none"
-          stroke={inhibinStroke}
-          strokeWidth="1.3"
-          strokeDasharray={inhibinDash}
-          color={inhibinStroke}
-          markerEnd="url(#ah-down)"
-        />
+        <Pulse active={inhibinBroken} duration={1.2} intensity={0.4}>
+          <path
+            d="M100,395 C40,330 30,200 60,145 Q100,128 178,140"
+            fill="none"
+            stroke={inhibinStroke}
+            strokeWidth={inhibinWidth}
+            strokeDasharray={inhibinDash}
+            markerEnd={`url(#${
+              inhibinBroken
+                ? 'ah-abnormal'
+                : state.inhibinB === 'weak'
+                  ? 'ah-weak'
+                  : 'ah-normal'
+            })`}
+          />
+        </Pulse>
         <text
           x="22"
           y="266"
           fontSize="14"
-          fill={inhibinStroke}
+          fill={COLOR.label}
           fontStyle="italic"
-          fontWeight="600"
+          fontWeight="700"
         >
           Inhibin B
         </text>
@@ -1216,28 +1378,38 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           x="22"
           y="284"
           fontSize="12"
-          fill={COLOR.labelSmall}
+          fill={COLOR.label}
           fontStyle="italic"
+          fontWeight="700"
         >
           (Sertoli → pit.)
         </text>
       </g>
 
-      {/* Testosterone: from Leydig (right of testis) back up to hypothalamus */}
-      <g id="testosterone-feedback" opacity={tOpacity} color={tStroke}>
-        <path
-          d="M300,395 C370,330 380,200 350,135 Q320,108 222,100"
-          fill="none"
-          stroke={tStroke}
-          strokeWidth={tWidth}
-          strokeDasharray={tDash}
-          markerEnd="url(#ah-down)"
-        />
+      {/* Testosterone: from Leydig (right of testis) back up to             */}
+      {/* hypothalamus.  Same broken-state visual: dashed red + pulse.        */}
+      <g id="testosterone-feedback" opacity={tOpacity}>
+        <Pulse active={tBroken} duration={1.2} intensity={0.4}>
+          <path
+            d="M300,395 C370,330 380,200 350,135 Q320,108 222,100"
+            fill="none"
+            stroke={tStroke}
+            strokeWidth={tWidth}
+            strokeDasharray={tDash}
+            markerEnd={`url(#${
+              tBroken
+                ? 'ah-abnormal'
+                : state.testosterone === 'weak' || state.testosterone === 'absent'
+                  ? 'ah-weak'
+                  : 'ah-normal'
+            })`}
+          />
+        </Pulse>
         <text
           x="350"
           y="266"
           fontSize="15"
-          fill={tStroke}
+          fill={COLOR.label}
           fontStyle="italic"
           fontWeight="700"
         >
@@ -1247,8 +1419,9 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
           x="334"
           y="284"
           fontSize="12"
-          fill={COLOR.labelSmall}
+          fill={COLOR.label}
           fontStyle="italic"
+          fontWeight="700"
         >
           (Leydig → hyp.)
         </text>
@@ -1301,7 +1474,8 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
             y={state.adipose === 'large' ? 400 : 392}
             textAnchor="middle"
             fontSize="13"
-            fill={COLOR.adipose}
+            fill={COLOR.label}
+            fontWeight="700"
           >
             adipose
           </text>
@@ -1311,8 +1485,9 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
               y={state.adipose === 'large' ? 410 : 402}
               textAnchor="middle"
               fontSize="12"
-              fill={COLOR.adipose}
+              fill={COLOR.label}
               fontStyle="italic"
+              fontWeight="700"
             >
               aromatase
             </text>
@@ -1320,26 +1495,28 @@ function HpgAxisSvg({ state }: { state: AxisState }) {
         </g>
       )}
 
-      {/* Aromatase arrow — T from Leydig diverted to E2 in adipose */}
+      {/* Aromatase arrow — T from Leydig diverted to E2 in adipose.       */}
+      {/* This is a compensatory/abnormal shunt: amber colour reflects the */}
+      {/* metabolic re-routing rather than a clean broken state.            */}
       {state.aromatase === 'active' && (
         <Pulse active duration={1.6}>
           <g id="aromatase-arrow">
             <path
               d="M195,420 Q140,395 90,365"
               fill="none"
-              stroke={COLOR.adipose}
-              strokeWidth="1.5"
-              strokeDasharray="3 2"
-              markerEnd="url(#ah-down)"
-              color={COLOR.adipose}
-              opacity="0.85"
+              stroke={COLOR.compensating}
+              strokeWidth="2.5"
+              strokeDasharray="6 4"
+              markerEnd="url(#ah-compensating)"
+              opacity="0.9"
             />
             <text
               x="125"
               y="395"
               fontSize="12"
-              fill={COLOR.adipose}
+              fill={COLOR.label}
               fontStyle="italic"
+              fontWeight="700"
             >
               T→E2
             </text>
@@ -1409,8 +1586,50 @@ function ConditionCard({ condition }: { condition: DetectedCondition }) {
 
       <div className="grid grid-cols-1 gap-4 p-4 pl-5 md:grid-cols-[440px_1fr] md:gap-5">
         {/* ----- SVG diagram (left on md+, top on mobile) ----- */}
-        <div className="flex items-start justify-center rounded-md border border-border/40 bg-background/40 p-2">
+        {/* The container is forced to a slate-900 dark background regardless */}
+        {/* of the page theme (light/dark) because the SVG was designed       */}
+        {/* against a dark medical-illustration backdrop and uses pure white  */}
+        {/* labels.  Without this, FSH/LH/feedback labels become invisible in */}
+        {/* light mode (white-on-white).                                       */}
+        <div className="flex flex-col items-center rounded-md border border-slate-700/60 bg-slate-900 p-2">
           <HpgAxisSvg state={condition.axisState} />
+
+          {/* Color legend — explains the 3-state semantic colour system    */}
+          {/* used throughout the diagram (green=normal, amber=compensating, */}
+          {/* red=abnormal/dysfunctional).  Small dots match the actual SVG  */}
+          {/* stroke colours so users can map them at a glance.              */}
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-[11px] font-semibold text-white">
+            <span className="inline-flex items-center gap-1.5">
+              <span
+                className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-white/30"
+                style={{ backgroundColor: '#22c55e' }}
+                aria-hidden
+              />
+              Normal
+            </span>
+            <span className="text-slate-500" aria-hidden>
+              |
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span
+                className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-white/30"
+                style={{ backgroundColor: '#f59e0b' }}
+                aria-hidden
+              />
+              Compensating
+            </span>
+            <span className="text-slate-500" aria-hidden>
+              |
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span
+                className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-white/30"
+                style={{ backgroundColor: '#ef4444' }}
+                aria-hidden
+              />
+              Abnormal / Dysfunctional
+            </span>
+          </div>
         </div>
 
         {/* ----- Text panel ----- */}
