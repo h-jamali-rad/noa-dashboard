@@ -264,10 +264,12 @@ export default function BiomarkerDistributionChart({
 
   if (!distribution) {
     // The JSON has not yet loaded — render a thin skeleton bar so the
-    // form layout remains stable.
+    // form layout remains stable. Height matches the rendered chart
+    // (~50px) plus the small badge row beneath it (~10px) so there is
+    // no layout shift when the data loads.
     return (
       <div
-        className="mt-1.5 h-[58px] w-full animate-pulse rounded bg-muted/40"
+        className="mt-1 h-[60px] w-full animate-pulse rounded bg-muted/40"
         aria-hidden
       />
     )
@@ -287,11 +289,15 @@ export default function BiomarkerDistributionChart({
 
   return (
     <div
-      className="mt-1.5 space-y-0.5"
+      className="mt-1 space-y-0.5"
       aria-label={`Distribution chart for ${label}`}
       aria-hidden
     >
-      <div className="relative h-[44px] w-full overflow-hidden rounded">
+      {/* `overflow-hidden` is critical here — the pulsing outlier marker
+          is absolutely positioned and animated with Framer Motion, so
+          without clipping it could leak vertically into the row above
+          / below in the tight 3-column grid layout. */}
+      <div className="relative h-[50px] w-full overflow-hidden rounded">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={kdeData}
@@ -357,20 +363,24 @@ export default function BiomarkerDistributionChart({
 
         {/* Pulsing halo on the user-value marker when outlier (rendered
             outside Recharts so we can drive it with Framer Motion). The
-            marker x-position is computed from the chart's data domain. */}
+            marker x-position is computed from the chart's data domain.
+            Dimensions and scale range are deliberately small (8 px dot,
+            scale 0.85 → 1.0) so the animation stays comfortably inside
+            the 50-px chart and never visually overlaps neighbouring
+            cards in the 3-column grid. */}
         <AnimatePresence>
           {hasValue && clampedX !== null && zoneInfo!.isOutlier && (
             <motion.span
               key="outlier-pulse"
-              initial={{ opacity: 0, scale: 0.6 }}
+              initial={{ opacity: 0, scale: 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.6 }}
+              exit={{ opacity: 0, scale: 0.85 }}
               transition={{
                 duration: 0.6,
                 repeat: Infinity,
                 repeatType: 'reverse',
               }}
-              className="pointer-events-none absolute top-1/2 z-10 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-red-500/60"
+              className="pointer-events-none absolute top-1/2 z-10 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full ring-1 ring-red-500/60"
               style={{
                 left: `${
                   ((clampedX - distribution.min) /

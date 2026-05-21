@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown, Info } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -267,27 +268,63 @@ export default function CdssForm() {
           CatBoost-v2-aligned CDSS approximation (AUC {CATBOOST_AUC.toFixed(4)}, 95% CI {CATBOOST_CI}; prevalence 36.7% in n=2,413). This UI demonstrates risk summarization and is not a direct model export.
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
-          {FEATURE_FIELDS.map((f) => (
-            <div key={f.key}>
-              <label className="text-xs font-medium flex items-baseline gap-1.5">
-                {f.label}
-                {f.unit && <span className="text-[10px] text-muted-foreground/60 font-normal">({f.unit})</span>}
-              </label>
-              <Input
-                value={vals[f.key] ?? ''}
-                onChange={(e) => setVals((p) => ({ ...p, [f.key]: e.target.value }))}
-                placeholder={`${f.q1} – ${f.q3}`}
-                className={cn('placeholder:text-muted-foreground/30 placeholder:font-light', getInputClass(vals[f.key], f))}
-                type="number"
-              />
-              <BiomarkerDistributionChart
-                value={vals[f.key]}
-                distribution={BIOMARKER_DISTRIBUTIONS[f.key]}
-                label={f.label}
-              />
-            </div>
-          ))}
+        {/* 3-column responsive grid of compact biomarker cards. The KDE
+            distribution chart inside each card is hidden until the user
+            has entered a valid number — typing draws the chart in with a
+            short slide/fade so the form feels reactive without visual
+            noise on empty cells. */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {FEATURE_FIELDS.map((f) => {
+            const rawVal = vals[f.key]
+            const parsed =
+              rawVal !== undefined && rawVal !== '' ? Number(rawVal) : NaN
+            const hasValidValue = Number.isFinite(parsed)
+            return (
+              <div
+                key={f.key}
+                className="rounded-md border bg-card/40 p-2.5 space-y-1.5"
+              >
+                <label className="text-[11px] font-medium flex items-baseline gap-1">
+                  {f.label}
+                  {f.unit && (
+                    <span className="text-[9px] text-muted-foreground/60 font-normal">
+                      ({f.unit})
+                    </span>
+                  )}
+                </label>
+                <Input
+                  value={vals[f.key] ?? ''}
+                  onChange={(e) =>
+                    setVals((p) => ({ ...p, [f.key]: e.target.value }))
+                  }
+                  placeholder={`${f.q1} – ${f.q3}`}
+                  className={cn(
+                    'h-8 text-xs placeholder:text-muted-foreground/30 placeholder:font-light',
+                    getInputClass(vals[f.key], f),
+                  )}
+                  type="number"
+                />
+                <AnimatePresence initial={false}>
+                  {hasValidValue && (
+                    <motion.div
+                      key="dist-chart"
+                      initial={{ opacity: 0, y: -4, height: 0 }}
+                      animate={{ opacity: 1, y: 0, height: 'auto' }}
+                      exit={{ opacity: 0, y: -4, height: 0 }}
+                      transition={{ duration: 0.22, ease: 'easeOut' }}
+                      className="overflow-hidden"
+                    >
+                      <BiomarkerDistributionChart
+                        value={vals[f.key]}
+                        distribution={BIOMARKER_DISTRIBUTIONS[f.key]}
+                        label={f.label}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )
+          })}
         </div>
 
         <div className="space-y-3">
