@@ -829,7 +829,7 @@ export default function ClinicalInterpretation({
             </div>
 
             {/* Atlas scene — large full-width display */}
-            <div className="min-h-[700px] w-full overflow-hidden rounded lg:min-h-[800px]">
+            <div className="w-full overflow-hidden rounded">
               <HPGAxis3D state={mergedAxisState} />
             </div>
 

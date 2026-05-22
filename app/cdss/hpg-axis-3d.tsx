@@ -169,9 +169,9 @@ const PALETTE = {
   panelBorder: 'rgba(148, 163, 184, 0.35)',
 } as const
 
-/** Pixel-stable viewBox for the overlay SVG (matches container aspect 1:2). */
-const VB_W = 400
-const VB_H = 800
+/** Pixel-stable viewBox for the overlay SVG (horizontal layout ~2:1). */
+const VB_W = 1000
+const VB_H = 500
 
 // ===========================================================================
 // HELPERS
@@ -581,20 +581,20 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
     isAbnormal(state.sertoli, ['normal'])
   const leydigAbnormal = isAbnormal(state.leydig, ['normal'])
 
-  // ----- Coordinates (in overlay SVG viewBox 0..400 × 0..800) ------------
-  // Brain section (top)
-  const BRAIN = { x: 60, y: 10, w: 280, h: 230 }
-  const hypoCenter = { cx: 200, cy: 188, rx: 38, ry: 22 }
+  // ----- Coordinates (in overlay SVG viewBox 0..1000 × 0..500) -----------
+  // Brain section (left)
+  const BRAIN = { x: 20, y: 20, w: 320, h: 420 }
+  const hypoCenter = { cx: 180, cy: 340, rx: 42, ry: 24 }
 
-  // Pituitary section (middle)
-  const PIT = { x: 100, y: 300, w: 200, h: 130 }
-  const antLobe = { cx: 178, cy: 372, rx: 28, ry: 18 }
-  const postLobe = { cx: 232, cy: 372, rx: 20, ry: 16 }
+  // Pituitary section (center)
+  const PIT = { x: 380, y: 100, w: 240, h: 200 }
+  const antLobe = { cx: 475, cy: 210, rx: 32, ry: 22 }
+  const postLobe = { cx: 530, cy: 210, rx: 24, ry: 18 }
 
-  // Testis section (bottom)
-  const TES = { x: 60, y: 490, w: 280, h: 280 }
-  const tubulesRegion = { cx: 170, cy: 625, rx: 70, ry: 55 }
-  const leydigRegion = { cx: 240, cy: 700, rx: 50, ry: 32 }
+  // Testis section (right)
+  const TES = { x: 660, y: 30, w: 320, h: 420 }
+  const tubulesRegion = { cx: 790, cy: 230, rx: 75, ry: 65 }
+  const leydigRegion = { cx: 860, cy: 340, rx: 55, ry: 35 }
 
   return (
     <div
@@ -603,7 +603,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
         position: 'relative',
         width: '100%',
         height: '100%',
-        minHeight: 600,
+        minHeight: 400,
         background:
           'radial-gradient(circle at 50% 30%, #0f172a 0%, #020617 100%)',
         borderRadius: 8,
@@ -720,7 +720,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
             GnRH ARROW — Hypothalamus ↓ Pituitary
             ============================================================ */}
         <HormoneArrow
-          path={`M ${hypoCenter.cx} ${hypoCenter.cy + hypoCenter.ry + 4} C ${hypoCenter.cx} ${hypoCenter.cy + 70}, ${antLobe.cx + 4} ${antLobe.cy - 50}, ${antLobe.cx} ${antLobe.cy - antLobe.ry - 4}`}
+          path={`M ${hypoCenter.cx + hypoCenter.rx + 4} ${hypoCenter.cy} C ${hypoCenter.cx + 80} ${hypoCenter.cy}, ${antLobe.cx - 60} ${antLobe.cy}, ${antLobe.cx - antLobe.rx - 4} ${antLobe.cy}`}
           variant={gnrhV}
           arrowId="hpg-arrow-gnrh"
           handlers={handlers}
@@ -728,7 +728,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           tooltipDesc="Gonadotropin-releasing hormone. Pulsatile secretion (~every 90 min) from hypothalamus drives FSH/LH release from anterior pituitary."
           thickness={2.2}
         />
-        <HormonePill x={262} y={272} label="GnRH" variant={gnrhV} />
+        <HormonePill x={340} y={180} label="GnRH" variant={gnrhV} />
 
         {/* ============================================================
             MIDDLE SECTION — Pituitary Gland
@@ -781,60 +781,33 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
 
         {/* Labels */}
         <g pointerEvents="none" fontFamily="system-ui, sans-serif">
-          <line
-            x1={antLobe.cx - antLobe.rx}
-            y1={antLobe.cy}
-            x2={50}
-            y2={antLobe.cy + 10}
-            stroke={PALETTE.textMuted}
-            strokeWidth={0.8}
-            opacity={0.6}
-          />
           <text
-            x={48}
-            y={antLobe.cy + 8}
+            x={PIT.x + PIT.w / 2}
+            y={PIT.y - 8}
             fill={PALETTE.textTitle}
             fontSize={11}
             fontWeight={700}
-            textAnchor="end"
+            textAnchor="middle"
           >
-            Anterior Pituitary
+            Pituitary Gland
           </text>
           <text
-            x={48}
-            y={antLobe.cy + 20}
+            x={antLobe.cx}
+            y={antLobe.cy + antLobe.ry + 16}
             fill={PALETTE.textMuted}
             fontSize={9}
-            textAnchor="end"
+            textAnchor="middle"
           >
-            Gonadotrophs · FSH/LH
-          </text>
-
-          <line
-            x1={postLobe.cx + postLobe.rx}
-            y1={postLobe.cy}
-            x2={350}
-            y2={postLobe.cy + 12}
-            stroke={PALETTE.textMuted}
-            strokeWidth={0.8}
-            opacity={0.6}
-          />
-          <text
-            x={352}
-            y={postLobe.cy + 10}
-            fill={PALETTE.textTitle}
-            fontSize={11}
-            fontWeight={700}
-          >
-            Posterior
+            Anterior · FSH/LH
           </text>
           <text
-            x={352}
-            y={postLobe.cy + 22}
+            x={postLobe.cx}
+            y={postLobe.cy + postLobe.ry + 16}
             fill={PALETTE.textMuted}
             fontSize={9}
+            textAnchor="middle"
           >
-            Oxytocin · ADH
+            Posterior · ADH
           </text>
         </g>
 
@@ -842,7 +815,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
             FSH + LH ARROWS — Pituitary ↓ Testis
             ============================================================ */}
         <HormoneArrow
-          path={`M ${antLobe.cx - 12} ${antLobe.cy + antLobe.ry + 4} C ${antLobe.cx - 40} ${antLobe.cy + 70}, ${tubulesRegion.cx - 60} ${tubulesRegion.cy - 90}, ${tubulesRegion.cx - 30} ${tubulesRegion.cy - tubulesRegion.ry - 6}`}
+          path={`M ${antLobe.cx + antLobe.rx + 4} ${antLobe.cy - 10} C ${antLobe.cx + 80} ${antLobe.cy - 30}, ${tubulesRegion.cx - 90} ${tubulesRegion.cy - 30}, ${tubulesRegion.cx - tubulesRegion.rx - 6} ${tubulesRegion.cy}`}
           variant={fshV}
           arrowId="hpg-arrow-fsh"
           handlers={handlers}
@@ -850,8 +823,8 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           tooltipDesc="Follicle-stimulating hormone — acts on Sertoli cells to support spermatogenesis. Elevated FSH = Sertoli-cell dysfunction with loss of Inhibin B feedback."
         />
         <HormonePill
-          x={80}
-          y={478}
+          x={620}
+          y={150}
           label="FSH"
           value={values.fsh}
           unit="mIU/mL"
@@ -859,7 +832,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
         />
 
         <HormoneArrow
-          path={`M ${antLobe.cx + 14} ${antLobe.cy + antLobe.ry + 4} C ${antLobe.cx + 30} ${antLobe.cy + 70}, ${leydigRegion.cx - 30} ${leydigRegion.cy - 120}, ${leydigRegion.cx - 20} ${leydigRegion.cy - leydigRegion.ry - 4}`}
+          path={`M ${antLobe.cx + antLobe.rx + 4} ${antLobe.cy + 10} C ${antLobe.cx + 80} ${antLobe.cy + 40}, ${leydigRegion.cx - 90} ${leydigRegion.cy + 10}, ${leydigRegion.cx - leydigRegion.rx - 6} ${leydigRegion.cy}`}
           variant={lhV}
           arrowId="hpg-arrow-lh"
           handlers={handlers}
@@ -867,8 +840,8 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           tooltipDesc="Luteinizing hormone — acts on Leydig cells to stimulate testosterone synthesis. Elevated LH = Leydig-cell dysfunction or testosterone deficiency."
         />
         <HormonePill
-          x={246}
-          y={478}
+          x={620}
+          y={320}
           label="LH"
           value={values.lh}
           unit="mIU/mL"
@@ -931,66 +904,30 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
 
         {/* Labels */}
         <g pointerEvents="none" fontFamily="system-ui, sans-serif">
-          <line
-            x1={tubulesRegion.cx - tubulesRegion.rx}
-            y1={tubulesRegion.cy}
-            x2={50}
-            y2={tubulesRegion.cy - 6}
-            stroke={PALETTE.textMuted}
-            strokeWidth={0.8}
-            opacity={0.6}
-          />
           <text
-            x={48}
-            y={tubulesRegion.cy - 8}
+            x={tubulesRegion.cx}
+            y={tubulesRegion.cy + tubulesRegion.ry + 16}
             fill={PALETTE.textTitle}
-            fontSize={11}
+            fontSize={10}
             fontWeight={700}
-            textAnchor="end"
+            textAnchor="middle"
           >
-            Seminiferous
+            Seminiferous Tubules
           </text>
           <text
-            x={48}
-            y={tubulesRegion.cy + 4}
+            x={leydigRegion.cx}
+            y={leydigRegion.cy + leydigRegion.ry + 16}
             fill={PALETTE.textMuted}
             fontSize={9}
-            textAnchor="end"
+            textAnchor="middle"
           >
-            Tubules · spermatogenesis
-          </text>
-
-          <line
-            x1={leydigRegion.cx + leydigRegion.rx}
-            y1={leydigRegion.cy}
-            x2={350}
-            y2={leydigRegion.cy + 6}
-            stroke={PALETTE.textMuted}
-            strokeWidth={0.8}
-            opacity={0.6}
-          />
-          <text
-            x={352}
-            y={leydigRegion.cy + 4}
-            fill={PALETTE.textTitle}
-            fontSize={11}
-            fontWeight={700}
-          >
-            Leydig
-          </text>
-          <text
-            x={352}
-            y={leydigRegion.cy + 16}
-            fill={PALETTE.textMuted}
-            fontSize={9}
-          >
-            Testosterone source
+            Leydig Cells
           </text>
         </g>
 
         {/* Testis caption */}
         <text
-          x={VB_W / 2}
+          x={TES.x + TES.w / 2}
           y={TES.y + TES.h + 14}
           textAnchor="middle"
           fill={PALETTE.textTitle}
@@ -1010,9 +947,9 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
         {/* ============================================================
             FEEDBACK ARROWS (right side, both flowing upward)
             ============================================================ */}
-        {/* Testosterone — testis ↑ hypothalamus (outer right arc) */}
+        {/* Testosterone — testis → hypothalamus (top arc feedback) */}
         <HormoneArrow
-          path={`M ${TES.x + TES.w - 30} ${tubulesRegion.cy} C ${VB_W - 20} ${tubulesRegion.cy - 60}, ${VB_W - 10} 320, ${VB_W - 60} 180 C ${VB_W - 90} 140, ${hypoCenter.cx + hypoCenter.rx + 30} ${hypoCenter.cy - 8}, ${hypoCenter.cx + hypoCenter.rx + 6} ${hypoCenter.cy}`}
+          path={`M ${leydigRegion.cx} ${TES.y - 4} C ${leydigRegion.cx} ${-40}, ${hypoCenter.cx} ${-40}, ${hypoCenter.cx} ${BRAIN.y + 4}`}
           variant={tV}
           arrowId="hpg-arrow-t"
           reverse
@@ -1022,17 +959,17 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           tooltipDesc="Testosterone produced by Leydig cells feeds back negatively at the hypothalamus (and pituitary), suppressing GnRH/LH. Loss of this feedback elevates LH."
         />
         <HormonePill
-          x={VB_W - 50}
-          y={300}
+          x={500}
+          y={470}
           label="T"
           value={values.testosterone}
           unit="ng/mL"
           variant={tV}
         />
 
-        {/* Inhibin B — testis ↑ pituitary (inner right arc) */}
+        {/* Inhibin B — testis → pituitary (bottom arc feedback) */}
         <HormoneArrow
-          path={`M ${TES.x + TES.w - 60} ${tubulesRegion.cy - 30} C ${VB_W - 50} ${tubulesRegion.cy - 90}, ${VB_W - 40} 460, ${postLobe.cx + postLobe.rx + 30} ${postLobe.cy + 4} C ${postLobe.cx + postLobe.rx + 16} ${postLobe.cy + 2}, ${postLobe.cx + postLobe.rx + 8} ${postLobe.cy}, ${postLobe.cx + postLobe.rx + 4} ${postLobe.cy}`}
+          path={`M ${tubulesRegion.cx} ${TES.y + TES.h + 4} C ${tubulesRegion.cx} ${VB_H + 30}, ${antLobe.cx} ${VB_H + 30}, ${antLobe.cx} ${PIT.y + PIT.h + 4}`}
           variant={inhibinV}
           arrowId="hpg-arrow-inhibinb"
           reverse
@@ -1042,8 +979,8 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           tooltipDesc="Glycoprotein hormone produced by Sertoli cells. Feeds back negatively on the pituitary, selectively suppressing FSH. Low Inhibin B → elevated FSH = marker of Sertoli-cell failure."
         />
         <HormonePill
-          x={VB_W - 50}
-          y={500}
+          x={620}
+          y={470}
           label="Inhibin B"
           value={values.inhibinB}
           unit="pg/mL"
@@ -1105,7 +1042,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           values.testisVolume !== undefined ||
           values.inhibinB !== undefined ||
           values.estradiol !== undefined) && (
-          <g transform={`translate(10 ${VB_H - 124})`}>
+          <g transform={`translate(10 ${VB_H - 130})`}>
             <rect
               x={0}
               y={0}
