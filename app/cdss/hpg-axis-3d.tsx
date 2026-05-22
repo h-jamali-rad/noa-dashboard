@@ -1,64 +1,47 @@
 'use client'
 
 /**
- * HPGAxis3D — Medical-textbook-quality SVG atlas of the HPG axis
+ * HPGAxis3D — Medical atlas of the Hypothalamic-Pituitary-Gonadal (HPG) axis
  * --------------------------------------------------------------------------
- * Pure inline SVG (React JSX) rendering of the Hypothalamic-Pituitary-Gonadal
- * axis at the histological detail level expected in an andrology textbook.
+ * Vertical, top-to-bottom composition built around AI-generated medical
+ * atlas PNGs in /public/atlas:
  *
- * No external 3D / WebGL libraries — runs entirely in client React, scales
- * cleanly with the surrounding flex container, and is fully SSR-safe.
+ *   /atlas/brain-hypothalamus.png   ← top    (sagittal brain + hypothalamus)
+ *   /atlas/pituitary.png            ← middle (pituitary gland)
+ *   /atlas/testis-normal.png        ← bottom (healthy testis)
+ *   /atlas/testis-pathological.png  ← bottom (atrophic / damaged testis)
  *
- * Composition (top → bottom):
- *   1. Sagittal brain silhouette with highlighted hypothalamus + stalk
- *   2. Pituitary gland — anterior + posterior lobes, infundibular stalk
- *   3. Testis cross-section (parenchyma-level):
- *        • tunica albuginea capsule
- *        • multiple seminiferous tubule cross-sections (with Sertoli cells,
- *          spermatogonia / spermatocytes, basement membrane)
- *        • interstitial Leydig-cell clusters
- *        • capillary network in the interstitium
- *        • mediastinum testis + rete testis (right side)
+ * On top of those images we draw an interactive SVG overlay that contains:
+ *   • hover hotspots for each anatomical region (with medical tooltips)
+ *   • pulsing red/orange glows on any structure whose state ≠ 'normal'
+ *   • animated framer-motion arrows for the four signalling pathways
+ *     (GnRH ↓, FSH ↓, LH ↓, Testosterone ↑, Inhibin B ↑)
+ *   • hormone-value labels (from state.values) next to the relevant arrow
  *
- *   Hormone signalling — pulsing flow arrows:
- *     • GnRH        hypothalamus  ↓ pituitary
- *     • FSH, LH     pituitary     ↓ testis
- *     • Testosterone testis       ↑ hypothalamus  (negative feedback)
- *     • Inhibin B   Sertoli cells ↑ pituitary     (negative feedback)
+ * Public API (kept identical to the previous SVG-only implementation —
+ * clinical-interpretation modules import these names directly):
  *
- *   Pathology visualisation (state-driven):
- *     • high FSH + small testes → atrophic / shrunken tubules, thickened
- *       basement membranes, Sertoli-cell-only pattern
- *     • low T                 → fewer / smaller Leydig clusters
- *     • high LH               → Leydig-cell hyperplasia (more & larger but
- *       red-tinged / dysfunctional)
- *     • normal                → healthy spermatogenesis (multiple germ-cell
- *       layers visible inside each tubule)
- *
- *   Interaction:
- *     • Every anatomical structure has a hover tooltip (white-on-dark) with
- *       name + clinical significance.
- *
- * Public API (must remain stable — clinical-interpretation imports these):
- *     • default export HPGAxis3D({state: AxisState})
- *     • named export   HPGAxis3DLoading
- *     • named export   mergeAxisStates(states: AxisState[]): AxisState
- *     • named type     AxisState
+ *   • default export   HPGAxis3D({ state: AxisState })
+ *   • named export     HPGAxis3DLoading
+ *   • named export     mergeAxisStates(states: AxisState[]): AxisState
+ *   • named export     DEFAULT_AXIS_STATE
+ *   • named type       AxisState
+ *   • named type       HormoneValues
  * --------------------------------------------------------------------------
  */
 
 import { motion } from 'framer-motion'
 import {
-  useMemo,
   useRef,
   useState,
   type CSSProperties,
+  type MouseEvent as ReactMouseEvent,
   type RefObject,
 } from 'react'
 
-// ---------------------------------------------------------------------------
-// Public AxisState type — single source of truth (re-imported elsewhere)
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// PUBLIC TYPES — must remain stable (re-imported elsewhere)
+// ===========================================================================
 
 export type HormoneValues = {
   /** mIU/mL */ fsh?: number
@@ -89,9 +72,10 @@ export type AxisState = {
   values?: HormoneValues
 }
 
-// ---------------------------------------------------------------------------
-// State-merging — field-wise worst-case across multiple conditions
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// STATE MERGING — field-wise worst-case across multiple conditions
+// (identical algorithm to the previous version)
+// ===========================================================================
 
 const RANK: Record<string, number> = {
   normal: 0,
@@ -167,106 +151,74 @@ export function mergeAxisStates(states: AxisState[]): AxisState {
   return out
 }
 
-// ---------------------------------------------------------------------------
-// Palette — 3-state semantic + anatomical tones
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// VISUAL CONSTANTS
+// ===========================================================================
 
-const C = {
+const PALETTE = {
+  text: '#e2e8f0',
+  textMuted: '#94a3b8',
+  textTitle: '#f8fafc',
+  accent: '#60a5fa',
   normal: '#22c55e',
   compensating: '#f59e0b',
   abnormal: '#ef4444',
+  abnormalSoft: '#fb923c',
   faded: '#64748b',
-  bg: '#0f172a',
-  bgPanel: '#0b1220',
-  outline: '#94a3b8',
-  brainFill: '#1e293b',
-  brainStroke: '#cbd5e1',
-  hypothalamus: '#fda4af',
-  pituitaryAnt: '#fde68a',
-  pituitaryPost: '#fbcfe8',
-  tunica: '#e2e8f0',
-  tunicaInner: '#1e293b',
-  tubuleBM: '#94a3b8', // basement membrane
-  tubuleLumen: '#0f172a',
-  sertoli: '#60a5fa',
-  spermatogonia: '#a78bfa',
-  leydig: '#fb923c',
-  capillary: '#dc2626',
-  label: '#f8fafc',
-  labelMuted: '#cbd5e1',
+  panel: 'rgba(2, 6, 23, 0.78)',
+  panelBorder: 'rgba(148, 163, 184, 0.35)',
 } as const
 
-function stateColor(
+/** Pixel-stable viewBox for the overlay SVG (matches container aspect 1:2). */
+const VB_W = 400
+const VB_H = 800
+
+// ===========================================================================
+// HELPERS
+// ===========================================================================
+
+type ArrowVariant = 'normal' | 'pulsing' | 'faded' | 'broken'
+
+function arrowVariantFor(
   s:
     | 'normal'
-    | 'compensating'
-    | 'faded'
-    | 'damaged'
-    | 'atrophic'
-    | 'sparse'
-    | 'unresponsive'
     | 'pulsing'
+    | 'faded'
     | 'suppressed'
     | 'weak'
     | 'broken'
     | 'absent'
-): string {
-  if (s === 'normal' || s === 'pulsing') return C.normal
-  if (s === 'compensating') return C.compensating
-  if (s === 'faded') return C.faded
-  return C.abnormal
+): ArrowVariant {
+  if (s === 'broken' || s === 'absent') return 'broken'
+  if (s === 'pulsing') return 'pulsing'
+  if (s === 'faded' || s === 'weak' || s === 'suppressed') return 'faded'
+  return 'normal'
 }
 
-// ---------------------------------------------------------------------------
-// Tooltip — controlled by parent SVG via shared state
-// ---------------------------------------------------------------------------
+function arrowColor(v: ArrowVariant): string {
+  if (v === 'broken') return PALETTE.abnormal
+  if (v === 'pulsing') return PALETTE.normal
+  if (v === 'faded') return PALETTE.faded
+  return PALETTE.normal
+}
+
+function isAbnormal<T extends string>(s: T, normalValues: T[]): boolean {
+  return !normalValues.includes(s)
+}
+
+// ===========================================================================
+// TOOLTIP
+// ===========================================================================
 
 type Tooltip = { x: number; y: number; name: string; desc: string }
 
-function TooltipBox({ tip }: { tip: Tooltip | null }) {
-  if (!tip) return null
-  // Place tooltip so it doesn't run off the right/top edges
-  const offsetX = 14
-  const offsetY = -8
-  const style: CSSProperties = {
-    position: 'absolute',
-    left: tip.x + offsetX,
-    top: tip.y + offsetY,
-    transform: 'translateY(-100%)',
-    pointerEvents: 'none',
-    zIndex: 50,
-    maxWidth: 260,
-    minWidth: 180,
-    background: 'rgba(2, 6, 23, 0.96)',
-    color: '#ffffff',
-    border: '1px solid rgba(148, 163, 184, 0.35)',
-    borderRadius: 8,
-    padding: '8px 11px',
-    fontSize: 11.5,
-    lineHeight: 1.45,
-    boxShadow: '0 12px 28px rgba(0, 0, 0, 0.6)',
-    backdropFilter: 'blur(6px)',
-    fontFamily:
-      'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
-  }
-  return (
-    <div style={style}>
-      <div style={{ fontWeight: 700, color: '#60a5fa', marginBottom: 4 }}>
-        {tip.name}
-      </div>
-      <div style={{ color: '#e2e8f0' }}>{tip.desc}</div>
-    </div>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// HoverGroup — convenience wrapper to register hover handlers on an SVG <g>
-// ---------------------------------------------------------------------------
-
 type HoverHandlers = {
-  onEnter: (name: string, desc: string) => (e: React.MouseEvent) => void
+  onEnter: (
+    name: string,
+    desc: string
+  ) => (e: ReactMouseEvent) => void
   onLeave: () => void
-  onMove: (e: React.MouseEvent) => void
+  onMove: (e: ReactMouseEvent) => void
 }
 
 function makeHandlers(
@@ -297,1058 +249,155 @@ function makeHandlers(
   }
 }
 
-// ===========================================================================
-// SUB-COMPONENTS (rendered inside the main SVG)
-// ===========================================================================
-
-// ---------------------------------------------------------------------------
-// Brain sagittal silhouette
-// ---------------------------------------------------------------------------
-
-function Brain({
-  state,
-  handlers,
-}: {
-  state: AxisState
-  handlers: HoverHandlers
-}) {
-  const isFaded = state.hypothalamus === 'faded'
-  const isComp = state.hypothalamus === 'compensating'
-  const hColor = stateColor(state.hypothalamus)
-
+function TooltipBox({ tip }: { tip: Tooltip | null }) {
+  if (!tip) return null
+  const style: CSSProperties = {
+    position: 'absolute',
+    left: tip.x + 14,
+    top: tip.y - 8,
+    transform: 'translateY(-100%)',
+    pointerEvents: 'none',
+    zIndex: 50,
+    maxWidth: 260,
+    minWidth: 180,
+    background: 'rgba(2, 6, 23, 0.96)',
+    color: '#ffffff',
+    border: `1px solid ${PALETTE.panelBorder}`,
+    borderRadius: 8,
+    padding: '8px 11px',
+    fontSize: 11.5,
+    lineHeight: 1.45,
+    boxShadow: '0 12px 28px rgba(0, 0, 0, 0.6)',
+    backdropFilter: 'blur(6px)',
+    fontFamily:
+      'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+  }
   return (
-    <g>
-      {/* — Brain sagittal silhouette (cerebrum + cerebellum + brainstem) — */}
-      <g
-        onMouseEnter={handlers.onEnter(
-          'Cerebrum (sagittal section)',
-          'Mid-sagittal section of the brain shown for anatomical orientation. Hypothalamus sits at the base, just superior to the pituitary stalk.'
-        )}
-        onMouseLeave={handlers.onLeave}
-        onMouseMove={handlers.onMove}
-        style={{ cursor: 'help' }}
+    <div style={style}>
+      <div
+        style={{ fontWeight: 700, color: PALETTE.accent, marginBottom: 4 }}
       >
-        {/* Cerebrum — peanut-shaped outline */}
-        <path
-          d="M 215 60
-             C 145 60, 100 105, 100 165
-             C 100 200, 115 230, 145 245
-             L 165 250
-             C 175 252, 188 252, 200 250
-             L 240 248
-             L 270 250
-             L 295 245
-             C 320 235, 335 210, 335 180
-             C 335 155, 325 130, 305 110
-             C 285 85, 255 65, 215 60 Z"
-          fill={C.brainFill}
-          stroke={C.brainStroke}
-          strokeWidth={1.6}
-          opacity={isFaded ? 0.5 : 0.95}
-        />
-        {/* Cortical gyri — subtle curved lines */}
-        <g
-          fill="none"
-          stroke={C.brainStroke}
-          strokeWidth={0.8}
-          opacity={isFaded ? 0.25 : 0.55}
-          strokeLinecap="round"
-        >
-          <path d="M 130 130 C 150 120, 175 118, 195 132" />
-          <path d="M 145 100 C 165 95, 195 92, 215 105" />
-          <path d="M 175 80 C 200 75, 235 78, 260 92" />
-          <path d="M 230 95 C 255 95, 285 105, 305 130" />
-          <path d="M 250 120 C 280 125, 305 145, 315 175" />
-          <path d="M 125 175 C 145 175, 165 185, 175 205" />
-          <path d="M 195 165 C 220 165, 245 175, 260 195" />
-          <path d="M 235 145 C 260 145, 285 158, 300 180" />
-        </g>
-
-        {/* Cerebellum — small folded structure (lower right) */}
-        <path
-          d="M 290 220
-             C 305 220, 320 230, 325 248
-             C 327 260, 320 270, 308 273
-             C 295 275, 280 268, 275 255
-             C 273 240, 280 225, 290 220 Z"
-          fill={C.brainFill}
-          stroke={C.brainStroke}
-          strokeWidth={1.4}
-          opacity={isFaded ? 0.4 : 0.85}
-        />
-        <g
-          fill="none"
-          stroke={C.brainStroke}
-          strokeWidth={0.7}
-          opacity={isFaded ? 0.25 : 0.5}
-        >
-          <path d="M 285 230 L 322 232" />
-          <path d="M 282 240 L 324 244" />
-          <path d="M 281 252 L 322 256" />
-          <path d="M 285 264 L 318 268" />
-        </g>
-
-        {/* Brainstem stem going down to spinal cord */}
-        <path
-          d="M 240 250
-             L 235 285
-             L 245 305
-             L 240 320"
-          fill="none"
-          stroke={C.brainStroke}
-          strokeWidth={6}
-          strokeLinecap="round"
-          opacity={isFaded ? 0.4 : 0.75}
-        />
-        {/* Corpus callosum — inner C-shape */}
-        <path
-          d="M 165 140
-             C 200 120, 250 120, 285 145"
-          fill="none"
-          stroke={C.brainStroke}
-          strokeWidth={2}
-          opacity={isFaded ? 0.25 : 0.5}
-          strokeLinecap="round"
-        />
-      </g>
-
-      {/* — Hypothalamus highlight — */}
-      <g
-        onMouseEnter={handlers.onEnter(
-          'Hypothalamus',
-          'Neuroendocrine command center. Releases GnRH in pulsatile fashion (~every 90 min) to drive gonadotroph cells in the anterior pituitary.'
-        )}
-        onMouseLeave={handlers.onLeave}
-        onMouseMove={handlers.onMove}
-        style={{ cursor: 'help' }}
-      >
-        {/* Pulsing halo for compensating state */}
-        {isComp && (
-          <motion.circle
-            cx={222}
-            cy={232}
-            r={22}
-            fill={hColor}
-            opacity={0.22}
-            animate={{ scale: [1, 1.18, 1], opacity: [0.18, 0.32, 0.18] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        )}
-        {/* Glow ring */}
-        <circle cx={222} cy={232} r={16} fill={hColor} opacity={0.18} />
-        {/* Solid hypothalamus body */}
-        <ellipse
-          cx={222}
-          cy={232}
-          rx={13}
-          ry={9}
-          fill={C.hypothalamus}
-          stroke={hColor}
-          strokeWidth={1.8}
-          opacity={isFaded ? 0.6 : 1}
-        />
-        {/* Label leader line + text */}
-        <line
-          x1={205}
-          y1={232}
-          x2={70}
-          y2={232}
-          stroke={C.outline}
-          strokeWidth={0.8}
-          opacity={0.6}
-        />
-        <text
-          x={68}
-          y={228}
-          fill={C.label}
-          fontSize={11}
-          fontWeight={700}
-          textAnchor="end"
-          fontFamily="system-ui, sans-serif"
-        >
-          Hypothalamus
-        </text>
-        <text
-          x={68}
-          y={242}
-          fill={C.labelMuted}
-          fontSize={9}
-          textAnchor="end"
-          fontFamily="system-ui, sans-serif"
-        >
-          GnRH-secreting neurons
-        </text>
-      </g>
-
-      {/* Infundibular stalk — connects hypothalamus to pituitary */}
-      <g
-        onMouseEnter={handlers.onEnter(
-          'Infundibular Stalk',
-          'Pituitary stalk / hypophyseal portal system. Carries GnRH directly from the hypothalamus to the anterior pituitary, bypassing systemic circulation.'
-        )}
-        onMouseLeave={handlers.onLeave}
-        onMouseMove={handlers.onMove}
-        style={{ cursor: 'help' }}
-      >
-        <path
-          d="M 222 245
-             C 222 265, 218 285, 215 305"
-          fill="none"
-          stroke={C.brainStroke}
-          strokeWidth={4}
-          strokeLinecap="round"
-          opacity={isFaded ? 0.35 : 0.7}
-        />
-        {/* Portal vessels — thin red lines along the stalk */}
-        <path
-          d="M 219 245 C 218 265, 215 285, 213 305"
-          fill="none"
-          stroke="#b91c1c"
-          strokeWidth={0.9}
-          opacity={0.8}
-        />
-        <path
-          d="M 225 245 C 224 265, 222 285, 218 305"
-          fill="none"
-          stroke="#b91c1c"
-          strokeWidth={0.9}
-          opacity={0.8}
-        />
-      </g>
-    </g>
+        {tip.name}
+      </div>
+      <div style={{ color: PALETTE.text }}>{tip.desc}</div>
+    </div>
   )
 }
 
-// ---------------------------------------------------------------------------
-// Pituitary — anterior + posterior lobes
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// SUB-COMPONENTS
+// ===========================================================================
 
-function Pituitary({
-  state,
-  handlers,
+/**
+ * Pulsing red/orange glow used as an SVG overlay on any structure whose
+ * state ≠ 'normal'. Rendered as a soft ellipse with animated opacity+scale.
+ */
+function AbnormalGlow({
+  cx,
+  cy,
+  rx,
+  ry,
+  color = PALETTE.abnormal,
 }: {
-  state: AxisState
-  handlers: HoverHandlers
-}) {
-  const isFaded = state.pituitary === 'faded'
-  const isComp = state.pituitary === 'compensating'
-  const pColor = stateColor(state.pituitary)
-
-  // Compensating pituitary is enlarged
-  const scale = isComp ? 1.18 : 1.0
-
-  return (
-    <g transform={`translate(215 320) scale(${scale}) translate(-215 -320)`}>
-      {/* Pulsing halo when compensating */}
-      {isComp && (
-        <motion.ellipse
-          cx={215}
-          cy={325}
-          rx={42}
-          ry={26}
-          fill={pColor}
-          opacity={0.18}
-          animate={{ scale: [1, 1.12, 1], opacity: [0.12, 0.26, 0.12] }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      )}
-
-      {/* Sella turcica outline — bony cradle */}
-      <path
-        d="M 180 340 L 180 326 Q 215 318, 250 326 L 250 340 Z"
-        fill="none"
-        stroke={C.outline}
-        strokeWidth={0.9}
-        opacity={0.45}
-        strokeDasharray="2 2"
-      />
-
-      {/* Anterior lobe (adenohypophysis) — larger, anterior (left) */}
-      <g
-        onMouseEnter={handlers.onEnter(
-          'Anterior Pituitary',
-          'Adenohypophysis. Gonadotroph cells produce FSH (Sertoli stimulation) and LH (Leydig stimulation) in response to GnRH.'
-        )}
-        onMouseLeave={handlers.onLeave}
-        onMouseMove={handlers.onMove}
-        style={{ cursor: 'help' }}
-      >
-        <ellipse
-          cx={205}
-          cy={326}
-          rx={22}
-          ry={14}
-          fill={C.pituitaryAnt}
-          stroke={pColor}
-          strokeWidth={1.8}
-          opacity={isFaded ? 0.55 : 0.95}
-        />
-        {/* Cellular detail — small dots representing gonadotrophs */}
-        <g fill="#a16207" opacity={isFaded ? 0.3 : 0.6}>
-          <circle cx={195} cy={322} r={1.3} />
-          <circle cx={201} cy={329} r={1.3} />
-          <circle cx={208} cy={324} r={1.3} />
-          <circle cx={213} cy={331} r={1.3} />
-          <circle cx={219} cy={326} r={1.3} />
-          <circle cx={197} cy={332} r={1.3} />
-          <circle cx={210} cy={319} r={1.3} />
-        </g>
-      </g>
-
-      {/* Posterior lobe (neurohypophysis) — smaller, posterior (right) */}
-      <g
-        onMouseEnter={handlers.onEnter(
-          'Posterior Pituitary',
-          'Neurohypophysis. Stores oxytocin and ADH (vasopressin). Not directly involved in HPG signalling but shown for anatomical completeness.'
-        )}
-        onMouseLeave={handlers.onLeave}
-        onMouseMove={handlers.onMove}
-        style={{ cursor: 'help' }}
-      >
-        <ellipse
-          cx={238}
-          cy={328}
-          rx={13}
-          ry={11}
-          fill={C.pituitaryPost}
-          stroke={pColor}
-          strokeWidth={1.4}
-          opacity={isFaded ? 0.5 : 0.85}
-        />
-      </g>
-
-      {/* Label leader line + text */}
-      <line
-        x1={252}
-        y1={326}
-        x2={400}
-        y2={326}
-        stroke={C.outline}
-        strokeWidth={0.8}
-        opacity={0.6}
-      />
-      <text
-        x={402}
-        y={322}
-        fill={C.label}
-        fontSize={11}
-        fontWeight={700}
-        fontFamily="system-ui, sans-serif"
-      >
-        Pituitary Gland
-      </text>
-      <text
-        x={402}
-        y={336}
-        fill={C.labelMuted}
-        fontSize={9}
-        fontFamily="system-ui, sans-serif"
-      >
-        Anterior • Posterior lobes
-      </text>
-    </g>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// Seminiferous tubule cross-section (single tubule)
-// ---------------------------------------------------------------------------
-
-type TubuleProps = {
   cx: number
   cy: number
-  r: number
-  state: AxisState
-  variant?: 'normal' | 'sertoli-only' | 'sparse'
-  handlers: HoverHandlers
-  rotate?: number
-}
-
-function Tubule({
-  cx,
-  cy,
-  r,
-  state,
-  variant = 'normal',
-  handlers,
-  rotate = 0,
-}: TubuleProps) {
-  const isDamaged = state.tubules === 'damaged'
-  const isSparse = state.tubules === 'sparse'
-  const isAtrophic = state.testis === 'atrophic'
-  // Atrophic / damaged → thickened basement membrane
-  const bmWidth = isDamaged || isAtrophic ? 3.2 : 1.6
-  const bmColor = isDamaged
-    ? C.abnormal
-    : isAtrophic
-      ? C.compensating
-      : C.tubuleBM
-
-  // Inner lumen radius (where germ cells sit)
-  const innerR = r * 0.78
-
-  // Determine pathology pattern
-  const showSpermatogonia =
-    variant === 'normal' && !isDamaged && !isSparse && !isAtrophic
-  const sertoliCount =
-    variant === 'sertoli-only' || isDamaged || isAtrophic
-      ? 6
-      : isSparse
-        ? 4
-        : 8
-  const sertoliColor = state.sertoli === 'damaged' ? C.abnormal : C.sertoli
-
-  // Sertoli cells (basal, attached to basement membrane)
-  const sertoliPositions = useMemo(() => {
-    const arr: Array<{ x: number; y: number; r: number }> = []
-    for (let i = 0; i < sertoliCount; i++) {
-      const a = (i / sertoliCount) * Math.PI * 2
-      arr.push({
-        x: cx + Math.cos(a) * innerR * 0.92,
-        y: cy + Math.sin(a) * innerR * 0.92,
-        r: r * 0.085,
-      })
-    }
-    return arr
-  }, [cx, cy, innerR, r, sertoliCount])
-
-  // Spermatogonia / spermatocytes layer
-  const spermPositions = useMemo(() => {
-    if (!showSpermatogonia) return []
-    const arr: Array<{ x: number; y: number; r: number }> = []
-    const n = 10
-    for (let i = 0; i < n; i++) {
-      const a = (i / n) * Math.PI * 2 + 0.2
-      const radius = innerR * 0.55
-      arr.push({
-        x: cx + Math.cos(a) * radius,
-        y: cy + Math.sin(a) * radius,
-        r: r * 0.07,
-      })
-    }
-    // Inner ring — round spermatids
-    const n2 = 6
-    for (let i = 0; i < n2; i++) {
-      const a = (i / n2) * Math.PI * 2 + 0.6
-      const radius = innerR * 0.28
-      arr.push({
-        x: cx + Math.cos(a) * radius,
-        y: cy + Math.sin(a) * radius,
-        r: r * 0.05,
-      })
-    }
-    return arr
-  }, [cx, cy, innerR, r, showSpermatogonia])
-
-  const tooltipName = 'Seminiferous Tubule'
-  const tooltipDesc =
-    variant === 'sertoli-only' || isDamaged
-      ? 'Damaged seminiferous tubule — thickened basement membrane and Sertoli-cell-only pattern (no spermatogenesis).'
-      : isAtrophic
-        ? 'Atrophic tubule — reduced diameter, thickened basement membrane, depleted germ-cell population.'
-        : 'Healthy seminiferous tubule with all stages of spermatogenesis: spermatogonia at the basement membrane, primary/secondary spermatocytes, and round spermatids near the lumen.'
-
-  const pulse = isDamaged || isAtrophic
-
+  rx: number
+  ry: number
+  color?: string
+}) {
   return (
-    <g
-      transform={`rotate(${rotate} ${cx} ${cy})`}
-      onMouseEnter={handlers.onEnter(tooltipName, tooltipDesc)}
-      onMouseLeave={handlers.onLeave}
-      onMouseMove={handlers.onMove}
-      style={{ cursor: 'help' }}
-    >
-      {pulse ? (
-        <motion.circle
-          cx={cx}
-          cy={cy}
-          r={r}
-          fill={C.tubuleLumen}
-          stroke={bmColor}
-          strokeWidth={bmWidth}
-          animate={{ opacity: [0.85, 1, 0.85] }}
-          transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      ) : (
-        <circle
-          cx={cx}
-          cy={cy}
-          r={r}
-          fill={C.tubuleLumen}
-          stroke={bmColor}
-          strokeWidth={bmWidth}
-        />
-      )}
-
-      {/* Inner lumen ring (subtle) */}
-      <circle
-        cx={cx}
-        cy={cy}
-        r={innerR * 0.32}
-        fill="none"
-        stroke={C.outline}
-        strokeWidth={0.5}
-        opacity={0.3}
-        strokeDasharray="1.5 2"
-      />
-
-      {/* Sertoli cells */}
-      {sertoliPositions.map((p, i) => (
-        <ellipse
-          key={`s${i}`}
-          cx={p.x}
-          cy={p.y}
-          rx={p.r * 1.2}
-          ry={p.r * 0.85}
-          fill={sertoliColor}
-          opacity={isDamaged ? 0.8 : 0.85}
-          stroke={sertoliColor}
-          strokeWidth={0.4}
-        />
-      ))}
-
-      {/* Spermatogonia / spermatocytes */}
-      {spermPositions.map((p, i) => (
-        <circle
-          key={`g${i}`}
-          cx={p.x}
-          cy={p.y}
-          r={p.r}
-          fill={C.spermatogonia}
-          opacity={0.85}
-        />
-      ))}
-
-      {/* If Sertoli-cell-only pattern → render a tiny SCO marker */}
-      {(variant === 'sertoli-only' || isDamaged) && (
-        <text
-          x={cx}
-          y={cy + 3}
-          fill={C.abnormal}
-          fontSize={r * 0.32}
-          fontWeight={700}
-          textAnchor="middle"
-          fontFamily="system-ui, sans-serif"
-          opacity={0.85}
-        >
-          SCO
-        </text>
-      )}
-    </g>
+    <motion.ellipse
+      cx={cx}
+      cy={cy}
+      rx={rx}
+      ry={ry}
+      fill={color}
+      pointerEvents="none"
+      initial={{ opacity: 0.25, scale: 1 }}
+      animate={{
+        opacity: [0.18, 0.55, 0.18],
+        scale: [1, 1.18, 1],
+      }}
+      transition={{
+        duration: 1.9,
+        repeat: Infinity,
+        ease: 'easeInOut',
+      }}
+      style={{ transformOrigin: `${cx}px ${cy}px`, filter: 'blur(2px)' }}
+    />
   )
 }
 
-// ---------------------------------------------------------------------------
-// Leydig cell cluster — interstitial endocrine cells
-// ---------------------------------------------------------------------------
-
-function LeydigCluster({
+/**
+ * Hotspot — an invisible (or faint outline) hover region that triggers the
+ * tooltip when the user hovers over an anatomical structure.
+ */
+function Hotspot({
   cx,
   cy,
-  size,
-  state,
+  rx,
+  ry,
+  name,
+  desc,
   handlers,
 }: {
   cx: number
   cy: number
-  size: number
-  state: AxisState
+  rx: number
+  ry: number
+  name: string
+  desc: string
   handlers: HoverHandlers
 }) {
-  const isDamaged = state.leydig === 'damaged'
-  const isUnresp = state.leydig === 'unresponsive'
-  const isTLow = state.testosterone === 'weak' || state.testosterone === 'absent'
-  const isLHHigh = state.lh === 'pulsing'
-
-  // Hyperplasia from high LH but dysfunctional → more cells, red tint
-  const hyperplasia = isLHHigh && (isDamaged || isUnresp)
-
-  const count = isTLow ? 3 : hyperplasia ? 9 : 6
-  const cellR = isTLow ? size * 0.18 : hyperplasia ? size * 0.26 : size * 0.22
-
-  const fill = isDamaged || isUnresp ? C.abnormal : C.leydig
-  const opacity = isTLow ? 0.55 : 0.92
-
-  const positions = useMemo(() => {
-    const arr: Array<{ x: number; y: number }> = []
-    for (let i = 0; i < count; i++) {
-      const a = (i / count) * Math.PI * 2 + 0.3
-      const radius = size * (0.25 + (i % 2) * 0.18)
-      arr.push({
-        x: cx + Math.cos(a) * radius,
-        y: cy + Math.sin(a) * radius,
-      })
-    }
-    return arr
-  }, [cx, cy, count, size])
-
-  const pulse = isDamaged || isUnresp
-
   return (
-    <g
-      onMouseEnter={handlers.onEnter(
-        'Leydig Cells (interstitial)',
-        isTLow
-          ? 'Leydig cells reduced in number and size — diminished testosterone synthesis (∼7 mg/day in healthy adults).'
-          : hyperplasia
-            ? 'Leydig-cell hyperplasia — enlarged and increased in number under high LH drive, but dysfunctional (low T despite high LH).'
-            : 'Leydig cells in the interstitial space — primary source of testosterone (∼7 mg/day) in response to LH stimulation.'
-      )}
-      onMouseLeave={handlers.onLeave}
-      onMouseMove={handlers.onMove}
+    <ellipse
+      cx={cx}
+      cy={cy}
+      rx={rx}
+      ry={ry}
+      fill="rgba(96, 165, 250, 0.001)"
+      stroke="rgba(96, 165, 250, 0.18)"
+      strokeWidth={0.8}
+      strokeDasharray="3 3"
       style={{ cursor: 'help' }}
-    >
-      {pulse ? (
-        <motion.g
-          animate={{ opacity: [0.7, 1, 0.7] }}
-          transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          {positions.map((p, i) => (
-            <circle
-              key={i}
-              cx={p.x}
-              cy={p.y}
-              r={cellR}
-              fill={fill}
-              opacity={opacity}
-              stroke={fill}
-              strokeWidth={0.4}
-            />
-          ))}
-        </motion.g>
-      ) : (
-        positions.map((p, i) => (
-          <circle
-            key={i}
-            cx={p.x}
-            cy={p.y}
-            r={cellR}
-            fill={fill}
-            opacity={opacity}
-            stroke={fill}
-            strokeWidth={0.4}
-          />
-        ))
-      )}
-    </g>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// Capillary — thin red vessel between tubules
-// ---------------------------------------------------------------------------
-
-function Capillary({
-  d,
-  state,
-  handlers,
-}: {
-  d: string
-  state: AxisState
-  handlers: HoverHandlers
-}) {
-  const isFaded = state.vessels === 'faded'
-  return (
-    <path
-      d={d}
-      fill="none"
-      stroke={C.capillary}
-      strokeWidth={isFaded ? 0.8 : 1.4}
-      opacity={isFaded ? 0.4 : 0.85}
-      strokeLinecap="round"
-      style={{ cursor: 'help' }}
-      onMouseEnter={handlers.onEnter(
-        'Capillary',
-        'Testicular interstitial capillary. Carries oxygenated blood and delivers LH; transports testosterone away into systemic circulation.'
-      )}
+      onMouseEnter={handlers.onEnter(name, desc)}
       onMouseLeave={handlers.onLeave}
       onMouseMove={handlers.onMove}
     />
   )
 }
 
-// ---------------------------------------------------------------------------
-// Testis cross-section — the central, detailed view
-// ---------------------------------------------------------------------------
-
-function TestisCrossSection({
-  state,
-  handlers,
-}: {
-  state: AxisState
-  handlers: HoverHandlers
-}) {
-  const isAtrophic = state.testis === 'atrophic'
-  const isDamaged = state.testis === 'damaged'
-  const isFaded = state.testis === 'faded'
-  const tColor = stateColor(state.testis)
-
-  // Center of the testis cross-section
-  const cx = 215
-  const cy = 620
-  const Rbase = 165
-  const scale = isAtrophic ? 0.72 : isDamaged ? 0.9 : 1.0
-  const R = Rbase * scale
-
-  // Tubule layout — relative coordinates around the testis center
-  // Pattern: pathology determines which subset to render & their detail
-  const tubuleVariant = (): 'normal' | 'sertoli-only' | 'sparse' => {
-    if (state.tubules === 'damaged' || (isAtrophic && state.sertoli === 'damaged'))
-      return 'sertoli-only'
-    if (state.tubules === 'sparse') return 'sparse'
-    return 'normal'
-  }
-
-  // Tubule grid (offsets from center, scaled by R/165 so they shrink with testis)
-  const tubuleLayout: Array<{ dx: number; dy: number; r: number }> = [
-    { dx: -82, dy: -62, r: 32 },
-    { dx: -10, dy: -78, r: 30 },
-    { dx: 62, dy: -60, r: 30 },
-    { dx: -98, dy: 8, r: 32 },
-    { dx: -22, dy: -8, r: 30 },
-    { dx: 50, dy: 6, r: 30 },
-    { dx: 100, dy: 16, r: 26 },
-    { dx: -70, dy: 70, r: 30 },
-    { dx: 8, dy: 70, r: 30 },
-    { dx: 70, dy: 75, r: 28 },
-  ]
-  const tubuleCount =
-    state.tubules === 'sparse' || isAtrophic ? 6 : tubuleLayout.length
-
-  return (
-    <g>
-      {/* — Tunica vaginalis (subtle outer ring) — */}
-      <circle
-        cx={cx}
-        cy={cy}
-        r={R + 14}
-        fill="none"
-        stroke={C.outline}
-        strokeWidth={0.6}
-        opacity={0.3}
-        strokeDasharray="3 3"
-      />
-
-      {/* — Tunica albuginea (dense fibrous capsule) — */}
-      <g
-        onMouseEnter={handlers.onEnter(
-          'Tunica Albuginea',
-          'Dense white fibrous capsule (0.5–1 mm thick) surrounding the testicular parenchyma. Maintains intratesticular pressure and provides structural support.'
-        )}
-        onMouseLeave={handlers.onLeave}
-        onMouseMove={handlers.onMove}
-        style={{ cursor: 'help' }}
-      >
-        <circle
-          cx={cx}
-          cy={cy}
-          r={R + 4}
-          fill="#f8fafc"
-          stroke={tColor}
-          strokeWidth={3}
-          opacity={isFaded ? 0.4 : 0.9}
-        />
-        {/* Subtle inner shadow ring */}
-        <circle
-          cx={cx}
-          cy={cy}
-          r={R}
-          fill={C.tunicaInner}
-          stroke="#475569"
-          strokeWidth={1}
-          opacity={isFaded ? 0.45 : 1}
-        />
-      </g>
-
-      {/* — Parenchyma background — slight pink interstitium tint — */}
-      <circle
-        cx={cx}
-        cy={cy}
-        r={R - 2}
-        fill="#3f1d2a"
-        opacity={isFaded ? 0.18 : 0.35}
-      />
-
-      {/* — Interstitial capillary network — */}
-      <g opacity={isFaded ? 0.4 : 0.9}>
-        <Capillary
-          d={`M ${cx - 130} ${cy - 30} C ${cx - 90} ${cy - 80}, ${cx - 30} ${cy - 50}, ${cx + 30} ${cy - 80}`}
-          state={state}
-          handlers={handlers}
-        />
-        <Capillary
-          d={`M ${cx - 110} ${cy + 40} C ${cx - 50} ${cy + 20}, ${cx + 20} ${cy + 50}, ${cx + 80} ${cy + 30}`}
-          state={state}
-          handlers={handlers}
-        />
-        <Capillary
-          d={`M ${cx + 10} ${cy + 100} C ${cx + 50} ${cy + 80}, ${cx + 80} ${cy + 60}, ${cx + 120} ${cy + 90}`}
-          state={state}
-          handlers={handlers}
-        />
-        <Capillary
-          d={`M ${cx - 90} ${cy - 90} C ${cx - 70} ${cy - 60}, ${cx - 80} ${cy - 20}, ${cx - 100} ${cy + 20}`}
-          state={state}
-          handlers={handlers}
-        />
-      </g>
-
-      {/* — Seminiferous tubules — */}
-      <g>
-        {tubuleLayout.slice(0, tubuleCount).map((t, i) => {
-          const tx = cx + t.dx * scale
-          const ty = cy + t.dy * scale
-          const tr = t.r * scale
-          // Skip if tubule center falls outside the parenchyma circle
-          const distFromCenter = Math.hypot(tx - cx, ty - cy)
-          if (distFromCenter + tr > R - 6) return null
-          return (
-            <Tubule
-              key={i}
-              cx={tx}
-              cy={ty}
-              r={tr}
-              state={state}
-              variant={tubuleVariant()}
-              handlers={handlers}
-              rotate={(i * 37) % 60}
-            />
-          )
-        })}
-      </g>
-
-      {/* — Leydig cell clusters (interstitial space, between tubules) — */}
-      <g opacity={isFaded ? 0.4 : 1}>
-        <LeydigCluster
-          cx={cx - 50}
-          cy={cy - 36}
-          size={26}
-          state={state}
-          handlers={handlers}
-        />
-        <LeydigCluster
-          cx={cx + 28}
-          cy={cy - 36}
-          size={24}
-          state={state}
-          handlers={handlers}
-        />
-        <LeydigCluster
-          cx={cx - 50}
-          cy={cy + 40}
-          size={24}
-          state={state}
-          handlers={handlers}
-        />
-        <LeydigCluster
-          cx={cx + 30}
-          cy={cy + 40}
-          size={26}
-          state={state}
-          handlers={handlers}
-        />
-      </g>
-
-      {/* — Mediastinum testis + rete testis on the right — */}
-      <g
-        onMouseEnter={handlers.onEnter(
-          'Mediastinum / Rete Testis',
-          'Mediastinum testis — fibrous structure on the posterior surface containing the rete testis, an anastomosing network of tubules collecting sperm from the seminiferous tubules.'
-        )}
-        onMouseLeave={handlers.onLeave}
-        onMouseMove={handlers.onMove}
-        style={{ cursor: 'help' }}
-      >
-        <path
-          d={`M ${cx + R - 4} ${cy - 30}
-              Q ${cx + R - 22} ${cy}, ${cx + R - 4} ${cy + 30}`}
-          fill="#cbd5e1"
-          opacity={0.35}
-          stroke={C.outline}
-          strokeWidth={0.8}
-        />
-        {/* Rete tubule network */}
-        <g
-          fill="none"
-          stroke="#94a3b8"
-          strokeWidth={0.9}
-          opacity={0.7}
-        >
-          <path d={`M ${cx + R - 18} ${cy - 18} Q ${cx + R - 12} ${cy - 12}, ${cx + R - 6} ${cy - 18}`} />
-          <path d={`M ${cx + R - 20} ${cy - 8} Q ${cx + R - 13} ${cy - 2}, ${cx + R - 6} ${cy - 8}`} />
-          <path d={`M ${cx + R - 20} ${cy + 4} Q ${cx + R - 13} ${cy + 10}, ${cx + R - 6} ${cy + 4}`} />
-          <path d={`M ${cx + R - 18} ${cy + 16} Q ${cx + R - 12} ${cy + 22}, ${cx + R - 6} ${cy + 16}`} />
-        </g>
-      </g>
-
-      {/* — Labels (leader lines pointing into the testis) — */}
-      <g fontFamily="system-ui, sans-serif">
-        {/* Tunica albuginea */}
-        <line
-          x1={cx + R - 3}
-          y1={cy - R + 60}
-          x2={cx + R + 60}
-          y2={cy - R + 40}
-          stroke={C.outline}
-          strokeWidth={0.8}
-          opacity={0.6}
-        />
-        <text
-          x={cx + R + 62}
-          y={cy - R + 38}
-          fill={C.label}
-          fontSize={10.5}
-          fontWeight={700}
-        >
-          Tunica albuginea
-        </text>
-
-        {/* Seminiferous tubule */}
-        <line
-          x1={cx - 22}
-          y1={cy - 38}
-          x2={cx - R - 60}
-          y2={cy - R + 20}
-          stroke={C.outline}
-          strokeWidth={0.8}
-          opacity={0.6}
-        />
-        <text
-          x={cx - R - 62}
-          y={cy - R + 18}
-          fill={C.label}
-          fontSize={10.5}
-          fontWeight={700}
-          textAnchor="end"
-        >
-          Seminiferous tubule
-        </text>
-        <text
-          x={cx - R - 62}
-          y={cy - R + 30}
-          fill={C.labelMuted}
-          fontSize={9}
-          textAnchor="end"
-        >
-          (Sertoli + germ cells)
-        </text>
-
-        {/* Leydig cells */}
-        <line
-          x1={cx - 50}
-          y1={cy + 40}
-          x2={cx - R - 60}
-          y2={cy + R - 10}
-          stroke={C.outline}
-          strokeWidth={0.8}
-          opacity={0.6}
-        />
-        <text
-          x={cx - R - 62}
-          y={cy + R - 12}
-          fill={C.label}
-          fontSize={10.5}
-          fontWeight={700}
-          textAnchor="end"
-        >
-          Leydig cells
-        </text>
-        <text
-          x={cx - R - 62}
-          y={cy + R}
-          fill={C.labelMuted}
-          fontSize={9}
-          textAnchor="end"
-        >
-          (interstitial endocrine)
-        </text>
-
-        {/* Rete testis */}
-        <line
-          x1={cx + R - 10}
-          y1={cy}
-          x2={cx + R + 60}
-          y2={cy + 20}
-          stroke={C.outline}
-          strokeWidth={0.8}
-          opacity={0.6}
-        />
-        <text
-          x={cx + R + 62}
-          y={cy + 18}
-          fill={C.label}
-          fontSize={10.5}
-          fontWeight={700}
-        >
-          Rete testis
-        </text>
-      </g>
-
-      {/* — Title under the testis — */}
-      <text
-        x={cx}
-        y={cy + R + 30}
-        textAnchor="middle"
-        fill={C.label}
-        fontSize={12}
-        fontWeight={700}
-        fontFamily="system-ui, sans-serif"
-      >
-        Testis — Cross-Section (Histological View)
-      </text>
-      <text
-        x={cx}
-        y={cy + R + 46}
-        textAnchor="middle"
-        fill={C.labelMuted}
-        fontSize={10}
-        fontFamily="system-ui, sans-serif"
-      >
-        {isAtrophic
-          ? 'Atrophic parenchyma — reduced volume, thickened basement membranes'
-          : isDamaged
-            ? 'Damaged parenchyma — disrupted spermatogenesis'
-            : 'Healthy parenchyma — full-thickness spermatogenesis'}
-      </text>
-    </g>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// Animated hormone flow arrow — pulsing dashed line + arrowhead
-// ---------------------------------------------------------------------------
-
+/**
+ * Animated hormone-flow arrow. Uses framer-motion's strokeDashoffset to
+ * create a moving-dash effect. State-driven styling:
+ *   • 'normal'  → solid green, slow dashes
+ *   • 'pulsing' → bright green, fast dashes
+ *   • 'faded'   → grey, very slow dashes, low opacity
+ *   • 'broken'  → red, static dashed line, no arrowhead
+ */
 function HormoneArrow({
   path,
-  state,
+  variant,
   arrowId,
   reverse = false,
   thickness = 2.4,
-  handlers,
   tooltipName,
   tooltipDesc,
+  handlers,
 }: {
   path: string
-  state:
-    | 'normal'
-    | 'pulsing'
-    | 'faded'
-    | 'suppressed'
-    | 'weak'
-    | 'broken'
-    | 'absent'
+  variant: ArrowVariant
   arrowId: string
   reverse?: boolean
   thickness?: number
-  handlers: HoverHandlers
   tooltipName: string
   tooltipDesc: string
+  handlers: HoverHandlers
 }) {
-  const color = stateColor(state)
-  const isBroken = state === 'broken' || state === 'absent'
-  const isWeak = state === 'weak' || state === 'faded' || state === 'suppressed'
-
-  const speed = isBroken ? 0 : isWeak ? 4.5 : 1.8
+  const color = arrowColor(variant)
+  const isBroken = variant === 'broken'
+  const speed =
+    variant === 'pulsing' ? 1.2 : variant === 'faded' ? 4.5 : 2.2
 
   return (
     <g
@@ -1370,6 +419,7 @@ function HormoneArrow({
           <path d="M 0 0 L 10 5 L 0 10 z" fill={color} />
         </marker>
       </defs>
+
       {/* Backdrop static line */}
       <path
         d={path}
@@ -1377,10 +427,22 @@ function HormoneArrow({
         stroke={color}
         strokeWidth={thickness}
         strokeLinecap="round"
-        opacity={isBroken ? 0.15 : 0.3}
+        opacity={isBroken ? 0.18 : variant === 'faded' ? 0.22 : 0.32}
       />
-      {/* Animated dashed line (only when not broken) */}
-      {!isBroken && (
+
+      {isBroken ? (
+        // Broken / absent → static dashed red line, no arrowhead
+        <path
+          d={path}
+          fill="none"
+          stroke={color}
+          strokeWidth={thickness}
+          strokeLinecap="round"
+          strokeDasharray="3 7"
+          opacity={0.65}
+        />
+      ) : (
+        // Animated dashed flow with arrowhead
         <motion.path
           d={path}
           fill="none"
@@ -1389,6 +451,7 @@ function HormoneArrow({
           strokeLinecap="round"
           strokeDasharray="9 8"
           markerEnd={`url(#${arrowId})`}
+          opacity={variant === 'faded' ? 0.6 : 1}
           animate={{ strokeDashoffset: reverse ? [0, 17] : [17, 0] }}
           transition={{
             duration: speed,
@@ -1397,56 +460,53 @@ function HormoneArrow({
           }}
         />
       )}
-      {/* Broken / absent arrow → red X marker at midpoint */}
-      {isBroken && (
-        <g>
-          <path
-            d={path}
-            fill="none"
-            stroke={color}
-            strokeWidth={thickness}
-            strokeLinecap="round"
-            strokeDasharray="3 6"
-            opacity={0.45}
-          />
-        </g>
+
+      {/* Extra pulsing halo overlay when 'pulsing' */}
+      {variant === 'pulsing' && (
+        <motion.path
+          d={path}
+          fill="none"
+          stroke={color}
+          strokeWidth={thickness + 4}
+          strokeLinecap="round"
+          pointerEvents="none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.35, 0] }}
+          transition={{
+            duration: 1.6,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
       )}
     </g>
   )
 }
 
-// ---------------------------------------------------------------------------
-// Hormone label pill — name + value
-// ---------------------------------------------------------------------------
-
+/**
+ * Pill-shaped label next to an arrow, showing hormone name + (optional) value.
+ */
 function HormonePill({
   x,
   y,
   label,
   value,
   unit,
-  state,
+  variant,
 }: {
   x: number
   y: number
   label: string
   value?: number
   unit?: string
-  state:
-    | 'normal'
-    | 'pulsing'
-    | 'faded'
-    | 'suppressed'
-    | 'weak'
-    | 'broken'
-    | 'absent'
+  variant: ArrowVariant
 }) {
-  const color = stateColor(state)
+  const color = arrowColor(variant)
   const formatted =
     typeof value === 'number' && Number.isFinite(value)
       ? `${value.toFixed(value >= 10 ? 0 : 1)}${unit ? ` ${unit}` : ''}`
       : null
-  const width = formatted ? 92 : 56
+  const width = formatted ? 96 : 56
   const height = 20
   return (
     <g pointerEvents="none">
@@ -1500,6 +560,42 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
 
   const values = state.values ?? {}
 
+  // ----- Image picks ------------------------------------------------------
+  const testisSrc =
+    state.testis !== 'normal'
+      ? '/atlas/testis-pathological.png'
+      : '/atlas/testis-normal.png'
+
+  // ----- Arrow variants ---------------------------------------------------
+  const gnrhV = arrowVariantFor(state.gnrh)
+  const fshV = arrowVariantFor(state.fsh)
+  const lhV = arrowVariantFor(state.lh)
+  const tV = arrowVariantFor(state.testosterone)
+  const inhibinV = arrowVariantFor(state.inhibinB)
+
+  // ----- Abnormal-region flags -------------------------------------------
+  const hypoAbnormal = isAbnormal(state.hypothalamus, ['normal'])
+  const pituiAbnormal = isAbnormal(state.pituitary, ['normal'])
+  const tubulesAbnormal =
+    isAbnormal(state.tubules, ['normal']) ||
+    isAbnormal(state.sertoli, ['normal'])
+  const leydigAbnormal = isAbnormal(state.leydig, ['normal'])
+
+  // ----- Coordinates (in overlay SVG viewBox 0..400 × 0..800) ------------
+  // Brain section (top)
+  const BRAIN = { x: 60, y: 10, w: 280, h: 230 }
+  const hypoCenter = { cx: 200, cy: 188, rx: 38, ry: 22 }
+
+  // Pituitary section (middle)
+  const PIT = { x: 100, y: 300, w: 200, h: 130 }
+  const antLobe = { cx: 178, cy: 372, rx: 28, ry: 18 }
+  const postLobe = { cx: 232, cy: 372, rx: 20, ry: 16 }
+
+  // Testis section (bottom)
+  const TES = { x: 60, y: 490, w: 280, h: 280 }
+  const tubulesRegion = { cx: 170, cy: 625, rx: 70, ry: 55 }
+  const leydigRegion = { cx: 240, cy: 700, rx: 50, ry: 32 }
+
   return (
     <div
       ref={containerRef}
@@ -1507,18 +603,20 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
         position: 'relative',
         width: '100%',
         height: '100%',
+        minHeight: 600,
         background:
           'radial-gradient(circle at 50% 30%, #0f172a 0%, #020617 100%)',
-        borderRadius: 6,
+        borderRadius: 8,
         overflow: 'hidden',
+        color: PALETTE.text,
       }}
     >
       <svg
-        viewBox="0 0 800 900"
+        viewBox={`0 0 ${VB_W} ${VB_H}`}
         preserveAspectRatio="xMidYMid meet"
         style={{ width: '100%', height: '100%', display: 'block' }}
       >
-        {/* Faint background grid for the "atlas" feel */}
+        {/* — Faint atlas grid + vignette — */}
         <defs>
           <pattern
             id="atlas-grid"
@@ -1541,209 +639,552 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
             <stop offset="100%" stopColor="#020617" stopOpacity="0.7" />
           </radialGradient>
         </defs>
-        <rect x="0" y="0" width="800" height="900" fill="url(#atlas-grid)" />
-        <rect x="0" y="0" width="800" height="900" fill="url(#vignette)" />
+        <rect x="0" y="0" width={VB_W} height={VB_H} fill="url(#atlas-grid)" />
+        <rect x="0" y="0" width={VB_W} height={VB_H} fill="url(#vignette)" />
 
-        {/* — Top brain section — */}
-        <Brain state={state} handlers={handlers} />
+        {/* ============================================================
+            TOP SECTION — Brain / Hypothalamus
+            ============================================================ */}
+        <image
+          href="/atlas/brain-hypothalamus.png"
+          xlinkHref="/atlas/brain-hypothalamus.png"
+          x={BRAIN.x}
+          y={BRAIN.y}
+          width={BRAIN.w}
+          height={BRAIN.h}
+          preserveAspectRatio="xMidYMid meet"
+          opacity={state.hypothalamus === 'faded' ? 0.55 : 0.95}
+        />
 
-        {/* — Pituitary section — */}
-        <Pituitary state={state} handlers={handlers} />
+        {/* Abnormal-state glow over the hypothalamus */}
+        {hypoAbnormal && (
+          <AbnormalGlow
+            cx={hypoCenter.cx}
+            cy={hypoCenter.cy}
+            rx={hypoCenter.rx + 6}
+            ry={hypoCenter.ry + 6}
+            color={
+              state.hypothalamus === 'compensating'
+                ? PALETTE.abnormalSoft
+                : PALETTE.abnormal
+            }
+          />
+        )}
 
-        {/* — GnRH arrow: hypothalamus → pituitary — */}
+        {/* Hover hotspot — hypothalamus */}
+        <Hotspot
+          cx={hypoCenter.cx}
+          cy={hypoCenter.cy}
+          rx={hypoCenter.rx}
+          ry={hypoCenter.ry}
+          name="Hypothalamus"
+          desc="Releases GnRH in pulsatile fashion to regulate anterior pituitary function."
+          handlers={handlers}
+        />
+
+        {/* Label */}
+        <g pointerEvents="none">
+          <line
+            x1={hypoCenter.cx - hypoCenter.rx}
+            y1={hypoCenter.cy}
+            x2={50}
+            y2={hypoCenter.cy}
+            stroke={PALETTE.textMuted}
+            strokeWidth={0.8}
+            opacity={0.6}
+          />
+          <text
+            x={48}
+            y={hypoCenter.cy - 3}
+            fill={PALETTE.textTitle}
+            fontSize={11}
+            fontWeight={700}
+            textAnchor="end"
+            fontFamily="system-ui, sans-serif"
+          >
+            Hypothalamus
+          </text>
+          <text
+            x={48}
+            y={hypoCenter.cy + 10}
+            fill={PALETTE.textMuted}
+            fontSize={9}
+            textAnchor="end"
+            fontFamily="system-ui, sans-serif"
+          >
+            GnRH neurons
+          </text>
+        </g>
+
+        {/* ============================================================
+            GnRH ARROW — Hypothalamus ↓ Pituitary
+            ============================================================ */}
         <HormoneArrow
-          path="M 222 250 C 222 270, 222 290, 215 310"
-          state={state.gnrh}
-          arrowId="arrow-gnrh"
+          path={`M ${hypoCenter.cx} ${hypoCenter.cy + hypoCenter.ry + 4} C ${hypoCenter.cx} ${hypoCenter.cy + 70}, ${antLobe.cx + 4} ${antLobe.cy - 50}, ${antLobe.cx} ${antLobe.cy - antLobe.ry - 4}`}
+          variant={gnrhV}
+          arrowId="hpg-arrow-gnrh"
           handlers={handlers}
           tooltipName="GnRH"
           tooltipDesc="Gonadotropin-releasing hormone. Pulsatile secretion (~every 90 min) from hypothalamus drives FSH/LH release from anterior pituitary."
-          thickness={2}
+          thickness={2.2}
         />
-        <HormonePill
-          x={280}
-          y={278}
-          label="GnRH"
-          state={state.gnrh}
+        <HormonePill x={262} y={272} label="GnRH" variant={gnrhV} />
+
+        {/* ============================================================
+            MIDDLE SECTION — Pituitary Gland
+            ============================================================ */}
+        <image
+          href="/atlas/pituitary.png"
+          xlinkHref="/atlas/pituitary.png"
+          x={PIT.x}
+          y={PIT.y}
+          width={PIT.w}
+          height={PIT.h}
+          preserveAspectRatio="xMidYMid meet"
+          opacity={state.pituitary === 'faded' ? 0.55 : 0.95}
         />
 
-        {/* — FSH arrow: pituitary → testis (left curve) — */}
+        {/* Abnormal glow — anterior lobe (FSH/LH source) */}
+        {pituiAbnormal && (
+          <AbnormalGlow
+            cx={antLobe.cx}
+            cy={antLobe.cy}
+            rx={antLobe.rx + 6}
+            ry={antLobe.ry + 6}
+            color={
+              state.pituitary === 'compensating'
+                ? PALETTE.abnormalSoft
+                : PALETTE.abnormal
+            }
+          />
+        )}
+
+        {/* Hover hotspots — anterior + posterior lobes */}
+        <Hotspot
+          cx={antLobe.cx}
+          cy={antLobe.cy}
+          rx={antLobe.rx}
+          ry={antLobe.ry}
+          name="Anterior Pituitary"
+          desc="Produces FSH and LH in response to GnRH stimulation."
+          handlers={handlers}
+        />
+        <Hotspot
+          cx={postLobe.cx}
+          cy={postLobe.cy}
+          rx={postLobe.rx}
+          ry={postLobe.ry}
+          name="Posterior Pituitary"
+          desc="Stores and releases oxytocin and vasopressin (ADH)."
+          handlers={handlers}
+        />
+
+        {/* Labels */}
+        <g pointerEvents="none" fontFamily="system-ui, sans-serif">
+          <line
+            x1={antLobe.cx - antLobe.rx}
+            y1={antLobe.cy}
+            x2={50}
+            y2={antLobe.cy + 10}
+            stroke={PALETTE.textMuted}
+            strokeWidth={0.8}
+            opacity={0.6}
+          />
+          <text
+            x={48}
+            y={antLobe.cy + 8}
+            fill={PALETTE.textTitle}
+            fontSize={11}
+            fontWeight={700}
+            textAnchor="end"
+          >
+            Anterior Pituitary
+          </text>
+          <text
+            x={48}
+            y={antLobe.cy + 20}
+            fill={PALETTE.textMuted}
+            fontSize={9}
+            textAnchor="end"
+          >
+            Gonadotrophs · FSH/LH
+          </text>
+
+          <line
+            x1={postLobe.cx + postLobe.rx}
+            y1={postLobe.cy}
+            x2={350}
+            y2={postLobe.cy + 12}
+            stroke={PALETTE.textMuted}
+            strokeWidth={0.8}
+            opacity={0.6}
+          />
+          <text
+            x={352}
+            y={postLobe.cy + 10}
+            fill={PALETTE.textTitle}
+            fontSize={11}
+            fontWeight={700}
+          >
+            Posterior
+          </text>
+          <text
+            x={352}
+            y={postLobe.cy + 22}
+            fill={PALETTE.textMuted}
+            fontSize={9}
+          >
+            Oxytocin · ADH
+          </text>
+        </g>
+
+        {/* ============================================================
+            FSH + LH ARROWS — Pituitary ↓ Testis
+            ============================================================ */}
         <HormoneArrow
-          path="M 200 340 C 130 400, 100 480, 130 550"
-          state={state.fsh}
-          arrowId="arrow-fsh"
+          path={`M ${antLobe.cx - 12} ${antLobe.cy + antLobe.ry + 4} C ${antLobe.cx - 40} ${antLobe.cy + 70}, ${tubulesRegion.cx - 60} ${tubulesRegion.cy - 90}, ${tubulesRegion.cx - 30} ${tubulesRegion.cy - tubulesRegion.ry - 6}`}
+          variant={fshV}
+          arrowId="hpg-arrow-fsh"
           handlers={handlers}
           tooltipName="FSH"
-          tooltipDesc="Follicle-stimulating hormone. Acts on Sertoli cells to support spermatogenesis. Elevated FSH indicates Sertoli-cell dysfunction with loss of Inhibin B feedback."
+          tooltipDesc="Follicle-stimulating hormone — acts on Sertoli cells to support spermatogenesis. Elevated FSH = Sertoli-cell dysfunction with loss of Inhibin B feedback."
         />
         <HormonePill
-          x={110}
-          y={440}
+          x={80}
+          y={478}
           label="FSH"
           value={values.fsh}
           unit="mIU/mL"
-          state={state.fsh}
+          variant={fshV}
         />
 
-        {/* — LH arrow: pituitary → testis (right curve) — */}
         <HormoneArrow
-          path="M 232 340 C 300 400, 330 480, 300 550"
-          state={state.lh}
-          arrowId="arrow-lh"
+          path={`M ${antLobe.cx + 14} ${antLobe.cy + antLobe.ry + 4} C ${antLobe.cx + 30} ${antLobe.cy + 70}, ${leydigRegion.cx - 30} ${leydigRegion.cy - 120}, ${leydigRegion.cx - 20} ${leydigRegion.cy - leydigRegion.ry - 4}`}
+          variant={lhV}
+          arrowId="hpg-arrow-lh"
           handlers={handlers}
           tooltipName="LH"
-          tooltipDesc="Luteinizing hormone. Acts on Leydig cells to stimulate testosterone synthesis. Elevated LH indicates Leydig-cell dysfunction or testosterone deficiency."
+          tooltipDesc="Luteinizing hormone — acts on Leydig cells to stimulate testosterone synthesis. Elevated LH = Leydig-cell dysfunction or testosterone deficiency."
         />
         <HormonePill
-          x={325}
-          y={440}
+          x={246}
+          y={478}
           label="LH"
           value={values.lh}
           unit="mIU/mL"
-          state={state.lh}
+          variant={lhV}
         />
 
-        {/* — Testis cross-section — */}
-        <TestisCrossSection state={state} handlers={handlers} />
+        {/* ============================================================
+            BOTTOM SECTION — Testis (normal or pathological)
+            ============================================================ */}
+        <image
+          href={testisSrc}
+          xlinkHref={testisSrc}
+          x={TES.x}
+          y={TES.y}
+          width={TES.w}
+          height={TES.h}
+          preserveAspectRatio="xMidYMid meet"
+          opacity={state.testis === 'faded' ? 0.55 : 0.97}
+        />
 
-        {/* — Testosterone feedback: testis → hypothalamus (wide left arc) — */}
+        {/* Abnormal-state glows */}
+        {tubulesAbnormal && (
+          <AbnormalGlow
+            cx={tubulesRegion.cx}
+            cy={tubulesRegion.cy}
+            rx={tubulesRegion.rx + 4}
+            ry={tubulesRegion.ry + 4}
+            color={PALETTE.abnormal}
+          />
+        )}
+        {leydigAbnormal && (
+          <AbnormalGlow
+            cx={leydigRegion.cx}
+            cy={leydigRegion.cy}
+            rx={leydigRegion.rx + 4}
+            ry={leydigRegion.ry + 4}
+            color={PALETTE.abnormalSoft}
+          />
+        )}
+
+        {/* Hover hotspots — seminiferous tubules + Leydig cells */}
+        <Hotspot
+          cx={tubulesRegion.cx}
+          cy={tubulesRegion.cy}
+          rx={tubulesRegion.rx}
+          ry={tubulesRegion.ry}
+          name="Seminiferous Tubules"
+          desc="Site of spermatogenesis, regulated by FSH and testosterone."
+          handlers={handlers}
+        />
+        <Hotspot
+          cx={leydigRegion.cx}
+          cy={leydigRegion.cy}
+          rx={leydigRegion.rx}
+          ry={leydigRegion.ry}
+          name="Leydig Cells"
+          desc="Produce testosterone in response to LH stimulation."
+          handlers={handlers}
+        />
+
+        {/* Labels */}
+        <g pointerEvents="none" fontFamily="system-ui, sans-serif">
+          <line
+            x1={tubulesRegion.cx - tubulesRegion.rx}
+            y1={tubulesRegion.cy}
+            x2={50}
+            y2={tubulesRegion.cy - 6}
+            stroke={PALETTE.textMuted}
+            strokeWidth={0.8}
+            opacity={0.6}
+          />
+          <text
+            x={48}
+            y={tubulesRegion.cy - 8}
+            fill={PALETTE.textTitle}
+            fontSize={11}
+            fontWeight={700}
+            textAnchor="end"
+          >
+            Seminiferous
+          </text>
+          <text
+            x={48}
+            y={tubulesRegion.cy + 4}
+            fill={PALETTE.textMuted}
+            fontSize={9}
+            textAnchor="end"
+          >
+            Tubules · spermatogenesis
+          </text>
+
+          <line
+            x1={leydigRegion.cx + leydigRegion.rx}
+            y1={leydigRegion.cy}
+            x2={350}
+            y2={leydigRegion.cy + 6}
+            stroke={PALETTE.textMuted}
+            strokeWidth={0.8}
+            opacity={0.6}
+          />
+          <text
+            x={352}
+            y={leydigRegion.cy + 4}
+            fill={PALETTE.textTitle}
+            fontSize={11}
+            fontWeight={700}
+          >
+            Leydig
+          </text>
+          <text
+            x={352}
+            y={leydigRegion.cy + 16}
+            fill={PALETTE.textMuted}
+            fontSize={9}
+          >
+            Testosterone source
+          </text>
+        </g>
+
+        {/* Testis caption */}
+        <text
+          x={VB_W / 2}
+          y={TES.y + TES.h + 14}
+          textAnchor="middle"
+          fill={PALETTE.textTitle}
+          fontSize={11}
+          fontWeight={700}
+          fontFamily="system-ui, sans-serif"
+        >
+          {state.testis === 'atrophic'
+            ? 'Testis — Atrophic Parenchyma'
+            : state.testis === 'damaged'
+              ? 'Testis — Damaged Parenchyma'
+              : state.testis === 'faded'
+                ? 'Testis — Suppressed Function'
+                : 'Testis — Healthy Parenchyma'}
+        </text>
+
+        {/* ============================================================
+            FEEDBACK ARROWS (right side, both flowing upward)
+            ============================================================ */}
+        {/* Testosterone — testis ↑ hypothalamus (outer right arc) */}
         <HormoneArrow
-          path="M 80 600 C 30 500, 20 350, 60 230 C 90 200, 140 210, 170 218"
-          state={state.testosterone}
-          arrowId="arrow-t"
+          path={`M ${TES.x + TES.w - 30} ${tubulesRegion.cy} C ${VB_W - 20} ${tubulesRegion.cy - 60}, ${VB_W - 10} 320, ${VB_W - 60} 180 C ${VB_W - 90} 140, ${hypoCenter.cx + hypoCenter.rx + 30} ${hypoCenter.cy - 8}, ${hypoCenter.cx + hypoCenter.rx + 6} ${hypoCenter.cy}`}
+          variant={tV}
+          arrowId="hpg-arrow-t"
+          reverse
+          thickness={2.2}
           handlers={handlers}
           tooltipName="Testosterone (negative feedback)"
           tooltipDesc="Testosterone produced by Leydig cells feeds back negatively at the hypothalamus (and pituitary), suppressing GnRH/LH. Loss of this feedback elevates LH."
-          thickness={2.2}
         />
         <HormonePill
-          x={50}
-          y={420}
+          x={VB_W - 50}
+          y={300}
           label="T"
           value={values.testosterone}
           unit="ng/mL"
-          state={state.testosterone}
+          variant={tV}
         />
 
-        {/* — Inhibin B feedback: Sertoli → pituitary (wide right arc) — */}
+        {/* Inhibin B — testis ↑ pituitary (inner right arc) */}
         <HormoneArrow
-          path="M 360 600 C 420 520, 430 420, 380 360 C 340 330, 290 330, 260 332"
-          state={state.inhibinB}
-          arrowId="arrow-inhibinb"
+          path={`M ${TES.x + TES.w - 60} ${tubulesRegion.cy - 30} C ${VB_W - 50} ${tubulesRegion.cy - 90}, ${VB_W - 40} 460, ${postLobe.cx + postLobe.rx + 30} ${postLobe.cy + 4} C ${postLobe.cx + postLobe.rx + 16} ${postLobe.cy + 2}, ${postLobe.cx + postLobe.rx + 8} ${postLobe.cy}, ${postLobe.cx + postLobe.rx + 4} ${postLobe.cy}`}
+          variant={inhibinV}
+          arrowId="hpg-arrow-inhibinb"
+          reverse
+          thickness={2.2}
           handlers={handlers}
           tooltipName="Inhibin B (negative feedback)"
-          tooltipDesc="Glycoprotein hormone produced by Sertoli cells. Feeds back negatively on the pituitary, selectively suppressing FSH. Low Inhibin B → elevated FSH → marker of Sertoli-cell failure."
-          thickness={2.2}
+          tooltipDesc="Glycoprotein hormone produced by Sertoli cells. Feeds back negatively on the pituitary, selectively suppressing FSH. Low Inhibin B → elevated FSH = marker of Sertoli-cell failure."
         />
         <HormonePill
-          x={420}
-          y={480}
+          x={VB_W - 50}
+          y={500}
           label="Inhibin B"
           value={values.inhibinB}
           unit="pg/mL"
-          state={state.inhibinB}
+          variant={inhibinV}
         />
 
-        {/* — Side legend (status) — */}
-        <g transform="translate(620 60)">
+        {/* ============================================================
+            STATUS LEGEND (top-right)
+            ============================================================ */}
+        <g transform={`translate(${VB_W - 118} 14)`}>
           <rect
             x={0}
             y={0}
-            width={160}
-            height={108}
-            rx={8}
-            ry={8}
-            fill="rgba(2, 6, 23, 0.7)"
+            width={108}
+            height={84}
+            rx={6}
+            ry={6}
+            fill={PALETTE.panel}
             stroke="#334155"
             strokeWidth={1}
           />
           <text
-            x={10}
-            y={18}
-            fill="#f8fafc"
-            fontSize={10}
+            x={8}
+            y={14}
+            fill={PALETTE.textTitle}
+            fontSize={9}
             fontWeight={700}
-            letterSpacing={0.5}
+            letterSpacing={0.4}
             fontFamily="system-ui, sans-serif"
           >
             AXIS STATUS
           </text>
           <g fontFamily="system-ui, sans-serif">
-            <circle cx={16} cy={36} r={5} fill={C.normal} />
-            <text x={28} y={40} fill="#e2e8f0" fontSize={10}>
+            <circle cx={14} cy={30} r={4} fill={PALETTE.normal} />
+            <text x={24} y={33} fill={PALETTE.text} fontSize={9}>
               Normal
             </text>
-            <circle cx={16} cy={56} r={5} fill={C.compensating} />
-            <text x={28} y={60} fill="#e2e8f0" fontSize={10}>
+            <circle cx={14} cy={46} r={4} fill={PALETTE.compensating} />
+            <text x={24} y={49} fill={PALETTE.text} fontSize={9}>
               Compensating
             </text>
-            <circle cx={16} cy={76} r={5} fill={C.abnormal} />
-            <text x={28} y={80} fill="#e2e8f0" fontSize={10}>
+            <circle cx={14} cy={62} r={4} fill={PALETTE.abnormal} />
+            <text x={24} y={65} fill={PALETTE.text} fontSize={9}>
               Dysfunctional
             </text>
-            <circle cx={16} cy={96} r={5} fill={C.faded} />
-            <text x={28} y={100} fill="#e2e8f0" fontSize={10}>
+            <circle cx={14} cy={78} r={4} fill={PALETTE.faded} />
+            <text x={24} y={81} fill={PALETTE.text} fontSize={9}>
               Suppressed
             </text>
           </g>
         </g>
 
-        {/* — Patient summary panel (if values present) — */}
+        {/* ============================================================
+            PATIENT VALUES PANEL (only when values are present)
+            ============================================================ */}
         {(values.fsh !== undefined ||
           values.lh !== undefined ||
           values.testosterone !== undefined ||
-          values.testisVolume !== undefined) && (
-          <g transform="translate(620 190)">
+          values.testisVolume !== undefined ||
+          values.inhibinB !== undefined ||
+          values.estradiol !== undefined) && (
+          <g transform={`translate(10 ${VB_H - 124})`}>
             <rect
               x={0}
               y={0}
-              width={160}
-              height={110}
-              rx={8}
-              ry={8}
-              fill="rgba(2, 6, 23, 0.7)"
+              width={150}
+              height={114}
+              rx={6}
+              ry={6}
+              fill={PALETTE.panel}
               stroke="#334155"
               strokeWidth={1}
             />
             <text
-              x={10}
-              y={18}
-              fill="#f8fafc"
-              fontSize={10}
+              x={8}
+              y={14}
+              fill={PALETTE.textTitle}
+              fontSize={9}
               fontWeight={700}
-              letterSpacing={0.5}
+              letterSpacing={0.4}
               fontFamily="system-ui, sans-serif"
             >
               PATIENT VALUES
             </text>
             <g
               fontFamily="ui-monospace, SFMono-Regular, monospace"
-              fontSize={10}
-              fill="#e2e8f0"
+              fontSize={9.5}
+              fill={PALETTE.text}
             >
               {values.fsh !== undefined && (
-                <text x={10} y={38}>
-                  FSH       <tspan fill={stateColor(state.fsh)} fontWeight={700}>{values.fsh.toFixed(1)}</tspan> mIU/mL
+                <text x={8} y={30}>
+                  FSH{'  '}
+                  <tspan fill={arrowColor(fshV)} fontWeight={700}>
+                    {values.fsh.toFixed(1)}
+                  </tspan>{' '}
+                  mIU/mL
                 </text>
               )}
               {values.lh !== undefined && (
-                <text x={10} y={56}>
-                  LH        <tspan fill={stateColor(state.lh)} fontWeight={700}>{values.lh.toFixed(1)}</tspan> mIU/mL
+                <text x={8} y={46}>
+                  LH{'   '}
+                  <tspan fill={arrowColor(lhV)} fontWeight={700}>
+                    {values.lh.toFixed(1)}
+                  </tspan>{' '}
+                  mIU/mL
                 </text>
               )}
               {values.testosterone !== undefined && (
-                <text x={10} y={74}>
-                  T          <tspan fill={stateColor(state.testosterone)} fontWeight={700}>{values.testosterone.toFixed(2)}</tspan> ng/mL
+                <text x={8} y={62}>
+                  T{'    '}
+                  <tspan fill={arrowColor(tV)} fontWeight={700}>
+                    {values.testosterone.toFixed(2)}
+                  </tspan>{' '}
+                  ng/mL
                 </text>
               )}
               {values.testisVolume !== undefined && (
-                <text x={10} y={92}>
-                  TV       <tspan fill={stateColor(state.testis)} fontWeight={700}>{values.testisVolume.toFixed(1)}</tspan> mL
+                <text x={8} y={78}>
+                  TV{'   '}
+                  <tspan fontWeight={700}>
+                    {values.testisVolume.toFixed(1)}
+                  </tspan>{' '}
+                  mL
+                </text>
+              )}
+              {values.inhibinB !== undefined && (
+                <text x={8} y={94}>
+                  InB{'  '}
+                  <tspan fill={arrowColor(inhibinV)} fontWeight={700}>
+                    {values.inhibinB.toFixed(0)}
+                  </tspan>{' '}
+                  pg/mL
                 </text>
               )}
               {values.estradiol !== undefined && (
-                <text x={10} y={106}>
-                  E2       <tspan fontWeight={700}>{values.estradiol.toFixed(0)}</tspan> pg/mL
+                <text x={8} y={110}>
+                  E2{'   '}
+                  <tspan fontWeight={700}>
+                    {values.estradiol.toFixed(0)}
+                  </tspan>{' '}
+                  pg/mL
                 </text>
               )}
             </g>
