@@ -867,7 +867,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
         background:
           'radial-gradient(circle at 50% 30%, #0f172a 0%, #020617 100%)',
         borderRadius: 8,
-        overflow: 'hidden',
+        overflow: 'visible',
         color: PALETTE.text,
       }}
     >
