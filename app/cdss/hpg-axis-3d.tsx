@@ -828,19 +828,20 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
   const leydigAbnormal = isAbnormal(state.leydig, ['normal'])
 
   // ----- Coordinates (in overlay SVG viewBox 0..1000 × 0..500) -----------
-  // Brain section (left)
-  const BRAIN = { x: 20, y: 20, w: 320, h: 420 }
-  const hypoCenter = { cx: 180, cy: 340, rx: 42, ry: 24 }
+  // Brain image: 800×500 in box 300×380 → aspect fit fills width, h=300/1.6=187.5
+  const BRAIN = { x: 20, y: 40, w: 300, h: 380 }
+  // Hypothalamus is ~lower-center of the brain image
+  const hypoCenter = { cx: 170, cy: 310, rx: 48, ry: 28 }
 
-  // Pituitary section (center)
-  const PIT = { x: 380, y: 100, w: 240, h: 200 }
-  const antLobe = { cx: 475, cy: 210, rx: 32, ry: 22 }
-  const postLobe = { cx: 530, cy: 210, rx: 24, ry: 18 }
+  // Pituitary image: 500×400 in box 210×230 → fills width, h=210/1.25=168
+  const PIT = { x: 370, y: 90, w: 210, h: 230 }
+  const antLobe = { cx: 455, cy: 215, rx: 34, ry: 24 }
+  const postLobe = { cx: 510, cy: 215, rx: 26, ry: 20 }
 
-  // Testis section (right)
-  const TES = { x: 660, y: 30, w: 320, h: 420 }
-  const tubulesRegion = { cx: 790, cy: 230, rx: 75, ry: 65 }
-  const leydigRegion = { cx: 860, cy: 340, rx: 55, ry: 35 }
+  // Testis image: 800×500 in box 300×380 → aspect fit fills width, h=187.5
+  const TES = { x: 640, y: 40, w: 300, h: 380 }
+  const tubulesRegion = { cx: 770, cy: 230, rx: 70, ry: 60 }
+  const leydigRegion = { cx: 840, cy: 340, rx: 50, ry: 30 }
 
   return (
     <div
@@ -900,6 +901,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           height={BRAIN.h}
           preserveAspectRatio="xMidYMid meet"
           opacity={state.hypothalamus === 'faded' ? 0.55 : 0.95}
+          style={{ mixBlendMode: 'lighten' }}
         />
 
         {/* Abnormal-state glow over the hypothalamus */}
@@ -969,7 +971,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
             GnRH ARROW — Hypothalamus ↓ Pituitary
             ============================================================ */}
         <HormoneArrow
-          path={`M ${hypoCenter.cx + hypoCenter.rx + 4} ${hypoCenter.cy} C ${hypoCenter.cx + 80} ${hypoCenter.cy}, ${antLobe.cx - 60} ${antLobe.cy}, ${antLobe.cx - antLobe.rx - 4} ${antLobe.cy}`}
+          path={`M ${BRAIN.x + BRAIN.w} ${hypoCenter.cy - 30} C ${BRAIN.x + BRAIN.w + 20} ${antLobe.cy}, ${PIT.x - 20} ${antLobe.cy}, ${PIT.x} ${antLobe.cy}`}
           variant={gnrhV}
           arrowId="hpg-arrow-gnrh"
           handlers={handlers}
@@ -990,7 +992,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           }}
           thickness={2.2}
         />
-        <HormonePill x={340} y={180} label="GnRH" variant={gnrhV} />
+        <HormonePill x={(BRAIN.x + BRAIN.w + PIT.x) / 2} y={antLobe.cy - 25} label="GnRH" variant={gnrhV} />
 
         {/* ============================================================
             MIDDLE SECTION — Pituitary Gland
@@ -1004,6 +1006,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           height={PIT.h}
           preserveAspectRatio="xMidYMid meet"
           opacity={state.pituitary === 'faded' ? 0.55 : 0.95}
+          style={{ mixBlendMode: 'lighten' }}
         />
 
         {/* Abnormal glow — anterior lobe (FSH/LH source) */}
@@ -1101,7 +1104,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
             FSH + LH ARROWS — Pituitary ↓ Testis
             ============================================================ */}
         <HormoneArrow
-          path={`M ${antLobe.cx + antLobe.rx + 4} ${antLobe.cy - 10} C ${antLobe.cx + 80} ${antLobe.cy - 30}, ${tubulesRegion.cx - 90} ${tubulesRegion.cy - 30}, ${tubulesRegion.cx - tubulesRegion.rx - 6} ${tubulesRegion.cy}`}
+          path={`M ${PIT.x + PIT.w} ${antLobe.cy - 12} C ${PIT.x + PIT.w + 30} ${antLobe.cy - 30}, ${TES.x - 30} ${tubulesRegion.cy - 20}, ${TES.x} ${tubulesRegion.cy}`}
           variant={fshV}
           arrowId="hpg-arrow-fsh"
           handlers={handlers}
@@ -1125,8 +1128,8 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           }}
         />
         <HormonePill
-          x={620}
-          y={150}
+          x={(PIT.x + PIT.w + TES.x) / 2}
+          y={antLobe.cy - 40}
           label="FSH"
           value={values.fsh}
           unit="mIU/mL"
@@ -1134,7 +1137,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
         />
 
         <HormoneArrow
-          path={`M ${antLobe.cx + antLobe.rx + 4} ${antLobe.cy + 10} C ${antLobe.cx + 80} ${antLobe.cy + 40}, ${leydigRegion.cx - 90} ${leydigRegion.cy + 10}, ${leydigRegion.cx - leydigRegion.rx - 6} ${leydigRegion.cy}`}
+          path={`M ${PIT.x + PIT.w} ${antLobe.cy + 16} C ${PIT.x + PIT.w + 30} ${antLobe.cy + 50}, ${TES.x - 30} ${leydigRegion.cy - 10}, ${TES.x} ${leydigRegion.cy}`}
           variant={lhV}
           arrowId="hpg-arrow-lh"
           handlers={handlers}
@@ -1158,8 +1161,8 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           }}
         />
         <HormonePill
-          x={620}
-          y={320}
+          x={(PIT.x + PIT.w + TES.x) / 2}
+          y={leydigRegion.cy - 10}
           label="LH"
           value={values.lh}
           unit="mIU/mL"
@@ -1178,6 +1181,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           height={TES.h}
           preserveAspectRatio="xMidYMid meet"
           opacity={state.testis === 'faded' ? 0.55 : 0.97}
+          style={{ mixBlendMode: 'lighten' }}
         />
 
         {/* Abnormal-state glows */}
@@ -1311,7 +1315,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
             ============================================================ */}
         {/* Testosterone — testis → hypothalamus (top arc feedback) */}
         <HormoneArrow
-          path={`M ${leydigRegion.cx} ${TES.y - 4} C ${leydigRegion.cx} ${-40}, ${hypoCenter.cx} ${-40}, ${hypoCenter.cx} ${BRAIN.y + 4}`}
+          path={`M ${TES.x + TES.w / 2} ${TES.y} C ${TES.x + TES.w / 2} ${-30}, ${BRAIN.x + BRAIN.w / 2} ${-30}, ${BRAIN.x + BRAIN.w / 2} ${BRAIN.y}`}
           variant={tV}
           arrowId="hpg-arrow-t"
           reverse
@@ -1333,8 +1337,8 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           }}
         />
         <HormonePill
-          x={500}
-          y={470}
+          x={(BRAIN.x + BRAIN.w / 2 + TES.x + TES.w / 2) / 2}
+          y={16}
           label="T"
           value={values.testosterone}
           unit="ng/mL"
@@ -1343,7 +1347,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
 
         {/* Inhibin B — testis → pituitary (bottom arc feedback) */}
         <HormoneArrow
-          path={`M ${tubulesRegion.cx} ${TES.y + TES.h + 4} C ${tubulesRegion.cx} ${VB_H + 30}, ${antLobe.cx} ${VB_H + 30}, ${antLobe.cx} ${PIT.y + PIT.h + 4}`}
+          path={`M ${TES.x + TES.w / 2} ${TES.y + TES.h} C ${TES.x + TES.w / 2} ${VB_H + 25}, ${PIT.x + PIT.w / 2} ${VB_H + 25}, ${PIT.x + PIT.w / 2} ${PIT.y + PIT.h}`}
           variant={inhibinV}
           arrowId="hpg-arrow-inhibinb"
           reverse
@@ -1367,8 +1371,8 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           }}
         />
         <HormonePill
-          x={620}
-          y={470}
+          x={(PIT.x + PIT.w / 2 + TES.x + TES.w / 2) / 2}
+          y={VB_H - 12}
           label="Inhibin B"
           value={values.inhibinB}
           unit="pg/mL"
@@ -1378,12 +1382,12 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
         {/* ============================================================
             STATUS LEGEND (top-right)
             ============================================================ */}
-        <g transform={`translate(${VB_W - 118} 14)`}>
+        <g transform={`translate(${VB_W - 120} 6)`}>
           <rect
             x={0}
             y={0}
-            width={108}
-            height={84}
+            width={114}
+            height={86}
             rx={6}
             ry={6}
             fill={PALETTE.panel}
@@ -1392,7 +1396,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           />
           <text
             x={8}
-            y={14}
+            y={15}
             fill={PALETTE.textTitle}
             fontSize={9}
             fontWeight={700}
@@ -1402,20 +1406,20 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
             AXIS STATUS
           </text>
           <g fontFamily="system-ui, sans-serif">
-            <circle cx={14} cy={30} r={4} fill={PALETTE.normal} />
-            <text x={24} y={33} fill={PALETTE.text} fontSize={9}>
+            <circle cx={14} cy={32} r={4} fill={PALETTE.normal} />
+            <text x={24} y={35} fill={PALETTE.text} fontSize={9}>
               Normal
             </text>
-            <circle cx={14} cy={46} r={4} fill={PALETTE.compensating} />
-            <text x={24} y={49} fill={PALETTE.text} fontSize={9}>
+            <circle cx={14} cy={48} r={4} fill={PALETTE.compensating} />
+            <text x={24} y={51} fill={PALETTE.text} fontSize={9}>
               Compensating
             </text>
-            <circle cx={14} cy={62} r={4} fill={PALETTE.abnormal} />
-            <text x={24} y={65} fill={PALETTE.text} fontSize={9}>
+            <circle cx={14} cy={64} r={4} fill={PALETTE.abnormal} />
+            <text x={24} y={67} fill={PALETTE.text} fontSize={9}>
               Dysfunctional
             </text>
-            <circle cx={14} cy={78} r={4} fill={PALETTE.faded} />
-            <text x={24} y={81} fill={PALETTE.text} fontSize={9}>
+            <circle cx={14} cy={80} r={4} fill={PALETTE.faded} />
+            <text x={24} y={83} fill={PALETTE.text} fontSize={9}>
               Suppressed
             </text>
           </g>
