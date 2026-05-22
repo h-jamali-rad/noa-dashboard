@@ -157,7 +157,7 @@ export function mergeAxisStates(states: AxisState[]): AxisState {
 
 const PALETTE = {
   text: '#e2e8f0',
-  textMuted: '#94a3b8',
+  textMuted: '#cbd5e1',
   textTitle: '#f8fafc',
   accent: '#60a5fa',
   normal: '#22c55e',
@@ -865,7 +865,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
         preserveAspectRatio="xMidYMid meet"
         style={{ width: '100%', height: '100%', display: 'block' }}
       >
-        {/* — Faint atlas grid + vignette — */}
+        {/* — Faint atlas grid + vignette + text shadow filter — */}
         <defs>
           <pattern
             id="atlas-grid"
@@ -887,6 +887,10 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
             <stop offset="0%" stopColor="#0f172a" stopOpacity="0" />
             <stop offset="100%" stopColor="#020617" stopOpacity="0.7" />
           </radialGradient>
+          {/* Dark halo behind text for contrast against any background */}
+          <filter id="text-shadow" x="-15%" y="-15%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#020617" floodOpacity="0.9" />
+          </filter>
         </defs>
         <rect x="0" y="0" width={VB_W} height={VB_H} fill="url(#atlas-grid)" />
         <rect x="0" y="0" width={VB_W} height={VB_H} fill="url(#vignette)" />
@@ -903,7 +907,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           height={BRAIN.h}
           preserveAspectRatio="xMidYMid meet"
           opacity={state.hypothalamus === 'faded' ? 0.55 : 0.95}
-          style={{ mixBlendMode: 'screen' }}
+          
         />
 
         {/* Abnormal-state glow over the hypothalamus */}
@@ -947,7 +951,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
         />
 
         {/* Label */}
-        <g pointerEvents="none" fontFamily="system-ui, sans-serif">
+        <g pointerEvents="none" fontFamily="system-ui, sans-serif" filter="url(#text-shadow)">
           <text
             x={BRAIN.x + BRAIN.w / 2}
             y={BRAIN.y + BRAIN.h + 16}
@@ -1008,7 +1012,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           height={PIT.h}
           preserveAspectRatio="xMidYMid meet"
           opacity={state.pituitary === 'faded' ? 0.55 : 0.95}
-          style={{ mixBlendMode: 'screen' }}
+          
         />
 
         {/* Abnormal glow — anterior lobe (FSH/LH source) */}
@@ -1071,7 +1075,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
         />
 
         {/* Labels */}
-        <g pointerEvents="none" fontFamily="system-ui, sans-serif">
+        <g pointerEvents="none" fontFamily="system-ui, sans-serif" filter="url(#text-shadow)">
           <text
             x={PIT.x + PIT.w / 2}
             y={PIT.y - 8}
@@ -1183,7 +1187,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           height={TES.h}
           preserveAspectRatio="xMidYMid meet"
           opacity={state.testis === 'faded' ? 0.55 : 0.97}
-          style={{ mixBlendMode: 'screen' }}
+          
         />
 
         {/* Abnormal-state glows */}
@@ -1271,7 +1275,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
         />
 
         {/* Labels */}
-        <g pointerEvents="none" fontFamily="system-ui, sans-serif">
+        <g pointerEvents="none" fontFamily="system-ui, sans-serif" filter="url(#text-shadow)">
           <text
             x={tubulesRegion.cx}
             y={tubulesRegion.cy + tubulesRegion.ry + 16}
@@ -1302,6 +1306,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           fontSize={11}
           fontWeight={700}
           fontFamily="system-ui, sans-serif"
+          filter="url(#text-shadow)"
         >
           {state.testis === 'atrophic'
             ? 'Testis — Atrophic Parenchyma'
