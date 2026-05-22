@@ -207,15 +207,30 @@ function isAbnormal<T extends string>(s: T, normalValues: T[]): boolean {
 }
 
 // ===========================================================================
-// TOOLTIP
+// TOOLTIP — rich clinical tooltips with hormone values + interpretation
 // ===========================================================================
 
-type Tooltip = { x: number; y: number; name: string; desc: string }
+type TooltipLine = {
+  label: string
+  value: string
+  color?: string
+}
+
+type Tooltip = {
+  x: number
+  y: number
+  name: string
+  desc: string
+  status?: string
+  statusColor?: string
+  hormoneLines?: TooltipLine[]
+  clinicalNote?: string
+  outcomeNote?: string
+}
 
 type HoverHandlers = {
   onEnter: (
-    name: string,
-    desc: string
+    tip: Omit<Tooltip, 'x' | 'y'>
   ) => (e: ReactMouseEvent) => void
   onLeave: () => void
   onMove: (e: ReactMouseEvent) => void
@@ -226,14 +241,13 @@ function makeHandlers(
   containerRef: RefObject<HTMLDivElement>
 ): HoverHandlers {
   return {
-    onEnter: (name, desc) => (e) => {
+    onEnter: (tipData) => (e) => {
       const rect = containerRef.current?.getBoundingClientRect()
       if (!rect) return
       setTip({
+        ...tipData,
         x: e.clientX - rect.left,
         y: e.clientY - rect.top,
-        name,
-        desc,
       })
     },
     onLeave: () => setTip(null),
@@ -258,30 +272,232 @@ function TooltipBox({ tip }: { tip: Tooltip | null }) {
     transform: 'translateY(-100%)',
     pointerEvents: 'none',
     zIndex: 50,
-    maxWidth: 260,
-    minWidth: 180,
-    background: 'rgba(2, 6, 23, 0.96)',
+    maxWidth: 340,
+    minWidth: 220,
+    background: 'rgba(2, 6, 23, 0.97)',
     color: '#ffffff',
     border: `1px solid ${PALETTE.panelBorder}`,
-    borderRadius: 8,
-    padding: '8px 11px',
+    borderRadius: 10,
+    padding: '10px 13px',
     fontSize: 11.5,
-    lineHeight: 1.45,
-    boxShadow: '0 12px 28px rgba(0, 0, 0, 0.6)',
-    backdropFilter: 'blur(6px)',
+    lineHeight: 1.5,
+    boxShadow: '0 14px 32px rgba(0, 0, 0, 0.7)',
+    backdropFilter: 'blur(8px)',
     fontFamily:
       'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
   }
+  const divider: CSSProperties = {
+    height: 1,
+    background: 'rgba(148, 163, 184, 0.2)',
+    margin: '6px 0',
+  }
   return (
     <div style={style}>
-      <div
-        style={{ fontWeight: 700, color: PALETTE.accent, marginBottom: 4 }}
-      >
-        {tip.name}
+      {/* Header: name + status badge */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+        <span style={{ fontWeight: 700, color: PALETTE.accent, fontSize: 12.5 }}>
+          {tip.name}
+        </span>
+        {tip.status && (
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 600,
+              color: tip.statusColor ?? PALETTE.text,
+              background: `${tip.statusColor ?? PALETTE.faded}22`,
+              border: `1px solid ${tip.statusColor ?? PALETTE.faded}44`,
+              borderRadius: 4,
+              padding: '1px 6px',
+              textTransform: 'uppercase',
+              letterSpacing: 0.5,
+            }}
+          >
+            {tip.status}
+          </span>
+        )}
       </div>
-      <div style={{ color: PALETTE.text }}>{tip.desc}</div>
+
+      {/* Anatomical description */}
+      <div style={{ color: PALETTE.textMuted, fontSize: 10.5, marginBottom: 4 }}>
+        {tip.desc}
+      </div>
+
+      {/* Hormone values section */}
+      {tip.hormoneLines && tip.hormoneLines.length > 0 && (
+        <>
+          <div style={divider} />
+          <div style={{ fontSize: 9, fontWeight: 600, color: PALETTE.textMuted, letterSpacing: 0.5, marginBottom: 3, textTransform: 'uppercase' }}>
+            Patient Values
+          </div>
+          {tip.hormoneLines.map((line, i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 1 }}>
+              <span style={{ color: PALETTE.text }}>{line.label}</span>
+              <span style={{ fontWeight: 700, fontFamily: 'ui-monospace, monospace', color: line.color ?? PALETTE.text }}>
+                {line.value}
+              </span>
+            </div>
+          ))}
+        </>
+      )}
+
+      {/* Clinical interpretation */}
+      {tip.clinicalNote && (
+        <>
+          <div style={divider} />
+          <div style={{ fontSize: 9, fontWeight: 600, color: PALETTE.textMuted, letterSpacing: 0.5, marginBottom: 3, textTransform: 'uppercase' }}>
+            Clinical Significance
+          </div>
+          <div style={{ color: '#fbbf24', fontSize: 10.5, lineHeight: 1.4 }}>
+            {tip.clinicalNote}
+          </div>
+        </>
+      )}
+
+      {/* NOA outcome relevance */}
+      {tip.outcomeNote && (
+        <>
+          <div style={divider} />
+          <div style={{ fontSize: 9, fontWeight: 600, color: PALETTE.textMuted, letterSpacing: 0.5, marginBottom: 3, textTransform: 'uppercase' }}>
+            Impact on Sperm Retrieval
+          </div>
+          <div style={{ color: '#fb923c', fontSize: 10.5, lineHeight: 1.4 }}>
+            {tip.outcomeNote}
+          </div>
+        </>
+      )}
     </div>
   )
+}
+
+// ===========================================================================
+// CLINICAL INTERPRETATION HELPERS
+// ===========================================================================
+
+function statusLabel(
+  s: string
+): { text: string; color: string } {
+  switch (s) {
+    case 'normal':
+    case 'pulsing':
+      return { text: 'Normal', color: PALETTE.normal }
+    case 'compensating':
+      return { text: 'Compensating', color: PALETTE.compensating }
+    case 'faded':
+    case 'suppressed':
+    case 'weak':
+      return { text: 'Suppressed', color: PALETTE.faded }
+    case 'damaged':
+    case 'broken':
+    case 'atrophic':
+      return { text: 'Dysfunctional', color: PALETTE.abnormal }
+    case 'unresponsive':
+      return { text: 'Unresponsive', color: PALETTE.abnormal }
+    case 'absent':
+      return { text: 'Absent', color: PALETTE.abnormal }
+    case 'sparse':
+      return { text: 'Sparse', color: PALETTE.abnormalSoft }
+    default:
+      return { text: s, color: PALETTE.textMuted }
+  }
+}
+
+/** Interpret FSH value in clinical context */
+function fshInterpretation(v?: number): string | undefined {
+  if (v === undefined) return undefined
+  if (v < 1.5) return 'Low FSH → hypogonadotropic state; consider hypothalamic/pituitary cause (Kallmann, tumor).'
+  if (v <= 12) return 'FSH within normal range (1.5–12 mIU/mL).'
+  if (v <= 25) return 'Moderately elevated FSH (>12) → suggests partial Sertoli cell dysfunction. Residual spermatogenesis may exist.'
+  return 'Markedly elevated FSH (>25) → severe spermatogenic failure. Sertoli cells unable to produce adequate Inhibin B feedback.'
+}
+
+/** Interpret LH value */
+function lhInterpretation(v?: number): string | undefined {
+  if (v === undefined) return undefined
+  if (v < 1.7) return 'Low LH → hypogonadotropic state; pituitary/hypothalamic origin likely.'
+  if (v <= 8.6) return 'LH within normal range (1.7–8.6 mIU/mL).'
+  if (v <= 20) return 'Elevated LH → Leydig cell compensation; testosterone production under stress.'
+  return 'Markedly elevated LH (>20) → primary Leydig cell failure; poor testosterone synthesis.'
+}
+
+/** Interpret testosterone */
+function testosteroneInterpretation(v?: number): string | undefined {
+  if (v === undefined) return undefined
+  if (v < 2.5) return 'Low testosterone (<2.5 ng/mL) → inadequate intratesticular T for spermatogenesis. Consider HCG stimulation before micro-TESE.'
+  if (v <= 10) return 'Testosterone within normal range (2.5–10 ng/mL).'
+  return 'Supraphysiologic testosterone → possible exogenous source. Exogenous T suppresses spermatogenesis; must discontinue before TESE.'
+}
+
+/** Interpret Inhibin B */
+function inhibinBInterpretation(v?: number): string | undefined {
+  if (v === undefined) return undefined
+  if (v < 40) return 'Very low Inhibin B (<40 pg/mL) → severe Sertoli cell dysfunction. Strong predictor of failed sperm retrieval.'
+  if (v < 80) return 'Low Inhibin B (40–80 pg/mL) → reduced Sertoli cell function. Focal spermatogenesis possible.'
+  return 'Inhibin B ≥80 pg/mL → relatively preserved Sertoli cell function. Favorable for micro-TESE.'
+}
+
+function fshColor(v?: number): string {
+  if (v === undefined) return PALETTE.text
+  if (v < 1.5 || v > 25) return PALETTE.abnormal
+  if (v > 12) return PALETTE.abnormalSoft
+  return PALETTE.normal
+}
+function lhColor(v?: number): string {
+  if (v === undefined) return PALETTE.text
+  if (v < 1.7 || v > 20) return PALETTE.abnormal
+  if (v > 8.6) return PALETTE.abnormalSoft
+  return PALETTE.normal
+}
+function tColor(v?: number): string {
+  if (v === undefined) return PALETTE.text
+  if (v < 2.5) return PALETTE.abnormal
+  if (v > 10) return PALETTE.abnormalSoft
+  return PALETTE.normal
+}
+function inhibColor(v?: number): string {
+  if (v === undefined) return PALETTE.text
+  if (v < 40) return PALETTE.abnormal
+  if (v < 80) return PALETTE.abnormalSoft
+  return PALETTE.normal
+}
+
+/** Build hormone lines array from values */
+function buildHormoneLines(values: HormoneValues, keys: (keyof HormoneValues)[]): TooltipLine[] {
+  const lines: TooltipLine[] = []
+  const units: Record<keyof HormoneValues, string> = {
+    fsh: 'mIU/mL',
+    lh: 'mIU/mL',
+    testosterone: 'ng/mL',
+    estradiol: 'pg/mL',
+    testisVolume: 'mL',
+    inhibinB: 'pg/mL',
+  }
+  const labels: Record<keyof HormoneValues, string> = {
+    fsh: 'FSH',
+    lh: 'LH',
+    testosterone: 'Testosterone',
+    estradiol: 'Estradiol',
+    testisVolume: 'Testis Volume',
+    inhibinB: 'Inhibin B',
+  }
+  const colorFns: Record<keyof HormoneValues, (v?: number) => string> = {
+    fsh: fshColor,
+    lh: lhColor,
+    testosterone: tColor,
+    estradiol: () => PALETTE.text,
+    testisVolume: (v) => (v !== undefined && v < 12 ? PALETTE.abnormalSoft : PALETTE.text),
+    inhibinB: inhibColor,
+  }
+  for (const k of keys) {
+    const v = values[k]
+    if (typeof v === 'number' && Number.isFinite(v)) {
+      lines.push({
+        label: labels[k],
+        value: `${v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2)} ${units[k]}`,
+        color: colorFns[k](v),
+      })
+    }
+  }
+  return lines
 }
 
 // ===========================================================================
@@ -371,16 +587,14 @@ function Hotspot({
   cy,
   rx,
   ry,
-  name,
-  desc,
+  tipData,
   handlers,
 }: {
   cx: number
   cy: number
   rx: number
   ry: number
-  name: string
-  desc: string
+  tipData: Omit<Tooltip, 'x' | 'y'>
   handlers: HoverHandlers
 }) {
   return (
@@ -394,7 +608,7 @@ function Hotspot({
       strokeWidth={0.8}
       strokeDasharray="3 3"
       style={{ cursor: 'help' }}
-      onMouseEnter={handlers.onEnter(name, desc)}
+      onMouseEnter={handlers.onEnter(tipData)}
       onMouseLeave={handlers.onLeave}
       onMouseMove={handlers.onMove}
     />
@@ -415,8 +629,7 @@ function HormoneArrow({
   arrowId,
   reverse = false,
   thickness = 3,
-  tooltipName,
-  tooltipDesc,
+  tipData,
   handlers,
 }: {
   path: string
@@ -424,8 +637,7 @@ function HormoneArrow({
   arrowId: string
   reverse?: boolean
   thickness?: number
-  tooltipName: string
-  tooltipDesc: string
+  tipData: Omit<Tooltip, 'x' | 'y'>
   handlers: HoverHandlers
 }) {
   const color = arrowColor(variant)
@@ -435,7 +647,7 @@ function HormoneArrow({
 
   return (
     <g
-      onMouseEnter={handlers.onEnter(tooltipName, tooltipDesc)}
+      onMouseEnter={handlers.onEnter(tipData)}
       onMouseLeave={handlers.onLeave}
       onMouseMove={handlers.onMove}
       style={{ cursor: 'help' }}
@@ -711,8 +923,22 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           cy={hypoCenter.cy}
           rx={hypoCenter.rx}
           ry={hypoCenter.ry}
-          name="Hypothalamus"
-          desc="Releases GnRH in pulsatile fashion to regulate anterior pituitary function."
+          tipData={{
+            name: 'Hypothalamus',
+            desc: 'GnRH pulse generator — releases GnRH every ~90 min to drive anterior pituitary FSH/LH secretion.',
+            ...statusLabel(state.hypothalamus),
+            status: statusLabel(state.hypothalamus).text,
+            statusColor: statusLabel(state.hypothalamus).color,
+            hormoneLines: buildHormoneLines(values, ['fsh', 'lh']),
+            clinicalNote: state.hypothalamus === 'compensating'
+              ? 'Hypothalamus is up-regulating GnRH pulse frequency to compensate for low gonadal feedback.'
+              : state.hypothalamus === 'faded'
+                ? 'Hypothalamic GnRH output is suppressed — hypogonadotropic state. Rule out exogenous testosterone, opioids, or structural lesion.'
+                : undefined,
+            outcomeNote: state.hypothalamus !== 'normal'
+              ? 'Hypothalamic dysfunction → secondary hypogonadism. HCG/HMG therapy may restore spermatogenesis before considering micro-TESE.'
+              : undefined,
+          }}
           handlers={handlers}
         />
 
@@ -747,8 +973,21 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           variant={gnrhV}
           arrowId="hpg-arrow-gnrh"
           handlers={handlers}
-          tooltipName="GnRH"
-          tooltipDesc="Gonadotropin-releasing hormone. Pulsatile secretion (~every 90 min) from hypothalamus drives FSH/LH release from anterior pituitary."
+          tipData={{
+            name: 'GnRH Signaling',
+            desc: 'Gonadotropin-releasing hormone — pulsatile decapeptide from hypothalamus to anterior pituitary via portal circulation.',
+            ...statusLabel(state.gnrh),
+            status: statusLabel(state.gnrh).text,
+            statusColor: statusLabel(state.gnrh).color,
+            clinicalNote: state.gnrh === 'suppressed'
+              ? 'GnRH suppressed → exogenous steroids, opioids, or hypothalamic lesion. FSH/LH will be inappropriately low.'
+              : state.gnrh === 'pulsing'
+                ? 'GnRH pulse frequency increased — compensatory response to low gonadal feedback.'
+                : undefined,
+            outcomeNote: state.gnrh === 'suppressed'
+              ? 'Reversible cause of azoospermia. Pulsatile GnRH or gonadotropin therapy can restore spermatogenesis in 6–12 months.'
+              : undefined,
+          }}
           thickness={2.2}
         />
         <HormonePill x={340} y={180} label="GnRH" variant={gnrhV} />
@@ -788,8 +1027,28 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           cy={antLobe.cy}
           rx={antLobe.rx}
           ry={antLobe.ry}
-          name="Anterior Pituitary"
-          desc="Produces FSH and LH in response to GnRH stimulation."
+          tipData={{
+            name: 'Anterior Pituitary',
+            desc: 'Gonadotroph cells synthesize and secrete FSH and LH under GnRH stimulation. Key regulator of testicular function.',
+            ...statusLabel(state.pituitary),
+            status: statusLabel(state.pituitary).text,
+            statusColor: statusLabel(state.pituitary).color,
+            hormoneLines: buildHormoneLines(values, ['fsh', 'lh']),
+            clinicalNote: (() => {
+              const notes: string[] = []
+              const fi = fshInterpretation(values.fsh)
+              const li = lhInterpretation(values.lh)
+              if (fi) notes.push(fi)
+              if (li) notes.push(li)
+              if (state.pituitary === 'compensating') notes.push('Pituitary is in compensatory overdrive — increasing gonadotropin output to overcome gonadal failure.')
+              return notes.length > 0 ? notes.join(' ') : undefined
+            })(),
+            outcomeNote: (values.fsh !== undefined && values.fsh > 12)
+              ? 'Elevated FSH is the hallmark of primary testicular failure (NOA). FSH >25 with low Inhibin B = poor micro-TESE prognosis (SRR ~30%). FSH 12–25 with preserved volume = intermediate prognosis (SRR ~40–50%).'
+              : (values.fsh !== undefined && values.fsh < 1.5)
+                ? 'Low FSH suggests hypogonadotropic hypogonadism — potentially treatable with gonadotropins. Excellent TESE prognosis after hormonal correction.'
+                : undefined,
+          }}
           handlers={handlers}
         />
         <Hotspot
@@ -797,8 +1056,12 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           cy={postLobe.cy}
           rx={postLobe.rx}
           ry={postLobe.ry}
-          name="Posterior Pituitary"
-          desc="Stores and releases oxytocin and vasopressin (ADH)."
+          tipData={{
+            name: 'Posterior Pituitary',
+            desc: 'Neurohypophysis — stores and releases oxytocin and vasopressin (ADH). Not directly involved in HPG axis gonadotropin regulation.',
+            status: 'N/A for HPG',
+            statusColor: PALETTE.textMuted,
+          }}
           handlers={handlers}
         />
 
@@ -842,8 +1105,24 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           variant={fshV}
           arrowId="hpg-arrow-fsh"
           handlers={handlers}
-          tooltipName="FSH"
-          tooltipDesc="Follicle-stimulating hormone — acts on Sertoli cells to support spermatogenesis. Elevated FSH = Sertoli-cell dysfunction with loss of Inhibin B feedback."
+          tipData={{
+            name: 'FSH → Sertoli Cells',
+            desc: 'Follicle-stimulating hormone binds FSH receptors on Sertoli cells, activating spermatogenesis support, ABP production, and Inhibin B secretion.',
+            ...statusLabel(state.fsh),
+            status: statusLabel(state.fsh).text,
+            statusColor: statusLabel(state.fsh).color,
+            hormoneLines: buildHormoneLines(values, ['fsh', 'inhibinB']),
+            clinicalNote: fshInterpretation(values.fsh),
+            outcomeNote: values.fsh !== undefined
+              ? values.fsh > 25
+                ? 'FSH >25 mIU/mL with small testis volume (<6 mL) strongly predicts maturation arrest or Sertoli-cell-only pattern. Micro-TESE SRR approximately 20–35%.'
+                : values.fsh > 12
+                  ? 'Moderately elevated FSH suggests partial spermatogenic failure. Focal spermatogenesis may still be present — micro-TESE SRR 40–55%.'
+                  : values.fsh < 1.5
+                    ? 'Low FSH → hypogonadotropic hypogonadism. Gonadotropin therapy may induce spermatogenesis, potentially avoiding TESE altogether.'
+                    : 'Normal FSH with azoospermia → consider obstructive causes or early maturation arrest.'
+              : undefined,
+          }}
         />
         <HormonePill
           x={620}
@@ -859,8 +1138,24 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           variant={lhV}
           arrowId="hpg-arrow-lh"
           handlers={handlers}
-          tooltipName="LH"
-          tooltipDesc="Luteinizing hormone — acts on Leydig cells to stimulate testosterone synthesis. Elevated LH = Leydig-cell dysfunction or testosterone deficiency."
+          tipData={{
+            name: 'LH → Leydig Cells',
+            desc: 'Luteinizing hormone binds LH/hCG receptors on Leydig cells, stimulating steroidogenesis (testosterone synthesis via cholesterol → pregnenolone → testosterone).',
+            ...statusLabel(state.lh),
+            status: statusLabel(state.lh).text,
+            statusColor: statusLabel(state.lh).color,
+            hormoneLines: buildHormoneLines(values, ['lh', 'testosterone']),
+            clinicalNote: lhInterpretation(values.lh),
+            outcomeNote: values.lh !== undefined
+              ? values.lh > 20
+                ? 'Markedly elevated LH with low T → primary Leydig cell failure. Poor intratesticular testosterone environment for spermatogenesis.'
+                : values.lh > 8.6
+                  ? 'Elevated LH → compensatory response. Leydig cells under stress but still functional.'
+                  : values.lh < 1.7
+                    ? 'Low LH → hypogonadotropic state. HCG therapy can mimic LH action and restore intratesticular testosterone.'
+                    : undefined
+              : undefined,
+          }}
         />
         <HormonePill
           x={620}
@@ -911,8 +1206,33 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           cy={tubulesRegion.cy}
           rx={tubulesRegion.rx}
           ry={tubulesRegion.ry}
-          name="Seminiferous Tubules"
-          desc="Site of spermatogenesis, regulated by FSH and testosterone."
+          tipData={{
+            name: 'Seminiferous Tubules',
+            desc: 'Site of spermatogenesis — Sertoli cells form the blood-testis barrier and nurture developing germ cells from spermatogonia → spermatozoa. Requires FSH + intratesticular testosterone.',
+            ...statusLabel(state.tubules === 'normal' ? state.sertoli : state.tubules),
+            status: statusLabel(state.tubules === 'normal' ? state.sertoli : state.tubules).text,
+            statusColor: statusLabel(state.tubules === 'normal' ? state.sertoli : state.tubules).color,
+            hormoneLines: buildHormoneLines(values, ['fsh', 'inhibinB', 'testisVolume']),
+            clinicalNote: (() => {
+              const notes: string[] = []
+              if (state.tubules === 'damaged' || state.sertoli === 'damaged')
+                notes.push('Tubular damage with Sertoli cell dysfunction — Sertoli-cell-only (SCO) pattern likely on histology.')
+              if (state.tubules === 'sparse')
+                notes.push('Sparse tubules — focal spermatogenesis may exist in isolated regions.')
+              const ibi = inhibinBInterpretation(values.inhibinB)
+              if (ibi) notes.push(ibi)
+              return notes.length > 0 ? notes.join(' ') : undefined
+            })(),
+            outcomeNote: (() => {
+              if (state.tubules === 'damaged' && state.sertoli === 'damaged')
+                return 'Complete SCO pattern → micro-TESE SRR ~25–30%. Surgeon should explore multiple regions for focal spermatogenesis.'
+              if (state.tubules === 'sparse')
+                return 'Hypospermatogenesis pattern → micro-TESE SRR ~50–60%. Best prognosis among NOA subtypes.'
+              if (values.testisVolume !== undefined && values.testisVolume < 6)
+                return 'Testis volume <6 mL → significantly reduced parenchyma. Associated with lower SRR.'
+              return undefined
+            })(),
+          }}
           handlers={handlers}
         />
         <Hotspot
@@ -920,8 +1240,27 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           cy={leydigRegion.cy}
           rx={leydigRegion.rx}
           ry={leydigRegion.ry}
-          name="Leydig Cells"
-          desc="Produce testosterone in response to LH stimulation."
+          tipData={{
+            name: 'Leydig Cells',
+            desc: 'Interstitial cells producing testosterone via LH stimulation. Intratesticular T concentration is 50–100× serum levels and essential for spermatogenesis.',
+            ...statusLabel(state.leydig),
+            status: statusLabel(state.leydig).text,
+            statusColor: statusLabel(state.leydig).color,
+            hormoneLines: buildHormoneLines(values, ['testosterone', 'lh', 'estradiol']),
+            clinicalNote: (() => {
+              const notes: string[] = []
+              const ti = testosteroneInterpretation(values.testosterone)
+              if (ti) notes.push(ti)
+              if (state.leydig === 'damaged' || state.leydig === 'unresponsive')
+                notes.push('Leydig cell dysfunction — reduced steroidogenic capacity. Serum T may be low despite elevated LH.')
+              return notes.length > 0 ? notes.join(' ') : undefined
+            })(),
+            outcomeNote: values.testosterone !== undefined && values.testosterone < 2.5
+              ? 'Low serum testosterone correlates with poor intratesticular T environment. Pre-TESE HCG stimulation for 3 months may improve micro-TESE SRR by 10–15%.'
+              : state.leydig === 'unresponsive'
+                ? 'Leydig cells unresponsive to LH → primary hypogonadism. Limited benefit from hormonal optimization.'
+                : undefined,
+          }}
           handlers={handlers}
         />
 
@@ -978,8 +1317,20 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           reverse
           thickness={2.2}
           handlers={handlers}
-          tooltipName="Testosterone (negative feedback)"
-          tooltipDesc="Testosterone produced by Leydig cells feeds back negatively at the hypothalamus (and pituitary), suppressing GnRH/LH. Loss of this feedback elevates LH."
+          tipData={{
+            name: 'Testosterone — Negative Feedback',
+            desc: 'Testosterone from Leydig cells feeds back at hypothalamus (suppresses GnRH pulse frequency) and anterior pituitary (suppresses LH secretion). Loss of this feedback loop elevates LH.',
+            ...statusLabel(state.testosterone),
+            status: statusLabel(state.testosterone).text,
+            statusColor: statusLabel(state.testosterone).color,
+            hormoneLines: buildHormoneLines(values, ['testosterone', 'lh']),
+            clinicalNote: testosteroneInterpretation(values.testosterone),
+            outcomeNote: values.testosterone !== undefined && values.testosterone < 2.5
+              ? 'Low T → impaired intratesticular testosterone environment. Pre-operative HCG stimulation (1500–3000 IU 2×/wk for 3 months) may improve sperm retrieval rates by optimizing local T concentration.'
+              : state.testosterone === 'broken' || state.testosterone === 'absent'
+                ? 'Absent testosterone feedback → unopposed GnRH/LH drive. Indicates severe Leydig cell damage.'
+                : undefined,
+          }}
         />
         <HormonePill
           x={500}
@@ -998,8 +1349,22 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           reverse
           thickness={2.2}
           handlers={handlers}
-          tooltipName="Inhibin B (negative feedback)"
-          tooltipDesc="Glycoprotein hormone produced by Sertoli cells. Feeds back negatively on the pituitary, selectively suppressing FSH. Low Inhibin B → elevated FSH = marker of Sertoli-cell failure."
+          tipData={{
+            name: 'Inhibin B — Negative Feedback',
+            desc: 'Glycoprotein secreted by Sertoli cells. Selectively suppresses FSH at the anterior pituitary via activin/follistatin signaling. Best serological marker of Sertoli cell function and spermatogenic status.',
+            ...statusLabel(state.inhibinB),
+            status: statusLabel(state.inhibinB).text,
+            statusColor: statusLabel(state.inhibinB).color,
+            hormoneLines: buildHormoneLines(values, ['inhibinB', 'fsh']),
+            clinicalNote: inhibinBInterpretation(values.inhibinB),
+            outcomeNote: values.inhibinB !== undefined
+              ? values.inhibinB < 40
+                ? 'Inhibin B <40 pg/mL is the strongest serological predictor of SCO histology. Micro-TESE SRR approximately 20–30%. However, focal spermatogenesis cannot be excluded — proceed with micro-TESE.'
+                : values.inhibinB < 80
+                  ? 'Inhibin B 40–80 pg/mL → intermediate prognosis. Residual spermatogenesis likely in some tubules. Micro-TESE SRR ~45–55%.'
+                  : 'Inhibin B ≥80 pg/mL → relatively preserved Sertoli function. If NOA confirmed, micro-TESE SRR ~55–70%. Consider obstructive cause.'
+              : undefined,
+          }}
         />
         <HormonePill
           x={620}
