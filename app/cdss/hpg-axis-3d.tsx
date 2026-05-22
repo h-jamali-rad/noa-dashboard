@@ -1672,7 +1672,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
                   anchorY = PIT.y - 18 - tIdx * 40
                   break
                 case 'testis':
-                  anchorX = TES.x + TES.w / 2
+                  anchorX = TES.x + TES.w * 0.35
                   anchorY = TES.y - 18 - tIdx * 40
                   break
                 default:
