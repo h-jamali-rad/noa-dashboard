@@ -831,19 +831,26 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
   // PADDING: 30px from all viewBox edges so nothing is clipped
   const PAD = 30
 
-  // Brain section (left) — pushed in from left edge
-  const BRAIN = { x: PAD, y: PAD + 20, w: 260, h: 340 }
-  const hypoCenter = { cx: BRAIN.x + BRAIN.w * 0.47, cy: BRAIN.y + BRAIN.h * 0.72, rx: 44, ry: 26 }
+  // Box sizes matched to actual image aspect ratios (no wasted space).
+  // Images render edge-to-edge inside their box.
+  //
+  // Brain/Testis: 800×500 = 1.6:1 aspect
+  // Pituitary:    500×400 = 1.25:1 aspect
 
-  // Pituitary section (center)
-  const PIT = { x: 370, y: 100, w: 200, h: 220 }
-  const antLobe = { cx: PIT.x + PIT.w * 0.40, cy: PIT.y + PIT.h * 0.52, rx: 32, ry: 22 }
-  const postLobe = { cx: PIT.x + PIT.w * 0.65, cy: PIT.y + PIT.h * 0.52, rx: 24, ry: 18 }
+  // Brain (left) — 1.6:1 aspect
+  const BRAIN = { x: PAD, y: 120, w: 280, h: 175 }
+  // Hypothalamus: warm glow in lower-center of the brain cross-section
+  const hypoCenter = { cx: BRAIN.x + BRAIN.w * 0.47, cy: BRAIN.y + BRAIN.h * 0.68, rx: 38, ry: 22 }
 
-  // Testis section (right) — pulled in from right edge
-  const TES = { x: 650, y: PAD + 20, w: 260, h: 340 }
-  const tubulesRegion = { cx: TES.x + TES.w * 0.42, cy: TES.y + TES.h * 0.48, rx: 60, ry: 52 }
-  const leydigRegion = { cx: TES.x + TES.w * 0.65, cy: TES.y + TES.h * 0.75, rx: 44, ry: 28 }
+  // Pituitary (center) — 1.25:1 aspect
+  const PIT = { x: 380, y: 130, w: 190, h: 152 }
+  const antLobe = { cx: PIT.x + PIT.w * 0.38, cy: PIT.y + PIT.h * 0.55, rx: 28, ry: 20 }
+  const postLobe = { cx: PIT.x + PIT.w * 0.62, cy: PIT.y + PIT.h * 0.55, rx: 22, ry: 16 }
+
+  // Testis (right) — 1.6:1 aspect
+  const TES = { x: 670, y: 120, w: 280, h: 175 }
+  const tubulesRegion = { cx: TES.x + TES.w * 0.42, cy: TES.y + TES.h * 0.45, rx: 55, ry: 40 }
+  const leydigRegion = { cx: TES.x + TES.w * 0.62, cy: TES.y + TES.h * 0.72, rx: 40, ry: 24 }
 
   return (
     <div
@@ -1441,7 +1448,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           values.testisVolume !== undefined ||
           values.inhibinB !== undefined ||
           values.estradiol !== undefined) && (
-          <g transform={`translate(10 ${VB_H - 130})`}>
+          <g transform={`translate(${PAD} ${BRAIN.y + BRAIN.h + 50})`}>
             <rect
               x={0}
               y={0}
