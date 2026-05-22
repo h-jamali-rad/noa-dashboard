@@ -776,9 +776,8 @@ export default function ClinicalInterpretation({
     return merged
   }, [conditions, vals])
 
-  // No abnormalities → render nothing. Parent AnimatePresence handles the
-  // fade-in/out of this entire block as the user edits values.
-  if (conditions.length === 0) return null
+  // Always show the HPG atlas (even with no abnormalities detected).
+  // The condition cards below only appear when conditions.length > 0.
 
   return (
     <div className="rounded-lg border bg-card p-4 space-y-3">
@@ -829,7 +828,7 @@ export default function ClinicalInterpretation({
             </div>
 
             {/* Atlas scene — large full-width display */}
-            <div className="w-full overflow-hidden rounded">
+            <div className="w-full rounded">
               <HPGAxis3D state={mergedAxisState} />
             </div>
 
