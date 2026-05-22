@@ -811,46 +811,33 @@ export default function ClinicalInterpretation({
         </p>
       </div>
 
-      {/* ----- 50 / 50 split: clinical text on the left, sticky 3D atlas */}
-      {/* on the right.  Stacks vertically on screens < lg (1024px).      */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
-        {/* LEFT — clinical text panel (scrolls naturally) */}
-        <div className="space-y-3 lg:w-1/2 lg:min-w-0">
-          <AnimatePresence mode="popLayout" initial={false}>
-            {conditions.map((c) => (
-              <ConditionCard key={c.id} condition={c} />
-            ))}
-          </AnimatePresence>
-
-          {/* Scientific Basis */}
-          <ScientificBasis />
-        </div>
-
-        {/* RIGHT — sticky 3D anatomical atlas */}
-        <div className="lg:sticky lg:top-4 lg:w-1/2 lg:self-start">
-          <div className="flex flex-col rounded-md border border-slate-700/60 bg-slate-900 p-2">
+      {/* ----- Full-width HPG axis atlas on top, clinical text below ----- */}
+      <div className="flex flex-col gap-6">
+        {/* TOP — full-width anatomical atlas */}
+        <div className="w-full">
+          <div className="flex flex-col rounded-md border border-slate-700/60 bg-slate-900 p-3">
             {/* Header */}
-            <div className="mb-2 flex items-center justify-between px-1">
+            <div className="mb-3 flex items-center justify-between px-1">
               <div>
-                <h4 className="text-[12px] font-semibold uppercase tracking-wide text-slate-200">
+                <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-200">
                   Interactive HPG Axis Atlas
                 </h4>
-                <p className="text-[10px] text-slate-400">
+                <p className="text-xs text-slate-400">
                   Hover any structure for details
                 </p>
               </div>
             </div>
 
-            {/* 3D scene — fills available height, never collapses */}
-            <div className="h-[calc(100vh-200px)] min-h-[500px] w-full overflow-hidden rounded">
+            {/* Atlas scene — large full-width display */}
+            <div className="min-h-[700px] w-full overflow-hidden rounded lg:min-h-[800px]">
               <HPGAxis3D state={mergedAxisState} />
             </div>
 
             {/* Color legend */}
-            <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-[11px] font-semibold text-white">
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-white">
               <span className="inline-flex items-center gap-1.5">
                 <span
-                  className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-white/30"
+                  className="inline-block h-3 w-3 rounded-full ring-1 ring-white/30"
                   style={{ backgroundColor: '#22c55e' }}
                   aria-hidden
                 />
@@ -861,7 +848,7 @@ export default function ClinicalInterpretation({
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <span
-                  className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-white/30"
+                  className="inline-block h-3 w-3 rounded-full ring-1 ring-white/30"
                   style={{ backgroundColor: '#f59e0b' }}
                   aria-hidden
                 />
@@ -872,7 +859,7 @@ export default function ClinicalInterpretation({
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <span
-                  className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-white/30"
+                  className="inline-block h-3 w-3 rounded-full ring-1 ring-white/30"
                   style={{ backgroundColor: '#ef4444' }}
                   aria-hidden
                 />
@@ -880,6 +867,18 @@ export default function ClinicalInterpretation({
               </span>
             </div>
           </div>
+        </div>
+
+        {/* BOTTOM — clinical interpretation & reports */}
+        <div className="space-y-3">
+          <AnimatePresence mode="popLayout" initial={false}>
+            {conditions.map((c) => (
+              <ConditionCard key={c.id} condition={c} />
+            ))}
+          </AnimatePresence>
+
+          {/* Scientific Basis */}
+          <ScientificBasis />
         </div>
       </div>
     </div>
