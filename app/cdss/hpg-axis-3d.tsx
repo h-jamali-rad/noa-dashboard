@@ -265,18 +265,33 @@ function makeHandlers(
 
 function TooltipBox({ tip, containerRef }: { tip: Tooltip | null; containerRef: React.RefObject<HTMLDivElement | null> }) {
   if (!tip) return null
-  // Smart positioning: show below cursor if not enough space above
-  const containerH = containerRef.current?.clientHeight ?? 600
-  const showBelow = tip.y < 200 // if cursor is in upper 200px, show tooltip below
-  const leftClamped = Math.min(tip.x + 14, (containerRef.current?.clientWidth ?? 1000) - 360)
+  // Use viewport-relative coordinates so tooltip never goes off-screen
+  const rect = containerRef.current?.getBoundingClientRect()
+  const vpW = typeof window !== 'undefined' ? window.innerWidth : 1200
+  const vpH = typeof window !== 'undefined' ? window.innerHeight : 800
+  const absX = (rect?.left ?? 0) + tip.x
+  const absY = (rect?.top ?? 0) + tip.y
+  const tooltipW = 340
+  const tooltipH = 320 // estimated max height
+  // Position: prefer right+above cursor, but clamp to viewport
+  let left = absX + 16
+  let top = absY - tooltipH - 8
+  // If goes off right edge, flip to left of cursor
+  if (left + tooltipW > vpW - 8) left = absX - tooltipW - 16
+  // If goes off top, show below cursor
+  if (top < 8) top = absY + 20
+  // If goes off bottom, clamp
+  if (top + tooltipH > vpH - 8) top = vpH - tooltipH - 8
+  // Clamp left
+  if (left < 8) left = 8
+
   const style: CSSProperties = {
-    position: 'absolute',
-    left: Math.max(4, leftClamped),
-    top: showBelow ? tip.y + 18 : tip.y - 8,
-    transform: showBelow ? 'none' : 'translateY(-100%)',
+    position: 'fixed',
+    left,
+    top,
     pointerEvents: 'none',
-    zIndex: 50,
-    maxWidth: 340,
+    zIndex: 9999,
+    maxWidth: tooltipW,
     minWidth: 220,
     background: 'rgba(2, 6, 23, 0.97)',
     color: '#ffffff',
