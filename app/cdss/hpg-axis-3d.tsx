@@ -306,25 +306,59 @@ function AbnormalGlow({
   color?: string
 }) {
   return (
-    <motion.ellipse
-      cx={cx}
-      cy={cy}
-      rx={rx}
-      ry={ry}
-      fill={color}
-      pointerEvents="none"
-      initial={{ opacity: 0.25, scale: 1 }}
-      animate={{
-        opacity: [0.18, 0.55, 0.18],
-        scale: [1, 1.18, 1],
-      }}
-      transition={{
-        duration: 1.9,
-        repeat: Infinity,
-        ease: 'easeInOut',
-      }}
-      style={{ transformOrigin: `${cx}px ${cy}px`, filter: 'blur(2px)' }}
-    />
+    <g pointerEvents="none">
+      {/* Solid bold ring */}
+      <motion.ellipse
+        cx={cx}
+        cy={cy}
+        rx={rx}
+        ry={ry}
+        fill="none"
+        stroke={color}
+        strokeWidth={3}
+        initial={{ opacity: 0.7 }}
+        animate={{
+          opacity: [0.6, 1, 0.6],
+          strokeWidth: [3, 4.5, 3],
+        }}
+        transition={{
+          duration: 1.5,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+        style={{ transformOrigin: `${cx}px ${cy}px` }}
+      />
+      {/* Outer expanding pulse ring */}
+      <motion.ellipse
+        cx={cx}
+        cy={cy}
+        rx={rx}
+        ry={ry}
+        fill="none"
+        stroke={color}
+        strokeWidth={2}
+        initial={{ opacity: 0.6, scale: 1 }}
+        animate={{
+          opacity: [0.6, 0],
+          scale: [1, 1.4],
+        }}
+        transition={{
+          duration: 1.8,
+          repeat: Infinity,
+          ease: 'easeOut',
+        }}
+        style={{ transformOrigin: `${cx}px ${cy}px` }}
+      />
+      {/* Faint fill for visibility */}
+      <ellipse
+        cx={cx}
+        cy={cy}
+        rx={rx}
+        ry={ry}
+        fill={color}
+        opacity={0.12}
+      />
+    </g>
   )
 }
 
@@ -380,7 +414,7 @@ function HormoneArrow({
   variant,
   arrowId,
   reverse = false,
-  thickness = 2.4,
+  thickness = 3,
   tooltipName,
   tooltipDesc,
   handlers,
@@ -683,34 +717,23 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
         />
 
         {/* Label */}
-        <g pointerEvents="none">
-          <line
-            x1={hypoCenter.cx - hypoCenter.rx}
-            y1={hypoCenter.cy}
-            x2={50}
-            y2={hypoCenter.cy}
-            stroke={PALETTE.textMuted}
-            strokeWidth={0.8}
-            opacity={0.6}
-          />
+        <g pointerEvents="none" fontFamily="system-ui, sans-serif">
           <text
-            x={48}
-            y={hypoCenter.cy - 3}
+            x={BRAIN.x + BRAIN.w / 2}
+            y={BRAIN.y + BRAIN.h + 16}
             fill={PALETTE.textTitle}
             fontSize={11}
             fontWeight={700}
-            textAnchor="end"
-            fontFamily="system-ui, sans-serif"
+            textAnchor="middle"
           >
             Hypothalamus
           </text>
           <text
-            x={48}
-            y={hypoCenter.cy + 10}
+            x={BRAIN.x + BRAIN.w / 2}
+            y={BRAIN.y + BRAIN.h + 28}
             fill={PALETTE.textMuted}
             fontSize={9}
-            textAnchor="end"
-            fontFamily="system-ui, sans-serif"
+            textAnchor="middle"
           >
             GnRH neurons
           </text>
