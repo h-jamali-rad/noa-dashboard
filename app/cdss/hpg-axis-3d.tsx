@@ -263,13 +263,17 @@ function makeHandlers(
   }
 }
 
-function TooltipBox({ tip }: { tip: Tooltip | null }) {
+function TooltipBox({ tip, containerRef }: { tip: Tooltip | null; containerRef: React.RefObject<HTMLDivElement | null> }) {
   if (!tip) return null
+  // Smart positioning: show below cursor if not enough space above
+  const containerH = containerRef.current?.clientHeight ?? 600
+  const showBelow = tip.y < 200 // if cursor is in upper 200px, show tooltip below
+  const leftClamped = Math.min(tip.x + 14, (containerRef.current?.clientWidth ?? 1000) - 360)
   const style: CSSProperties = {
     position: 'absolute',
-    left: tip.x + 14,
-    top: tip.y - 8,
-    transform: 'translateY(-100%)',
+    left: Math.max(4, leftClamped),
+    top: showBelow ? tip.y + 18 : tip.y - 8,
+    transform: showBelow ? 'none' : 'translateY(-100%)',
     pointerEvents: 'none',
     zIndex: 50,
     maxWidth: 340,
@@ -1535,7 +1539,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
         )}
       </svg>
 
-      <TooltipBox tip={tip} />
+      <TooltipBox tip={tip} containerRef={containerRef} />
     </div>
   )
 }
