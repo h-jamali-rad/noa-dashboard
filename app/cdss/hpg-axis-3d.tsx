@@ -520,6 +520,103 @@ function buildHormoneLines(values: HormoneValues, keys: (keyof HormoneValues)[])
 }
 
 // ===========================================================================
+// DIAGNOSIS DERIVATION — persistent labels from AxisState
+// ===========================================================================
+
+type DiagAnnotation = {
+  /** Short label e.g. "Primary Testicular Failure" */
+  label: string
+  /** Where to anchor: 'brain' | 'pituitary' | 'testis' | 'global' */
+  target: 'brain' | 'pituitary' | 'testis' | 'global'
+  /** severity badge color */
+  color: string
+  /** severity text */
+  severity: string
+  /** short clinical one-liner */
+  note: string
+}
+
+function deriveDiagnoses(s: AxisState): DiagAnnotation[] {
+  const out: DiagAnnotation[] = []
+  const v = s.values ?? {}
+
+  // Primary testicular failure: high FSH/LH + low T + damaged testis
+  const fshHigh = v.fsh !== undefined && v.fsh > 12
+  const lhHigh = v.lh !== undefined && v.lh > 9
+  const tLow = v.testosterone !== undefined && v.testosterone < 3
+  const tvLow = v.testisVolume !== undefined && v.testisVolume < 12
+
+  if (fshHigh && lhHigh && tLow) {
+    out.push({
+      label: 'Primary Testicular Failure',
+      target: 'testis',
+      color: PALETTE.abnormal,
+      severity: 'SEVERE',
+      note: `FSH ↑ LH ↑ T ↓ — pituitary driving maximally, testis unresponsive`,
+    })
+  } else if (fshHigh && tLow) {
+    out.push({
+      label: 'Gonadal Insufficiency',
+      target: 'testis',
+      color: PALETTE.abnormal,
+      severity: 'SEVERE',
+      note: `FSH ↑ T ↓ — seminiferous failure with Leydig dysfunction`,
+    })
+  } else if (fshHigh && lhHigh && !tLow) {
+    out.push({
+      label: 'Compensated Gonadotrophin Elevation',
+      target: 'pituitary',
+      color: PALETTE.compensating,
+      severity: 'MODERATE',
+      note: `FSH ↑ LH ↑ T normal — testis maintaining output under stress`,
+    })
+  }
+
+  // Testicular atrophy
+  if (tvLow) {
+    out.push({
+      label: 'Testicular Atrophy',
+      target: 'testis',
+      color: PALETTE.abnormalSoft,
+      severity: 'MODERATE',
+      note: `TV ${v.testisVolume!.toFixed(1)} mL (<12) — reduced spermatogenic mass`,
+    })
+  }
+
+  // Hypothalamic/central
+  if (s.hypothalamus === 'faded') {
+    out.push({
+      label: 'Hypogonadotropic State',
+      target: 'brain',
+      color: PALETTE.abnormal,
+      severity: 'SEVERE',
+      note: 'Suppressed GnRH — rule out exogenous T, opioids, lesion',
+    })
+  } else if (s.hypothalamus === 'compensating') {
+    out.push({
+      label: 'Hypothalamic Compensation',
+      target: 'brain',
+      color: PALETTE.compensating,
+      severity: 'MILD',
+      note: 'GnRH pulse frequency up-regulated to compensate',
+    })
+  }
+
+  // Obesity/aromatase
+  if (s.aromatase === 'active') {
+    out.push({
+      label: 'Aromatase Excess',
+      target: 'global',
+      color: PALETTE.abnormalSoft,
+      severity: 'MODERATE',
+      note: 'BMI ↑ → excess T→E2 conversion → central suppression',
+    })
+  }
+
+  return out
+}
+
+// ===========================================================================
 // SUB-COMPONENTS
 // ===========================================================================
 
@@ -824,6 +921,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
   )
 
   const values = state.values ?? {}
+  const diagnoses = deriveDiagnoses(state)
 
   // ----- Image picks ------------------------------------------------------
   const testisSrc =
@@ -1552,6 +1650,110 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
             </g>
           </g>
         )}
+        {/* ===== DIAGNOSIS ANNOTATIONS — persistent callouts ===== */}
+        {diagnoses.length > 0 && (() => {
+          // Group by target and track per-target stack index
+          const targetCount: Record<string, number> = {}
+          return (
+          <g fontFamily="system-ui, sans-serif" filter="url(#text-shadow)">
+            {diagnoses.map((d, i) => {
+              const tIdx = targetCount[d.target] ?? 0
+              targetCount[d.target] = tIdx + 1
+
+              // Position based on target structure — stack per target
+              let anchorX: number, anchorY: number
+              switch (d.target) {
+                case 'brain':
+                  anchorX = BRAIN.x + BRAIN.w / 2
+                  anchorY = BRAIN.y - 18 - tIdx * 40
+                  break
+                case 'pituitary':
+                  anchorX = PIT.x + PIT.w / 2
+                  anchorY = PIT.y - 18 - tIdx * 40
+                  break
+                case 'testis':
+                  anchorX = TES.x + TES.w / 2
+                  anchorY = TES.y - 18 - tIdx * 40
+                  break
+                default:
+                  anchorX = VB_W / 2
+                  anchorY = 20 + tIdx * 40
+              }
+              // Clamp Y so it doesn't go above viewBox
+              anchorY = Math.max(14, anchorY)
+
+              return (
+                <g key={`diag-${i}`}>
+                  {/* Leader line from badge to structure */}
+                  {d.target !== 'global' && (
+                    <line
+                      x1={anchorX}
+                      y1={anchorY + 24}
+                      x2={anchorX}
+                      y2={d.target === 'brain' ? BRAIN.y : d.target === 'pituitary' ? PIT.y : TES.y}
+                      stroke={d.color}
+                      strokeWidth={0.8}
+                      strokeDasharray="3 2"
+                      opacity={0.5}
+                    />
+                  )}
+                  {/* Badge background */}
+                  <motion.rect
+                    x={anchorX - 95}
+                    y={anchorY - 10}
+                    width={190}
+                    height={34}
+                    rx={6}
+                    fill="#0f172a"
+                    fillOpacity={0.88}
+                    stroke={d.color}
+                    strokeWidth={1.2}
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 + i * 0.15, duration: 0.4 }}
+                  />
+                  {/* Severity dot */}
+                  <motion.circle
+                    cx={anchorX - 82}
+                    cy={anchorY}
+                    r={3.5}
+                    fill={d.color}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: [1, 1.3, 1] }}
+                    transition={{ delay: 0.5 + i * 0.15, duration: 1.5, repeat: Infinity }}
+                  />
+                  {/* Label text */}
+                  <motion.text
+                    x={anchorX - 72}
+                    y={anchorY + 1}
+                    fill={PALETTE.textTitle}
+                    fontSize={8.5}
+                    fontWeight={700}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 + i * 0.15 }}
+                  >
+                    {d.label}
+                    <tspan fill={d.color} fontSize={7} fontWeight={600}> [{d.severity}]</tspan>
+                  </motion.text>
+                  {/* Note text */}
+                  <motion.text
+                    x={anchorX - 82}
+                    y={anchorY + 14}
+                    fill={PALETTE.textMuted}
+                    fontSize={6.5}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 + i * 0.15 }}
+                  >
+                    {d.note.length > 60 ? d.note.slice(0, 60) + '…' : d.note}
+                  </motion.text>
+                </g>
+              )
+            })}
+          </g>
+          )
+        })()}
       </svg>
 
       <TooltipBox tip={tip} containerRef={containerRef} />
