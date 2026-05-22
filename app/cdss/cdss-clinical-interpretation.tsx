@@ -449,14 +449,15 @@ const COLOR = {
 }
 
 // ---------------------------------------------------------------------------
-// Anatomical visualisation — INTERACTIVE 3D (React Three Fiber)
+// Anatomical visualisation — medical-textbook SVG atlas
 // ---------------------------------------------------------------------------
 //
-// The previous SVG-based `HpgAxisSvg` (plus its `Pulse` and `FlowingDots`
-// helpers) has been replaced by an anatomically realistic 3D scene rendered
-// with @react-three/fiber + @react-three/drei.  The 3D component lives in a
-// sibling file (`./hpg-axis-3d.tsx`) and is loaded via `next/dynamic` with
-// `ssr: false` because three.js cannot run in the Next.js SSR environment.
+// The previous Three.js/.glb implementation has been replaced by a pure
+// inline-SVG atlas that renders the HPG axis at histological detail
+// (sagittal brain + pituitary lobes + testis cross-section with
+// seminiferous tubules, Sertoli/Leydig cells, capillaries) in
+// `./hpg-axis-3d.tsx`.  The component is SSR-safe, so we no longer need
+// `next/dynamic` with `ssr: false` — a plain import works.
 //
 // All clinical logic above (REFERENCE / THRESHOLDS / detectConditions /
 // AxisState / COLOR palette / narrative + prognosis text / evidence arrays)
@@ -469,7 +470,7 @@ const HPGAxis3D = dynamic(() => import('./hpg-axis-3d'), {
     <div className="flex h-full min-h-[400px] w-full items-center justify-center rounded-xl bg-slate-900">
       <div className="flex flex-col items-center gap-2">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-400 border-t-transparent" />
-        <span className="text-xs font-medium text-slate-300">Loading 3D anatomy…</span>
+        <span className="text-xs font-medium text-slate-300">Loading anatomical atlas…</span>
       </div>
     </div>
   ),
@@ -751,10 +752,29 @@ export default function ClinicalInterpretation({
   // Merge axisStates across all detected conditions into one shared state
   // for the single 3D atlas.  Picks the field-wise worst case so a patient
   // with multiple overlapping conditions still sees a coherent diagram.
-  const mergedAxisState = useMemo(
-    () => mergeAxisStates(conditions.map((c) => c.axisState)),
-    [conditions]
-  )
+  const mergedAxisState = useMemo(() => {
+    const merged = mergeAxisStates(conditions.map((c) => c.axisState))
+    // Attach patient hormone values from the form so the atlas can display
+    // them on hormone arrows and the patient-values panel.
+    const fsh = num(vals.FSH)
+    const lh = num(vals.LH)
+    const t = num(vals.Testosterone_levels)
+    const e2 = num(vals.E2)
+    const tvL = num(vals.Testicular_volume_LT)
+    const tvR = num(vals.Testicular_volume_RT)
+    let tv: number | undefined
+    if (tvL !== null && tvR !== null) tv = (tvL + tvR) / 2
+    else if (tvL !== null) tv = tvL
+    else if (tvR !== null) tv = tvR
+    const values: AxisState['values'] = {}
+    if (fsh !== null) values.fsh = fsh
+    if (lh !== null) values.lh = lh
+    if (t !== null) values.testosterone = t
+    if (e2 !== null) values.estradiol = e2
+    if (tv !== undefined) values.testisVolume = tv
+    if (Object.keys(values).length > 0) merged.values = values
+    return merged
+  }, [conditions, vals])
 
   // No abnormalities → render nothing. Parent AnimatePresence handles the
   // fade-in/out of this entire block as the user edits values.
@@ -816,7 +836,7 @@ export default function ClinicalInterpretation({
                   Interactive HPG Axis Atlas
                 </h4>
                 <p className="text-[10px] text-slate-400">
-                  Hover any structure for details • Drag to rotate
+                  Hover any structure for details
                 </p>
               </div>
             </div>
