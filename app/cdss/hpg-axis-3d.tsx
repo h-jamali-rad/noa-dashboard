@@ -828,20 +828,22 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
   const leydigAbnormal = isAbnormal(state.leydig, ['normal'])
 
   // ----- Coordinates (in overlay SVG viewBox 0..1000 × 0..500) -----------
-  // Brain image: 800×500 in box 300×380 → aspect fit fills width, h=300/1.6=187.5
-  const BRAIN = { x: 20, y: 40, w: 300, h: 380 }
-  // Hypothalamus is ~lower-center of the brain image
-  const hypoCenter = { cx: 170, cy: 310, rx: 48, ry: 28 }
+  // PADDING: 30px from all viewBox edges so nothing is clipped
+  const PAD = 30
 
-  // Pituitary image: 500×400 in box 210×230 → fills width, h=210/1.25=168
-  const PIT = { x: 370, y: 90, w: 210, h: 230 }
-  const antLobe = { cx: 455, cy: 215, rx: 34, ry: 24 }
-  const postLobe = { cx: 510, cy: 215, rx: 26, ry: 20 }
+  // Brain section (left) — pushed in from left edge
+  const BRAIN = { x: PAD, y: PAD + 20, w: 260, h: 340 }
+  const hypoCenter = { cx: BRAIN.x + BRAIN.w * 0.47, cy: BRAIN.y + BRAIN.h * 0.72, rx: 44, ry: 26 }
 
-  // Testis image: 800×500 in box 300×380 → aspect fit fills width, h=187.5
-  const TES = { x: 640, y: 40, w: 300, h: 380 }
-  const tubulesRegion = { cx: 770, cy: 230, rx: 70, ry: 60 }
-  const leydigRegion = { cx: 840, cy: 340, rx: 50, ry: 30 }
+  // Pituitary section (center)
+  const PIT = { x: 370, y: 100, w: 200, h: 220 }
+  const antLobe = { cx: PIT.x + PIT.w * 0.40, cy: PIT.y + PIT.h * 0.52, rx: 32, ry: 22 }
+  const postLobe = { cx: PIT.x + PIT.w * 0.65, cy: PIT.y + PIT.h * 0.52, rx: 24, ry: 18 }
+
+  // Testis section (right) — pulled in from right edge
+  const TES = { x: 650, y: PAD + 20, w: 260, h: 340 }
+  const tubulesRegion = { cx: TES.x + TES.w * 0.42, cy: TES.y + TES.h * 0.48, rx: 60, ry: 52 }
+  const leydigRegion = { cx: TES.x + TES.w * 0.65, cy: TES.y + TES.h * 0.75, rx: 44, ry: 28 }
 
   return (
     <div
@@ -901,7 +903,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           height={BRAIN.h}
           preserveAspectRatio="xMidYMid meet"
           opacity={state.hypothalamus === 'faded' ? 0.55 : 0.95}
-          style={{ mixBlendMode: 'lighten' }}
+          style={{ mixBlendMode: 'screen' }}
         />
 
         {/* Abnormal-state glow over the hypothalamus */}
@@ -971,7 +973,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
             GnRH ARROW — Hypothalamus ↓ Pituitary
             ============================================================ */}
         <HormoneArrow
-          path={`M ${BRAIN.x + BRAIN.w} ${hypoCenter.cy - 30} C ${BRAIN.x + BRAIN.w + 20} ${antLobe.cy}, ${PIT.x - 20} ${antLobe.cy}, ${PIT.x} ${antLobe.cy}`}
+          path={`M ${BRAIN.x + BRAIN.w} ${hypoCenter.cy} Q ${(BRAIN.x + BRAIN.w + PIT.x) / 2} ${antLobe.cy}, ${PIT.x} ${antLobe.cy}`}
           variant={gnrhV}
           arrowId="hpg-arrow-gnrh"
           handlers={handlers}
@@ -990,9 +992,9 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
               ? 'Reversible cause of azoospermia. Pulsatile GnRH or gonadotropin therapy can restore spermatogenesis in 6–12 months.'
               : undefined,
           }}
-          thickness={2.2}
+          thickness={1.5}
         />
-        <HormonePill x={(BRAIN.x + BRAIN.w + PIT.x) / 2} y={antLobe.cy - 25} label="GnRH" variant={gnrhV} />
+        <HormonePill x={(BRAIN.x + BRAIN.w + PIT.x) / 2} y={hypoCenter.cy + 10} label="GnRH" variant={gnrhV} />
 
         {/* ============================================================
             MIDDLE SECTION — Pituitary Gland
@@ -1006,7 +1008,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           height={PIT.h}
           preserveAspectRatio="xMidYMid meet"
           opacity={state.pituitary === 'faded' ? 0.55 : 0.95}
-          style={{ mixBlendMode: 'lighten' }}
+          style={{ mixBlendMode: 'screen' }}
         />
 
         {/* Abnormal glow — anterior lobe (FSH/LH source) */}
@@ -1104,7 +1106,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
             FSH + LH ARROWS — Pituitary ↓ Testis
             ============================================================ */}
         <HormoneArrow
-          path={`M ${PIT.x + PIT.w} ${antLobe.cy - 12} C ${PIT.x + PIT.w + 30} ${antLobe.cy - 30}, ${TES.x - 30} ${tubulesRegion.cy - 20}, ${TES.x} ${tubulesRegion.cy}`}
+          path={`M ${PIT.x + PIT.w} ${antLobe.cy - 14} Q ${(PIT.x + PIT.w + TES.x) / 2} ${tubulesRegion.cy - 40}, ${TES.x} ${tubulesRegion.cy}`}
           variant={fshV}
           arrowId="hpg-arrow-fsh"
           handlers={handlers}
@@ -1137,7 +1139,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
         />
 
         <HormoneArrow
-          path={`M ${PIT.x + PIT.w} ${antLobe.cy + 16} C ${PIT.x + PIT.w + 30} ${antLobe.cy + 50}, ${TES.x - 30} ${leydigRegion.cy - 10}, ${TES.x} ${leydigRegion.cy}`}
+          path={`M ${PIT.x + PIT.w} ${antLobe.cy + 14} Q ${(PIT.x + PIT.w + TES.x) / 2} ${leydigRegion.cy + 10}, ${TES.x} ${leydigRegion.cy}`}
           variant={lhV}
           arrowId="hpg-arrow-lh"
           handlers={handlers}
@@ -1181,7 +1183,7 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           height={TES.h}
           preserveAspectRatio="xMidYMid meet"
           opacity={state.testis === 'faded' ? 0.55 : 0.97}
-          style={{ mixBlendMode: 'lighten' }}
+          style={{ mixBlendMode: 'screen' }}
         />
 
         {/* Abnormal-state glows */}
@@ -1315,11 +1317,11 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
             ============================================================ */}
         {/* Testosterone — testis → hypothalamus (top arc feedback) */}
         <HormoneArrow
-          path={`M ${TES.x + TES.w / 2} ${TES.y} C ${TES.x + TES.w / 2} ${-30}, ${BRAIN.x + BRAIN.w / 2} ${-30}, ${BRAIN.x + BRAIN.w / 2} ${BRAIN.y}`}
+          path={`M ${TES.x + TES.w * 0.6} ${TES.y} C ${TES.x + TES.w * 0.6} ${PAD}, ${BRAIN.x + BRAIN.w * 0.6} ${PAD}, ${BRAIN.x + BRAIN.w * 0.6} ${BRAIN.y}`}
           variant={tV}
           arrowId="hpg-arrow-t"
           reverse
-          thickness={2.2}
+          thickness={1.5}
           handlers={handlers}
           tipData={{
             name: 'Testosterone — Negative Feedback',
@@ -1337,8 +1339,8 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           }}
         />
         <HormonePill
-          x={(BRAIN.x + BRAIN.w / 2 + TES.x + TES.w / 2) / 2}
-          y={16}
+          x={(BRAIN.x + BRAIN.w * 0.6 + TES.x + TES.w * 0.6) / 2}
+          y={PAD + 4}
           label="T"
           value={values.testosterone}
           unit="ng/mL"
@@ -1347,11 +1349,11 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
 
         {/* Inhibin B — testis → pituitary (bottom arc feedback) */}
         <HormoneArrow
-          path={`M ${TES.x + TES.w / 2} ${TES.y + TES.h} C ${TES.x + TES.w / 2} ${VB_H + 25}, ${PIT.x + PIT.w / 2} ${VB_H + 25}, ${PIT.x + PIT.w / 2} ${PIT.y + PIT.h}`}
+          path={`M ${TES.x + TES.w * 0.35} ${TES.y + TES.h} C ${TES.x + TES.w * 0.35} ${VB_H - PAD}, ${PIT.x + PIT.w * 0.45} ${VB_H - PAD}, ${PIT.x + PIT.w * 0.45} ${PIT.y + PIT.h}`}
           variant={inhibinV}
           arrowId="hpg-arrow-inhibinb"
           reverse
-          thickness={2.2}
+          thickness={1.5}
           handlers={handlers}
           tipData={{
             name: 'Inhibin B — Negative Feedback',
@@ -1371,8 +1373,8 @@ export default function HPGAxis3D({ state }: { state: AxisState }) {
           }}
         />
         <HormonePill
-          x={(PIT.x + PIT.w / 2 + TES.x + TES.w / 2) / 2}
-          y={VB_H - 12}
+          x={(PIT.x + PIT.w * 0.45 + TES.x + TES.w * 0.35) / 2}
+          y={VB_H - PAD - 4}
           label="Inhibin B"
           value={values.inhibinB}
           unit="pg/mL"
