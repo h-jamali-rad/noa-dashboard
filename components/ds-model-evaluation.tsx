@@ -1,24 +1,48 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+/**
+ * DS Model Framework Evaluation
+ * ------------------------------------------------------------------
+ * Section 4 of the Usability Testing page. Implements a dissertation-grade
+ * audit of the NOA micro-TESE Clinical Decision Support System against the
+ * 22-group "DS Model" reference framework by Arts et al.
+ *
+ *  1.  Introduction & framework provenance
+ *  2.  Interactive SVG flowchart (faithful to the original Arts et al. layout)
+ *  3.  Scoring system (formula, denominator, overall compliance)
+ *  4.  22 expandable per-group cards with status filters
+ *  5.  Gap analysis & prioritised research / development action items
+ *
+ *  All visuals are pure SVG / Tailwind — no external chart libraries.
+ *  Source data is embedded directly in this module (no JSON import).
+ *  Source: http://www.icove.nl/DSModel/  (Arts, D. et al.)
+ */
+
+import { useMemo, useState, useRef, useCallback } from 'react'
 import {
-  Layers,
+  Activity,
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle2,
   ChevronDown,
   ChevronUp,
-  CheckCircle2,
-  AlertTriangle,
-  XCircle,
-  MinusCircle,
+  Download,
+  ExternalLink,
   Filter,
+  Layers,
   Lightbulb,
-  Target,
+  Link2,
+  MinusCircle,
   Sparkles,
+  Star,
+  Target,
+  XCircle,
+  Zap,
 } from 'lucide-react'
-import dsModelMapping from '@/data/ds_model_mapping.json'
 
-/* ──────────────────────────────────────────────────────────────────────── */
-/*  Types                                                                   */
-/* ──────────────────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────
+ *  TYPES
+ * ───────────────────────────────────────────────────────────────────────── */
 
 type Status = 'applicable' | 'partial' | 'gap' | 'not_applicable'
 
@@ -58,592 +82,1127 @@ interface MappingData {
   overall_summary: OverallSummary
 }
 
-const DATA = dsModelMapping as unknown as MappingData
+/* ─────────────────────────────────────────────────────────────────────────
+ *  EMBEDDED DATA  (22 groups · 400 items · pre-coded statuses)
+ *  Stored as a String.raw template literal so backslash-escaped JSON quotes
+ *  inside descriptions survive parsing untouched.
+ * ───────────────────────────────────────────────────────────────────────── */
 
-/* ──────────────────────────────────────────────────────────────────────── */
-/*  Status configuration                                                    */
-/* ──────────────────────────────────────────────────────────────────────── */
+
+const RAW_MAPPING: string = String.raw`
+{"groups":[{"name":"Patient","description":"Characteristics of the real-world patient who is the subject of the decision. For the NOA micro-TESE CDSS, the patient is an infertile male with non-obstructive azoospermia (NOA) being counselled prior to microdissection testicular sperm extraction.","items":[{"text":"patient-doctor interactions35","status":"partial","description":"The CDSS is explicitly framed as a preoperative counselling aid that supports the urologist–patient interaction by translating opaque biomarker patterns into a personalised probability of sperm retrieval, but the system itself does not model, measure, or instrument the dyadic interaction (e.g., shared decision-making quality, patient comprehension), leaving the dynamics of that conversation outside the evaluation."},{"text":"demographics45(*), 57","status":"applicable","description":"Patient demographics are explicitly captured as model inputs and as cohort descriptors: Age and Body Mass Index (BMI) are two of the eleven evidence-supported CDSS features, and the underlying training cohort of 2,413 consecutive Iranian men (Royan Institute, 2007–2022) characterises the demographic substrate of the predictions."},{"text":"risks and benefits of intervention22, 35","status":"partial","description":"By outputting a calibrated probability of sperm retrieval together with Decision Curve Analysis–derived net-benefit information and a sensitivity/specificity threshold equalizer, the CDSS implicitly supports a benefit–risk conversation about whether to proceed with micro-TESE; however, the surgical risks (anaesthesia, testicular atrophy, hypogonadism) and downstream ICSI considerations are not formalised as structured outputs."},{"text":"clinical status (severity of illness)21(-), 43, 50, 51","status":"applicable","description":"Severity in the NOA context is encoded as endocrine and testicular phenotype severity, operationalised through inputs such as FSH, LH, Testosterone, T/E2 ratio, Inhibin B, bilateral testicular volume, and karyotype; the model and HPG-axis visualisation jointly communicate how impaired the patient's spermatogenic axis is."},{"text":"reason for visit51","status":"applicable","description":"The reason for the encounter—preoperative counselling for proposed micro-TESE in NOA—is the explicit indication and inclusion criterion for using the tool, and is fixed by the clinical pathway in which the CDSS is deployed."}],"summary":{"applicable":3,"partial":2,"gap":0,"not_applicable":0}},{"name":"User","description":"Characteristics of the real-world clinician interacting with the system. The intended user of the NOA CDSS is a urologist or andrologist conducting preoperative counselling.","items":[{"text":"role (doctor, nurse, specialty, etc.)3, 15, 18, 21, 36, 43","status":"applicable","description":"The target user role is explicitly specified as urologists and andrologists; the CDSS is designed around the cognitive and informational needs of these surgical sub-specialists rather than a generalist or non-physician role."},{"text":"experience20(-), 21, 43, 51","status":"gap","description":"Although the usability evaluation contrasted AI experts with human (clinical) experts, the system does not formally stratify or adapt to clinician experience (e.g., resident vs. attending vs. high-volume sub-specialist); future work should examine how experience modulates trust in, and appropriate reliance on, the predicted probability and SHAP outputs."},{"text":"demographics51","status":"not_applicable","description":"Clinician demographics (age, gender) are not relevant to the prediction task, and the stateless web architecture intentionally avoids collecting any user-identifying data."},{"text":"is the decision maker3, 35","status":"applicable","description":"The CDSS is positioned as decision-support, not decision-replacement: the urologist remains the autonomous decision-maker who interprets the predicted probability and SHAP explanations within the broader clinical context to recommend or decline micro-TESE."},{"text":"is an output intermediary3, 15, 47, 60","status":"not_applicable","description":"The architecture is single-user point-of-care; there is no notion of an intermediary relaying CDSS output to a separate decision-maker, because the operating surgeon is both the user and the decision-maker."},{"text":"attitude toward decision support/computers22, 34, 35","status":"partial","description":"User attitudes are partially captured through the System Usability Scale (SUS) evaluation by AI and clinical experts, but clinician-specific attitudinal constructs (e.g., trust in AI, algorithmic aversion, early-adopter status) are not explicitly modelled or measured."},{"text":"workload / running late43, 51","status":"gap","description":"The CDSS does not measure or adapt to clinician workload or time pressure during a clinic session; a real-world evaluation would need to characterise how counselling-time constraints affect engagement with the SHAP waterfall and HPG-axis visualisations."}],"summary":{"applicable":2,"partial":1,"gap":2,"not_applicable":2}},{"name":"Patient Data","description":"Computer-accessible patient data used by the decision-support system. The NOA CDSS relies on a small set of structured biomarker, anatomical, and genetic variables entered manually by the clinician at the point of counselling.","items":[{"text":"Data source:3, 21(-), 23†","status":"applicable","description":"The data source is explicit: eleven structured patient features (FSH, LH, Testosterone, E2, T/E2 ratio, Inhibin B, bilateral testicular volume, Age, BMI, karyotype) are entered into a web form, derived from routine andrological work-up."},{"text":"Not the user25(-), 34","status":"gap","description":"Currently the user (clinician) typically enters the data themselves; there is no automated retrieval from laboratory or EMR systems, which is a known barrier to uptake and a clear direction for future integration work."},{"text":"Automatic16, 37","status":"gap","description":"No automatic data ingestion mechanism exists; values are not pulled from laboratory information systems, imaging archives, or genetic reporting systems. Building HL7/FHIR connectors would substantially reduce data-entry burden."},{"text":"from EPR3, 21, 37","status":"gap","description":"There is no electronic-patient-record integration; the prototype is a standalone Next.js web application. Future deployment in clinical settings would require EPR integration to retrieve biomarker results without rekeying."},{"text":"from instruments3","status":"not_applicable","description":"The CDSS does not consume real-time data streams from clinical instruments; all inputs are discrete numeric or categorical features that arise from prior laboratory analyses."},{"text":"Intermediary3","status":"not_applicable","description":"There is no intermediary data-entry role in the intended deployment; the clinician interacts directly with the CDSS during the counselling encounter."},{"text":"patient3, 21","status":"not_applicable","description":"Patients do not enter data directly into the CDSS; the tool is clinician-facing in the preoperative counselling setting rather than patient-facing."},{"text":"project staff21","status":"not_applicable","description":"In the intended clinical workflow, project staff are not data-entry intermediaries; research staff entered data only during retrospective cohort assembly, which is a research activity rather than CDSS operation."},{"text":"existing staff21","status":"gap","description":"Delegating data entry to existing clinic staff (e.g., nurses, andrology technicians) is feasible but not part of the current workflow; investigating such delegation could reduce clinician burden and improve uptake."},{"text":"User3, 21, 33","status":"applicable","description":"The user (urologist/andrologist) is the primary data-entry agent in the current implementation, supplying the eleven features through the CDSS form before prediction."},{"text":"prompted for data53","status":"applicable","description":"The CDSS actively prompts the user for the eleven required features through a structured input form with field-level labelling and validation against clinical reference ranges."},{"text":"ease/expressiveness of data entry24, 22, 23†, 33","status":"partial","description":"Data entry is bounded to eleven structured fields—small enough to be tractable—and field-level colour coding against reference ranges provides immediate semantic feedback; however, no formal time-to-entry measurement or comparative usability study of the form design has been reported beyond the SUS evaluation."},{"text":"data entered for DS is incorporated into EPR and available as clinical data","status":"gap","description":"Because the CDSS is stateless and does not persist patient data server-side, entered values are not written back to any EPR, foregoing potential secondary use as clinical documentation of the counselling event."},{"text":"Validity/Quality","status":"partial","description":"Validity is partially supported by colour-coded biomarker validation against published reference ranges, which surfaces implausible values; however, there is no formal data completeness check, plausibility rule set, or audit trail to systematically assess data quality at the point of entry."},{"text":"unambiguous (structured, standardized, or coded)3, 52","status":"applicable","description":"All eleven inputs are highly structured: continuous laboratory values (hormones, volumes), bounded numeric demographics (Age, BMI), and a discrete categorical karyotype field, eliminating free-text ambiguity."},{"text":"Data type / Data elements (lab result, drug, diagnosis, etc.) standardized, defined input data/data elements, Wright et al.36, 58","status":"partial","description":"Data elements are well-defined locally (units and ranges are specified per feature), but they are not mapped to standard terminologies (LOINC for laboratory tests, SNOMED CT for diagnoses, HGNC/HGVS for karyotype) that would enable interoperability and reuse across institutions."}],"summary":{"applicable":4,"partial":3,"gap":5,"not_applicable":4}},{"name":"User data","description":"Computer-accessible data about the user (clinician). The NOA CDSS deliberately collects no user data in production, consistent with its stateless, privacy-preserving architecture.","items":[{"text":"User profile","status":"gap","description":"No persistent user profile is maintained, which precludes role-aware customisation of outputs or evidence summaries; introducing optional profiles would enable adaptation to user role and prior experience."},{"text":"role, department, etc.","status":"gap","description":"Although the intended role is fixed (urologist/andrologist), the system does not store or use this attribute to tailor outputs; departmental context is not captured."},{"text":"usage historyAA","status":"gap","description":"No per-user usage history is logged, which prevents longitudinal study of user behaviour or learning curves. Adding opt-in usage analytics could support post-deployment evaluation while respecting privacy."},{"text":"User actions","status":"gap","description":"User actions within the CDSS (which SHAP elements are explored, threshold slider manipulation, time-on-task) are not currently instrumented for analysis."},{"text":"UI events (mouse clicks, typing)","status":"gap","description":"UI-event telemetry is not collected; capturing such interaction data would enable evaluation of which explanation artefacts (waterfall, HPG axis, PDP) clinicians actually engage with."},{"text":"sensors (eye tracking, etc.)JW","status":"not_applicable","description":"Specialised sensor instrumentation (eye tracking, biometric input) is not feasible in a web-based outpatient counselling context and is outside the scope of the project."},{"text":"able to collect feedback about overridden alerts and use to improve alerts / feedback field34, 43, 53","status":"gap","description":"The CDSS issues no interruptive alerts and provides no structured feedback channel for the user to flag disagreement with the predicted probability; a lightweight feedback mechanism (e.g., 'was this prediction useful?') would enable continuous improvement."},{"text":"system requests user dataAA","status":"not_applicable","description":"The CDSS does not request user-level data beyond the patient features needed for prediction, consistent with its minimal, stateless design."},{"text":"Validity/Quality","status":"not_applicable","description":"As no user data is collected, validity/quality of user data is moot for the current implementation."}],"summary":{"applicable":0,"partial":0,"gap":6,"not_applicable":3}},{"name":"Abstract Patient","description":"The internal computational model of the patient that the CDSS uses to reason. For the NOA CDSS this is the CatBoost classifier together with the SHAP-derived patient-specific feature attributions and the HPG-axis visualisation.","items":[{"text":"system models individuals (advice calibrated to individual patient)SE","status":"applicable","description":"The model produces a patient-specific predicted probability, and TreeSHAP generates an individualised waterfall explanation showing how each of the eleven features moved the prediction from the base rate to the patient's personal estimate."},{"text":"accounts for uncertainty about patientAA","status":"partial","description":"Uncertainty is represented at the cohort level via 95% confidence intervals around the AUC (0.823–0.845) and through probability calibration, but per-patient predictive uncertainty (e.g., conformal intervals, Monte-Carlo dropout, prediction intervals) is not surfaced to the user as a calibrated individual confidence band."},{"text":"recognition of anomalous patientsJW","status":"gap","description":"There is no explicit out-of-distribution or anomaly detector that flags patients whose feature pattern lies outside the training-set support; adding such a safeguard is a recommended next step to prevent overconfident predictions on atypical phenotypes."},{"text":"Validity/Quality","status":"applicable","description":"Model validity is rigorously assessed through 5×5 nested cross-validation with leakage-controlled pipelines, AUC of 0.8306 (95% CI 0.823–0.845), TRIPOD+AI 2024 and PROBAST+AI 2025 reporting compliance, and additional discrimination/calibration diagnostics through DCA."}],"summary":{"applicable":2,"partial":1,"gap":1,"not_applicable":0}},{"name":"Abstract user","description":"The system's internal model of the user, used to tailor when and how decision support is delivered. The NOA CDSS does not maintain such a model.","items":[{"text":"static modelAA","status":"gap","description":"No static model of the user (role, specialty, preferences) is encoded; outputs are identical regardless of who is using the system."},{"text":"dynamic modelAA","status":"gap","description":"No dynamic user model is maintained; the CDSS does not adapt over time to individual user behaviour or preferences."},{"text":"uses classes of users","status":"gap","description":"Although urologists/andrologists are the implicit target class, the system does not differentiate output presentation between, for example, senior surgeons and trainees."},{"text":"models individuals (calibrated to individual users)AA","status":"gap","description":"No per-user calibration or personalisation is implemented; integrating such personalisation would require persistent user state, which the current stateless architecture intentionally avoids."},{"text":"alerts customizable by user30, 43","status":"partial","description":"The CDSS does not emit traditional alerts, but the threshold equalizer allows the user to dynamically adjust the sensitivity/specificity trade-off, which is a partial form of user-driven customisation of the binary outcome boundary."},{"text":"user sees a specific alert only once30","status":"not_applicable","description":"Because the CDSS does not issue alerts, suppression of repeated alerts to the same user is not relevant."},{"text":"turn off alerts if user performs well53","status":"not_applicable","description":"No alert system exists; performance-based suppression is therefore not applicable."},{"text":"interface tailored to user42, 61","status":"gap","description":"The interface is uniform for all users; tailoring (e.g., simplifying the SHAP plot for novice users, surfacing more technical detail for experts) is not implemented but is worth exploring in future iterations."},{"text":"adapts to previous user responsesAA","status":"gap","description":"The system does not learn from or adapt to a user's prior interactions; each session is independent because there is no persistent state."},{"text":"accounts for uncertainty about user / workflowAA","status":"gap","description":"No representation of uncertainty about the user's workflow, expertise, or current cognitive load is incorporated into the decision-support logic."},{"text":"Validity/Quality","status":"not_applicable","description":"Because no abstract user model is maintained, its validity is not assessed."}],"summary":{"applicable":0,"partial":1,"gap":7,"not_applicable":3}},{"name":"DS System","description":"The decision-support system itself, including reasoning, reliability, development process, and transportability. The NOA CDSS is a CatBoost-based ML system wrapped in a Next.js web frontend with client-side prediction.","items":[{"text":"speed / (perceived) time required to use system24, 25, 33, 34, 35, 53","status":"partial","description":"Prediction is performed client-side and is effectively instantaneous, and the structured eleven-field form is bounded in size; however, formal measurement of total time-on-task during counselling has not been reported beyond the SUS-based usability study."},{"text":"reliability","status":"partial","description":"Reliability of the model itself is supported by nested cross-validation and deterministic inference, but software-level reliability (uptime, error handling, browser/OS coverage) has not been formally characterised."},{"text":"Validity/Quality","status":"applicable","description":"End-to-end validity is anchored by TRIPOD+AI 2024 and PROBAST+AI 2025 compliant reporting, leakage-controlled 5×5 nested cross-validation, calibration assessment, and DCA, supporting the validity of both the model and the way its outputs are presented."},{"text":"graceful degradationNP","status":"gap","description":"Behaviour under degraded conditions (missing features, out-of-range values, model load failure) is not explicitly specified; documenting and testing graceful-degradation pathways is a recommended hardening step."},{"text":"recognizes and responds to cases outside its scopeJW","status":"gap","description":"The CDSS does not explicitly detect cases outside the training distribution (e.g., obstructive azoospermia, prepubertal patients); out-of-scope detection would prevent inappropriate use."},{"text":"recognizes and responds to inaccurate, improbable, or missing valuesSE","status":"partial","description":"Colour-coded reference-range validation surfaces implausible biomarker values for the clinician, but the model itself does not refuse to predict when values are missing or extreme, nor does it formally quantify the resulting predictive degradation."},{"text":"recognizes and responds to changing informationSE","status":"not_applicable","description":"The CDSS operates on a single static snapshot of patient features per counselling session and is not designed to monitor longitudinal change in biomarkers in real time."},{"text":"recognize when the intent of the guideline has been met31","status":"not_applicable","description":"The CDSS is a probabilistic predictor, not a guideline-implementation system, so tracking guideline completion is not part of its remit."},{"text":"continue even if part of the guideline has not been followed31","status":"not_applicable","description":"As above, the CDSS does not implement a step-wise guideline, so partial-guideline tolerance is not applicable."},{"text":"development and maintenance","status":"partial","description":"Development followed a documented data-science pipeline with TRIPOD+AI and PROBAST+AI reporting and SUS-based usability evaluation, but a formal post-deployment maintenance plan (model monitoring, drift detection, retraining schedule) has not been specified."},{"text":"developed/reviewed by people with domain knowledge30, 34","status":"applicable","description":"The work is a multidisciplinary collaboration involving clinical (reproductive urology/andrology) and AI/ML expertise at the Royan Institute, and the eleven input features were selected for clinical evidentiary support."},{"text":"user involvement in building system3, 25(-), 34","status":"partial","description":"Clinician input shaped feature selection and dashboard design, and an SUS-based usability evaluation with human experts elicited user feedback, but formal user-centred design methods (contextual inquiry, iterative co-design with end-users in clinic) are not extensively documented."},{"text":"developed through an iterative process/ pilot testing20(-), 21, 25, 34","status":"partial","description":"The modelling work was clearly iterative (cross-validated model comparison, feature-set refinement), and the CDSS dashboard has undergone an SUS-based usability evaluation; however, no field pilot in a real clinic with prospective patients has yet been reported."},{"text":"update mechanism (manual, automatic)3","status":"gap","description":"No formal update mechanism (manual or automatic) for the deployed model is described; specifying retraining triggers, version control, and roll-out procedures is recommended."},{"text":"reasoning/representation3, 33, 36","status":"applicable","description":"Reasoning is fully specified as a CatBoost gradient-boosted decision-tree classifier trained on a 73-feature matrix (55 raw + 18 NLP-engineered pathology features), with TreeSHAP, LIME, PDP, and DCA providing interpretability."},{"text":"rule based3, 36","status":"not_applicable","description":"The system is not rule-based; its decision logic is learned from data via gradient boosting, not encoded as if-then rules."},{"text":"Bayesian36","status":"not_applicable","description":"The champion model is CatBoost, not a Bayesian model; no Bayesian inference engine is used in production."},{"text":"neural network3","status":"not_applicable","description":"Neural networks were not selected as the champion architecture; the model is a gradient-boosted decision-tree ensemble."},{"text":"probabilistic models3","status":"applicable","description":"CatBoost outputs a probability of sperm retrieval (a calibrated probabilistic prediction), and probability calibration is reported alongside discrimination, making the system probabilistic in its output."},{"text":"manual algorithm3","status":"not_applicable","description":"No manually authored clinical algorithm or scoring system is used; predictions are produced by the learned model."},{"text":"frames36","status":"not_applicable","description":"Frame-based knowledge representation is not used in this ML-based CDSS."},{"text":"first-order logic36","status":"not_applicable","description":"No first-order-logic engine is employed; the CDSS uses statistical learning rather than symbolic reasoning."},{"text":"decision theoretic approaches36","status":"partial","description":"Decision Curve Analysis (DCA) explicitly applies a decision-theoretic framing to evaluate net benefit across threshold probabilities, but full decision-theoretic modelling of utilities (e.g., expected cost of false negatives versus false positives in a formal utility function) is not implemented."},{"text":"homegrown, proprietary, or open/publicly available18, 36, 47, 57","status":"applicable","description":"The CDSS is academically developed (homegrown), built on open-source components (CatBoost, Next.js, SHAP, LIME) and is intended for academic dissemination through publication in JMIR Medical Informatics."},{"text":"CDSS could be readily transported to another site7, 34","status":"partial","description":"The stateless web architecture is architecturally portable, but transportability of the model itself is uncertain because external validation on cohorts beyond the Royan Institute has not been performed; deployment at another site would require external validation and probable recalibration."}],"summary":{"applicable":5,"partial":8,"gap":3,"not_applicable":9}},{"name":"Trigger","description":"The event that initiates decision support. For the NOA CDSS, the trigger is fully passive: the user navigates to the CDSS during preoperative counselling and manually enters data.","items":[{"text":"timeAA","status":"not_applicable","description":"No time-based triggers exist; the system has no scheduler."},{"text":"absolute timeAA","status":"not_applicable","description":"Absolute-time triggers (cron-style scheduling) are not part of the design."},{"text":"relative timeAA","status":"not_applicable","description":"Relative-time triggers are not part of the design; the CDSS only runs when invoked."},{"text":"event","status":"applicable","description":"The triggering event is a UI event: the user opens the CDSS and submits the form. No clinical-event triggers exist."},{"text":"independent of the user","status":"not_applicable","description":"There are no user-independent triggers; the system never fires on its own."},{"text":"system action (e.g. lab value stored)JW","status":"not_applicable","description":"No automatic triggering by underlying system actions (e.g., a new hormone result becoming available) exists, because there is no EPR/laboratory integration."},{"text":"action of another user","status":"not_applicable","description":"Multi-user actions cannot trigger the system; only the immediate user can invoke it."},{"text":"UI event","status":"applicable","description":"All operation is bound to UI events: page load, field entry, and the 'predict' button."},{"text":"passive: activates only on user request48","status":"applicable","description":"The CDSS is fundamentally passive: it activates only on direct user request, which is appropriate for an elective preoperative counselling tool."},{"text":"active48","status":"not_applicable","description":"The system has no active mode; it never reaches out to the user."},{"text":"allows enough time for DS system to work optimally","status":"applicable","description":"Because the user invokes the CDSS during the dedicated counselling visit, there is ample time for the system to complete its computation (which is effectively instant)."},{"text":"data requested before vs during execution37","status":"applicable","description":"Data are collected before execution: the user enters all eleven features prior to requesting a prediction, ensuring a complete input vector at inference time."},{"text":"standardized, defined triggers Triggers, Wright et al.52; 58","status":"partial","description":"The trigger is well defined locally (user submission of the form), but it is not mapped to any standardised trigger taxonomy such as those proposed by Wright and Sittig for interoperable CDSS."}],"summary":{"applicable":5,"partial":1,"gap":0,"not_applicable":7}},{"name":"Knowledge source","description":"Source of medical knowledge underpinning the CDSS reasoning. The NOA CDSS knowledge is learned from retrospective cohort data, supplemented by the clinical literature on NOA biomarkers.","items":[{"text":"guidelines/protocols3, 37, 59","status":"gap","description":"The CDSS does not formally encode published clinical guidelines (e.g., EAU, AUA guidelines for male infertility); linking outputs to relevant guideline statements would strengthen clinical legitimacy."},{"text":"local, national, or international guidelinesJW","status":"gap","description":"Specifically, no explicit mapping to local Iranian, regional, or international (EAU/AUA/ASRM) guidelines is provided; this is a feasible enhancement."},{"text":"decision rules16, 37","status":"not_applicable","description":"The CDSS does not implement crisp decision rules; its decision boundary is learned from data."},{"text":"formula/physiologic model16, 37, 59","status":"partial","description":"The HPG-axis visualisation reflects the hypothalamic-pituitary-gonadal physiologic schema and overlays patient-specific values onto it, providing a soft physiologic frame; however, no closed-form physiologic equations drive the prediction itself."},{"text":"experts59","status":"partial","description":"Domain experts (reproductive urologists at the Royan Institute) informed feature selection and interpretation, but formal expert elicitation (Delphi, consensus panels) is not described."},{"text":"single or multiple","status":"partial","description":"Multiple domain experts within the Royan Institute were involved, but the breadth of expert input across institutions is limited and not formally enumerated."},{"text":"formal or informal method","status":"gap","description":"Expert input appears to have been informal; no Delphi process, consensus rating, or structured elicitation is documented."},{"text":"local, national, or international consensusJW","status":"gap","description":"The knowledge base reflects local expert practice and the published literature, not an explicit consensus document at any geographic scale."},{"text":"evidenceJW","status":"applicable","description":"Feature selection is explicitly grounded in evidence: the eleven CDSS inputs were chosen based on published evidence linking each variable to sperm-retrieval outcomes in NOA."},{"text":"data analysis59","status":"applicable","description":"The core knowledge source is a retrospective data analysis of 2,413 micro-TESE cases over fifteen years, from which the prediction model is learned."},{"text":"decision analysis59","status":"partial","description":"Decision Curve Analysis is included to quantify net benefit across decision thresholds, providing a partial formal decision-analytic component, but full decision-tree or Markov modelling is not employed."},{"text":"learning system59","status":"applicable","description":"The CDSS is itself a machine-learning system (CatBoost), squarely in the 'learning system' category of knowledge sources."},{"text":"Validity/Quality45","status":"applicable","description":"Knowledge validity is supported by the large, single-centre cohort (n=2,413), the TRIPOD+AI/PROBAST+AI-compliant reporting, and the use of cross-validated discrimination and calibration metrics."},{"text":"level of evidence43","status":"partial","description":"The underlying study is a retrospective single-centre cohort, which corresponds to a moderate level of evidence; this is acknowledged through PROBAST+AI risk-of-bias reporting but the CDSS itself does not display an evidence-level badge to users."},{"text":"trusted by the usersJW","status":"partial","description":"User trust was indirectly assessed through SUS scoring with AI and human experts; however, dedicated measures of trust calibration (e.g., trust scales, agreement with model predictions) were not the primary endpoint."}],"summary":{"applicable":4,"partial":6,"gap":4,"not_applicable":1}},{"name":"Organization/Setting","description":"The organisational and clinical setting in which the CDSS is intended to operate. The training cohort is from a single tertiary fertility centre in Iran; the deployment context is preoperative andrology counselling.","items":[{"text":"Clinical setting3, 5, 13, 21, 36, 41, 45, 57","status":"applicable","description":"The clinical setting is explicitly specified as a tertiary academic fertility centre (Royan Institute, Tehran), with the CDSS intended for use in preoperative andrology counselling clinics."},{"text":"inpatient vs outpatient / general practice2, 3, 13, 21(-), 36, 41(^), 45(*), 47(-), 57","status":"applicable","description":"The intended setting is outpatient sub-specialty andrology (preoperative counselling), not inpatient or general-practice care, which constrains the appropriate user and patient population."},{"text":"academic vs non-academic5, 13, 21(-)","status":"applicable","description":"The development and target environment is an academic, research-intensive fertility centre; transportability to non-academic centres has not yet been demonstrated."},{"text":"other settings5, 18, 36. 57","status":"gap","description":"No evaluation in other settings (community urology clinics, non-academic IVF centres, international centres) has been performed; multisite external validation is a key future direction."},{"text":"country/region15, 18, 21(-), 47(-)","status":"applicable","description":"The training data and target population are explicitly identified as Iranian (Royan Institute, Tehran), which has implications for external generalisability and the need for cross-regional validation."},{"text":"population/epidemiology43","status":"applicable","description":"The NOA cohort epidemiology is reported (n=2,413, 36.7% retrieval-success rate), providing transparent characterisation of the population on which the model was built."},{"text":"has learners (students/residents)34, 47","status":"gap","description":"Although academic centres typically include learners, the CDSS does not formally consider how trainees might use the system differently from attendings, nor does it include an educational mode for residents."},{"text":"infrastructure","status":"partial","description":"Required infrastructure is minimal—a modern web browser—and the stateless client-side architecture is deliberately low-burden, but assumptions about reliable internet access and adequate display hardware for the visualisations are not explicitly enumerated."},{"text":"equipment location / accessibility7, 34, 35","status":"gap","description":"No analysis of where in the clinic the CDSS would be accessed (counselling room computer, mobile device, shared workstation) is documented; equipment accessibility affects whether the CDSS is actually used at the right time."},{"text":"free to use CDSS without colleague approval34","status":"applicable","description":"Because the CDSS is an information tool—not a treatment authorisation system—the clinician can freely use it without colleague or administrative approval at the point of counselling."},{"text":"data security high but well-managed / password problems22, 34, 35","status":"partial","description":"The stateless architecture (no patient data stored server-side) is intrinsically privacy-preserving, but formal authentication, audit logging, and security review (ISO 27001, HIPAA-equivalent assessment) are not described."},{"text":"technical problems35","status":"gap","description":"Anticipated technical-problem rates (browser incompatibility, JavaScript failures, network outages) and mitigation strategies have not been characterised."},{"text":"room setup51","status":"gap","description":"The physical/room context for using the CDSS during counselling (display orientation toward patient, projector use during shared decision-making) has not been described or evaluated."},{"text":"support","status":"gap","description":"No formal user-support or training plan is documented beyond the SUS evaluation; in real deployment, training and helpdesk support would be needed."},{"text":"technical support / training34, 35","status":"gap","description":"Technical support pathways and a training curriculum for prospective clinical users have not yet been articulated."},{"text":"organizational support / commitment34","status":"partial","description":"Institutional commitment is implicit through the Royan Institute partnership that provided the cohort, but explicit organisational sign-off, change-management plans, and resource allocation for clinical roll-out are not detailed."},{"text":"ADE rate of the organization43","status":"not_applicable","description":"Adverse drug-event rates are not relevant to a sperm-retrieval prediction CDSS that does not involve medication orders."},{"text":"alert override rate of the organization43","status":"not_applicable","description":"The CDSS does not issue interruptive alerts, so organisational alert-override rates are not a meaningful contextual factor."}],"summary":{"applicable":6,"partial":3,"gap":7,"not_applicable":2}},{"name":"Clinical workflow","description":"Integration with the physical clinical workflow. The NOA CDSS is intended for use during outpatient preoperative counselling but is a standalone web tool rather than an integrated EHR component.","items":[{"text":"workflow integration3, 7, 22, 34, 35, 37","status":"gap","description":"The CDSS is a standalone web application without integration into existing clinical workflow systems (EHR, scheduling, surgical planning); deeper integration is a well-recognised determinant of CDSS uptake and is identified as a clear gap."},{"text":"targets system typically used for task47","status":"gap","description":"Preoperative counselling is typically documented within an EHR; the CDSS lives outside that system, requiring context-switching by the clinician."},{"text":"targets person typically responsible for task47, 53","status":"applicable","description":"The CDSS targets exactly the person typically responsible for micro-TESE counselling—the operating urologist/andrologist—rather than a non-decision-making intermediary."},{"text":"requires novel actions that would not otherwise be performed, vs workflow flexibility3","status":"partial","description":"Using the CDSS does add a discrete action (open the web tool, enter eleven fields) that is not strictly part of pre-existing workflow; however, the data entered are values the clinician already reviews routinely, so the marginal cognitive load is bounded."},{"text":"does not stop the workflow, unless the user should stop what they're doing56","status":"applicable","description":"The CDSS is non-interruptive by design—the user invokes it deliberately—so it does not impose unsolicited halts on the counselling workflow."},{"text":"enough time to use system22","status":"applicable","description":"Counselling visits typically allow several minutes for case review, which is sufficient for the bounded eleven-field entry and exploration of SHAP and HPG-axis outputs."},{"text":"supports the current task34, 43","status":"applicable","description":"The CDSS is purpose-built for exactly the current task—deciding whether to proceed with micro-TESE and how to counsel the patient—rather than a generic predictor."},{"text":"automatic provision as part of workflow25(*), 34","status":"gap","description":"The CDSS is not automatically provisioned when the clinician opens a patient's chart for counselling; provision is user-initiated, which is a known barrier to consistent uptake."},{"text":"predictability/standardization of workflow","status":"applicable","description":"Preoperative micro-TESE counselling is a predictable, standardised encounter type with a defined input set, which is favourable for CDSS deployment."}],"summary":{"applicable":5,"partial":1,"gap":3,"not_applicable":0}},{"name":"Cognitive workflow","description":"The mental decision-making processes the CDSS interacts with. The NOA CDSS most directly supports hypothetico-deductive and risk-stratifying reasoning during the counselling decision.","items":[{"text":"decision-making strategies9, 10","status":"partial","description":"The CDSS implicitly supports a probabilistic reasoning strategy by surfacing predicted probabilities and feature attributions, but it does not explicitly characterise the clinical decision-making strategy of its users."},{"text":"pattern recognition/automatic9, 10, 12","status":"partial","description":"The HPG-axis visualisation and reference-range colour coding are designed to support rapid clinical pattern recognition (e.g., 'classic hypergonadotropic hypogonadism'), though this is a side-effect rather than an explicit design goal."},{"text":"rule out worst case scenario9, 10","status":"partial","description":"Because the worst case in micro-TESE counselling is unnecessary surgery with no retrieval, the CDSS's probability output and threshold equalizer help frame that worst-case probability, though no explicit 'rule out' workflow is implemented."},{"text":"exhaustive method9, 10","status":"not_applicable","description":"The CDSS does not encourage an exhaustive enumeration of possibilities; it provides a single condensed probabilistic judgement."},{"text":"hypthetico-deductive method9, 10","status":"applicable","description":"The CDSS aligns naturally with hypothetico-deductive reasoning: the clinician forms an initial hypothesis from clinical history, then uses the CDSS's probability and SHAP explanations to confirm or refute that hypothesis quantitatively."},{"text":"heuristics9, 10","status":"partial","description":"The CDSS provides a data-driven counterweight to clinical heuristics (such as over-reliance on FSH alone), which is a recognised contribution of explainable AI in this domain; however, the system does not explicitly catalogue or address particular heuristics."},{"text":"cognitive disposition to respond9, 10","status":"gap","description":"The system does not analyse or correct clinicians' cognitive dispositions; future human-factors studies could explore whether SHAP-based explanations attenuate specific dispositions in micro-TESE counselling."},{"text":"satisficing12","status":"not_applicable","description":"The CDSS does not engage with satisficing-versus-optimising as an explicit design construct."},{"text":"optimising12","status":"not_applicable","description":"Likewise, optimising is not explicitly modelled as a decision strategy."},{"text":"models of clinical decision making1","status":"gap","description":"No formal model of clinical decision-making was explicitly adopted as the theoretical frame for the CDSS; positioning the work against, e.g., Banning's typology would strengthen the design rationale."},{"text":"information processing model1","status":"partial","description":"The CDSS broadly aligns with an information-processing view—cues (features) feed a model that supports hypothesis evaluation—but this alignment is implicit rather than explicit."},{"text":"intuitive-humanist model1","status":"not_applicable","description":"An intuitive-humanist 'expert tacit knowledge' frame is not the model adopted; the CDSS deliberately externalises evidence."},{"text":"hypothesis-driven assessment + risk reduction1","status":"applicable","description":"The system is consistent with hypothesis-driven risk reduction: the predicted probability and SHAP explanations support the clinician in stratifying surgical risk (here, the risk of futile micro-TESE)."},{"text":"situational awareness model49","status":"gap","description":"The CDSS does not formally instantiate a situational-awareness framework; doing so could illuminate which contextual cues integrate with the model output."},{"text":"System 1 / System 2 Croskerry: System 1/211","status":"partial","description":"By offering an analytic, transparent probability supported by SHAP/LIME/PDP explanations, the CDSS deliberately invites System-2 reasoning to complement and potentially counterbalance System-1 heuristics; however, this dual-process framing is not explicitly cited in the design rationale."},{"text":"Type of error being corrected39","status":"partial","description":"The CDSS addresses mistakes-of-judgement (incorrect probabilistic estimation of retrieval success leading to inappropriate surgical decisions), but the project does not formally categorise itself within the slips/mistakes taxonomy of Patel et al."},{"text":"slips/lapses Patel et al.39","status":"not_applicable","description":"Slips and lapses (execution errors of correct plans) are not the target of the CDSS, which addresses the upstream judgement task."},{"text":"mistakes Patel et al.39","status":"applicable","description":"The CDSS is squarely aimed at reducing mistakes of judgement: improving the accuracy of the clinician's probabilistic estimate of retrieval success and thus the appropriateness of the surgical recommendation."},{"text":"cognitive biases Croskerry: biases9, 10","status":"partial","description":"By providing a calibrated, data-driven probability, the CDSS can mitigate biases such as anchoring on FSH or availability bias from recent cases, but no formal bias-mitigation evaluation is reported."},{"text":"New errors introduced by electronic prescribing Coiera et al.8","status":"partial","description":"The CDSS could itself introduce new errors—automation bias, overreliance on the predicted probability—but no formal assessment of CDSS-induced errors is included; this is a recommended target for prospective evaluation."},{"text":"alerts should match mental model of user42, 61","status":"partial","description":"The HPG-axis visualisation deliberately maps the prediction onto the urologist's existing mental model of male reproductive endocrinology, supporting cognitive alignment; SHAP-based local explanations are similarly aligned with feature-based clinical reasoning."}],"summary":{"applicable":3,"partial":10,"gap":3,"not_applicable":5}},{"name":"Intervention strategy","description":"Behavioural and organisational strategies surrounding the CDSS intervention. The NOA CDSS is deployed as a single-component informational tool without an explicit behaviour-change theoretical framework.","items":[{"text":"theoretical underpinning14, 28, 55","status":"gap","description":"The CDSS lacks an explicit behaviour-change theoretical underpinning; embedding the design in a recognised framework (e.g., Ottawa Decision Support Framework for patient-clinician decision aids) would strengthen the implementation rationale."},{"text":"expected utility theory14","status":"partial","description":"Decision Curve Analysis provides a partial expected-utility framing by quantifying net benefit at various threshold probabilities, although it does not elicit utilities directly."},{"text":"Ottawa decision support framework14","status":"gap","description":"The Ottawa Decision Support Framework, which is highly relevant to preoperative counselling decisions, is not explicitly used; aligning the CDSS with this framework could enrich its shared-decision-making role."},{"text":"theory of reasoned action14, 55","status":"not_applicable","description":"The theory of reasoned action targets behaviour-change interventions; it is not directly germane to a probabilistic prediction tool."},{"text":"consumer behavior model14","status":"not_applicable","description":"Consumer behaviour modelling is not applicable to this clinician-facing prediction tool."},{"text":"conflict theory model14","status":"not_applicable","description":"Conflict-theory modelling of decisional coping is not directly engaged."},{"text":"social cognitive theory14, 55","status":"not_applicable","description":"Social cognitive theory is not used as a frame for this tool."},{"text":"health belief model14","status":"not_applicable","description":"The health belief model is a patient-behaviour framework not directly engaged by this clinician-facing CDSS."},{"text":"transtheoretical model of behavior change14, 55","status":"not_applicable","description":"Stages-of-change modelling is not used."},{"text":"empowerment14","status":"partial","description":"The CDSS may indirectly empower patients by giving the clinician transparent SHAP explanations they can share, but explicit patient-empowerment objectives and measurement are not part of the current scope."},{"text":"error detection and recovery40","status":"gap","description":"No explicit error-detection-and-recovery mechanism is built into the workflow (e.g., flagging probable data-entry errors based on internal consistency); this is a feasible enhancement."},{"text":"Implemented with other behavior modification (multifaceted)3, 41(-), 47(*)","status":"gap","description":"The CDSS is a single-component intervention; it is not embedded in a multifaceted implementation strategy (training, audit-and-feedback, opinion-leader engagement), which limits expected impact based on prior CDSS evidence."},{"text":"with new protocol16","status":"gap","description":"Introduction of the CDSS is not paired with a revised clinical protocol for preoperative counselling; co-designing a protocol with the CDSS would clarify its place in the pathway."},{"text":"with performance feedback / self-monitoring25(-), 34, 55","status":"gap","description":"No mechanism provides clinicians with performance feedback (e.g., calibration of their predictions versus actual outcomes); audit-and-feedback could meaningfully complement the tool."},{"text":"with educational intervention25(-), 34","status":"gap","description":"No accompanying educational intervention is described; a brief curriculum on AI literacy and explanation interpretation would likely improve appropriate reliance."},{"text":"with clear incentive to use system34","status":"gap","description":"No explicit clinical or organisational incentive (financial, quality-of-care metric, credentialing requirement) is paired with the CDSS."},{"text":"with stress management55","status":"not_applicable","description":"Stress-management interventions are not relevant to this prediction tool."},{"text":"with general communication skills training55","status":"gap","description":"Although the CDSS supports physician-patient communication, no parallel communication-skills training is bundled; combining the tool with such training could amplify benefits."},{"text":"with modeling55","status":"not_applicable","description":"Behavioural modelling as a deployment intervention is not in scope."},{"text":"with relapse prevention/coping planning55","status":"not_applicable","description":"Relapse-prevention strategies are not relevant to this surgical prediction context."},{"text":"with goal setting55","status":"not_applicable","description":"Formal goal-setting interventions are not part of the deployment."},{"text":"with action planning55","status":"not_applicable","description":"Action-planning interventions for behaviour change are not used."},{"text":"facilitating social comparison55","status":"not_applicable","description":"The CDSS does not facilitate social comparison among clinicians."},{"text":"information copied to patient as well as provider13, 25(-), 34","status":"gap","description":"The CDSS output is not automatically shared with the patient as a printable summary, but doing so (e.g., a patient-friendly probability sheet) would directly support shared decision-making."},{"text":"transparency to peers","status":"not_applicable","description":"Peer transparency of CDSS use is not part of the implementation strategy."},{"text":"transparency to supervisors","status":"not_applicable","description":"Supervisor-level transparency of CDSS use is not part of the implementation strategy."},{"text":"transparency to public","status":"partial","description":"Public transparency is partially achieved through planned academic publication and the open-source/methodologically transparent reporting under TRIPOD+AI/PROBAST+AI, but individual usage is not publicly auditable."},{"text":"involvement of opinion leaders25, 34, 35","status":"partial","description":"The Royan Institute is itself a national opinion-leader in male-infertility treatment, which lends legitimacy; however, no explicit opinion-leader endorsement campaign accompanies the CDSS."},{"text":"user training7, 21, 20(-), 35","status":"gap","description":"No formal user-training programme accompanies the CDSS; a brief onboarding tutorial and SHAP-interpretation primer should be developed for clinical deployment."},{"text":"alignment with organizational priorities, clinician beliefs, or financial incentives25","status":"partial","description":"The CDSS aligns with the Royan Institute's reproductive-medicine mission and the broader clinical priority of avoiding futile surgery, but formal alignment with financial incentives or institutional KPIs has not been articulated."},{"text":"change management barriers understood and supported3, 34, 55","status":"gap","description":"Change-management barriers (algorithmic aversion, workflow disruption, regulatory uncertainty) are not formally analysed or mitigated in the current scope; this is a critical prerequisite for real-world deployment."}],"summary":{"applicable":0,"partial":5,"gap":12,"not_applicable":14}},{"name":"Clinical advice","description":"The conclusion that the CDSS communicates about the patient. The NOA CDSS produces a clinical probabilistic prognosis about the success of micro-TESE.","items":[{"text":"clinical vs nonclinical3, 36","status":"applicable","description":"The advice is unambiguously clinical: it predicts a biomedical outcome (sperm retrieval) rather than an administrative or resource-allocation outcome."},{"text":"Clinical domain3, 9, 17, 20(-), 21(-), 27, 32, 35, 36, 37, 41, 43, 50(-)","status":"applicable","description":"The clinical domain is reproductive urology/andrology, specifically preoperative prognostication for microdissection testicular sperm extraction in non-obstructive azoospermia."},{"text":"collect data59","status":"not_applicable","description":"The CDSS does not advise the user to collect additional patient data; it operates on data already gathered during work-up."},{"text":"perform exam / diagnostics / screening3, 5, 17, 20, 23, 37, 58","status":"not_applicable","description":"The system does not recommend additional examinations or screenings; its scope is prognostic, not diagnostic-workup planning."},{"text":"testing3, 9, 15, 17, 58","status":"not_applicable","description":"Test ordering is not within the scope of the CDSS."},{"text":"order a test37","status":"not_applicable","description":"The CDSS does not order tests; it consumes existing test results as inputs."},{"text":"change timing or type of test59","status":"not_applicable","description":"The CDSS does not advise on test timing or type."},{"text":"cancel test","status":"not_applicable","description":"Cancelling a test is not part of the CDSS's clinical advice space."},{"text":"note/interpret a test result9, 32, 54, 58, 59","status":"partial","description":"Although the system does not interpret individual tests in the classical sense, the colour-coded biomarker validation against reference ranges and SHAP feature attributions help the clinician interpret each test's contribution within the prognostic context."},{"text":"monitor15, 17, 36, 41, 58","status":"not_applicable","description":"Longitudinal monitoring is not a function of the CDSS; it produces a one-shot preoperative prediction."},{"text":"make diagnosis/add to differential3, 9, 17, 20, 23, 36, 37, 59","status":"not_applicable","description":"The diagnosis (NOA) is a precondition for using the CDSS, not an output of it; the system does not produce or refine the differential diagnosis."},{"text":"prognosis32, 36, 59","status":"applicable","description":"The CDSS's core output is a quantitative prognosis—the predicted probability of successful sperm retrieval at micro-TESE."},{"text":"treatment3, 9, 17","status":"partial","description":"The CDSS does not prescribe treatment; rather, it informs the binary treatment decision (proceed with micro-TESE vs. not) by quantifying expected benefit."},{"text":"order treatment / drug17, 23, 37, 41, 59","status":"not_applicable","description":"Treatment ordering is not within the CDSS's remit."},{"text":"change treatment / drug27, 52","status":"not_applicable","description":"Treatment changes are not in the scope of the prediction tool."},{"text":"same treatment but modify timing, dose, route, duration, etc.27, 41, 58, 59","status":"not_applicable","description":"The CDSS does not advise on the modification of any therapy parameters."},{"text":"drug dosing3, 5, 15, 20, 27, 37, 45(*), 54, 58, 59","status":"not_applicable","description":"Drug dosing is not relevant to a surgical-prognostic CDSS."},{"text":"drug interaction warnings27, 32, 54, 58","status":"not_applicable","description":"Drug interactions are outside the scope of the CDSS."},{"text":"basic (drug-drug) vs advanced (drug-lab, drug-diagnosis, etc.)29, 44, 57","status":"not_applicable","description":"Drug-interaction sophistication is not relevant to this prediction tool."},{"text":"cancel treatment41, 47(-), 52","status":"partial","description":"The CDSS does not formally recommend cancellation, but a very low predicted probability of retrieval—combined with the DCA-derived threshold—can support the decision to not proceed with surgery, which is a form of treatment cancellation."},{"text":"duplication27, 58","status":"not_applicable","description":"Duplicate-order detection is not part of the CDSS."},{"text":"look alike / sound alike warnings58","status":"not_applicable","description":"Medication-naming warnings are not relevant."},{"text":"polypharmacy alerts58","status":"not_applicable","description":"Polypharmacy alerting is unrelated to the prediction task."},{"text":"time-based alerts based on protocol or incomplete orders58","status":"not_applicable","description":"The CDSS does not generate time-based or protocol-completion alerts."},{"text":"referral / triage / disposition9, 17, 37, 59","status":"not_applicable","description":"The CDSS is invoked after referral; it does not handle triage or disposition."},{"text":"educate / counsel / advocate3, 9, 17, 37, 59","status":"applicable","description":"Counselling support is a primary intended use: the CDSS provides interpretable prognostic information together with SHAP-based explanations that the clinician can use to educate the patient about the basis for the recommendation."},{"text":"documentation / communication17, 58","status":"gap","description":"The CDSS does not currently produce a structured counselling note or letter that could be incorporated into the EPR; adding an exportable summary would address this gap."},{"text":"no action17, 25(#), 34, 53","status":"applicable","description":"An important downstream advice is precisely 'no action'—deferring or declining micro-TESE when predicted success probability is sufficiently low relative to the user-selected threshold."},{"text":"acute disease vs chronic disease management3, 5, 20, 37, 50(*), 58","status":"applicable","description":"NOA is a chronic condition and the CDSS addresses one decision within its long-term management; the system is specifically tailored to this chronic-disease decision context."},{"text":"patient preferences9","status":"partial","description":"The CDSS does not explicitly capture patient preferences, but the threshold equalizer allows the clinician to instantiate the patient's risk tolerance by adjusting the sensitivity/specificity trade-off; tighter coupling to preference elicitation would be valuable."},{"text":"history of presenting illness, past history, exam9","status":"partial","description":"Key elements of history (Age, BMI, karyotype, prior testicular volume) are inputs to the model, but free-text history is not captured."},{"text":"improving care at the bedside32","status":"applicable","description":"The CDSS is explicitly designed to improve point-of-care preoperative counselling, delivering individualised, evidence-based probability estimates that would otherwise be heuristically approximated."},{"text":"nonclinical9","status":"not_applicable","description":"The CDSS does not address nonclinical decisions."},{"text":"allocation of resources9","status":"not_applicable","description":"Resource allocation is not a CDSS output, although improved patient selection may indirectly affect operating-theatre utilisation."},{"text":"priority setting9","status":"not_applicable","description":"Case prioritisation is not a CDSS function."},{"text":"administrative9","status":"not_applicable","description":"No administrative advice is generated."},{"text":"cost/utilization9, 37, 54, 58","status":"gap","description":"Although better patient selection should reduce wasted operative resources, the CDSS does not surface cost/utilisation estimates; integrating a cost-effectiveness module would be a valuable extension."},{"text":"provide additional data for the DSSAA","status":"not_applicable","description":"The CDSS does not direct the user to provide additional data beyond the eleven inputs."},{"text":"medical domain (cardiology, neurology, etc.)36","status":"applicable","description":"The medical domain is reproductive urology / male infertility, which is explicitly scoped and reflected in the CDSS branding and the choice of HPG-axis visualisation."},{"text":"services offered46","status":"applicable","description":"The CDSS offers several distinguishable services: prediction, explanation, presentation/visualisation, calculation (probability and SHAP), and decision-curve aggregation."},{"text":"recommendation","status":"partial","description":"The CDSS issues a soft recommendation through its binary outcome at the user-set threshold but stops short of a hard imperative recommendation; this reflects an intentional decision-support (not decision-replacement) philosophy."},{"text":"documentation","status":"gap","description":"Documentation services (e.g., generating a counselling note from the CDSS output) are not implemented but are a natural extension."},{"text":"explanation","status":"applicable","description":"Explanation is a flagship service: TreeSHAP local explanations, global SHAP feature importance, LIME, and partial-dependence plots collectively provide multi-method explanations of every prediction."},{"text":"presentation","status":"applicable","description":"Presentation is a core service: SHAP waterfalls, the HPG-axis 3D visualisation, biomarker distribution overlays, and colour-coded reference-range validation reframe raw data into clinically meaningful displays."},{"text":"communication","status":"partial","description":"The CDSS facilitates clinician-patient communication during counselling by externalising the reasoning, but it does not provide structured communication tools (e.g., patient-handout export, shared-screen mode)."},{"text":"registration","status":"not_applicable","description":"The CDSS does not assist with maintaining patient demographic registries."},{"text":"calculation","status":"applicable","description":"Calculation is central: the system computes the predicted probability, SHAP values, LIME approximations, and DCA net benefit on demand."},{"text":"aggregation","status":"applicable","description":"The CDSS aggregates eleven heterogeneous data elements (endocrine, anatomical, demographic, genetic) into a single, interpretable prognostic estimate."},{"text":"relevance / quality of information22, 24, 33, 35, 53","status":"applicable","description":"The CDSS surfaces only information directly relevant to the preoperative micro-TESE decision (the eleven evidence-supported features and the resulting probability with explanations), avoiding extraneous content."},{"text":"clinically important30, 34","status":"applicable","description":"The clinical importance of avoiding futile micro-TESE—both psychologically and physically—motivates the entire project, and the predicted probability and explanations directly address this importance."},{"text":"financially important34","status":"partial","description":"Avoiding unsuccessful micro-TESE has clear financial implications, but the CDSS does not explicitly quantify the financial impact or present cost-based framing."},{"text":"accuracy / correctness / validity25, 30, 34, 45(*), 53","status":"applicable","description":"Accuracy is rigorously characterised by the AUC of 0.8306 (95% CI 0.823–0.845) under 5×5 nested cross-validation, with calibration assessed and reported in line with TRIPOD+AI 2024."},{"text":"sensitivity / reliability26, 34, 35, 53","status":"applicable","description":"Sensitivity is explicitly tunable through the threshold equalizer, allowing the user to navigate the sensitivity/specificity trade-off according to clinical priorities."},{"text":"specificity / focus / probability of adverse event23, 26, 35, 43, 42, 57, 60, 61","status":"applicable","description":"Specificity is similarly exposed via the threshold equalizer, and the predicted probability itself is a calibrated estimate of outcome occurrence."},{"text":"severity42, 43, 61","status":"partial","description":"Although the severity of a failed micro-TESE (psychological, physical, financial) is implicit, the CDSS does not formally tag predictions with a severity label or color code beyond the probability itself."},{"text":"urgency3, 53","status":"not_applicable","description":"Preoperative counselling for an elective micro-TESE is not time-critical in the minute-to-hour sense; urgency framing is not appropriate for this CDSS."},{"text":"when action must be taken","status":"not_applicable","description":"There is no fixed deadline associated with the prediction."},{"text":"when the adverse event will occur","status":"not_applicable","description":"The 'adverse event' (failed retrieval) only occurs at the time of surgery, which is scheduled independently."},{"text":"logistical complexity3, 35","status":"partial","description":"Operationally, acting on the CDSS output is straightforward (proceed with or defer surgery), but explicit assessment of the logistical pathway downstream of a low probability (e.g., counselling, donor sperm, adoption) is not part of the tool."},{"text":"resources available","status":"not_applicable","description":"Resource availability is not considered by the CDSS; the operating environment is assumed adequately resourced."},{"text":"user is confident in ability to perform action (self-efficacy)6","status":"not_applicable","description":"Self-efficacy in performing micro-TESE is an attribute of the surgeon, not addressed by the CDSS."}],"summary":{"applicable":18,"partial":10,"gap":3,"not_applicable":30}},{"name":"Output","description":"The form and classification of the message intended to convey the clinical advice.","items":[{"text":"prioritization of alerts42, 45(collinear), 56, 61","status":"not_applicable","description":"The CDSS issues a single per-patient prediction at user request rather than a set of alerts requiring prioritisation."},{"text":"critiquing vs consulting16, 36, 48, 50(*)","status":"applicable","description":"In Shortliffe's taxonomy, the CDSS is a consulting system: it produces a probabilistic recommendation in response to a user query, rather than critiquing an existing plan framed by the clinician."},{"text":"Other classifications: &lt;#shortliffe&gt;Shortliffe; &lt;#wright&gt;Wright/Sittig","status":"applicable","description":"In Wright/Sittig terms, the CDSS aligns with calculators/risk-assessment tools and patient-specific recommendations; in Shortliffe's typology it is a modelling/prediction tool for providing patient-specific recommendations."}],"summary":{"applicable":2,"partial":0,"gap":0,"not_applicable":1}},{"name":"Content","description":"The actual content of the message delivered to the user. The NOA CDSS conveys a patient-specific predicted probability supported by multi-method explanations.","items":[{"text":"patient-specific3, 16, 23, 24, 26, 46, 47(-), 53","status":"applicable","description":"All content is fully patient-specific: predicted probability, SHAP waterfall, biomarker reference-range comparison, and HPG-axis visualisation are all generated from the individual's inputs."},{"text":"recommendation vs assessment (\"what is true vs what to do\")3, 25(*), 34(^), 35, 47(-), 48, 53","status":"partial","description":"Content blends an assessment (the probability and explanations) with a soft recommendation (the binary outcome at the chosen threshold); the design intentionally privileges assessment over imperative recommendation."},{"text":"informative (assessment)","status":"applicable","description":"The principal informational content is the assessment: the probabilistic prediction and the multi-method explanations are informative rather than imperative."},{"text":"evidence summaryJW","status":"partial","description":"SHAP and PDP outputs effectively summarise model-derived evidence at the cohort level, and biomarker overlays summarise distributional evidence; however, no narrative evidence summary linked to the underlying clinical literature is provided."},{"text":"link to further informationAA","status":"gap","description":"The CDSS does not currently provide hyperlinks to external resources such as the underlying publication, NOA guidelines, or patient-education materials."},{"text":"alert (e.g. lab value alert)JW","status":"partial","description":"Biomarker values outside reference ranges are visually flagged (colour coding), which functions as a soft lab-value alert, although no interruptive alerting is implemented."},{"text":"critique (norm::practice)JW","status":"not_applicable","description":"The CDSS does not critique an existing care plan against a norm; it provides a consulting prediction."},{"text":"imperative (recommendation)","status":"partial","description":"The binary outcome derived from the threshold acts as a quasi-imperative ('proceed' vs 'do not proceed'), but the overall content is deliberately presented as advisory rather than mandatory."},{"text":"recommendation (for an intent, workflow, task, or action)AA","status":"partial","description":"A recommendation is implied for the action 'proceed with micro-TESE', but the CDSS is intentionally non-prescriptive and leaves the decision to the clinician."},{"text":"request to enter data for the DSSAA","status":"applicable","description":"The CDSS requests the eleven required patient features through a structured form."},{"text":"reminderJW","status":"not_applicable","description":"No reminder content is delivered; the CDSS responds to user requests rather than reminding the user to act."},{"text":"actionable","status":"applicable","description":"The content is actionable: the user receives a clear probability and binary outcome that directly inform the proceed/defer decision."},{"text":"explanation / reasoning available3, 24, 25(-), 34, 37, 47(-), 52, 53","status":"applicable","description":"Explanation availability is a flagship strength: SHAP (global and local), LIME, PDPs, and the HPG-axis visualisation collectively make the model's reasoning interrogable for every prediction."},{"text":"explains intentAA","status":"partial","description":"The intent of the CDSS (to estimate sperm-retrieval probability for preoperative counselling) is documented in the project framing, but the system does not explicitly state this intent at runtime as a banner or header."},{"text":"hierarchicalAA","status":"applicable","description":"Explanations are hierarchical: users see a top-level probability, then can drill down to feature attribution (SHAP waterfall), then to global model behaviour (PDP) and net-benefit (DCA) as needed."},{"text":"provides evidence / additional information25(-), 30, 34(^), 35, 53, 56","status":"applicable","description":"Additional information is provided through the biomarker distribution overlay, HPG-axis annotations, threshold equalizer, and SHAP/LIME/PDP/DCA panels, each supplying complementary evidence about the prediction."},{"text":"length / concise30, 26, 53","status":"partial","description":"The primary headline (probability and binary outcome) is concise, but the overall dashboard contains rich auxiliary panels; concision may need re-evaluation in real-world counselling time constraints."},{"text":"clear26, 30","status":"applicable","description":"Clarity is supported by colour coding, the HPG-axis schematic, the threshold equalizer's labelled axes, and explicit numeric labelling on SHAP plots."},{"text":"drug interaction warnings include:42, 45(-), 61","status":"not_applicable","description":"Drug-interaction warnings are not in scope."},{"text":"signal word42, 45, 61","status":"not_applicable","description":"No drug-interaction signal words are used because the CDSS does not warn about drugs."},{"text":"effect/consequences30, 42, 45, 55, 61","status":"not_applicable","description":"The CDSS does not detail drug-effect consequences; this category is drug-warning-specific."},{"text":"duration of effect30","status":"not_applicable","description":"Drug effect duration is not applicable."},{"text":"likelihood of effect30, 42, 45, 61","status":"not_applicable","description":"Likelihood of drug effect is not applicable; however, the CDSS does communicate the likelihood of its own predicted outcome through the probability."},{"text":"instructions30, 42, 45, 61","status":"not_applicable","description":"Drug-related instructions are not in scope."},{"text":"references30","status":"gap","description":"Although the underlying methodology will be published, the running CDSS does not expose literature references inline; adding citations or DOIs for the key prognostic biomarkers would strengthen the evidential framing."},{"text":"includes information about alternatives30, 53, 59","status":"gap","description":"Alternatives to micro-TESE (e.g., conventional TESE, donor sperm, adoption) are not surfaced when the predicted probability is low; including alternative pathways would improve the shared-decision-making value."},{"text":"includes information about seriousness of alert53","status":"not_applicable","description":"Because the CDSS does not issue alerts, alert seriousness is moot."},{"text":"includes information about certaintyAA","status":"partial","description":"Certainty is partially conveyed via the AUC and its confidence interval at the cohort level, but per-prediction certainty (e.g., a prediction interval) is not displayed to the user."},{"text":"Validity/Quality","status":"applicable","description":"Content validity is supported by clinically informed feature selection, model interpretability methods, and transparent reporting standards (TRIPOD+AI 2024, PROBAST+AI 2025)."}],"summary":{"applicable":9,"partial":8,"gap":3,"not_applicable":9}},{"name":"Timing","description":"When the message reaches the user. The NOA CDSS is invoked at the moment of preoperative counselling and is therefore aligned with the decision in time and place but is fully passive.","items":[{"text":"real time / time and place of decision-making15, 23, 25(*), 26, 34, 36","status":"applicable","description":"The CDSS produces predictions in real time at the point of preoperative counselling, delivering support exactly where and when the surgical decision is being deliberated."},{"text":"upon request / passive vs active3, 5, 15, 16, 20(*), 25(*), 30(^), 35, 36, 37, 41(^), 47(-), 59","status":"applicable","description":"Operation is upon request: the user initiates each session, which is appropriate for an elective preoperative tool and avoids alert-fatigue concerns."},{"text":"active for severe alerts and passive for less severe30","status":"not_applicable","description":"The CDSS does not differentiate active vs. passive modes by severity; it is uniformly passive."},{"text":"active","status":"not_applicable","description":"The CDSS does not operate actively (it never initiates contact with the user)."},{"text":"context insensitive","status":"not_applicable","description":"Context-insensitive active delivery is not implemented because the CDSS is passive."},{"text":"time-driven","status":"not_applicable","description":"No time-driven activation logic exists."},{"text":"driven by an external event","status":"not_applicable","description":"No external-event-driven activation exists."},{"text":"context sensitive","status":"not_applicable","description":"The CDSS has no automatic context-sensitivity logic; it only runs when invoked."},{"text":"UI event","status":"applicable","description":"The relevant timing event is the UI submission event when the user requests a prediction."},{"text":"before entering EPR59","status":"not_applicable","description":"There is no EPR integration, so EPR-entry timing is not applicable."},{"text":"as you enter EPR59","status":"not_applicable","description":"Not applicable in the absence of EPR integration."},{"text":"as you enter patient record37, 59","status":"not_applicable","description":"Not applicable for the standalone web CDSS."},{"text":"as you enter patient data59","status":"partial","description":"Field-level colour coding occurs as the user enters individual biomarker values, providing some inline feedback during data entry, but the prediction itself is deferred to form submission."},{"text":"when you take an action in the EPR (e.g. prescription)37, 41(^), 59","status":"not_applicable","description":"There is no EPR action trigger; the CDSS is invoked through its own UI."},{"text":"at the point of care / patient encounter3, 18, 21(-), 46, 47","status":"applicable","description":"The CDSS is explicitly designed to be used at the point of care during the preoperative counselling encounter."},{"text":"before encounter59","status":"partial","description":"The CDSS can also be used by the clinician shortly before the encounter to prepare, though the recommended deployment is during the encounter itself."},{"text":"during encounter59","status":"applicable","description":"The intended timing is during the encounter, leveraging the SHAP and HPG-axis outputs as conversational artefacts."},{"text":"after encounter59","status":"partial","description":"Post-encounter use (e.g., re-running the prediction after additional tests are back) is possible but is not the canonical workflow."},{"text":"time of decision","status":"applicable","description":"The CDSS is invoked precisely at the time the decision is being deliberated, which is the recommended time per the CDSS-effectiveness literature."},{"text":"before decision","status":"applicable","description":"By design, the CDSS is consulted before the proceed/defer decision is finalised."},{"text":"during decision","status":"applicable","description":"The CDSS supports the moment of decision-making by providing the calibrated probability and threshold equalizer as the clinician deliberates."},{"text":"after decision","status":"partial","description":"Post-decision use (e.g., to justify a decision to the patient or in documentation) is possible, although the system is primarily oriented to pre/at-decision timing."},{"text":"pause point","status":"applicable","description":"Preoperative counselling is itself a pause point in the surgical pathway, and the CDSS is naturally positioned to add value at that pause without interrupting other workflows."},{"text":"frequency35, 45(*)","status":"applicable","description":"Frequency is naturally bounded by the rate of NOA preoperative counselling visits, which is low compared to medication-alert CDSS, minimising alert-fatigue risk."},{"text":"absolute","status":"applicable","description":"Absolute frequency is low (per-clinician encounters with NOA patients) and is compatible with sustained engagement."},{"text":"all similar support","status":"not_applicable","description":"Frequency relative to other CDSS the user encounters is not characterised; this would only matter in an EHR-integrated deployment."},{"text":"repetition26, 43","status":"not_applicable","description":"The CDSS does not repeat the same notification to the user; each session is user-initiated."},{"text":"timing close to alerted event45, 42, 61","status":"applicable","description":"Timing is close to the alerted (proceed/defer) decision event, because the CDSS is consulted in the same counselling visit that culminates in that decision."}],"summary":{"applicable":12,"partial":4,"gap":0,"not_applicable":12}},{"name":"Channel","description":"Method by which the message is delivered. The NOA CDSS is delivered through a web-based graphical user interface built with Next.js.","items":[{"text":"printed3, 13, 46","status":"gap","description":"Printable outputs (e.g., a printable counselling sheet summarising the probability and key SHAP factors) are not currently implemented but would aid patient handouts."},{"text":"stand-alone vs integrated3, 5, 7, 16, 20(-), 21, 25(#), 35, 36","status":"applicable","description":"The CDSS is explicitly a stand-alone web application, which is appropriate for an early-stage research prototype but constrains future workflow integration."},{"text":"integrated with EPR3, 21(-), 22, 32, 34(^), 46, 52","status":"gap","description":"EPR integration is not implemented; integrating with hospital EPRs through standard interfaces (FHIR) is a recommended future direction to reduce data-entry burden."},{"text":"integrated with CPOE15, 21, 34","status":"not_applicable","description":"CPOE integration is not relevant because the CDSS does not order treatments or tests."},{"text":"integrated with CPOE vs EPR47(-)","status":"not_applicable","description":"This CPOE-versus-EPR distinction is moot for a non-ordering tool."},{"text":"integrated with handheld device21, 32","status":"partial","description":"Because it is web-based, the CDSS can in principle be loaded on tablets or smartphones, but a dedicated mobile UI has not been designed or tested."},{"text":"web-based3, 32","status":"applicable","description":"The CDSS is delivered as a Next.js web application, which is one of the explicit channels enumerated in the framework."},{"text":"integrated into handheld blood glucose testing device7","status":"not_applicable","description":"Integration into specific instruments such as glucometers is not relevant to the NOA use case."},{"text":"integrated with the system typically used for the task47","status":"gap","description":"Preoperative counselling is typically done within the EPR/PACS environment, and the CDSS is not integrated with those systems; this is the same gap as EPR integration."},{"text":"email3, 18, 21","status":"not_applicable","description":"Email is not used as a delivery channel."},{"text":"pager3, 21","status":"not_applicable","description":"Pager delivery is not relevant for an elective outpatient tool."},{"text":"phone3","status":"not_applicable","description":"Phone-based delivery is not used."},{"text":"staff21","status":"not_applicable","description":"The CDSS does not deliver advice via clinic staff intermediaries."},{"text":"UI description21","status":"applicable","description":"The UI is described in the project documentation as a structured input form plus a multi-panel dashboard featuring SHAP waterfall, biomarker distribution overlay, HPG-axis 3D visualisation, clinical interpretation panel, threshold equalizer, and binary outcome display."},{"text":"GUI","status":"applicable","description":"Delivery is through a graphical user interface, not a command-line, voice, or natural-language interface."},{"text":"type/text","status":"applicable","description":"Continuous biomarker fields use type/text input with numeric validation."},{"text":"drop down","status":"applicable","description":"Categorical inputs such as karyotype use drop-down menus for unambiguous entry."},{"text":"drag and drop","status":"not_applicable","description":"Drag-and-drop interactions are not used in the current UI."}],"summary":{"applicable":6,"partial":1,"gap":3,"not_applicable":8}},{"name":"Notification","description":"How the system signals that support is available. Because the CDSS is passive and user-initiated, traditional notification mechanics are largely not applicable.","items":[{"text":"no notification","status":"applicable","description":"The CDSS issues no system-initiated notifications; the user navigates to it intentionally, which is consistent with its passive, on-request operation model."},{"text":"on screen45(*)","status":"applicable","description":"All output is rendered on screen within the web dashboard."},{"text":"sizeSE","status":"partial","description":"Component sizing follows responsive web-design defaults; explicit human-factors evaluation of element sizing has not been reported."},{"text":"visibility42, 45, 61","status":"partial","description":"Key elements (predicted probability, binary outcome) are placed prominently, but a formal visibility/eye-tracking study has not been conducted."},{"text":"visibility42, 45, 61","status":"partial","description":"Duplicate of the previous criterion in the DS Model; the same assessment applies: prominent placement of headline outputs without a formal visibility study."},{"text":"legibility42, 45, 61","status":"partial","description":"Standard web-typography practices are followed (san-serif, sufficient contrast), but no quantitative legibility assessment has been performed."},{"text":"color30, 42, 45, 61","status":"applicable","description":"Colour is used meaningfully: green/yellow/red colour-coding of biomarker values against reference ranges, and colour gradients on the HPG-axis visualisation indicating status."},{"text":"shape42, 45, 61","status":"partial","description":"Shape cues (bars for SHAP, 3D shapes for HPG axis, slider for threshold) are used, but a formal shape-meaning mapping is not documented."},{"text":"icon30, 42, 45, 61","status":"gap","description":"Iconography is minimal; adding standardised icons (e.g., domain icons for endocrine vs anatomical features) could speed visual parsing."},{"text":"placement42, 61","status":"partial","description":"Headline output (probability, binary outcome) is placed near the threshold equalizer to support exploration, but a formal placement optimisation study has not been done."},{"text":"meaningful grouping45","status":"applicable","description":"Outputs are meaningfully grouped: the prediction and explanation are co-located, biomarker validation is grouped with the input form, and HPG axis sits alongside endocrine inputs."},{"text":"notification is near other relevant information30, 45","status":"applicable","description":"The predicted probability is rendered adjacent to its SHAP explanation and to the threshold equalizer, satisfying the principle of co-locating relevant information."},{"text":"use of placement to indicate medical domain30","status":"not_applicable","description":"The CDSS covers a single medical domain (reproductive urology), so placement is not needed to disambiguate domains."},{"text":"level of intrusiveness30","status":"applicable","description":"The CDSS is non-intrusive: it sits as a dedicated dashboard the user opens, never interrupting other tasks."},{"text":"not immediately visible","status":"not_applicable","description":"Because the CDSS is user-initiated, it is fully visible once opened; this criterion is moot."},{"text":"visible immediately, but does not take focus","status":"applicable","description":"When the CDSS dashboard is open, results are visible immediately on submission and do not steal focus through modal pop-ups."},{"text":"takes focus","status":"not_applicable","description":"No focus-stealing notifications are issued."},{"text":"takes focus and locks other tasks until user responds","status":"not_applicable","description":"No interruptive locking notifications exist."},{"text":"notification revertsSE","status":"not_applicable","description":"There are no transient notifications that revert; outputs persist until the user navigates away or re-runs."},{"text":"after some timeSE","status":"not_applicable","description":"Time-based reversion of notifications is not applicable."},{"text":"if data changes (e.g. blood glucose returns to normal range)SE","status":"not_applicable","description":"The CDSS operates on a static snapshot per session; it does not monitor changing data."},{"text":"interactive3, 56","status":"applicable","description":"The output is highly interactive: the threshold equalizer and the SHAP waterfall respond to user manipulation in real time."},{"text":"short56","status":"partial","description":"The headline message is short (a probability and a binary outcome), but the supporting dashboard is information-rich; a short-message mode for time-pressured use could be added."},{"text":"HL7 infobutton standard52","status":"gap","description":"No HL7 Infobutton or other interoperability standard is implemented; this is a natural enhancement if the CDSS is integrated into an EPR."},{"text":"external signalJW, 42, 61","status":"not_applicable","description":"No auditory, pager, or other external signal is used."}],"summary":{"applicable":8,"partial":7,"gap":2,"not_applicable":8}},{"name":"Format","description":"Presentation of the CDSS message. The NOA CDSS uses a clear, multi-panel dashboard format optimised for clinician interpretation of probabilistic predictions.","items":[{"text":"display only58, 59","status":"applicable","description":"Output is primarily display-only: the CDSS shows information rather than executing any clinical action."},{"text":"link (to further information or module where action can be performed)59","status":"gap","description":"External links (e.g., to scheduling for micro-TESE, to the underlying article, to patient educational resources) are not currently embedded."},{"text":"action can be taken using DSS","status":"not_applicable","description":"The CDSS does not execute clinical actions; it informs decisions made elsewhere."},{"text":"can be executed by noting agreement25(-), 34, 37, 59","status":"not_applicable","description":"Because the CDSS does not execute any action, agreement-based execution is moot."},{"text":"single vs multiple optionsJW","status":"partial","description":"Effectively a single option is implied (the proceed/defer dichotomy), but the threshold equalizer surfaces a continuum of trade-offs the user can interrogate."},{"text":"option to defer","status":"applicable","description":"The user can defer acting on any prediction; nothing in the CDSS commits the user to an action."},{"text":"option to override","status":"applicable","description":"The user is free to override the CDSS's binary recommendation; the system deliberately positions itself as advisory."},{"text":"response required3, 42, 45(-), 47(*), 56, 61","status":"not_applicable","description":"No response from the user is required by the CDSS; usage is voluntary."},{"text":"interruptive: must do something to continue18, 30","status":"not_applicable","description":"No interruptive behaviour exists."},{"text":"cannot be inactivated (forced compliance)37","status":"not_applicable","description":"Forced compliance is not implemented; user agency is preserved."},{"text":"justification required for override3, 25(#), 30, 34, 53","status":"not_applicable","description":"No override justification is requested because the CDSS does not enforce its output."},{"text":"interruptiveness adjusted based on alert severity30(^)","status":"not_applicable","description":"Because there is no interruptiveness, severity-based adjustment is not applicable."},{"text":"clear and intuitive UI22, 25, 33, 34, 35","status":"partial","description":"UI clarity is supported by the multi-panel dashboard and by usability testing through SUS scoring with AI and clinical experts; further iterative refinement with real end-users at the bedside is recommended."},{"text":"screen design (logical placement of buttons)53","status":"partial","description":"Standard web-design patterns are followed, and the SUS evaluation provides indirect evidence of acceptable screen design, but a dedicated button-placement study has not been performed."},{"text":"minimize work (scrolling, clicks, etc)53","status":"partial","description":"The bounded eleven-field form and single submission action minimise clicks, but exploring the rich dashboard requires some scrolling and panel interaction; a compact mode could be considered."},{"text":"unified processes/displays for same type of information56","status":"applicable","description":"Like information is unified across displays: endocrine biomarkers share consistent colour-coding, SHAP attributions use a consistent waterfall format, and the HPG axis applies a coherent schema to all endocrine inputs."},{"text":"proximity to recommended corrective actions42, 61","status":"not_applicable","description":"Because there is no in-system corrective action (the CDSS does not execute care), this criterion does not apply."},{"text":"learnability and confusability42, 61","status":"partial","description":"The SUS evaluation indirectly assesses learnability, but explicit learnability and confusability metrics for the SHAP and HPG-axis components in particular are not individually reported."},{"text":"corollary orders (e.g. prompt to order test when medication is ordered)27, 58","status":"not_applicable","description":"Corollary-order prompting is not in scope for a prediction tool."},{"text":"physical formatting (size, color, font, whitespace, etc.)AA","status":"partial","description":"Standard physical formatting principles are applied, but no formal style-guide or design system has been published for the CDSS."}],"summary":{"applicable":4,"partial":6,"gap":1,"not_applicable":9}},{"name":"Study factors","description":"Methodological factors of the evaluation study. The NOA CDSS underlying study is a retrospective single-centre cohort; no prospective clinical trial has yet been conducted.","items":[{"text":"allocation","status":"gap","description":"Because the underlying study is observational, there is no random allocation; a future prospective comparative-effectiveness study could include explicit allocation."},{"text":"concealedPR","status":"not_applicable","description":"Allocation concealment is moot in a retrospective cohort design."},{"text":"unit of allocationPR","status":"not_applicable","description":"There is no allocation unit because no allocation occurred."},{"text":"clustering accounted appropriatelyPR","status":"not_applicable","description":"Clustering does not apply to a single-centre retrospective cohort; in a future multisite trial, surgeon and site clustering would need to be modelled."},{"text":"confounding","status":"partial","description":"Confounding is partially addressed through inclusion of relevant demographic, endocrine, and anatomical covariates in the model and through PROBAST+AI risk-of-bias reporting, but unmeasured confounders inherent to a retrospective single-centre design remain."},{"text":"differences between control and intervention groupsPR","status":"not_applicable","description":"There is no control vs. intervention group structure in the underlying retrospective study."},{"text":"control was usual care vs control was a different interventionPR","status":"not_applicable","description":"There is no comparator group; this would only apply to a prospective evaluation."},{"text":"confounding by interaction with other processes7","status":"gap","description":"Potential confounding by interaction with other clinical processes (e.g., changes in surgical technique over the 2007–2022 window) is not formally quantified; time-period sensitivity analyses are recommended."},{"text":"outcome measured3, 15, 16, 34","status":"applicable","description":"The outcome is clearly defined and measured: presence or absence of motile sperm retrieval at micro-TESE, a binary, patient-centered surgical outcome."},{"text":"practitioner vs patient-centered5, 23","status":"applicable","description":"The outcome (sperm retrieval success) is fundamentally patient-centered, given its direct downstream impact on the patient's ability to father a biological child."},{"text":"surrogate vs clinical outcome4, 21(-), 50(*), 60","status":"partial","description":"Sperm retrieval is a clinical end-point of the surgery itself, but is a surrogate for the ultimate patient-centred outcome of live birth; the CDSS does not currently predict ICSI or live-birth outcomes."},{"text":"study was powered to detect this outcome","status":"applicable","description":"With 2,413 patients and 886 retrievals (36.7%), the study is well powered to estimate discrimination of the prediction model, as reflected in the narrow 95% CI for AUC (0.823–0.845)."},{"text":"reasonable to observe this outcome from the study design","status":"applicable","description":"Sperm retrieval is observable at the time of surgery; the retrospective cohort design captures this outcome reliably."},{"text":"sample size calculations21(-)","status":"partial","description":"Sample size was effectively determined by the available consecutive cohort rather than a formal a priori sample-size calculation; this is acknowledged under PROBAST+AI reporting."},{"text":"number of participants21(-)","status":"applicable","description":"The number of participants is explicitly reported as 2,413 consecutive patients."},{"text":"follow-up / withdrawalsPR","status":"partial","description":"Because the primary outcome (sperm retrieval) is captured at the time of surgery, follow-up loss is not a major threat, but longer-term outcomes (ICSI success, live birth) are not in scope and constitute a follow-up gap."},{"text":"study design (RCT vs quasi-experimental)47(-), 60","status":"gap","description":"The underlying study is a retrospective cohort, not an RCT or quasi-experimental design; a prospective controlled evaluation of CDSS-supported counselling versus usual care is a key future study."},{"text":"less rigorous study methods20(-)","status":"partial","description":"Methodological rigour is supported by 5×5 nested cross-validation, leakage-controlled pipelines, and adherence to TRIPOD+AI/PROBAST+AI; however, the retrospective single-centre design is intrinsically less rigorous than prospective multisite evaluation."},{"text":"funding source5","status":"gap","description":"Funding source should be transparently reported in the publication; this is standard for academic dissemination but is not part of the current summary."},{"text":"system developed by authors20(*), 21(-), 34, 47(-)","status":"applicable","description":"The CDSS is developed by the study authors, which is transparently acknowledged and is the norm for emerging ML tools; this is a known threat to optimism bias that external validation is intended to address."},{"text":"baseline adherence47(-)","status":"not_applicable","description":"There is no baseline adherence outcome because the CDSS does not measure adherence to a guideline."}],"summary":{"applicable":6,"partial":5,"gap":4,"not_applicable":6}},{"name":"Empirical measures","description":"Empirical measures of CDSS effectiveness collected in the study. For the NOA CDSS, empirical measures so far are limited to model performance and an initial usability evaluation.","items":[{"text":"usageSE","status":"gap","description":"Real-world usage metrics (login frequency, number of predictions per user, time of day) are not collected because the system has not been deployed in clinical use; logging usage analytics during pilot deployment is a clear next step."},{"text":"usability","status":"applicable","description":"Usability has been empirically evaluated through System Usability Scale (SUS) scoring with AI experts and human clinical experts, providing an initial quantitative usability benchmark."},{"text":"feedback from users: ease of use, workload, sense of autonomy7","status":"partial","description":"Some user feedback is captured implicitly through SUS items, but dedicated qualitative interviews and workload measures (e.g., NASA-TLX, autonomy scales) have not been used."},{"text":"saves time or requires minimal time to use23†, 25, 34","status":"partial","description":"Time-on-task is not yet measured empirically; the eleven-field form is designed to be quick to complete, but actual time-to-decision deltas versus usual care have not been quantified."},{"text":"user satisfaction","status":"partial","description":"User satisfaction is partially captured by SUS; deeper satisfaction measurement (e.g., NPS, qualitative themes from expert reviewers) would enrich the evaluation."},{"text":"impact34","status":"gap","description":"Clinical impact (effect of CDSS-supported counselling on patient decisions, appropriateness of surgery, regret, or live-birth outcomes) has not been empirically measured; this is the most important empirical gap for future research."},{"text":"harms/nuisance21, 27","status":"gap","description":"Potential harms (overreliance on the model, anchoring on the predicted probability, patient distress from explicit probability disclosure) are not empirically characterised; a careful prospective evaluation should monitor these."},{"text":"clinically inappropriate reminders21","status":"not_applicable","description":"The CDSS does not issue reminders, so inappropriate-reminder rates do not apply."},{"text":"alert failures26","status":"not_applicable","description":"There are no alerts to fail; this metric does not apply to this passive prediction tool."},{"text":"costs21, 27","status":"gap","description":"Implementation and operating costs (development effort, hosting, integration), and downstream cost-effectiveness (avoided futile surgeries, downstream IVF cycles) have not been characterised; cost-effectiveness analysis is a recommended extension."},{"text":"override rate of alerts (per alert)43","status":"not_applicable","description":"There are no alerts to override; this metric does not apply."}],"summary":{"applicable":1,"partial":3,"gap":4,"not_applicable":3}}],"overall_summary":{"total_items":400,"applicable":105,"partial":86,"gap":73,"not_applicable":136,"key_strengths":["Patient-specific probabilistic prediction with strong discrimination (CatBoost classifier, AUC 0.8306; 95% CI 0.823–0.845) validated via 5×5 nested cross-validation, supporting criteria around individualised modelling, validity, and probabilistic reasoning.","Multi-method explainability stack (TreeSHAP global and local, LIME, partial-dependence plots, decision curve analysis) producing hierarchical, patient-specific explanations that satisfy a broad range of Content and Clinical-advice criteria around explanation, presentation, and aggregation.","Domain-meaningful presentation through the HPG-axis 3D visualisation, biomarker reference-range colour coding, and the threshold equalizer, which together align the system with the urologist's mental model and expose the sensitivity/specificity trade-off interactively.","Methodologically transparent reporting in line with TRIPOD+AI 2024 and PROBAST+AI 2025, with a large single-centre consecutive cohort (n=2,413, 2007–2022), addressing many Knowledge-source and Study-factor criteria.","Stateless, privacy-preserving web architecture (Next.js, client-side prediction) that makes the CDSS deployable on standard browsers without data-storage liabilities, supporting clear, intuitive, point-of-care delivery during preoperative counselling.","Empirical usability evaluation through System Usability Scale (SUS) scoring by both AI experts and clinical experts, providing an initial quantitative benchmark of usability."],"key_gaps":["Absence of EPR/CPOE integration and workflow embedding: all data are manually entered, automatic provision is not supported, and outputs are not written back as documentation, which collectively constrains real-world uptake.","Lack of prospective, comparative-effectiveness evaluation: no RCT, no multisite external validation, and no formal measurement of clinical impact (decision quality, appropriateness of surgery, downstream live-birth outcomes) or potential harms (overreliance, algorithmic anchoring).","No formal abstract-user model, user profile, or adaptation to clinician role/experience; the system treats all users identically and collects no usage telemetry.","No explicit behaviour-change or implementation-science framework (e.g., Ottawa Decision Support Framework), no multifaceted intervention (training, audit-and-feedback, opinion-leader engagement), and no formal change-management plan.","Limited safeguards around out-of-distribution patients, missing data, and graceful degradation; no per-prediction uncertainty interval is exposed to the user.","Insufficient connection to standardised terminologies (LOINC, SNOMED CT) and interoperability standards (FHIR, HL7 Infobutton), which would be required for portable deployment.","No structured patient-facing output (printable counselling sheet, links to patient education, articulation of alternatives such as donor sperm or adoption), which limits the shared-decision-making value.","Cost-effectiveness, real-world usage analytics, and post-deployment monitoring (model drift, calibration over time) are not yet characterised."],"recommendations":["Conduct a prospective multisite external-validation study with re-estimation of calibration and discrimination on independent cohorts to demonstrate transportability, and prepare a PROBAST+AI-compliant updated risk-of-bias assessment.","Design and run a prospective comparative-effectiveness pilot (e.g., stepped-wedge or cluster-randomised) measuring clinical impact, decisional regret, decision quality, and potential harms versus usual care.","Integrate the CDSS with hospital EPRs using FHIR APIs, support SMART-on-FHIR launch from the patient chart, and write counselling summaries back to the record to satisfy Patient Data, Channel, and Clinical-workflow integration criteria.","Add safeguards for out-of-distribution detection, calibrated per-patient prediction intervals (e.g., conformal prediction), and explicit handling of missing or implausible feature values, with a graceful-degradation specification.","Develop a structured user-training programme (AI literacy, SHAP interpretation, appropriate reliance) and pair the CDSS with audit-and-feedback to clinicians, anchored in a recognised behaviour-change framework such as the Ottawa Decision Support Framework.","Expose patient-facing outputs (printable counselling sheets with personalised SHAP highlights, plain-language probability framing, and information about alternatives such as donor sperm or adoption) to support shared decision-making.","Implement opt-in usage analytics, longitudinal model-performance monitoring, drift detection, and a documented retraining/update protocol to support post-deployment quality.","Map all input features to LOINC/SNOMED CT, add standardised triggers and HL7 Infobutton support, and explicitly tie clinical advice to the relevant EAU/AUA/ASRM guideline statements to strengthen interoperability and clinical legitimacy.","Augment empirical evaluation with qualitative interviews, workload measurement (NASA-TLX), trust calibration, and formal cost-effectiveness analysis to provide a comprehensive evidence base for adoption."]}}
+`
+
+const DATA: MappingData = JSON.parse(RAW_MAPPING) as MappingData
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+ *  STATUS CONFIGURATION
+ * ───────────────────────────────────────────────────────────────────────── */
 
 const STATUS_CONFIG: Record<
   Status,
   {
     label: string
-    color: string // hex for SVG
-    bgClass: string
-    textClass: string
-    borderClass: string
+    short: string
+    hex: string
     badgeClass: string
+    cardClass: string
+    dotClass: string
     Icon: typeof CheckCircle2
   }
 > = {
   applicable: {
     label: 'Applicable',
-    color: '#10b981',
-    bgClass: 'bg-emerald-500',
-    textClass: 'text-emerald-400',
-    borderClass: 'border-emerald-500/40',
+    short: 'App.',
+    hex: '#10b981',
     badgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40',
+    cardClass: 'border-l-emerald-500/70 bg-emerald-500/[0.04]',
+    dotClass: 'bg-emerald-400',
     Icon: CheckCircle2,
   },
   partial: {
     label: 'Partial',
-    color: '#f59e0b',
-    bgClass: 'bg-amber-500',
-    textClass: 'text-amber-400',
-    borderClass: 'border-amber-500/40',
+    short: 'Par.',
+    hex: '#f59e0b',
     badgeClass: 'bg-amber-500/15 text-amber-300 border-amber-500/40',
+    cardClass: 'border-l-amber-500/70 bg-amber-500/[0.04]',
+    dotClass: 'bg-amber-400',
     Icon: AlertTriangle,
   },
   gap: {
     label: 'Gap',
-    color: '#ef4444',
-    bgClass: 'bg-red-500',
-    textClass: 'text-red-400',
-    borderClass: 'border-red-500/40',
-    badgeClass: 'bg-red-500/15 text-red-300 border-red-500/40',
+    short: 'Gap',
+    hex: '#ef4444',
+    badgeClass: 'bg-rose-500/15 text-rose-300 border-rose-500/40',
+    cardClass: 'border-l-rose-500/70 bg-rose-500/[0.04]',
+    dotClass: 'bg-rose-400',
     Icon: XCircle,
   },
   not_applicable: {
-    label: 'Not Applicable',
-    color: '#6b7280',
-    bgClass: 'bg-gray-500',
-    textClass: 'text-gray-400',
-    borderClass: 'border-gray-500/40',
-    badgeClass: 'bg-gray-500/15 text-gray-300 border-gray-500/40',
+    label: 'Not applicable',
+    short: 'N/A',
+    hex: '#64748b',
+    badgeClass: 'bg-slate-500/15 text-slate-300 border-slate-500/40',
+    cardClass: 'border-l-slate-500/60 bg-slate-500/[0.04]',
+    dotClass: 'bg-slate-400',
     Icon: MinusCircle,
   },
 }
 
-const STATUS_ORDER: Status[] = ['applicable', 'partial', 'gap', 'not_applicable']
+/* ─────────────────────────────────────────────────────────────────────────
+ *  SCORING HELPERS
+ * ───────────────────────────────────────────────────────────────────────── */
 
-/* ──────────────────────────────────────────────────────────────────────── */
-/*  Pure-SVG donut chart                                                    */
-/* ──────────────────────────────────────────────────────────────────────── */
-
-interface DonutSlice {
-  status: Status
-  value: number
+/** Returns the [0, 100] compliance score for a group, or null if no evaluable items. */
+function computeGroupScore(s: GroupSummary): number | null {
+  const denom = s.applicable + s.partial + s.gap
+  if (denom === 0) return null
+  return ((s.applicable + 0.5 * s.partial) / denom) * 100
 }
 
-function DonutChart({ slices, total }: { slices: DonutSlice[]; total: number }) {
-  const size = 200
-  const stroke = 28
-  const radius = (size - stroke) / 2
-  const circumference = 2 * Math.PI * radius
-  const cx = size / 2
-  const cy = size / 2
+/** Map a score to a semantic compliance tier. */
+type Tier = 'high' | 'medium' | 'low' | 'na'
 
-  let cumulative = 0
-  const arcs = slices
-    .filter((s) => s.value > 0)
-    .map((s) => {
-      const fraction = s.value / total
-      const dashLength = fraction * circumference
-      const arc = {
-        ...s,
-        offset: -cumulative,
-        dash: dashLength,
-        gap: circumference - dashLength,
-        fraction,
-      }
-      cumulative += dashLength
-      return arc
-    })
+function scoreTier(score: number | null): Tier {
+  if (score === null) return 'na'
+  if (score >= 70) return 'high'
+  if (score >= 40) return 'medium'
+  return 'low'
+}
 
+const TIER_HEX: Record<Tier, string> = {
+  high: '#10b981',    // emerald-500
+  medium: '#f59e0b',  // amber-500
+  low: '#ef4444',     // rose-500
+  na: '#64748b',      // slate-500
+}
+
+const TIER_LABEL: Record<Tier, string> = {
+  high: 'High compliance (≥ 70 %)',
+  medium: 'Medium compliance (40 – 70 %)',
+  low: 'Low compliance (< 40 %)',
+  na: 'Not evaluable',
+}
+
+const TIER_BADGE: Record<Tier, string> = {
+  high: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40',
+  medium: 'bg-amber-500/15 text-amber-300 border-amber-500/40',
+  low: 'bg-rose-500/15 text-rose-300 border-rose-500/40',
+  na: 'bg-slate-500/15 text-slate-300 border-slate-500/40',
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ *  FLOWCHART LAYOUT  (transcribed from the original Arts et al. HTML)
+ * ───────────────────────────────────────────────────────────────────────── */
+
+interface FlowNode { id: number; name: string; x: number; y: number; w: number; h: number }
+
+const FLOW_NODES: ReadonlyArray<FlowNode> = [
+  { id: 1,  name: 'Patient',               x: 231, y: 108,  w: 165, h: 35  },
+  { id: 2,  name: 'User',                  x: 576, y: 20,   w: 165, h: 35  },
+  { id: 3,  name: 'Patient Data',          x: 231, y: 275,  w: 165, h: 35  },
+  { id: 4,  name: 'User data',             x: 576, y: 275,  w: 165, h: 35  },
+  { id: 5,  name: 'Abstract Patient',      x: 231, y: 1187, w: 165, h: 35  },
+  { id: 6,  name: 'Abstract user',         x: 576, y: 1187, w: 165, h: 35  },
+  { id: 7,  name: 'DS System',             x: 181, y: 361,  w: 165, h: 35  },
+  { id: 8,  name: 'Trigger',               x: 410, y: 374,  w: 165, h: 35  },
+  { id: 9,  name: 'Knowledge source',      x: 7,   y: 350,  w: 165, h: 35  },
+  { id: 10, name: 'Organization/Setting',  x: 576, y: 60,   w: 165, h: 35  },
+  { id: 11, name: 'Clinical workflow',     x: 576, y: 100,  w: 165, h: 35  },
+  { id: 12, name: 'Cognitive workflow',    x: 576, y: 140,  w: 165, h: 35  },
+  { id: 13, name: 'Intervention strategy', x: 785, y: 341,  w: 500, h: 762 },
+  { id: 14, name: 'Clinical advice',       x: 231, y: 1402, w: 165, h: 35  },
+  { id: 15, name: 'Output',                x: 570, y: 1462, w: 165, h: 35  },
+  { id: 16, name: 'Content',               x: 578, y: 1522, w: 165, h: 35  },
+  { id: 17, name: 'Timing',                x: 578, y: 1602, w: 165, h: 35  },
+  { id: 18, name: 'Channel',               x: 578, y: 1562, w: 165, h: 35  },
+  { id: 19, name: 'Notification',          x: 578, y: 1642, w: 165, h: 35  },
+  { id: 20, name: 'Format',                x: 578, y: 1682, w: 165, h: 35  },
+  { id: 21, name: 'Study factors',         x: 7,   y: 1683, w: 165, h: 35  },
+  { id: 22, name: 'Empirical measures',    x: 7,   y: 1723, w: 165, h: 35  },
+]
+
+/** Connecting lines, derived from the original CSS transform(rotate(rad)) divs. */
+const FLOW_LINES: ReadonlyArray<readonly [number, number, number, number]> = [
+  [89.5, 367.5, 90.0, 1225.5],
+  [313.5, 125.5, 314.0, 216.5],
+  [313.5, 292.5, 314.0, 216.5],
+  [313.5, 292.5, 314.0, 351.5],
+  [313.5, 1204.5, 314.0, 351.5],
+  [313.5, 1204.5, 314.0, 1328.5],
+  [313.5, 1419.5, 314.0, 1328.5],
+  [313.5, 125.5, 470.0, 124.5],
+  [470.0, 124.5, 470.0, 217.0],
+  [314.0, 216.5, 470.0, 217.0],
+  [313.5, 1419.5, 659.0, 1328.5],
+  [658.5, 292.5, 659.0, 216.5],
+  [658.5, 292.5, 659.0, 351.5],
+  [658.5, 1204.5, 659.0, 351.5],
+  [658.5, 1204.5, 659.0, 1328.5],
+  [868.0, 1203.5, 1035.0, 722.0],
+  [658.5, 1204.5, 868.0, 1203.5],
+  [90.0, 1225.5, 180.0, 1227.0],
+  [659.0, 216.5, 660.0, 185.0],
+  [470.0, 124.5, 566.0, 126.0],
+  [755.0, 1527.0, 868.0, 1523.5],
+  [868.0, 1523.5, 1315.0, 1410.0],
+  [1315.0, 1410.0, 1315.0, 82.0],
+  [755.0, 82.0, 1315.0, 82.0],
+  [653.0, 1458.0, 659.0, 1328.5],
+]
+
+interface BgRegion { id: string; x: number; y: number; w: number; h: number; label: string }
+
+const FLOW_BG: ReadonlyArray<BgRegion> = [
+  { id: 'ds-region',     x: 180, y: 360,  w: 601, h: 975, label: ''                 },
+  { id: 'user-region',   x: 565, y: 0,    w: 190, h: 185, label: 'User & setting'   },
+  { id: 'output-region', x: 565, y: 1457, w: 190, h: 265, label: 'Output channel'   },
+]
+
+/* ─────────────────────────────────────────────────────────────────────────
+ *  ACTION ITEMS  (prioritised research / development backlog)
+ * ───────────────────────────────────────────────────────────────────────── */
+
+type Priority = 'critical' | 'important' | 'optional'
+
+interface ActionItem {
+  id: string
+  title: string
+  rationale: string
+  groups: string[]
+}
+
+const ACTIONS: Record<Priority, ActionItem[]> = {
+  critical: [
+    {
+      id: 'A1',
+      title: 'Implement HL7 FHIR / openEHR ingestion of biomarker inputs',
+      rationale:
+        'Eliminate the manual rekeying of FSH, LH, Testosterone, E2, Inhibin B, testicular volume and karyotype by retrieving them directly from the andrology laboratory information system. Removes the most-cited deployment barrier and addresses Patient Data → Data source (automatic, from EPR / from instruments).',
+      groups: ['Patient Data', 'DS System', 'Clinical workflow'],
+    },
+    {
+      id: 'A2',
+      title: 'Conduct prospective, multi-site external validation',
+      rationale:
+        'Recruit consecutive NOA cohorts at two or more centres outside Iran and re-estimate discrimination (AUC), calibration slope/intercept, and net-benefit per TRIPOD+AI 2024 and PROBAST+AI 2025 in a frozen-model, prospective design.',
+      groups: ['Knowledge source', 'Study factors', 'Empirical measures'],
+    },
+    {
+      id: 'A3',
+      title: 'Run a randomised comparative-effectiveness trial vs. unaided counselling',
+      rationale:
+        'Quantify the marginal effect of the CDSS on shared-decision quality, decisional conflict, sperm-retrieval yield and procedure rate using an RCT with allocation at the surgeon-day level. Closes the largest Empirical Measures and Intervention Strategy gap.',
+      groups: ['Intervention strategy', 'Empirical measures', 'Clinical workflow'],
+    },
+    {
+      id: 'A4',
+      title: 'Build a model-drift monitoring & recalibration pipeline',
+      rationale:
+        'Continuous monitoring of calibration drift and feature distribution shift, with a documented retraining cadence and pre-registered acceptance gates. Required for safe operation as cohort epidemiology, IVF practice, and laboratory assays evolve.',
+      groups: ['DS System', 'Knowledge source', 'Study factors'],
+    },
+  ],
+  important: [
+    {
+      id: 'B1',
+      title: 'Embed the CDSS inside the surgical EPR / CPOE workflow',
+      rationale:
+        'Single sign-on, contextual launch from the patient chart, and write-back of the predicted probability + SHAP rationale as a structured clinical note. Converts the standalone prototype into a workflow-native instrument.',
+      groups: ['Organization/Setting', 'Clinical workflow', 'Output'],
+    },
+    {
+      id: 'B2',
+      title: 'Add a shared decision-making (SDM) module with iconographic risk aids',
+      rationale:
+        'Render the predicted probability as an icon-array of 100 people and a personalised decision-aid worksheet co-designed with patient-representative panels. Targets Clinical advice → presentation and the Cognitive Workflow gap in patient-doctor interactions.',
+      groups: ['Clinical advice', 'Cognitive workflow', 'Format'],
+    },
+    {
+      id: 'B3',
+      title: 'Introduce role-adaptive UI for residents vs. attendings',
+      rationale:
+        'Detect (or self-declare) user experience class and modulate explanation depth, default thresholds, and visibility of advanced visualisations. Closes the Abstract User gaps around static model, individual modelling, and uses classes of users.',
+      groups: ['Abstract user', 'User data', 'Format'],
+    },
+    {
+      id: 'B4',
+      title: 'Graceful-degradation layer for missing / implausible biomarker values',
+      rationale:
+        'Detect values outside physiological range or impossible combinations (e.g. inhibin B with castrate testosterone), surface a transparent warning, and switch to a reduced-feature surrogate model when inputs are incomplete. Targets DS System → graceful degradation criteria.',
+      groups: ['DS System', 'Patient Data', 'Notification'],
+    },
+    {
+      id: 'B5',
+      title: 'Add a patient-facing plain-language report generator',
+      rationale:
+        'One-click PDF summarising the patient probability, contributing factors in lay language, and the surgeon\'s threshold-equalizer choice — given to the patient at the end of the counselling visit to support reflection and family discussion.',
+      groups: ['Output', 'Content', 'Format'],
+    },
+    {
+      id: 'B6',
+      title: 'Capture clinician trust calibration in deployment',
+      rationale:
+        'Instrument the production deployment with a brief embedded trust-in-AI scale and SUS to measure whether reliance is appropriate (i.e. correlated with model confidence) rather than uniform. Required for the User → attitude toward decision support criterion.',
+      groups: ['User', 'Empirical measures', 'Study factors'],
+    },
+  ],
+  optional: [
+    {
+      id: 'C1',
+      title: 'Multilingual UI (English, Persian, Arabic, Spanish)',
+      rationale:
+        'Pre-validated translations and right-to-left layout for the SHAP waterfall and HPG-axis visualisations, enabling international deployment without relying on third-party browser translation.',
+      groups: ['Organization/Setting', 'Format', 'Channel'],
+    },
+    {
+      id: 'C2',
+      title: 'Educational mode with anonymised case library for surgical residents',
+      rationale:
+        'Curated cases with hidden ground-truth retrieval outcomes; residents predict, the CDSS reveals, and a debrief screen contrasts predictions with SHAP attributions to accelerate calibrated learning.',
+      groups: ['Abstract user', 'Knowledge source', 'Notification'],
+    },
+    {
+      id: 'C3',
+      title: 'Eye-tracking pilot to assess SHAP / HPG-axis cognitive load',
+      rationale:
+        'A small mixed-methods study using gaze tracking, NASA-TLX and retrospective think-aloud to quantify what visual components actually inform the surgeon\'s decision. Optional but high-yield for the Format and Empirical Measures groups.',
+      groups: ['User data', 'Format', 'Empirical measures'],
+    },
+    {
+      id: 'C4',
+      title: 'Audit trail of clinician overrides for bias and fairness analysis',
+      rationale:
+        'Log every clinician deviation from the CDSS recommendation alongside outcomes to enable post-hoc fairness audits across age strata, karyotype, and BMI — supporting the Study Factors and Empirical Measures groups.',
+      groups: ['User data', 'Study factors', 'Empirical measures'],
+    },
+    {
+      id: 'C5',
+      title: 'Programmatic API for federated research consortia',
+      rationale:
+        'Expose a permissioned, audited inference API so external research groups can submit anonymised cohorts for benchmark predictions without exporting the model weights — supporting transportability and external validation.',
+      groups: ['DS System', 'Organization/Setting', 'Channel'],
+    },
+  ],
+}
+
+const PRIORITY_META: Record<Priority, { label: string; cls: string; chip: string; Icon: typeof Zap }> = {
+  critical:  { label: 'Critical',  cls: 'border-rose-500/60 bg-rose-500/[0.06]',  chip: 'bg-rose-500/20 text-rose-200 border-rose-500/40',   Icon: Zap },
+  important: { label: 'Important', cls: 'border-amber-500/60 bg-amber-500/[0.05]', chip: 'bg-amber-500/20 text-amber-200 border-amber-500/40', Icon: Star },
+  optional:  { label: 'Optional',  cls: 'border-cyan-500/60 bg-cyan-500/[0.05]',   chip: 'bg-cyan-500/20 text-cyan-200 border-cyan-500/40',    Icon: Sparkles },
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ *  UTILITIES
+ * ───────────────────────────────────────────────────────────────────────── */
+
+function slugify(s: string): string {
+  return 'dsg-' + s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
+
+/** Strip the superscript reference markers (e.g. "(*)", footnote digits) used
+ *  in the original Arts et al. catalogue, so the human-readable item label is
+ *  legible while preserving the raw "text" elsewhere if needed.            */
+function cleanItemText(s: string): string {
+  let out = s
+  // Strip trailing 2–3-letter UPPERCASE source codes (AA, JW, SE, NP, SE, …)
+  // but only if they directly follow a lowercase letter — this preserves
+  // labels like "GUI" or "UI events".
+  out = out.replace(/([a-z])([A-Z]{2,3})$/u, '$1')
+  // Strip trailing footnote reference blocks: any combination of digits with
+  // optional parenthesised modifiers like "(-)" "(*)" "(^)" and dagger marks,
+  // separated by commas/whitespace and optionally preceded by ":" or ";".
+  out = out.replace(
+    /(?:[\s,;:]*\d+(?:\([^)]*\))?(?:\s*[\u2020\u2021†‡])?)+\s*[\u2020\u2021†‡]?\s*$/u,
+    ''
+  )
+  // Tidy any dangling punctuation left behind by the stripping above
+  // (e.g. trailing ":", ";", ",", or "/").
+  out = out.replace(/[\s,;:/]+$/u, '')
+  return out.trim()
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ *  SECTION COMPONENTS
+ * ───────────────────────────────────────────────────────────────────────── */
+
+// ── 1. Introduction ───────────────────────────────────────────────────────
+function IntroductionSection() {
   return (
-    <svg
-      viewBox={`0 0 ${size} ${size}`}
-      width={size}
-      height={size}
-      role="img"
-      aria-label="DS model status distribution"
-      className="-rotate-90"
-    >
-      {/* Track */}
-      <circle
-        cx={cx}
-        cy={cy}
-        r={radius}
-        fill="none"
-        stroke="#1f2937"
-        strokeWidth={stroke}
-      />
-      {/* Slices */}
-      {arcs.map((a) => (
-        <circle
-          key={a.status}
-          cx={cx}
-          cy={cy}
-          r={radius}
-          fill="none"
-          stroke={STATUS_CONFIG[a.status].color}
-          strokeWidth={stroke}
-          strokeDasharray={`${a.dash} ${a.gap}`}
-          strokeDashoffset={a.offset}
-          strokeLinecap="butt"
-        />
-      ))}
-      {/* Centre text — rotated back upright */}
-      <g transform={`rotate(90 ${cx} ${cy})`}>
-        <text
-          x={cx}
-          y={cy - 6}
-          textAnchor="middle"
-          className="fill-white"
-          style={{ fontSize: 26, fontWeight: 700, fontFamily: 'inherit' }}
-        >
-          {total}
-        </text>
-        <text
-          x={cx}
-          y={cy + 16}
-          textAnchor="middle"
-          className="fill-gray-400"
-          style={{ fontSize: 11, fontFamily: 'inherit' }}
-        >
-          total items
-        </text>
-      </g>
-    </svg>
+    <section className="rounded-2xl border border-cyan-900/40 bg-gradient-to-br from-gray-900 to-gray-900/60 p-6 shadow-lg shadow-cyan-900/10">
+      <div className="flex items-start gap-4">
+        <div className="rounded-xl bg-cyan-500/10 p-3 ring-1 ring-cyan-500/30">
+          <Layers className="h-6 w-6 text-cyan-300" />
+        </div>
+        <div className="flex-1 space-y-4">
+          <div>
+            <h3 className="text-lg font-semibold text-cyan-100">
+              About the DS Model
+            </h3>
+            <p className="mt-1 text-xs uppercase tracking-wider text-cyan-400/80">
+              A reference framework for evaluating Clinical Decision Support Systems
+            </p>
+          </div>
+
+          <p className="text-sm leading-relaxed text-gray-300">
+            The <span className="font-semibold text-gray-100">Decision Support Model</span> (DS Model) is the
+            community framework introduced by{' '}
+            <span className="italic">Arts, D. L. et al.</span> to systematically describe and evaluate a
+            Clinical Decision Support System (CDSS) across the entire socio-technical chain — from the real-world
+            patient and user, through the system’s internal abstractions and knowledge sources, to the output
+            channel and the empirical measures that prove it works. The framework decomposes a CDSS into{' '}
+            <span className="font-semibold text-cyan-200">22 functional groups</span> aggregating{' '}
+            <span className="font-semibold text-cyan-200">400 individual evaluation items</span>, providing a
+            uniform vocabulary for comparing systems and for diagnosing the gaps that prevent uptake.
+          </p>
+
+          <p className="text-sm leading-relaxed text-gray-300">
+            This section reports a complete, item-level audit of the NOA micro-TESE CDSS against the DS Model.
+            Every one of the 400 reference criteria was reviewed against the implemented system and assigned one
+            of four statuses (<em>applicable</em>, <em>partial</em>, <em>gap</em>, or <em>not&nbsp;applicable</em>),
+            yielding both an aggregate compliance score and a prioritised list of research and development actions
+            for full conformance.
+          </p>
+
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <a
+              href="/ds_model.html"
+              download
+              className="inline-flex items-center gap-2 rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-3 py-1.5 text-xs font-medium text-cyan-200 transition hover:bg-cyan-500/20 hover:text-cyan-100"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Download original DS Model HTML
+            </a>
+            <a
+              href="http://www.icove.nl/DSModel/"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex items-center gap-2 rounded-lg border border-teal-500/40 bg-teal-500/10 px-3 py-1.5 text-xs font-medium text-teal-200 transition hover:bg-teal-500/20 hover:text-teal-100"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              icove.nl/DSModel — Arts et al.
+            </a>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-800/60 px-2.5 py-1 text-[11px] text-slate-300">
+              <Link2 className="h-3 w-3" />
+              22 groups · 400 items
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }
 
-/* ──────────────────────────────────────────────────────────────────────── */
-/*  Mini stacked bar — used inside each group card header                  */
-/* ──────────────────────────────────────────────────────────────────────── */
+// ── 2. Flowchart ──────────────────────────────────────────────────────────
+function FlowchartSection({ onNodeClick, scores }: {
+  onNodeClick: (groupName: string) => void
+  scores: Map<string, number | null>
+}) {
+  const [hoverId, setHoverId] = useState<number | null>(null)
 
-function StackedBar({ summary }: { summary: GroupSummary }) {
-  const total =
-    summary.applicable + summary.partial + summary.gap + summary.not_applicable
-  if (total === 0) return null
+  // Tight viewBox around all nodes + lines.
+  const PAD = 16
+  const minX = -8 - PAD
+  const minY = -10 - PAD
+  const width = 1320 + PAD * 2
+  const height = 1770 + PAD * 2
+
   return (
-    <div className="flex h-2 w-full overflow-hidden rounded-full bg-gray-800">
-      {STATUS_ORDER.map((s) => {
-        const value = summary[s]
-        if (value === 0) return null
-        const pct = (value / total) * 100
-        return (
-          <div
-            key={s}
-            className={STATUS_CONFIG[s].bgClass}
-            style={{ width: `${pct}%` }}
-            title={`${STATUS_CONFIG[s].label}: ${value} (${pct.toFixed(0)}%)`}
-          />
-        )
-      })}
+    <section className="rounded-2xl border border-cyan-900/40 bg-gray-900/60 p-4 sm:p-6">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 className="flex items-center gap-2 text-lg font-semibold text-cyan-100">
+            <Activity className="h-5 w-5 text-cyan-400" />
+            Interactive DS Model Flowchart
+          </h3>
+          <p className="mt-1 text-xs text-gray-400">
+            Faithful reproduction of the Arts et al. spatial layout. Click any group to jump to its
+            detailed card below; colour encodes compliance.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 text-[11px]">
+          {(['high','medium','low','na'] as const).map(t => (
+            <span key={t} className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 ${TIER_BADGE[t]}`}>
+              <span className="h-2 w-2 rounded-full" style={{ background: TIER_HEX[t] }} />
+              {TIER_LABEL[t]}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="overflow-auto rounded-xl border border-gray-800 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 p-2 sm:p-4">
+        <svg
+          viewBox={`${minX} ${minY} ${width} ${height}`}
+          className="mx-auto block w-full"
+          style={{ maxHeight: '78vh', minWidth: 600 }}
+          preserveAspectRatio="xMidYMid meet"
+          role="img"
+          aria-label="DS Model 22-group flowchart"
+        >
+          <defs>
+            <marker
+              id="dsm-arrow"
+              viewBox="0 0 10 10"
+              refX="8"
+              refY="5"
+              markerWidth="6"
+              markerHeight="6"
+              orient="auto-start-reverse"
+            >
+              <path d="M0,0 L10,5 L0,10 z" fill="#475569" />
+            </marker>
+            <filter id="dsm-glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="2.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          {/* faint background regions */}
+          {FLOW_BG.map(bg => (
+            <g key={bg.id}>
+              <rect
+                x={bg.x}
+                y={bg.y}
+                width={bg.w}
+                height={bg.h}
+                rx={14}
+                fill="rgba(8, 145, 178, 0.04)"
+                stroke="rgba(8, 145, 178, 0.20)"
+                strokeDasharray="4 6"
+                strokeWidth={1.2}
+              />
+              {bg.label && (
+                <text
+                  x={bg.x + bg.w / 2}
+                  y={bg.y + 18}
+                  textAnchor="middle"
+                  fontSize={12}
+                  fill="rgba(165, 243, 252, 0.6)"
+                  fontWeight={500}
+                >
+                  {bg.label}
+                </text>
+              )}
+            </g>
+          ))}
+
+          {/* connecting lines */}
+          <g stroke="#475569" strokeWidth={1.4} strokeLinecap="round" fill="none" opacity={0.85}>
+            {FLOW_LINES.map(([x1, y1, x2, y2], i) => (
+              <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} />
+            ))}
+          </g>
+
+          {/* nodes */}
+          {FLOW_NODES.map(n => {
+            const score = scores.get(n.name) ?? null
+            const tier = scoreTier(score)
+            const fill = TIER_HEX[tier]
+            const isBig = n.w > 200
+            const isHover = hoverId === n.id
+            return (
+              <g
+                key={n.id}
+                onMouseEnter={() => setHoverId(n.id)}
+                onMouseLeave={() => setHoverId(null)}
+                onClick={() => onNodeClick(n.name)}
+                style={{ cursor: 'pointer' }}
+              >
+                <rect
+                  x={n.x}
+                  y={n.y}
+                  width={n.w}
+                  height={n.h}
+                  rx={isBig ? 18 : 10}
+                  fill={fill}
+                  fillOpacity={isBig ? 0.10 : (isHover ? 0.45 : 0.32)}
+                  stroke={fill}
+                  strokeWidth={isHover ? 2.4 : 1.6}
+                  filter={isHover ? 'url(#dsm-glow)' : undefined}
+                />
+                {isBig ? (
+                  <>
+                    <text
+                      x={n.x + n.w / 2}
+                      y={n.y + 26}
+                      textAnchor="middle"
+                      fontSize={18}
+                      fontWeight={700}
+                      fill="#e2e8f0"
+                    >
+                      {n.name}
+                    </text>
+                    <text
+                      x={n.x + n.w / 2}
+                      y={n.y + 46}
+                      textAnchor="middle"
+                      fontSize={11}
+                      fill="#94a3b8"
+                    >
+                      {score === null ? 'n / a' : `${score.toFixed(1)} % compliance`}
+                    </text>
+                  </>
+                ) : (
+                  <>
+                    <text
+                      x={n.x + n.w / 2}
+                      y={n.y + n.h / 2 + 1}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fontSize={12.5}
+                      fontWeight={600}
+                      fill="#f8fafc"
+                      style={{ pointerEvents: 'none' }}
+                    >
+                      {n.name}
+                    </text>
+                    {/* small score chip on the node */}
+                    <g style={{ pointerEvents: 'none' }}>
+                      <rect
+                        x={n.x + n.w - 36}
+                        y={n.y - 10}
+                        width={36}
+                        height={18}
+                        rx={9}
+                        fill="#0f172a"
+                        stroke={fill}
+                        strokeWidth={1.2}
+                      />
+                      <text
+                        x={n.x + n.w - 18}
+                        y={n.y + 3}
+                        textAnchor="middle"
+                        fontSize={11}
+                        fontWeight={700}
+                        fill={fill}
+                      >
+                        {score === null ? 'n/a' : `${Math.round(score)}%`}
+                      </text>
+                    </g>
+                  </>
+                )}
+              </g>
+            )
+          })}
+        </svg>
+      </div>
+
+      <p className="mt-3 text-[11px] text-gray-500 italic">
+        Layout, positions, and connecting lines transcribed pixel-for-pixel from the canonical Arts et al. HTML
+        diagram (icove.nl/DSModel).
+      </p>
+    </section>
+  )
+}
+
+// ── 3. Scoring system ─────────────────────────────────────────────────────
+function ScoringSection({ overall }: {
+  overall: {
+    applicable: number
+    partial: number
+    gap: number
+    not_applicable: number
+    evaluated: number
+    score: number
+    points: number
+  }
+}) {
+  const segments = [
+    { key: 'applicable',     n: overall.applicable,     color: STATUS_CONFIG.applicable.hex,     label: 'Applicable',     pts: '1 pt'   },
+    { key: 'partial',        n: overall.partial,        color: STATUS_CONFIG.partial.hex,        label: 'Partial',        pts: '0.5 pt' },
+    { key: 'gap',            n: overall.gap,            color: STATUS_CONFIG.gap.hex,            label: 'Gap',            pts: '0 pt'   },
+    { key: 'not_applicable', n: overall.not_applicable, color: STATUS_CONFIG.not_applicable.hex, label: 'Not applicable', pts: 'excl.' },
+  ]
+  const total = overall.applicable + overall.partial + overall.gap + overall.not_applicable
+
+  return (
+    <section className="rounded-2xl border border-cyan-900/40 bg-gray-900/60 p-6">
+      <div className="mb-5 flex items-start gap-3">
+        <Target className="mt-0.5 h-5 w-5 text-cyan-400" />
+        <div>
+          <h3 className="text-lg font-semibold text-cyan-100">Scoring system</h3>
+          <p className="mt-1 text-xs text-gray-400">
+            Each of the 400 criteria is mapped to one status. <em>Not&nbsp;applicable</em> items are
+            <span className="font-medium text-gray-300"> excluded from the denominator</span> because they cannot
+            sensibly be satisfied by this CDSS.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_auto_1fr]">
+        {/* Formula */}
+        <div className="rounded-xl border border-gray-800 bg-gray-950/60 p-5">
+          <p className="text-xs uppercase tracking-wider text-cyan-400/80">Formula</p>
+          <div className="mt-3 space-y-2 font-mono text-xs text-gray-300">
+            <div className="flex items-center justify-between rounded bg-gray-900 px-3 py-1.5">
+              <span>applicable</span><span className="text-emerald-300">+1.0 pt</span>
+            </div>
+            <div className="flex items-center justify-between rounded bg-gray-900 px-3 py-1.5">
+              <span>partial</span><span className="text-amber-300">+0.5 pt</span>
+            </div>
+            <div className="flex items-center justify-between rounded bg-gray-900 px-3 py-1.5">
+              <span>gap</span><span className="text-rose-300">+0.0 pt</span>
+            </div>
+            <div className="flex items-center justify-between rounded bg-gray-900 px-3 py-1.5">
+              <span>not_applicable</span><span className="text-slate-400">excluded</span>
+            </div>
+          </div>
+          <div className="mt-4 rounded-lg border border-cyan-500/30 bg-cyan-500/[0.06] p-3 text-center text-[13px] font-mono text-cyan-100">
+            score &nbsp;=&nbsp; (Σ points) / (app + par + gap) &nbsp;×&nbsp; 100
+          </div>
+        </div>
+
+        {/* Overall score donut + headline */}
+        <div className="flex flex-col items-center justify-center gap-2">
+          <ScoreDonut score={overall.score} />
+          <p className="text-xs uppercase tracking-wider text-cyan-400/80">Overall compliance</p>
+          <p className="text-[11px] text-gray-500">
+            {overall.points.toFixed(1)} / {overall.evaluated} pts
+          </p>
+        </div>
+
+        {/* Stats */}
+        <div className="rounded-xl border border-gray-800 bg-gray-950/60 p-5">
+          <p className="text-xs uppercase tracking-wider text-cyan-400/80">Distribution across 400 items</p>
+          <div className="mt-3 flex h-3 overflow-hidden rounded-full ring-1 ring-gray-800">
+            {segments.map(s => (
+              <div
+                key={s.key}
+                style={{ width: `${(s.n / total) * 100}%`, background: s.color }}
+                title={`${s.label}: ${s.n}`}
+              />
+            ))}
+          </div>
+          <div className="mt-4 space-y-1.5">
+            {segments.map(s => (
+              <div key={s.key} className="flex items-center justify-between text-xs">
+                <span className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-sm" style={{ background: s.color }} />
+                  <span className="text-gray-200">{s.label}</span>
+                  <span className="text-gray-500">({s.pts})</span>
+                </span>
+                <span className="font-mono text-gray-300">{s.n}</span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 rounded-lg bg-gray-900 px-3 py-2 text-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400">Evaluated denominator</span>
+              <span className="font-mono font-semibold text-cyan-200">{overall.evaluated}</span>
+            </div>
+            <div className="mt-1 flex items-center justify-between">
+              <span className="text-gray-400">Numerator (points)</span>
+              <span className="font-mono font-semibold text-cyan-200">{overall.points.toFixed(1)}</span>
+            </div>
+            <div className="mt-1 flex items-center justify-between">
+              <span className="text-gray-400">Excluded (n/a)</span>
+              <span className="font-mono text-gray-300">{overall.not_applicable}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function ScoreDonut({ score }: { score: number }) {
+  const R = 56
+  const C = 2 * Math.PI * R
+  const tier = scoreTier(score)
+  const fill = TIER_HEX[tier]
+  const dash = (score / 100) * C
+  return (
+    <div className="relative">
+      <svg width={150} height={150} viewBox="0 0 150 150" className="-rotate-90">
+        <circle cx={75} cy={75} r={R} fill="none" stroke="#1e293b" strokeWidth={12} />
+        <circle
+          cx={75}
+          cy={75}
+          r={R}
+          fill="none"
+          stroke={fill}
+          strokeWidth={12}
+          strokeLinecap="round"
+          strokeDasharray={`${dash} ${C - dash}`}
+          style={{ transition: 'stroke-dasharray 600ms ease-out' }}
+        />
+      </svg>
+      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-3xl font-bold text-gray-50">{score.toFixed(1)}%</span>
+        <span className="text-[10px] uppercase tracking-wider text-gray-400">DS Model</span>
+      </div>
     </div>
   )
 }
 
-/* ──────────────────────────────────────────────────────────────────────── */
-/*  Status badge for an individual item                                     */
-/* ──────────────────────────────────────────────────────────────────────── */
+// ── 4. Group cards ────────────────────────────────────────────────────────
+type GroupFilter = 'all' | Status
 
-function StatusBadge({ status }: { status: Status }) {
-  const cfg = STATUS_CONFIG[status]
-  const Icon = cfg.Icon
+function GroupCard({ group, score }: { group: Group; score: number | null }) {
+  const [open, setOpen] = useState(false)
+  const [filter, setFilter] = useState<GroupFilter>('all')
+  const tier = scoreTier(score)
+
+  const counts = group.summary
+  const filtered = useMemo(
+    () => filter === 'all' ? group.items : group.items.filter(i => i.status === filter),
+    [group.items, filter]
+  )
+
+  return (
+    <article
+      id={slugify(group.name)}
+      className="overflow-hidden rounded-xl border border-gray-800 bg-gray-900/60 transition hover:border-cyan-800/60"
+      style={{ scrollMarginTop: '90px' }}
+    >
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="flex w-full items-center gap-3 p-4 text-left transition hover:bg-cyan-500/5"
+        aria-expanded={open}
+      >
+        <span
+          className="h-10 w-1.5 shrink-0 rounded-full"
+          style={{ background: TIER_HEX[tier] }}
+        />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <h4 className="truncate text-sm font-semibold text-gray-100">{group.name}</h4>
+            <span className={`shrink-0 rounded-md border px-1.5 py-0.5 text-[10px] font-semibold ${TIER_BADGE[tier]}`}>
+              {score === null ? 'n / a' : `${score.toFixed(0)}%`}
+            </span>
+          </div>
+          <p className="mt-0.5 line-clamp-2 text-xs text-gray-400">{group.description}</p>
+        </div>
+        <div className="hidden shrink-0 items-center gap-1.5 text-[11px] sm:flex">
+          <Pill n={counts.applicable}     status="applicable"     />
+          <Pill n={counts.partial}        status="partial"        />
+          <Pill n={counts.gap}            status="gap"            />
+          <Pill n={counts.not_applicable} status="not_applicable" />
+        </div>
+        {open
+          ? <ChevronUp className="h-4 w-4 shrink-0 text-cyan-400" />
+          : <ChevronDown className="h-4 w-4 shrink-0 text-gray-500" />}
+      </button>
+
+      {open && (
+        <div className="border-t border-gray-800 px-4 py-4">
+          <p className="text-xs leading-relaxed text-gray-400">{group.description}</p>
+
+          {/* sm-only count pills */}
+          <div className="mt-3 flex flex-wrap gap-1.5 sm:hidden">
+            <Pill n={counts.applicable}     status="applicable"     />
+            <Pill n={counts.partial}        status="partial"        />
+            <Pill n={counts.gap}            status="gap"            />
+            <Pill n={counts.not_applicable} status="not_applicable" />
+          </div>
+
+          {/* score breakdown bar */}
+          <div className="mt-4">
+            <div className="flex items-center justify-between text-[11px] text-gray-400">
+              <span className="inline-flex items-center gap-1.5">
+                <Filter className="h-3 w-3" /> {group.items.length} items
+              </span>
+              <span>{score === null ? 'Not evaluable (all n/a)' : `${score.toFixed(1)} % compliance`}</span>
+            </div>
+            <div className="mt-1.5 flex h-2 overflow-hidden rounded-full bg-gray-800">
+              {(['applicable','partial','gap','not_applicable'] as Status[]).map(s => {
+                const n = counts[s]
+                if (n === 0) return null
+                return (
+                  <div
+                    key={s}
+                    style={{
+                      width: `${(n / group.items.length) * 100}%`,
+                      background: STATUS_CONFIG[s].hex,
+                    }}
+                    title={`${STATUS_CONFIG[s].label}: ${n}`}
+                  />
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Filter buttons */}
+          <div className="mt-4 flex flex-wrap gap-1.5">
+            <FilterChip active={filter === 'all'} onClick={() => setFilter('all')} count={group.items.length}>
+              All
+            </FilterChip>
+            {(['applicable','partial','gap','not_applicable'] as Status[]).map(s => (
+              <FilterChip
+                key={s}
+                active={filter === s}
+                onClick={() => setFilter(s)}
+                count={counts[s]}
+                status={s}
+              >
+                {STATUS_CONFIG[s].label}
+              </FilterChip>
+            ))}
+          </div>
+
+          {/* items */}
+          <ul className="mt-4 space-y-2">
+            {filtered.length === 0 && (
+              <li className="rounded-md border border-dashed border-gray-700 px-3 py-2 text-xs text-gray-500">
+                No items in this category.
+              </li>
+            )}
+            {filtered.map((item, i) => {
+              const sc = STATUS_CONFIG[item.status]
+              const Icon = sc.Icon
+              return (
+                <li
+                  key={i}
+                  className={`rounded-lg border-l-2 bg-gray-950/40 p-3 ${sc.cardClass}`}
+                >
+                  <div className="flex items-start gap-2">
+                    <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: sc.hex }} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[13px] font-semibold text-gray-100">
+                        {cleanItemText(item.text)}
+                      </p>
+                      <p className="mt-1 text-xs leading-relaxed text-gray-400">{item.description}</p>
+                    </div>
+                    <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-medium ${sc.badgeClass}`}>
+                      {sc.label}
+                    </span>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      )}
+    </article>
+  )
+}
+
+function Pill({ n, status }: { n: number; status: Status }) {
+  const c = STATUS_CONFIG[status]
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${cfg.badgeClass}`}
+      className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-semibold ${c.badgeClass}`}
+      title={`${c.label}: ${n}`}
     >
-      <Icon className="h-3 w-3" />
-      {cfg.label}
+      <span className={`h-1.5 w-1.5 rounded-full ${c.dotClass}`} />
+      {n}
     </span>
   )
 }
 
-/* ──────────────────────────────────────────────────────────────────────── */
-/*  Single item row                                                         */
-/* ──────────────────────────────────────────────────────────────────────── */
-
-function ItemRow({ item }: { item: Item }) {
-  const [open, setOpen] = useState(false)
-  return (
-    <div className="rounded-lg border border-gray-800 bg-gray-900/60 transition-colors hover:border-gray-700">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-start justify-between gap-3 p-3 text-left"
-      >
-        <div className="flex flex-1 items-start gap-2">
-          <StatusBadge status={item.status} />
-          <span className="text-xs leading-snug text-gray-200">{item.text}</span>
-        </div>
-        {open ? (
-          <ChevronUp className="h-4 w-4 shrink-0 text-gray-400" />
-        ) : (
-          <ChevronDown className="h-4 w-4 shrink-0 text-gray-400" />
-        )}
-      </button>
-      {open && (
-        <div className="border-t border-gray-800 px-3 py-3 text-xs leading-relaxed text-gray-300">
-          {item.description}
-        </div>
-      )}
-    </div>
-  )
-}
-
-/* ──────────────────────────────────────────────────────────────────────── */
-/*  Group card                                                              */
-/* ──────────────────────────────────────────────────────────────────────── */
-
-function GroupCard({
-  group,
-  index,
-  filter,
+function FilterChip({
+  children, active, onClick, count, status,
 }: {
-  group: Group
-  index: number
-  filter: Status | 'all'
+  children: React.ReactNode
+  active: boolean
+  onClick: () => void
+  count: number
+  status?: Status
 }) {
-  const [open, setOpen] = useState(false)
-
-  const total =
-    group.summary.applicable +
-    group.summary.partial +
-    group.summary.gap +
-    group.summary.not_applicable
-
-  const visibleItems = useMemo(
-    () =>
-      filter === 'all'
-        ? group.items
-        : group.items.filter((i) => i.status === filter),
-    [group.items, filter],
-  )
-
-  // Highlight gap-heavy groups (≥25% of items are gaps)
-  const gapRatio = total > 0 ? group.summary.gap / total : 0
-  const isCritical = gapRatio >= 0.25
-
-  return (
-    <div
-      className={`rounded-xl border bg-gray-900/70 transition-all ${
-        isCritical
-          ? 'border-red-500/30 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]'
-          : 'border-gray-800 hover:border-cyan-500/40'
-      }`}
-    >
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-start gap-4 p-4 text-left"
-      >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 font-mono text-xs font-bold text-cyan-300">
-          {String(index + 1).padStart(2, '0')}
-        </div>
-
-        <div className="min-w-0 flex-1 space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="font-display text-sm font-semibold text-white">
-              {group.name}
-            </h3>
-            <span className="rounded-full border border-gray-700 bg-gray-800 px-2 py-0.5 text-[10px] font-medium text-gray-300">
-              {total} {total === 1 ? 'item' : 'items'}
-            </span>
-            {isCritical && (
-              <span className="inline-flex items-center gap-1 rounded-full border border-red-500/40 bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-300">
-                <AlertTriangle className="h-3 w-3" />
-                Gap-heavy
-              </span>
-            )}
-          </div>
-
-          <StackedBar summary={group.summary} />
-
-          <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] font-medium">
-            {STATUS_ORDER.map((s) => (
-              <span
-                key={s}
-                className={`inline-flex items-center gap-1 ${STATUS_CONFIG[s].textClass}`}
-              >
-                <span
-                  className={`inline-block h-2 w-2 rounded-full ${STATUS_CONFIG[s].bgClass}`}
-                />
-                {STATUS_CONFIG[s].label}: {group.summary[s]}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {open ? (
-          <ChevronUp className="mt-1 h-4 w-4 shrink-0 text-gray-400" />
-        ) : (
-          <ChevronDown className="mt-1 h-4 w-4 shrink-0 text-gray-400" />
-        )}
+  const base = 'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium transition'
+  if (active) {
+    if (status) {
+      const c = STATUS_CONFIG[status]
+      return (
+        <button onClick={onClick} className={`${base} ${c.badgeClass} ring-1 ring-offset-1 ring-offset-gray-900`}>
+          {children} <span className="opacity-70">·</span> <span className="font-mono">{count}</span>
+        </button>
+      )
+    }
+    return (
+      <button onClick={onClick} className={`${base} border-cyan-500/50 bg-cyan-500/15 text-cyan-200`}>
+        {children} <span className="opacity-70">·</span> <span className="font-mono">{count}</span>
       </button>
-
-      {open && (
-        <div className="space-y-3 border-t border-gray-800 px-4 pb-4 pt-3">
-          <p className="text-xs italic leading-relaxed text-gray-400">
-            {group.description}
-          </p>
-          {visibleItems.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-gray-700 p-4 text-center text-xs text-gray-500">
-              No items match the current filter.
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {visibleItems.map((it, i) => (
-                <ItemRow key={i} item={it} />
-              ))}
-            </div>
-          )}
-          {filter !== 'all' && (
-            <p className="text-[10px] text-gray-500">
-              Showing {visibleItems.length} of {group.items.length} items
-              filtered by status &ldquo;{STATUS_CONFIG[filter].label}&rdquo;.
-            </p>
-          )}
-        </div>
-      )}
-    </div>
+    )
+  }
+  return (
+    <button onClick={onClick} className={`${base} border-gray-700 bg-gray-900/60 text-gray-400 hover:border-gray-600 hover:text-gray-200`}>
+      {children} <span className="opacity-60">·</span> <span className="font-mono">{count}</span>
+    </button>
   )
 }
 
-/* ──────────────────────────────────────────────────────────────────────── */
-/*  Main exported component                                                 */
-/* ──────────────────────────────────────────────────────────────────────── */
-
-export default function DsModelEvaluation() {
-  const [filter, setFilter] = useState<Status | 'all'>('all')
-
-  const overall = DATA.overall_summary
-
-  // Derive percentages
-  const totals = useMemo(() => {
-    const t = overall.total_items
-    return STATUS_ORDER.map((s) => ({
-      status: s,
-      value: overall[s],
-      pct: t > 0 ? (overall[s] / t) * 100 : 0,
-    }))
-  }, [overall])
-
+// ── 5. Gap analysis & action items ────────────────────────────────────────
+function ActionItemsSection() {
   return (
-    <div className="space-y-6 rounded-2xl border border-gray-800 bg-gray-900/40 p-5 md:p-6">
-      {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-cyan-600 text-white shadow-md">
-            <Layers className="h-6 w-6" />
-          </div>
-          <div>
-            <h2 className="font-display text-2xl font-bold tracking-tight text-white">
-              DS Model Framework Evaluation
-            </h2>
-            <p className="mt-1 max-w-3xl text-sm text-gray-400">
-              Systematic mapping of the NOA micro-TESE CDSS against the 22
-              Decision Support (DS) model dimensions — {overall.total_items}{' '}
-              evaluation criteria across applicability, partial coverage, gaps,
-              and not-applicable items.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Summary dashboard ─────────────────────────────────────────── */}
-      <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-5">
-        <div className="grid items-center gap-6 md:grid-cols-[auto,1fr]">
-          {/* Donut chart */}
-          <div className="flex flex-col items-center gap-3">
-            <DonutChart
-              slices={totals.map((t) => ({ status: t.status, value: t.value }))}
-              total={overall.total_items}
-            />
-            <p className="text-[10px] uppercase tracking-wider text-gray-500">
-              Overall status distribution
-            </p>
-          </div>
-
-          {/* Status cards */}
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            {totals.map(({ status, value, pct }) => {
-              const cfg = STATUS_CONFIG[status]
-              const Icon = cfg.Icon
-              return (
-                <div
-                  key={status}
-                  className={`rounded-lg border bg-gray-900 p-4 ${cfg.borderClass}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`inline-flex items-center gap-1.5 text-xs font-semibold ${cfg.textClass}`}
-                    >
-                      <Icon className="h-3.5 w-3.5" />
-                      {cfg.label}
-                    </span>
-                    <span className="text-[10px] font-mono text-gray-500">
-                      {pct.toFixed(1)}%
-                    </span>
-                  </div>
-                  <p className="mt-2 text-3xl font-bold text-white">{value}</p>
-                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-gray-800">
-                    <div
-                      className={`h-full rounded-full ${cfg.bgClass}`}
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Cumulative stacked bar */}
-        <div className="mt-5 space-y-2">
-          <p className="text-[10px] uppercase tracking-wider text-gray-500">
-            Cumulative distribution
+    <section className="rounded-2xl border border-cyan-900/40 bg-gray-900/60 p-6">
+      <div className="mb-5 flex items-start gap-3">
+        <Lightbulb className="mt-0.5 h-5 w-5 text-cyan-400" />
+        <div>
+          <h3 className="text-lg font-semibold text-cyan-100">Gap analysis &amp; action items</h3>
+          <p className="mt-1 text-xs text-gray-400">
+            Concrete, prioritised research and development actions required to advance the CDSS toward full DS
+            Model conformance. Each action references the DS Model groups it would primarily affect.
           </p>
-          <div className="flex h-3 overflow-hidden rounded-full bg-gray-800">
-            {totals.map(
-              ({ status, pct }) =>
-                pct > 0 && (
-                  <div
-                    key={status}
-                    className={STATUS_CONFIG[status].bgClass}
-                    style={{ width: `${pct}%` }}
-                    title={`${STATUS_CONFIG[status].label}: ${pct.toFixed(1)}%`}
-                  />
-                ),
-            )}
-          </div>
         </div>
       </div>
 
-      {/* ── Filter bar ────────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-800 bg-gray-900/60 p-3">
-        <span className="inline-flex items-center gap-1.5 pl-2 pr-1 text-xs font-semibold text-gray-300">
-          <Filter className="h-3.5 w-3.5 text-cyan-400" />
-          Filter items:
-        </span>
-        <button
-          type="button"
-          onClick={() => setFilter('all')}
-          className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-            filter === 'all'
-              ? 'border-cyan-500 bg-cyan-500/15 text-cyan-300'
-              : 'border-gray-700 bg-gray-800/50 text-gray-300 hover:border-cyan-500/40 hover:text-cyan-300'
-          }`}
-        >
-          All ({overall.total_items})
-        </button>
-        {STATUS_ORDER.map((s) => {
-          const cfg = STATUS_CONFIG[s]
-          const active = filter === s
+      <div className="space-y-6">
+        {(['critical','important','optional'] as const).map(p => {
+          const meta = PRIORITY_META[p]
+          const Icon = meta.Icon
+          const items = ACTIONS[p]
           return (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setFilter(s)}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                active
-                  ? `${cfg.borderClass} bg-white/5 ${cfg.textClass}`
-                  : 'border-gray-700 bg-gray-800/50 text-gray-300 hover:border-gray-600'
-              }`}
-            >
-              <span
-                className={`inline-block h-2 w-2 rounded-full ${cfg.bgClass}`}
-              />
-              {cfg.label} ({overall[s]})
-            </button>
+            <div key={p}>
+              <div className="mb-3 flex items-center gap-2">
+                <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider ${meta.chip}`}>
+                  <Icon className="h-3.5 w-3.5" />
+                  {meta.label}
+                </span>
+                <span className="text-[11px] text-gray-500">{items.length} action{items.length === 1 ? '' : 's'}</span>
+              </div>
+              <ol className="grid gap-3 lg:grid-cols-2">
+                {items.map((a, idx) => (
+                  <li key={a.id} className={`rounded-xl border-l-4 ${meta.cls} border-y border-r border-gray-800 p-4`}>
+                    <div className="flex items-start gap-3">
+                      <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[11px] font-mono font-bold ${meta.chip}`}>
+                        {a.id}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-[13px] font-semibold leading-snug text-gray-100">{a.title}</h4>
+                        <p className="mt-1.5 text-xs leading-relaxed text-gray-400">{a.rationale}</p>
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {a.groups.map(g => (
+                            <span key={g} className="inline-flex items-center gap-1 rounded-full border border-cyan-700/40 bg-cyan-900/20 px-1.5 py-0.5 text-[10px] text-cyan-200">
+                              <Link2 className="h-2.5 w-2.5" />
+                              {g}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
           )
         })}
       </div>
 
-      {/* ── 22 group cards ────────────────────────────────────────────── */}
-      <div className="grid gap-3 lg:grid-cols-2">
-        {DATA.groups.map((group, i) => (
-          <GroupCard key={group.name} group={group} index={i} filter={filter} />
-        ))}
+      <div className="mt-6 rounded-xl border border-amber-700/30 bg-amber-500/5 p-4">
+        <div className="flex items-start gap-2.5">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
+          <p className="text-xs leading-relaxed text-amber-100/90">
+            <span className="font-semibold">Reading note:</span> Actions are framed at the research / engineering
+            level (e.g. <em>"Implement HL7 FHIR ingestion"</em>, <em>"Run an RCT"</em>, <em>"Build a drift
+            monitoring pipeline"</em>). They describe what the next development cycle of this CDSS should produce
+            — not feature requests for this dashboard.
+          </p>
+        </div>
       </div>
+    </section>
+  )
+}
 
-      {/* ── Gap analysis section ──────────────────────────────────────── */}
-      <div className="space-y-4 rounded-xl border border-gray-800 bg-gray-900/60 p-5">
-        <div className="flex items-center gap-2 border-b border-gray-800 pb-3">
-          <Target className="h-5 w-5 text-cyan-400" />
-          <h3 className="text-lg font-bold text-white">
-            Gap Analysis &amp; Recommendations
-          </h3>
-        </div>
+/* ─────────────────────────────────────────────────────────────────────────
+ *  MAIN COMPONENT
+ * ───────────────────────────────────────────────────────────────────────── */
 
-        <div className="grid gap-4 md:grid-cols-2">
-          {/* Key strengths */}
-          <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-4">
-            <h4 className="mb-3 flex items-center gap-2 text-sm font-bold text-emerald-300">
-              <Sparkles className="h-4 w-4" />
-              Key Strengths
-              <span className="ml-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-mono">
-                {overall.key_strengths.length}
-              </span>
-            </h4>
-            <ul className="space-y-2">
-              {overall.key_strengths.map((s, i) => (
-                <li
-                  key={i}
-                  className="flex items-start gap-2 text-xs leading-relaxed text-gray-200"
-                >
-                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400" />
-                  <span>{s}</span>
-                </li>
-              ))}
-            </ul>
+export default function DSModelEvaluation() {
+  const groupsRef = useRef<HTMLDivElement | null>(null)
+
+  // Per-group scores (computed once)
+  const groupScores = useMemo(() => {
+    const m = new Map<string, number | null>()
+    for (const g of DATA.groups) m.set(g.name, computeGroupScore(g.summary))
+    return m
+  }, [])
+
+  // Overall stats (computed once)
+  const overall = useMemo(() => {
+    const o = DATA.overall_summary
+    const evaluated = o.applicable + o.partial + o.gap
+    const points = o.applicable + 0.5 * o.partial
+    const score = evaluated > 0 ? (points / evaluated) * 100 : 0
+    return {
+      applicable: o.applicable,
+      partial: o.partial,
+      gap: o.gap,
+      not_applicable: o.not_applicable,
+      evaluated,
+      points,
+      score,
+    }
+  }, [])
+
+  // Sorted groups (best -> worst), for the cards section
+  const orderedGroups = useMemo(() => {
+    return [...DATA.groups]
+  }, [])
+
+  // Sort helpers
+  const [sortMode, setSortMode] = useState<'original' | 'score-desc' | 'score-asc'>('original')
+
+  const displayGroups = useMemo(() => {
+    if (sortMode === 'original') return orderedGroups
+    const arr = [...orderedGroups]
+    arr.sort((a, b) => {
+      const sa = groupScores.get(a.name) ?? -1
+      const sb = groupScores.get(b.name) ?? -1
+      return sortMode === 'score-desc' ? sb - sa : sa - sb
+    })
+    return arr
+  }, [orderedGroups, sortMode, groupScores])
+
+  const scrollToGroup = useCallback((groupName: string) => {
+    const el = document.getElementById(slugify(groupName))
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [])
+
+  return (
+    <div className="space-y-8 text-gray-200">
+      <IntroductionSection />
+
+      <FlowchartSection onNodeClick={scrollToGroup} scores={groupScores} />
+
+      <ScoringSection overall={overall} />
+
+      {/* Group cards section */}
+      <section className="rounded-2xl border border-cyan-900/40 bg-gray-900/60 p-6">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 className="flex items-center gap-2 text-lg font-semibold text-cyan-100">
+              <Layers className="h-5 w-5 text-cyan-400" />
+              22 functional groups · item-level audit
+            </h3>
+            <p className="mt-1 text-xs text-gray-400">
+              Click a group header to expand. Use the filter chips to view items by status.
+            </p>
           </div>
-
-          {/* Key gaps */}
-          <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-4">
-            <h4 className="mb-3 flex items-center gap-2 text-sm font-bold text-red-300">
-              <AlertTriangle className="h-4 w-4" />
-              Critical Gaps
-              <span className="ml-1 rounded-full bg-red-500/20 px-2 py-0.5 text-[10px] font-mono">
-                {overall.key_gaps.length}
-              </span>
-            </h4>
-            <ul className="space-y-2">
-              {overall.key_gaps.map((g, i) => (
-                <li
-                  key={i}
-                  className="flex items-start gap-2 text-xs leading-relaxed text-gray-200"
-                >
-                  <XCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-400" />
-                  <span>{g}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Recommendations — full width */}
-        <div className="rounded-lg border border-cyan-500/30 bg-cyan-500/5 p-4">
-          <h4 className="mb-3 flex items-center gap-2 text-sm font-bold text-cyan-300">
-            <Lightbulb className="h-4 w-4" />
-            Recommendations
-            <span className="ml-1 rounded-full bg-cyan-500/20 px-2 py-0.5 text-[10px] font-mono">
-              {overall.recommendations.length}
-            </span>
-          </h4>
-          <ol className="grid gap-2 md:grid-cols-2">
-            {overall.recommendations.map((r, i) => (
-              <li
-                key={i}
-                className="flex items-start gap-2 rounded-md border border-cyan-500/20 bg-gray-900/60 p-3 text-xs leading-relaxed text-gray-200"
+          <div className="flex items-center gap-1.5 text-[11px]">
+            <span className="text-gray-500">Sort:</span>
+            {[
+              { v: 'original',   label: 'Diagram order' },
+              { v: 'score-desc', label: 'Highest score' },
+              { v: 'score-asc',  label: 'Lowest score'  },
+            ].map(o => (
+              <button
+                key={o.v}
+                onClick={() => setSortMode(o.v as typeof sortMode)}
+                className={`rounded-full border px-2.5 py-1 transition ${
+                  sortMode === o.v
+                    ? 'border-cyan-500/50 bg-cyan-500/15 text-cyan-100'
+                    : 'border-gray-700 bg-gray-900/60 text-gray-400 hover:border-gray-600 hover:text-gray-200'
+                }`}
               >
-                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 font-mono text-[10px] font-bold text-cyan-300">
-                  {i + 1}
-                </span>
-                <span>{r}</span>
-              </li>
+                {o.label}
+              </button>
             ))}
-          </ol>
+          </div>
         </div>
-      </div>
 
-      {/* ── Footnote ──────────────────────────────────────────────────── */}
-      <p className="text-center text-[10px] text-gray-500">
-        DS Model framework · {DATA.groups.length} dimensions ·{' '}
-        {overall.total_items} criteria · NOA micro-TESE CDSS mapping
-      </p>
+        <div ref={groupsRef} className="space-y-3">
+          {displayGroups.map(g => (
+            <GroupCard key={g.name} group={g} score={groupScores.get(g.name) ?? null} />
+          ))}
+        </div>
+      </section>
+
+      <ActionItemsSection />
     </div>
   )
 }

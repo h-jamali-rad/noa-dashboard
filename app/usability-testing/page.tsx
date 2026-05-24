@@ -7,7 +7,7 @@ import { ClipboardCheck, ChevronDown, ChevronUp, Headphones, Pause, Volume2, Ext
 import podcastData from '@/data/content/usability_podcast_data.json'
 import AIAssistWrapper from '@/components/ai-assist-wrapper'
 import { sendUsabilityNotification } from '@/components/articles/email-notify'
-import DsModelEvaluation from '@/components/ds-model-evaluation'
+import DSModelEvaluation from '@/components/ds-model-evaluation'
 
 /**
  * localStorage key used to persist human SUS evaluations on the client.
@@ -708,7 +708,7 @@ export default function UsabilityTestingPage() {
             DS Model Framework Evaluation
             <span className="text-xs font-normal text-muted-foreground ml-2">22 dimensions · 400 mapped criteria</span>
           </h2>
-          <DsModelEvaluation />
+          <DSModelEvaluation />
         </div>
       </AIAssistWrapper>
 
