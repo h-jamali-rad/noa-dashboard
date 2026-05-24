@@ -7,6 +7,7 @@ import SiteShell from '@/components/site-shell'
 import RoadmapFab from '@/components/roadmap-fab'
 import { AIAssistProvider } from '@/components/ai-assist-provider'
 import AIAssistToggle from '@/components/ai-assist-toggle'
+import SplashScreen from '@/components/splash-screen'
 import type { Metadata } from 'next'
 
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-sans' })
@@ -69,6 +70,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AIAssistProvider>
+            <SplashScreen />
             <SiteShell>{children}</SiteShell>
             <RoadmapFab />
             <AIAssistToggle />

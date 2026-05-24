@@ -19,6 +19,7 @@
  */
 
 import { useMemo, useState, useRef, useCallback } from 'react'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 import {
   Activity,
   AlertCircle,
@@ -1155,13 +1156,20 @@ export default function DSModelEvaluation() {
 
   return (
     <div className="space-y-8 text-gray-200">
-      <IntroductionSection />
+      <AIAssistWrapper id="dsmodel-introduction">
+        <IntroductionSection />
+      </AIAssistWrapper>
 
-      <FlowchartSection onNodeClick={scrollToGroup} scores={groupScores} />
+      <AIAssistWrapper id="dsmodel-flowchart">
+        <FlowchartSection onNodeClick={scrollToGroup} scores={groupScores} />
+      </AIAssistWrapper>
 
-      <ScoringSection overall={overall} />
+      <AIAssistWrapper id="dsmodel-scoring">
+        <ScoringSection overall={overall} />
+      </AIAssistWrapper>
 
       {/* Group cards section */}
+      <AIAssistWrapper id="dsmodel-group-cards">
       <section className="rounded-2xl border border-cyan-900/40 bg-gray-900/60 p-6">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -1201,8 +1209,11 @@ export default function DSModelEvaluation() {
           ))}
         </div>
       </section>
+      </AIAssistWrapper>
 
-      <ActionItemsSection />
+      <AIAssistWrapper id="dsmodel-action-items">
+        <ActionItemsSection />
+      </AIAssistWrapper>
     </div>
   )
 }

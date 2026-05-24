@@ -1,0 +1,36 @@
+{
+  "name": "noa-cdss-dashboard",
+  "version": "1.0.0",
+  "description": "NOA microTESE Clinical Decision Support System Dashboard",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --mac --arm64"
+  },
+  "author": "Hossein Jamali-Rad",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.noacdss.dashboard",
+    "productName": "NOA CDSS Dashboard",
+    "mac": {
+      "target": [
+        {
+          "target": "dir",
+          "arch": ["arm64"]
+        }
+      ],
+      "category": "public.app-category.medical",
+      "icon": "icon.png"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "app/**/*"
+    ],
+    "extraResources": []
+  }
+}

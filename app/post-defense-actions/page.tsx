@@ -1,4 +1,5 @@
 import BreadcrumbNav from '@/components/breadcrumb-nav'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 import data from '@/data/content/extended_sections.json'
 
 export default function PostDefenseActionsPage() {
@@ -8,14 +9,16 @@ export default function PostDefenseActionsPage() {
       <div>
         <h1 className="font-display font-bold text-3xl tracking-tight">Post-Defense Corrective Actions</h1>
       </div>
-      <ol className="space-y-3">
-        {data.post_defense_actions.map((item, i) => (
-          <li key={i} className="rounded-lg border bg-card p-4 text-sm">
-            <span className="font-mono text-xs text-muted-foreground mr-2">{i + 1}.</span>
-            {item}
-          </li>
-        ))}
-      </ol>
+      <AIAssistWrapper id="post-defense-actions-overview">
+        <ol className="space-y-3">
+          {data.post_defense_actions.map((item, i) => (
+            <li key={i} className="rounded-lg border bg-card p-4 text-sm">
+              <span className="font-mono text-xs text-muted-foreground mr-2">{i + 1}.</span>
+              {item}
+            </li>
+          ))}
+        </ol>
+      </AIAssistWrapper>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import BreadcrumbNav from '@/components/breadcrumb-nav'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 import ModelShowcase from '@/components/model-showcase'
 
 export const metadata = {
@@ -23,7 +24,9 @@ export default function ModelShowcasePage() {
         </p>
       </header>
 
-      <ModelShowcase />
+      <AIAssistWrapper id="model-showcase-overview">
+        <ModelShowcase />
+      </AIAssistWrapper>
     </div>
   )
 }

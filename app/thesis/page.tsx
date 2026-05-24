@@ -1,4 +1,5 @@
 import BreadcrumbNav from '@/components/breadcrumb-nav'
+import AIAssistWrapper from '@/components/ai-assist-wrapper'
 import ThesisClient from './thesis-client'
 import thesisData from '@/data/thesis_content.json'
 
@@ -24,7 +25,9 @@ export default function ThesisPage() {
         </p>
       </header>
 
-      <ThesisClient data={thesisData as any} />
+      <AIAssistWrapper id="thesis-overview">
+        <ThesisClient data={thesisData as any} />
+      </AIAssistWrapper>
     </div>
   )
 }
