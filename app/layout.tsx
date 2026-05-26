@@ -14,7 +14,7 @@ const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-sans' })
 const jakartaSans = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-display' })
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' })
 
-const siteUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://noa-dashboard-h-jamali-rads-projects.vercel.app'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
