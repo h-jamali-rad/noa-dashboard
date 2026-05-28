@@ -29,6 +29,7 @@ import {
   ClipboardCheck,
   Trophy,
   FileText,
+  Send,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -71,6 +72,7 @@ const EXTRA_NAV: NavItem[] = [
   { href: '/hardware-specs', label: 'Hardware Specs', icon: Server, description: 'GPU / CPU / RAM infrastructure' },
   { href: '/podcast', label: 'Research Podcast', icon: Mic, description: 'AI-generated expert dialogue transcripts' },
   { href: '/roadmap', label: 'Project Roadmap', icon: Map, description: '3D interactive project mind map' },
+  { href: '/contact', label: 'Contact & Beyond', icon: Send, description: 'Get in touch & services beyond NOA' },
 ]
 
 export default function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
