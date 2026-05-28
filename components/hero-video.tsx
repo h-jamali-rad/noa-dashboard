@@ -55,7 +55,7 @@ export function HeroVideo() {
         <video
           ref={videoRef}
           autoPlay
-          muted
+          loop
           playsInline
           className="w-full h-auto object-contain bg-black"
           style={{ maxHeight: '520px' }}
