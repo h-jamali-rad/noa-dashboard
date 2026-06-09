@@ -41,7 +41,7 @@ export default function HomeContent({
         </p>
         <div className="flex gap-3 mt-5">
           <Button asChild><Link href="/phase/preprocessing">Start pipeline <ArrowRight className="ml-1 h-4 w-4" /></Link></Button>
-          <Button asChild variant="outline"><Link href="/cdss">Open CDSS</Link></Button>
+          <Button asChild variant="outline"><a href="https://mtese-cdss-panel-83mdzx.abacusai.app" target="_blank" rel="noopener noreferrer">Open CDSS</a></Button>
         </div>
       </section>
       </AIAssistWrapper>
