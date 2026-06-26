@@ -1,0 +1,2171 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mTESE CDSS — Mind Map + Learning Guide</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;300;400;500;700;900&display=swap');
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --bg: #0a0e17;
+  --bg2: #111827;
+  --bg3: #1a2236;
+  --card: #151d2e;
+  --border: #2a3553;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --accent: #60a5fa;
+  --accent2: #818cf8;
+  --green: #34d399;
+  --red: #f87171;
+  --orange: #fbbf24;
+  --pink: #f472b6;
+  --cyan: #22d3ee;
+  --glow: rgba(96,165,250,0.15);
+}
+
+/* === TAB BAR === */
+.tab-bar {
+  display: flex;
+  gap: 0;
+  background: var(--bg);
+  padding: 0.5rem 1rem 0;
+  border-bottom: 2px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+.tab-btn {
+  padding: 0.7rem 1.5rem;
+  background: var(--bg2);
+  color: var(--text2);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: 4px;
+}
+.tab-btn:hover { background: var(--bg3); color: var(--text); }
+.tab-btn.active {
+  background: var(--bg3);
+  color: var(--accent);
+  border-color: var(--accent);
+  border-bottom: 2px solid var(--bg3);
+  margin-bottom: -2px;
+  font-weight: 700;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+body {
+  font-family: 'Vazirmatn', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== HEADER ===== */
+.header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  padding: 2rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(ellipse at center, rgba(96,165,250,0.05) 0%, transparent 60%);
+  animation: pulse 8s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+.header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent2), var(--pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+}
+.header .subtitle {
+  color: var(--text2);
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  position: relative;
+}
+.header .badge {
+  display: inline-block;
+  background: rgba(52,211,153,0.15);
+  color: var(--green);
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  border: 1px solid rgba(52,211,153,0.3);
+  position: relative;
+}
+
+/* ===== V1→V2 BANNER ===== */
+.version-banner {
+  background: linear-gradient(90deg, rgba(248,113,113,0.1), rgba(251,191,36,0.1), rgba(52,211,153,0.1));
+  border: 1px solid rgba(251,191,36,0.3);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem auto;
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  font-size: 0.8rem;
+}
+.version-banner .col { text-align: center; }
+.version-banner .col-label { color: var(--text2); margin-bottom: 0.3rem; }
+.version-banner .v1 { color: var(--red); text-decoration: line-through; }
+.version-banner .arrow { color: var(--orange); font-size: 1.2rem; }
+.version-banner .v2 { color: var(--green); font-weight: 700; }
+
+/* ===== LAYOUT ===== */
+.main-container {
+  display: flex;
+  height: calc(100vh - 200px);
+  min-height: 600px;
+}
+
+/* ===== MIND MAP (LEFT) ===== */
+.mindmap-panel {
+  flex: 1;
+  position: relative;
+  border-left: 1px solid var(--border);
+  overflow: hidden;
+}
+.mindmap-panel svg {
+  width: 100%;
+  height: 100%;
+}
+.mindmap-controls {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+.mindmap-controls button {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.mindmap-controls button:hover {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+}
+
+/* ===== DETAIL PANEL (RIGHT) ===== */
+.detail-panel {
+  width: 420px;
+  min-width: 420px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 1.5rem;
+  transition: all 0.3s;
+}
+.detail-panel::-webkit-scrollbar { width: 4px; }
+.detail-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.detail-panel .panel-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.detail-panel .panel-subtitle {
+  font-size: 0.8rem;
+  color: var(--text2);
+  margin-bottom: 1.2rem;
+  line-height: 1.7;
+}
+
+/* Detail sections */
+.detail-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s;
+}
+.detail-section:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--glow);
+}
+.detail-section h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.detail-section p, .detail-section li {
+  font-size: 0.8rem;
+  line-height: 1.8;
+  color: var(--text2);
+}
+.detail-section ul { padding-right: 1.2rem; }
+.detail-section li { margin-bottom: 0.3rem; }
+
+.tag {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+.tag-green { background: rgba(52,211,153,0.15); color: var(--green); }
+.tag-red { background: rgba(248,113,113,0.15); color: var(--red); }
+.tag-blue { background: rgba(96,165,250,0.15); color: var(--accent); }
+.tag-orange { background: rgba(251,191,36,0.15); color: var(--orange); }
+.tag-pink { background: rgba(244,114,182,0.15); color: var(--pink); }
+.tag-cyan { background: rgba(34,211,238,0.15); color: var(--cyan); }
+
+.highlight-box {
+  background: rgba(52,211,153,0.08);
+  border: 1px solid rgba(52,211,153,0.25);
+  border-radius: 8px;
+  padding: 0.8rem;
+  margin-top: 0.5rem;
+}
+.warning-box {
+  background: rgba(248,113,113,0.08);
+  border: 1px solid rgba(248,113,113,0.25);
+  border-radius: 8px;
+  padding: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.shap-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.3rem 0;
+  font-size: 0.75rem;
+}
+.shap-bar .label { width: 120px; text-align: left; color: var(--text2); }
+.shap-bar .bar-bg {
+  flex: 1;
+  height: 14px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 7px;
+  overflow: hidden;
+}
+.shap-bar .bar-fill {
+  height: 100%;
+  border-radius: 7px;
+  transition: width 0.5s ease;
+}
+.shap-bar .val { width: 50px; text-align: right; color: var(--text); font-weight: 500; }
+
+/* Placeholder for initial state */
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text2);
+  text-align: center;
+  padding: 2rem;
+}
+.placeholder .icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.3; }
+.placeholder p { font-size: 0.85rem; line-height: 1.8; }
+
+/* ===== D3 TREE STYLES ===== */
+.node circle {
+  stroke-width: 2.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.node circle:hover {
+  filter: brightness(1.3) drop-shadow(0 0 8px currentColor);
+}
+.node text {
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 11px;
+  fill: var(--text);
+  cursor: pointer;
+}
+.link {
+  fill: none;
+  stroke: #2a3553;
+  stroke-width: 1.5px;
+  stroke-opacity: 0.6;
+}
+.link-active {
+  stroke: var(--accent) !important;
+  stroke-opacity: 1 !important;
+  stroke-width: 2.5px !important;
+}
+.node-active circle {
+  filter: brightness(1.4) drop-shadow(0 0 12px currentColor) !important;
+  stroke-width: 3.5px !important;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding: 1rem 2rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text2);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .main-container { flex-direction: column-reverse; height: auto; }
+  .detail-panel { width: 100%; min-width: unset; max-height: 50vh; }
+  .mindmap-panel { height: 50vh; }
+}
+
+    /* Guide table styling */
+    .guide-table { width:100%; border-collapse:collapse; font-size:0.72rem; }
+    .guide-table th, .guide-table td { padding:0.35rem 0.4rem; border:1px solid var(--bg3); text-align:right; }
+    .guide-table th { background:var(--bg3); font-weight:600; }
+    .guide-table tr:hover { background:rgba(139,92,246,0.06); }
+    
+    /* Bug card expand on click */
+    .bug-card { transition: all 0.3s ease; }
+    .bug-card:hover { transform: translateX(3px); box-shadow: -3px 0 12px rgba(0,0,0,0.15); }
+    .bug-card.expanded .bug-detail { display:block !important; }
+    .bug-card .bug-detail { animation: fadeIn 0.3s ease; }
+    
+    /* Warning and highlight boxes */
+    .warning-box { border-right:3px solid #ef4444; padding:0.6rem; margin:0.4rem 0; background:rgba(239,68,68,0.08); border-radius:8px; font-size:0.75rem; }
+    .highlight-box { border-right:3px solid #10b981; padding:0.6rem; margin:0.4rem 0; background:rgba(16,185,129,0.08); border-radius:8px; font-size:0.75rem; }
+    
+    /* Expandable box hover */
+    .expandable-box { transition: all 0.2s ease; }
+    .expandable-box:hover { transform: translateX(2px); box-shadow: -2px 0 8px rgba(0,0,0,0.1); }
+    
+    @keyframes fadeIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+    
+    
+    /* Guide tree path highlighting */
+    .glink-active {
+      stroke: var(--accent) !important;
+      stroke-opacity: 1 !important;
+      stroke-width: 2.5px !important;
+    }
+    .gnode-active circle {
+      filter: brightness(1.4) drop-shadow(0 0 12px currentColor) !important;
+      stroke-width: 3.5px !important;
+    }
+
+    /* Guide breadcrumb */
+    .guide-breadcrumb { display:flex; align-items:center; gap:0.4rem; padding:0.4rem 0.7rem; background:var(--bg2); border-radius:8px; font-size:0.72rem; margin-bottom:0.5rem; flex-wrap:wrap; direction:rtl; }
+    .guide-breadcrumb span { color:var(--txt2); }
+    .guide-breadcrumb .bc-item { color:var(--accent); cursor:pointer; padding:0.15rem 0.4rem; border-radius:4px; transition:background 0.2s; }
+    .guide-breadcrumb .bc-item:hover { background:rgba(139,92,246,0.15); }
+    .guide-breadcrumb .bc-current { color:#10b981; font-weight:600; }
+    .guide-breadcrumb .bc-sep { color:var(--txt2); opacity:0.5; }
+
+  </style>
+</head>
+<body>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('mindmap')">🧠 نقشه ذهنی</button>
+  <button class="tab-btn" onclick="switchTab('guide')">📚 راهنمای آموزشی A→Z</button>
+</div>
+
+<!-- TAB 1: MIND MAP -->
+<div id="tab-mindmap" class="tab-content active">
+
+<!-- HEADER -->
+<div class="header">
+  <h1>📋 Comments on RADs Project</h1>
+  <div class="subtitle">mTESE CDSS · تحلیل نقدها و چالش‌ها · نقشه ذهنی تعاملی</div>
+  <div class="badge">✅ منبع داده: project_brain v3 — CatBoost AUC = 0.7738</div>
+</div>
+
+<!-- V1→V2→V3 BANNER -->
+<div class="version-banner" style="grid-template-columns: 1fr auto 1fr auto 1fr;">
+  <div class="col">
+    <div class="col-label">V1 (منسوخ ❌)</div>
+    <div class="v1">LightGBM · AUC ≈0.99</div>
+    <div class="v1" style="font-size:0.7rem;">نشت Pipeline</div>
+  </div>
+  <div class="col" style="display:flex;align-items:center;justify-content:center;">
+    <div class="arrow">⟶</div>
+  </div>
+  <div class="col">
+    <div class="col-label">V2 (منسوخ ⚠️)</div>
+    <div style="color:var(--orange);">CatBoost · AUC 0.8306</div>
+    <div style="color:var(--orange);font-size:0.7rem;">نشت Encoding</div>
+  </div>
+  <div class="col" style="display:flex;align-items:center;justify-content:center;">
+    <div class="arrow">⟶</div>
+  </div>
+  <div class="col">
+    <div class="col-label">V3 (فعلی ✅)</div>
+    <div class="v2">CatBoost · AUC 0.7738</div>
+    <div style="color:var(--green);font-size:0.7rem;">Ordinal Encoding · صادقانه</div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-container">
+  <!-- DETAIL PANEL -->
+  <div class="detail-panel" id="detailPanel">
+    <div class="placeholder" id="placeholder">
+      <div class="icon">🧠</div>
+      <p>روی هر گره در نقشه ذهنی کلیک کنید<br>تا جزئیات آن اینجا نمایش داده شود</p>
+      <p style="margin-top:1rem;font-size:0.75rem;">گره‌ها قابل بازو بسته شدن هستند</p>
+    </div>
+    <div id="detailContent" style="display:none;"></div>
+  </div>
+
+  <!-- MIND MAP -->
+  <div class="mindmap-panel" id="mindmapPanel">
+    <div class="mindmap-controls">
+      <button onclick="zoomIn()" title="بزرگنمایی">+</button>
+      <button onclick="zoomOut()" title="کوچک‌نمایی">−</button>
+      <button onclick="resetZoom()" title="بازنشانی">⟲</button>
+      <button onclick="expandAll()" title="باز کردن همه">◱</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER TAB 1 -->
+</div><!-- end tab-mindmap -->
+
+<!-- TAB 2: LEARNING GUIDE -->
+<div id="tab-guide" class="tab-content">
+
+<div class="header">
+  <h1>📚 راهنمای آموزشی A→Z</h1>
+  <div class="subtitle">mTESE CDSS · کل Pipeline پژوهش از بیماری تا محصول · ۲۰ فصل</div>
+  <div class="badge">🎓 هر مرحله = یک پروژه کارشناسی ارشد!</div>
+</div>
+
+<div class="main-container">
+  <div class="detail-panel" id="guideDetailPanel">
+    <div id="guideBreadcrumb" class="guide-breadcrumb" style="display:none;"></div>
+    <div class="placeholder" id="guidePlaceholder">
+      <div class="icon">📚</div>
+      <p>روی هر گره در درخت آموزشی کلیک کنید<br>تا توضیحات آن فصل اینجا نمایش داده شود</p>
+      <p style="margin-top:1rem;font-size:0.75rem;">۲۰ فصل در ۷ دسته‌بندی</p>
+    </div>
+    <div id="guideDetailContent" style="display:none;"></div>
+  </div>
+  <div class="mindmap-panel" id="guideMindmapPanel">
+    <div class="mindmap-controls">
+      <button onclick="guideZoomIn()" title="بزرگنمایی">+</button>
+      <button onclick="guideZoomOut()" title="کوچک‌نمایی">−</button>
+      <button onclick="guideResetZoom()" title="بازنشانی">⟲</button>
+      <button onclick="guideExpandAll()" title="باز کردن همه">◱</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end tab-guide -->
+
+<!-- FOOTER -->
+<div class="footer">
+  📋 mTESE CDSS — Mind Map + Learning Guide &nbsp;|&nbsp;
+  پژوهشگر: حسین جمالی‌راد · دانشگاه علوم پزشکی مشهد · پژوهشگاه رویان &nbsp;|&nbsp;
+  این سند در حال تکمیل است
+</div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+// ===== TREE DATA =====
+const treeData = {
+  name: "Thesis — mTESE CDSS",
+  icon: "🎓",
+  color: "#60a5fa",
+  id: "root",
+  children: [
+    {
+      name: "🧪 Brain Storm: چالش‌های پژوهشی",
+      icon: "🧪",
+      color: "#f472b6",
+      id: "brainstorm",
+      children: [
+        {
+          name: "❓ پارادوکس پاتولوژی",
+          color: "#f87171",
+          id: "bs_challenge",
+          children: [
+            { name: "mTESE = شیر یا خط؟ (۵۰٪)", color: "#f87171", id: "bs_coin" },
+            { name: "پاتولوژی = حین عمل", color: "#f87171", id: "bs_intraop" },
+            { name: "بیضه بریده شده → پیش‌بینی بی‌معنی؟", color: "#f87171", id: "bs_meaningless" }
+          ]
+        },
+        {
+          name: "✅ پاسخ V3: دو حالت مدل",
+          color: "#34d399",
+          id: "bs_answer",
+          children: [
+            { name: "پاتولوژی = برترین عامل (SHAP≈0.49)", color: "#34d399", id: "bs_path_top" },
+            { name: "Pre-op مدل: AUC=0.64 (بدون پاتولوژی)", color: "#fbbf24", id: "bs_preop" },
+            { name: "Full مدل: AUC=0.77 (با پاتولوژی)", color: "#34d399", id: "bs_full_model" },
+            { name: "Salvage mTESE: پاتولوژی موجود!", color: "#22d3ee", id: "bs_salvage_use" }
+          ]
+        },
+        {
+          name: "📊 SHAP یعنی چه؟",
+          color: "#60a5fa",
+          id: "bs_shap_explain",
+          children: [
+            { name: "اعداد SHAP ≠ درصد", color: "#60a5fa", id: "bs_shap_not_pct" },
+            { name: "مجموع = ۴.۹۱ (نه ۱۰۰!)", color: "#60a5fa", id: "bs_shap_sum" }
+          ]
+        },
+        {
+          name: "🔬 کاربرد واقعی CDSS چیست؟",
+          color: "#fbbf24",
+          id: "bs_utility",
+          children: [
+            { name: "دقت ۷۷٪ پیش‌بینی چه چیزی؟", color: "#fbbf24", id: "bs_77pct" },
+            { name: "مشاوره قبل از عمل", color: "#34d399", id: "bs_counseling" },
+            { name: "مدیریت انتظارات بیمار", color: "#34d399", id: "bs_expectations" }
+          ]
+        },
+        {
+          name: "🧬 Pre-op vs Full Model",
+          color: "#f472b6",
+          id: "bs_with_without",
+          children: [
+            { name: "تحلیل دوگانه V3", color: "#f472b6", id: "bs_dual" },
+            { name: "Ceiling Effect: سقف 0.64", color: "#f472b6", id: "bs_ceiling" },
+            { name: "شکاف ۰.۱۳۷ = اهمیت پاتولوژی", color: "#f472b6", id: "bs_gap" }
+          ]
+        },
+        {
+          name: "🔄 Salvage mTESE",
+          color: "#22d3ee",
+          id: "bs_salvage",
+          children: [
+            { name: "پاتولوژی از عمل قبلی موجود!", color: "#22d3ee", id: "bs_path_available" },
+            { name: "Full model قابل استفاده", color: "#22d3ee", id: "bs_repeat_pred" },
+            { name: "داده کافی نداریم (۸.۸٪)", color: "#f87171", id: "bs_salvage_data" }
+          ]
+        },
+        {
+          name: "🧬 ویژگی‌های ژنتیک",
+          color: "#a78bfa",
+          id: "bs_genetics",
+          children: [
+            { name: "karyotype_severity (رتبه ۱۱)", color: "#a78bfa", id: "bs_karyotype" },
+            { name: "azf_deletion_severity (رتبه ۶)", color: "#a78bfa", id: "bs_azf" }
+          ]
+        },
+        {
+          name: "🎯 Dissection و مهارت جراح",
+          color: "#fb923c",
+          id: "bs_surgeon",
+          children: [
+            { name: "تأثیر مهارت جراح", color: "#fb923c", id: "bs_skill" },
+            { name: "محدودیت پژوهش ما", color: "#fb923c", id: "bs_limitation" }
+          ]
+        },
+        {
+          name: "⚠️ اعتبار و External Validation",
+          color: "#f87171",
+          id: "bs_validity",
+          children: [
+            { name: "بدون validation = بدون اعتبار؟", color: "#f87171", id: "bs_no_ext_val" },
+            { name: "single-center limitation", color: "#f87171", id: "bs_single_center" },
+            { name: "چه کنیم؟ Future Work", color: "#34d399", id: "bs_future" }
+          ]
+        }
+      ]
+    },
+    {
+      name: "💬 کامنت‌های دکتر دهدله",
+      icon: "💬",
+      color: "#818cf8",
+      id: "dehdele",
+      children: [
+        { name: "چرا ۱۷ مدل؟", color: "#818cf8", id: "deh_16models" },
+        { name: "چرا Deep Learning نه؟", color: "#818cf8", id: "deh_dl" },
+        { name: "ترتیب Pipeline", color: "#818cf8", id: "deh_pipeline" }
+      ]
+    },
+    {
+      name: "📊 نتایج V3",
+      icon: "📊",
+      color: "#22d3ee",
+      id: "results",
+      children: [
+        { name: "CatBoost AUC=0.7738", color: "#22d3ee", id: "res_catboost" },
+        { name: "SHAP Ranking (42 ویژگی)", color: "#22d3ee", id: "res_shap" },
+        { name: "عملکرد عملیاتی", color: "#22d3ee", id: "res_metrics" },
+        { name: "Leaderboard (17 مدل)", color: "#22d3ee", id: "res_leaderboard" }
+      ]
+    },
+    {
+      name: "🔧 سفر V1→V2→V3",
+      icon: "🔧",
+      color: "#fbbf24",
+      id: "corrections",
+      children: [
+        { name: "V1: نشت Pipeline (AUC≈0.99)", color: "#f87171", id: "cor_v1_leak" },
+        { name: "V2: نشت Encoding (AUC=0.83)", color: "#fbbf24", id: "cor_v2_leak" },
+        { name: "V3: اصلاح Ordinal (AUC=0.77)", color: "#34d399", id: "cor_v3_fix" }
+      ]
+    },
+    {
+      name: "📄 Paper A vs Paper B",
+      icon: "📄",
+      color: "#818cf8",
+      id: "papers_ab",
+      children: [
+        { name: "Paper A: ۱۷ مدل + پاتولوژی حضور دارد", color: "#60a5fa", id: "paper_a" },
+        { name: "Paper B: Pre-op only (AUC=0.64)", color: "#f472b6", id: "paper_b" },
+        { name: "V3: پاتولوژی = برترین عامل!", color: "#34d399", id: "papers_v3_result" }
+      ]
+    },
+    {
+      name: "📊 سهم ویژگی‌ها V3 + تفسیر",
+      icon: "📊",
+      color: "#60a5fa",
+      id: "feature_medical",
+      children: [
+        { name: "🔬 پاتولوژی RT (۲۸.۷٪ سهم)", color: "#f87171", id: "fm_path_rt" },
+        { name: "🧬 سایر بالینی (۲۲.۳٪)", color: "#60a5fa", id: "fm_clinical" },
+        { name: "🔬 پاتولوژی LT (۱۷.۳٪)", color: "#f472b6", id: "fm_path_lt" },
+        { name: "📏 حجم/فیزیکی (۱۷.۲٪)", color: "#22d3ee", id: "fm_volume" },
+        { name: "💉 هورمون‌ها (۱۴.۴٪)", color: "#fbbf24", id: "fm_hormones" }
+      ]
+    },
+    {
+      name: "🏗️ معماری Pipeline",
+      icon: "🏗️",
+      color: "#a78bfa",
+      id: "architecture",
+      children: [
+        { name: "۱۷ مدل از ۶ خانواده", color: "#a78bfa", id: "arch_models" },
+        { name: "۴۲ ویژگی نهایی", color: "#a78bfa", id: "arch_features" },
+        { name: "Dataset: n=2408", color: "#a78bfa", id: "arch_dataset" }
+      ]
+    }
+  ]
+};
+
+// ===== DETAIL CONTENT FOR EACH NODE =====
+const details = {
+  root: {
+    title: "🎓 Thesis — mTESE CDSS",
+    subtitle: "سیستم پشتیبانی تصمیم بالینی برای پیش‌بینی موفقیت micro-TESE — نسخه ۳",
+    sections: [
+      { title: "📌 خلاصه پروژه", content: `<p>پیش‌بینی موفقیت استخراج اسپرم در عمل micro-TESE با استفاده از ۱۷ مدل یادگیری ماشین روی <strong>۲۴۰۸ رکورد</strong> از پژوهشگاه رویان.</p><p>بهترین مدل: <strong>CatBoost</strong> با <span class='tag tag-green'>AUC = 0.7738 (CI: 0.7606–0.7870)</span></p><div class='highlight-box'><p><strong>V3 = نتیجه صادقانه:</strong> V2 دارای نشت encoding بود (AUC=0.8306). V3 با Ordinal Encoding صحیح → AUC=0.7738</p></div>` },
+      { title: "👥 تیم", content: `<p>پژوهشگر: <strong>حسین جمالی‌راد</strong><br>اساتید راهنما: دکتر حسن وکیلی ارکی و دکتر مرجان صباغیان<br>مشاور: سرکار خانم دکتر دهدله</p>` },
+      { title: "🔄 سفر V1→V2→V3", content: `<table style='width:100%;border-collapse:collapse;font-size:0.78rem;'><tr style='background:var(--bg3);'><th style='padding:0.4rem;'>نسخه</th><th style='padding:0.4rem;text-align:center;'>AUC</th><th style='padding:0.4rem;'>مشکل</th><th style='padding:0.4rem;'>اصلاح</th></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.3rem;color:var(--red);'>V1</td><td style='padding:0.3rem;text-align:center;color:var(--red);'>≈0.99</td><td style='padding:0.3rem;'>نشت Pipeline (پیش‌پردازش خارج CV)</td><td style='padding:0.3rem;'>—</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.3rem;color:var(--orange);'>V2</td><td style='padding:0.3rem;text-align:center;color:var(--orange);'>0.8306</td><td style='padding:0.3rem;'>نشت Encoding (one-hot → target encoding)</td><td style='padding:0.3rem;'>Pipeline داخل CV</td></tr><tr><td style='padding:0.3rem;color:var(--green);font-weight:700;'>V3 ✅</td><td style='padding:0.3rem;text-align:center;color:var(--green);font-weight:700;'>0.7738</td><td style='padding:0.3rem;'>—</td><td style='padding:0.3rem;'>Ordinal Encoding صحیح</td></tr></table>` }
+    ]
+  },
+
+  brainstorm: {
+    title: "🧪 Brain Storm: چالش‌های پژوهشی",
+    subtitle: "چالش فلسفی درباره معنای واقعی پیش‌بینی در mTESE",
+    sections: [
+      { title: "🤔 صورت مسئله", content: `<p>وقتی نتایج نشان می‌دهند که ویژگی‌های پاتولوژی (بافت‌شناسی بیضه) بیشترین تأثیر را در پیش‌بینی دارند، یک تناقض بنیادین شکل می‌گیرد:</p><div class='warning-box'><p><strong>در V3 پاتولوژی واقعاً مهم‌ترین عامل است!</strong> rt_severity_score با SHAP=0.491 رتبه ۱ دارد. اما این پارادوکس راه‌حل دارد ← مدل دو حالته</p></div>` }
+    ]
+  },
+
+  bs_challenge: {
+    title: "❓ چالش اصلی",
+    subtitle: "آیا پژوهش ما اصلاً معنا دارد؟",
+    sections: [
+      { title: "💭 استدلال", content: `<p>micro-TESE در ادبیات با <strong>۴۶-۵۴٪ موفقیت</strong> — عملاً شیر یا خط!</p><p>حالا پژوهش V3 ما می‌گوید با ۷۷٪ AUC می‌توانیم پیش‌بینی کنیم. اما مهم‌ترین عوامل از گروه پاتولوژی هستند (rt_severity_score SHAP=0.491) که <strong>حین عمل</strong> به دست می‌آیند...</p><div class='highlight-box'><p>✅ <strong>پاسخ V3:</strong> مدل دو حالت دارد — Pre-op (AUC=0.64) و Full/Salvage (AUC=0.77). هر کدام کاربرد خاص خود را دارد.</p></div>` }
+    ]
+  },
+
+  bs_coin: {
+    title: "🪙 mTESE = شیر یا خط؟",
+    subtitle: "نرخ موفقیت ۴۶-۵۴٪ در ادبیات",
+    sections: [
+      { title: "📚 شواهد", content: `<p>micro-TESE روش طلایی درمان NOA است اما نرخ موفقیت <strong>۴۶-۵۴٪</strong> — تقریباً مثل پرتاب سکه!</p><p>پژوهش V3 ما با <span class='tag tag-green'>AUC=0.7738</span> و <span class='tag tag-green'>CI: 0.7606–0.7870</span> نشان می‌دهد که Full model (با پاتولوژی) بهتر از ۵۰-۵۰ پیش‌بینی می‌کند.</p><p>اما Pre-op model (بدون پاتولوژی) فقط <span class='tag tag-orange'>AUC=0.6374</span> دارد — سقف واقعی پیش‌بینی قبل از عمل.</p>` }
+    ]
+  },
+
+  bs_intraop: {
+    title: "🔬 پاتولوژی = حین عمل",
+    subtitle: "داده‌های intra-operative قابل دسترس قبل از عمل نیستند — مگر در Salvage!",
+    sections: [
+      { title: "⚕️ توضیح", content: `<p>ویژگی‌های پاتولوژی از گزارش بافت‌شناسی بیضه استخراج می‌شوند — فقط <strong>بعد از نمونه‌برداری حین عمل</strong> در دسترس هستند.</p><p>در V3 این ویژگی‌ها <strong>برترین عوامل</strong> پیش‌بینی هستند:</p><ul><li>rt_severity_score: SHAP = 0.491 (رتبه ۱)</li><li>rt_tissue_heterogeneity: SHAP = 0.489 (رتبه ۲)</li></ul><div class='highlight-box'><p>🔑 <strong>اما در Salvage mTESE</strong> (عمل تکراری)، پاتولوژی از عمل قبلی موجود است! → Full model قابل استفاده</p></div>` }
+    ]
+  },
+
+  bs_meaningless: {
+    title: "🤯 بیضه بریده شده → پیش‌بینی بی‌معنی؟",
+    subtitle: "نقد فلسفی بر کل رویکرد پژوهش",
+    sections: [
+      { title: "💥 پارادوکس و حل آن در V3", content: `<div class='warning-box'><p>🔴 <strong>ادعای قدیمی V2:</strong> «پاتولوژی SHAP=0 → مدل کاملاً pre-op!»<br>🟢 <strong>واقعیت V3:</strong> پاتولوژی برترین عامل است! (SHAP=0.491)</p></div><div class='highlight-box' style='margin-top:1rem;'><p>✅ <strong>راه‌حل V3: مدل دو حالته</strong></p><ul><li><strong>Primary mTESE:</strong> اولین عمل → فقط pre-op features → AUC=0.6374 (سقف واقعی)</li><li><strong>Salvage mTESE:</strong> عمل تکراری → پاتولوژی از عمل قبلی موجود → Full model AUC=0.7738</li></ul></div>` }
+    ]
+  },
+
+  bs_answer: {
+    title: "✅ پاسخ V3: مدل دو حالته",
+    subtitle: "Pre-op (AUC=0.64) + Full/Salvage (AUC=0.77)",
+    sections: [
+      { title: "🎯 پاسخ کلیدی V3", content: `<div class='highlight-box'><p>در V3 پاتولوژی <strong>مهم‌ترین عامل</strong> پیش‌بینی است (برخلاف V2 که SHAP=0 بود). اما این مشکل نیست — بلکه مدل دو حالت دارد:</p></div><table style='width:100%;border-collapse:collapse;font-size:0.78rem;margin-top:0.8rem;'><tr style='background:var(--bg3);'><th style='padding:0.5rem;'>حالت</th><th style='padding:0.5rem;text-align:center;'>AUC</th><th style='padding:0.5rem;'>کاربرد</th></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'><strong>Pre-op only</strong></td><td style='padding:0.4rem;text-align:center;color:var(--orange);'>0.6374</td><td style='padding:0.4rem;'>Primary mTESE — قبل از اولین عمل</td></tr><tr><td style='padding:0.4rem;'><strong>Full model</strong></td><td style='padding:0.4rem;text-align:center;color:var(--green);font-weight:700;'>0.7738</td><td style='padding:0.4rem;'>Salvage mTESE — پاتولوژی از عمل قبلی موجود</td></tr></table><p style='margin-top:0.8rem;'>شکاف <strong>0.137</strong> بین دو مدل اثبات می‌کند که پاتولوژی واقعاً اطلاعات مهمی دارد.</p>` }
+    ]
+  },
+
+  bs_path_top: {
+    title: "📊 پاتولوژی = برترین عامل در V3",
+    subtitle: "rt_severity_score SHAP=0.491 — رتبه ۱ از ۴۲ ویژگی",
+    sections: [
+      { title: "📊 رتبه‌بندی SHAP V3 — پاتولوژی", content: `<div class='shap-bar'><span class='label'>1. RT Severity</span><div class='bar-bg'><div class='bar-fill' style='width:100%;background:linear-gradient(90deg,#f87171,#f472b6);'></div></div><span class='val'>0.491</span></div><div class='shap-bar'><span class='label'>2. RT Heterogeneity</span><div class='bar-bg'><div class='bar-fill' style='width:99%;background:linear-gradient(90deg,#f87171,#f472b6);'></div></div><span class='val'>0.489</span></div><div class='shap-bar'><span class='label'>3. LT Severity</span><div class='bar-bg'><div class='bar-fill' style='width:93%;background:linear-gradient(90deg,#f472b6,#a78bfa);'></div></div><span class='val'>0.458</span></div>` },
+      { title: "🔄 تفاوت با V2", content: `<div class='warning-box'><p><strong>V2:</strong> Pathology_RT و Pathology_LT هر دو SHAP = 0.000 داشتند! مدل اصلاً از پاتولوژی استفاده نمی‌کرد.</p><p><strong>V3:</strong> پاتولوژی RT گروه اول است با سهم ۱.۴۱ از کل SHAP. چرا؟ V2 دارای نشت target encoding بود که باعث شده بود مدل اطلاعات پاتولوژی را از کانال نشتی بگیرد — نه مستقیم.</p></div>` }
+    ]
+  },
+
+  bs_preop: {
+    title: "🏥 مدل Pre-op: AUC=0.6374",
+    subtitle: "سقف واقعی پیش‌بینی بدون پاتولوژی",
+    sections: [
+      { title: "📊 ویژگی‌های Pre-op", content: `<ul><li><strong>هورمونی:</strong> FSH (0.143)، LH (0.129)، تستوسترون (0.096)، T/E2 ratio (0.287)</li><li><strong>آنتروپومتریک:</strong> سن (0.192)، BMI (0.105)</li><li><strong>بیضه‌ای:</strong> حجم RT (0.173)، حجم LT (0.191)، Total vol (0.136)</li><li><strong>ژنتیک:</strong> AZF deletion (0.257)، Karyotype (0.157)</li></ul><div class='warning-box'><p>⚠️ بدون پاتولوژی، مدل فقط <strong>AUC=0.6374</strong> دارد. این سقف واقعی (ceiling) پیش‌بینی قبل از عمل است.</p></div>` },
+      { title: "💡 کاربرد بالینی", content: `<p>برای <strong>Primary mTESE</strong> (اولین عمل)، بیمار هنوز پاتولوژی ندارد. CDSS با AUC≈0.64 می‌تواند:</p><ul><li>بیماران با شانس بسیار پایین را شناسایی کند</li><li>مشاوره اولیه ارائه دهد</li><li>مدیریت انتظارات بیمار</li></ul><p>اما دقت ۶۴٪ محدودیت جدی دارد — <strong>صادقانه باید گفته شود.</strong></p>` }
+    ]
+  },
+
+  bs_full_model: {
+    title: "🏆 مدل Full: AUC=0.7738",
+    subtitle: "مدل کامل با پاتولوژی — برای Salvage mTESE",
+    sections: [
+      { title: "🔑 چرا Full model قوی‌تر است؟", content: `<p>شکاف <strong>0.137 AUC</strong> بین Pre-op (0.6374) و Full (0.7738) نشان می‌دهد پاتولوژی <strong>اطلاعات غیرقابل جایگزین</strong> دارد.</p><div class='highlight-box'><p>در V2 ادعا شده بود هورمون‌ها جایگزین (surrogate) پاتولوژی هستند. اما V3 نشان داد: <strong>هورمون‌ها فقط بخشی از اطلاعات پاتولوژی را منتقل می‌کنند.</strong></p></div>` },
+      { title: "🔬 گروه‌های ویژگی V3", content: `<div style='font-size:0.7rem;'><div style='display:flex;height:28px;border-radius:6px;overflow:hidden;margin:0.5rem 0;'><div style='width:29%;background:#f87171;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.6rem;'>Path RT ۲۹٪</div><div style='width:22%;background:#60a5fa;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.6rem;'>Clinical ۲۲٪</div><div style='width:17%;background:#f472b6;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.6rem;'>Path LT ۱۷٪</div><div style='width:17%;background:#22d3ee;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.6rem;'>Volume ۱۷٪</div><div style='width:15%;background:#fbbf24;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.6rem;'>Hormones ۱۵٪</div></div></div>` }
+    ]
+  },
+
+  bs_salvage_use: {
+    title: "🔄 Salvage mTESE: پاتولوژی موجود!",
+    subtitle: "در عمل تکراری، گزارش پاتولوژی از عمل قبلی در دسترس است",
+    sections: [
+      { title: "🔑 مفهوم کلیدی", content: `<div class='highlight-box'><p><strong>Salvage mTESE</strong> = عمل تکراری micro-TESE. در این حالت:</p><ul><li>گزارش پاتولوژی از عمل قبلی موجود است</li><li>rt_severity_score و lt_severity_score قابل محاسبه هستند</li><li>Full model (AUC=0.7738) قابل استفاده است!</li></ul></div><p style='margin-top:0.8rem;'>در دیتاست ما، <strong>۸.۸٪</strong> بیماران Salvage هستند. این subgroup دقیقاً همان جایی است که Full model CDSS بیشترین ارزش را دارد.</p>` }
+    ]
+  },
+
+  bs_shap_explain: {
+    title: "📊 SHAP یعنی چه؟",
+    subtitle: "توضیح اعداد اعشاری جلوی هر ویژگی",
+    sections: [
+      { title: "🔢 اعداد SHAP چیست؟", content: `<p>اعداد SHAP <strong>درصد نیستند!</strong></p><p><strong>Mean |SHAP|</strong> = میانگین قدر مطلق تأثیر هر ویژگی بر خروجی مدل در فضای <strong>log-odds</strong>.</p><div class='highlight-box'><p>🧮 مدل یک ترازو است. هر ویژگی وزنه‌ای روی کفه «موفق» یا «ناموفق» می‌گذارد. SHAP اندازه‌ی آن وزنه است — <strong>نه درصد سهم</strong>!</p></div>` },
+      { title: "📐 چرا جمع‌شان بیشتر از ۱۰۰ می‌شود؟", content: `<p>مجموع تمام مقادیر SHAP در V3: <strong>≈۴.۹۱</strong></p><p>این کاملاً طبیعی است چون:</p><ul><li>هر مقدار SHAP در فضای <strong>log-odds</strong> (لگاریتم نسبت شانس) است</li><li>ویژگی‌ها می‌توانند <strong>هم‌جهت</strong> عمل کنند</li><li>مقادیر SHAP برای هر بیمار جداگانه محاسبه و سپس <strong>میانگین مطلق</strong> گرفته می‌شود</li></ul>` }
+    ]
+  },
+
+  bs_shap_not_pct: {
+    title: "📊 اعداد SHAP ≠ درصد",
+    subtitle: "واحد SHAP: log-odds impact",
+    sections: [
+      { title: "📏 واحد", content: `<p>SHAP value واحدش <strong>log-odds</strong> است:</p><ul><li><strong>rt_severity_score = 0.491</strong> یعنی: به طور متوسط، شدت پاتولوژی بیضه راست ۰.۴۹۱ واحد log-odds پیش‌بینی مدل را تغییر می‌دهد</li><li>rt_severity_score (0.491) تقریباً <strong>۳۵ برابر</strong> orchiopexy (0.008) تأثیرگذارتر است</li></ul>` }
+    ]
+  },
+
+  bs_shap_sum: {
+    title: "🧮 مجموع ≈ ۴.۹۱",
+    subtitle: "۴۲ ویژگی با مجموع SHAP بسیار بیشتر از ۱",
+    sections: [
+      { title: "📊 توزیع سهم گروهی V3", content: `<table style='width:100%;border-collapse:collapse;font-size:0.78rem;'><tr style='background:var(--bg3);'><th style='padding:0.4rem;'>گروه</th><th style='padding:0.4rem;text-align:center;'>مجموع SHAP</th><th style='padding:0.4rem;text-align:center;'>سهم نسبی</th></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.3rem;color:var(--red);'><strong>Pathology RT</strong></td><td style='padding:0.3rem;text-align:center;font-weight:700;'>1.408</td><td style='padding:0.3rem;text-align:center;'>28.7%</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.3rem;'>Other Clinical</td><td style='padding:0.3rem;text-align:center;'>1.093</td><td style='padding:0.3rem;text-align:center;'>22.3%</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.3rem;color:var(--pink);'>Pathology LT</td><td style='padding:0.3rem;text-align:center;'>0.849</td><td style='padding:0.3rem;text-align:center;'>17.3%</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.3rem;'>Volume/Physical</td><td style='padding:0.3rem;text-align:center;'>0.846</td><td style='padding:0.3rem;text-align:center;'>17.2%</td></tr><tr><td style='padding:0.3rem;color:var(--orange);'>Hormones</td><td style='padding:0.3rem;text-align:center;'>0.709</td><td style='padding:0.3rem;text-align:center;'>14.4%</td></tr></table><p style='margin-top:0.5rem;font-size:0.75rem;color:var(--text2);'>پاتولوژی (RT+LT) = <strong>۴۶٪</strong> — یعنی تقریباً نیمی از قدرت پیش‌بینی!</p>` }
+    ]
+  },
+
+  bs_utility: {
+    title: "🔬 کاربرد واقعی CDSS",
+    subtitle: "دو حالت عملیاتی مدل V3",
+    sections: [
+      { title: "🎯 دو حالت", content: `<table style='width:100%;border-collapse:collapse;font-size:0.78rem;'><tr style='background:var(--bg3);'><th style='padding:0.5rem;'>حالت</th><th style='padding:0.5rem;text-align:center;'>AUC</th><th style='padding:0.5rem;'>کاربرد</th></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'>Pre-op only</td><td style='padding:0.4rem;text-align:center;color:var(--orange);'>0.6374</td><td style='padding:0.4rem;'>مشاوره قبل از اولین عمل — مدیریت انتظارات</td></tr><tr><td style='padding:0.4rem;'>Full (Salvage)</td><td style='padding:0.4rem;text-align:center;color:var(--green);'>0.7738</td><td style='padding:0.4rem;'>تصمیم‌گیری برای عمل تکراری — پاتولوژی موجود</td></tr></table>` }
+    ]
+  },
+
+  bs_77pct: {
+    title: "📊 دقت ۷۷٪ پیش‌بینی چه چیزی؟",
+    subtitle: "AUC=0.7738 یعنی تمایز ۷۷٪ بین موفق و ناموفق",
+    sections: [
+      { title: "📐 AUC=0.7738 یعنی چه؟", content: `<p>اگر دو بیمار تصادفی انتخاب کنیم (یکی موفق، یکی ناموفق)، مدل در <strong>۷۷.۳۸٪</strong> مواقع درست تشخیص می‌دهد کدام موفق بوده.</p><div class='highlight-box'><p>این برای Full model (با پاتولوژی) است. Pre-op only: فقط ۶۳.۷۴٪</p></div>` }
+    ]
+  },
+
+  bs_counseling: {
+    title: "👨‍⚕️ مشاوره قبل از عمل",
+    subtitle: "Pre-op model برای تصمیم اولیه",
+    sections: [
+      { title: "💊 کاربرد بالینی", content: `<p>با Pre-op model (AUC=0.64):</p><ul><li>شناسایی بیماران با شانس بسیار پایین</li><li>توضیح واقع‌بینانه شانس موفقیت</li><li>تصمیم آگاهانه بیمار و خانواده</li></ul><div class='warning-box'><p>⚠️ <strong>صداقت مهم است:</strong> AUC=0.64 یعنی مدل بسیار بهتر از تصادف نیست. باید محدودیت‌ها را صادقانه بیان کرد.</p></div>` }
+    ]
+  },
+
+  bs_expectations: {
+    title: "📋 مدیریت انتظارات بیمار",
+    subtitle: "چه بگوییم و چه نگوییم",
+    sections: [
+      { title: "✅ ارتباط صحیح", content: `<p>به جای «شانس شما ۷۷٪ است» باید بگوییم:</p><div class='highlight-box'><p>«مدل نشان می‌دهد بر اساس آزمایشات شما، شانس موفقیت [X]٪ تخمین زده می‌شود. اما این پیش‌بینی <strong>بدون اطلاعات پاتولوژی</strong> است و دقت محدود دارد (AUC≈0.64). نتیجه واقعی فقط حین عمل مشخص می‌شود.»</p></div>` }
+    ]
+  },
+
+  bs_with_without: {
+    title: "🧬 Pre-op vs Full Model",
+    subtitle: "مقایسه دقیق دو حالت مدل V3",
+    sections: [
+      { title: "🔬 تحلیل دوگانه V3", content: `<p>در V3 دو مدل مجزا آموزش دادیم:</p><table style='width:100%;border-collapse:collapse;font-size:0.78rem;'><tr style='background:var(--bg3);'><th style='padding:0.4rem;'>مدل</th><th style='padding:0.4rem;text-align:center;'>AUC</th><th style='padding:0.4rem;'>ویژگی‌ها</th></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'>Pre-op only</td><td style='padding:0.4rem;text-align:center;'>0.6374</td><td style='padding:0.4rem;'>هورمون + حجم + ژنتیک + دموگرافیک</td></tr><tr><td style='padding:0.4rem;font-weight:700;'>Full model</td><td style='padding:0.4rem;text-align:center;font-weight:700;'>0.7738</td><td style='padding:0.4rem;'>همه ۴۲ ویژگی شامل پاتولوژی</td></tr></table><p style='margin-top:0.5rem;'><strong>شکاف ۰.۱۳۷ AUC</strong> = اطلاعات پاتولوژی <strong>غیرقابل جایگزین</strong> هستند.</p>` }
+    ]
+  },
+
+  bs_dual: {
+    title: "🔬 تحلیل دوگانه V3",
+    subtitle: "دو مدل، دو کاربرد",
+    sections: [
+      { title: "📊 نتایج", content: `<div class='highlight-box'><p><strong>Pre-op AUC=0.6374</strong> — بدون پاتولوژی، هورمون‌ها و حجم بیضه سقف دقت را محدود می‌کنند.</p><p><strong>Full AUC=0.7738</strong> — با پاتولوژی، مدل ۱۳.۶ واحد AUC بهتر عمل می‌کند.</p></div><p style='margin-top:0.5rem;'>این نشان می‌دهد ادعای V2 که «هورمون‌ها جایگزین کامل پاتولوژی هستند» <strong>نادرست</strong> بود.</p>` }
+    ]
+  },
+
+  bs_ceiling: {
+    title: "📉 Ceiling Effect: سقف 0.64",
+    subtitle: "محدودیت ذاتی پیش‌بینی قبل از عمل",
+    sections: [
+      { title: "🔒 سقف Pre-op", content: `<p>AUC=0.6374 سقف واقعی پیش‌بینی قبل از عمل است:</p><ul><li>هورمون‌ها فقط <strong>بخشی</strong> از اطلاعات پاتولوژی را منتقل می‌کنند</li><li>حجم بیضه نشانگر غیرمستقیم است، نه مستقیم</li><li>ژنتیک (AZF, Karyotype) مهم است ولی در ۶۲٪ بیماران missing</li></ul><div class='warning-box'><p>⚠️ هیچ مدل ML‌ای نمی‌تواند بدون اطلاعات مستقیم بافت بیضه، بهتر از ~0.64 عمل کند. این محدودیت بیولوژیکی است، نه فنی.</p></div>` }
+    ]
+  },
+
+  bs_gap: {
+    title: "📊 شکاف ۰.۱۳۷ = اهمیت پاتولوژی",
+    subtitle: "Full model - Pre-op = 0.7738 - 0.6374 = 0.1364",
+    sections: [
+      { title: "📐 معنای شکاف", content: `<p>شکاف ۰.۱۳۷ AUC بین دو مدل اثبات می‌کند:</p><ul><li>پاتولوژی <strong>اطلاعات منحصربه‌فرد</strong> دارد</li><li>هورمون‌ها <strong>surrogate ناکامل</strong> پاتولوژی هستند</li><li>مدل Pre-op ناگزیر <strong>محدود</strong> است</li></ul>` }
+    ]
+  },
+
+  bs_salvage: {
+    title: "🔄 Salvage mTESE",
+    subtitle: "عمل تکراری — پاتولوژی از عمل قبلی موجود",
+    sections: [
+      { title: "🔑 مفهوم Salvage", content: `<p>Salvage mTESE = تکرار عمل بعد از شکست اولیه. در این حالت:</p><ul><li>پاتولوژی از عمل قبلی ثبت شده</li><li>rt_severity_score و lt_severity_score قابل محاسبه</li><li>Full model (AUC=0.77) قابل استفاده</li></ul><p>در دیتاست ما: <strong>۸.۸٪</strong> بیماران Salvage</p>` }
+    ]
+  },
+
+  bs_path_available: {
+    title: "📋 پاتولوژی از عمل قبلی",
+    subtitle: "گزارش pathology قبلی = ورودی مدل Full",
+    sections: [
+      { title: "✅ منطق", content: `<p>در Salvage mTESE، بیمار قبلاً یک‌بار عمل شده و گزارش پاتولوژی ثبت شده. بنابراین:</p><div class='highlight-box'><p>✅ rt_severity_score از گزارش قبلی محاسبه می‌شود<br>✅ rt_tissue_heterogeneity از تنوع بافتی قبلی<br>✅ Full model با AUC=0.7738 قابل استفاده!<br><br>این مهم‌ترین use case بالینی CDSS است.</p></div>` }
+    ]
+  },
+
+  bs_repeat_pred: {
+    title: "🔮 پیش‌بینی تکرار عمل",
+    subtitle: "Full model برای تصمیم‌گیری Salvage",
+    sections: [
+      { title: "💊 سناریو", content: `<p>بیمار بار اول عمل شد و ناموفق بود. حالا پزشک می‌خواهد بداند آیا عمل دوم ارزش دارد؟</p><p>CDSS می‌تواند با استفاده از پاتولوژی عمل اول + داده‌های بالینی جدید، پیش‌بینی دقیق‌تری (AUC=0.77) ارائه دهد.</p>` }
+    ]
+  },
+
+  bs_salvage_data: {
+    title: "⚠️ محدودیت داده Salvage",
+    subtitle: "فقط ۸.۸٪ بیماران = ۲۱۶ نفر",
+    sections: [
+      { title: "📊 آمار", content: `<p>در ۲۴۰۸ بیمار:</p><ul><li>Primary (اولین عمل): <strong>۹۱.۲٪</strong> (≈۲۱۹۲ نفر)</li><li>Salvage (تکراری): <strong>۸.۸٪</strong> (≈۲۱۶ نفر)</li></ul><div class='warning-box'><p>⚠️ تعداد Salvage کم است → external validation برای این subgroup ضروری.</p></div>` }
+    ]
+  },
+
+  bs_genetics: {
+    title: "🧬 ویژگی‌های ژنتیک در V3",
+    subtitle: "karyotype_severity و azf_deletion_severity حالا در مدل هستند!",
+    sections: [
+      { title: "🆕 نوآوری V3: ژنتیک", content: `<p>در V2 ویژگی‌های ژنتیک (Karyotype و Y-microdeletion) به‌خاطر missing بالا (۶۲٪) و encoding ضعیف از مدل حذف شده بودند.</p><p>در V3 با <strong>Ordinal Encoding صحیح</strong>:</p><div class='shap-bar'><span class='label'>6. AZF Deletion</span><div class='bar-bg'><div class='bar-fill' style='width:52%;background:linear-gradient(90deg,#a78bfa,#818cf8);'></div></div><span class='val'>0.257</span></div><div class='shap-bar'><span class='label'>11. Karyotype</span><div class='bar-bg'><div class='bar-fill' style='width:32%;background:linear-gradient(90deg,#a78bfa,#818cf8);'></div></div><span class='val'>0.157</span></div><div class='highlight-box' style='margin-top:0.5rem;'><p>💡 AZF deletion رتبه ۶ و Karyotype رتبه ۱۱ در SHAP هستند! این ویژگی‌ها در ادبیات پزشکی بسیار مهم شناخته می‌شوند و حالا مدل هم آنها را تأیید می‌کند.</p></div>` }
+    ]
+  },
+
+  bs_karyotype: {
+    title: "🧬 Karyotype Severity",
+    subtitle: "رتبه ۱۱ SHAP — SHAP = 0.157",
+    sections: [
+      { title: "📊 توضیح", content: `<p><strong>Karyotype</strong> (کاریوتایپ) = نقشه کروموزومی بیمار. اختلالات کاریوتایپ مثل Klinefelter (47,XXY) با NOA شدید مرتبط هستند.</p><p>karyotype_severity یک امتیاز ordinal است که شدت اختلال کروموزومی را نشان می‌دهد.</p><div class='highlight-box'><p>💡 با وجود ۶۲٪ missing، مدل CatBoost توانست اطلاعات مفیدی از آن استخراج کند — یکی از مزایای CatBoost در handling missing values.</p></div>` }
+    ]
+  },
+
+  bs_azf: {
+    title: "🧬 AZF Deletion Severity",
+    subtitle: "رتبه ۶ SHAP — SHAP = 0.257",
+    sections: [
+      { title: "📊 توضیح", content: `<p><strong>Y chromosome microdeletion (AZF)</strong> = حذف‌های ریز در کروموزوم Y:</p><ul><li><strong>AZFa:</strong> حذف شدید — اسپرم‌سازی تقریباً غیرممکن (SCO)</li><li><strong>AZFb:</strong> حذف متوسط — MA معمول</li><li><strong>AZFc:</strong> حذف خفیف — شانس اسپرم‌یابی ≈۵۰٪</li></ul><p>azf_deletion_severity این حذف‌ها را به یک امتیاز ordinal تبدیل کرده.</p><div class='highlight-box'><p>🏆 رتبه ۶ با SHAP=0.257 — بالاتر از Age (0.192)! ژنتیک اطلاعات مهمی برای پیش‌بینی دارد.</p></div>` }
+    ]
+  },
+
+  bs_surgeon: {
+    title: "🎯 نقطه Dissection و مهارت جراح",
+    subtitle: "عوامل اندازه‌گیری‌نشده در مدل ما",
+    sections: [
+      { title: "📚 پاسخ", content: `<p>مهارت جراح و تکنیک dissection از <strong>مهم‌ترین عوامل</strong> هستند ولی در مدل نیستند:</p><ul><li>learning curve جراح مستقیماً بر نتایج تأثیر دارد</li><li>SRR بین مراکز مختلف: <strong>۴۰-۶۰٪</strong> متغیر است</li></ul><div class='warning-box'><p>⚠️ <strong>محدودیت:</strong> مهارت جراح و تجهیزات آزمایشگاه unmeasured confounder هستند.</p></div>` }
+    ]
+  },
+
+  bs_skill: {
+    title: "👨‍⚕️ تأثیر مهارت جراح",
+    subtitle: "Surgeon experience as unmeasured factor",
+    sections: [
+      { title: "📊 شواهد", content: `<ul><li>micro-TESE جزو <strong>پیچیده‌ترین عمل‌های اورولوژی</strong></li><li>SRR بین مراکز: <strong>۴۰-۶۰٪</strong></li><li>تجربه بیشتر = شناسایی بهتر توبول‌های فعال</li></ul>` },
+      { title: "💡 در مقاله", content: `<div class='highlight-box'><p>"Surgeon experience and laboratory processing quality were not included as model features. This is a recognized limitation common to all existing mTESE prediction studies."</p></div>` }
+    ]
+  },
+
+  bs_limitation: {
+    title: "📝 محدودیت پژوهش ما",
+    subtitle: "V3 صادقانه‌ترین نسخه",
+    sections: [
+      { title: "⚖️ محدودیت‌ها", content: `<table style='width:100%;border-collapse:collapse;font-size:0.78rem;'><tr style='background:var(--bg3);'><th style='padding:0.5rem;'>محدودیت</th><th style='padding:0.5rem;'>پاسخ</th></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'>Pre-op AUC=0.64</td><td style='padding:0.4rem;'>سقف بیولوژیکی — صادقانه گزارش شده</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'>مهارت جراح</td><td style='padding:0.4rem;'>single-center → ثبات تکنیک</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'>retrospective</td><td style='padding:0.4rem;'>n=2408 بزرگ‌ترین dataset ML+mTESE</td></tr><tr><td style='padding:0.4rem;'>single-center</td><td style='padding:0.4rem;'>نیاز به external validation</td></tr></table>` }
+    ]
+  },
+
+  bs_validity: {
+    title: "⚠️ اعتبار و External Validation",
+    subtitle: "ضروری‌ترین کار آینده",
+    sections: [
+      { title: "📋 وضعیت", content: `<p>مدل V3 فقط روی داده‌های <strong>یک مرکز</strong> (پژوهشگاه رویان) آموزش و ارزیابی شده.</p><div class='warning-box'><p>بدون external validation، هیچ ادعای قابل تعمیمی نمی‌توانیم داشته باشیم.</p></div>` }
+    ]
+  },
+
+  bs_no_ext_val: {
+    title: "❓ بدون validation",
+    subtitle: "single-center = محدودیت جدی",
+    sections: [
+      { title: "📊 توضیح", content: `<p>Nested CV ۵×۵ از overfitting جلوگیری می‌کند اما نمی‌تواند generalizability را تضمین کند. نیاز به test روی مراکز دیگر داریم.</p>` }
+    ]
+  },
+
+  bs_single_center: {
+    title: "🏥 محدودیت single-center",
+    subtitle: "فقط پژوهشگاه رویان",
+    sections: [
+      { title: "⚠️ اثر", content: `<p>داده فقط از رویان → ممکن است الگوهای خاص آن مرکز یاد گرفته شده باشد.</p>` }
+    ]
+  },
+
+  bs_future: {
+    title: "🔮 Future Work",
+    subtitle: "کارهای پیشنهادی آینده",
+    sections: [
+      { title: "📋 اولویت‌ها", content: `<ol><li><strong>External validation</strong> در مراکز دیگر ایران</li><li><strong>Prospective study</strong></li><li>اضافه کردن <strong>surgeon experience</strong></li><li>ترکیب CDSS با <strong>AI co-pilot حین عمل</strong></li></ol>` }
+    ]
+  },
+
+  // ===== DR DEHDELE =====
+  dehdele: {
+    title: "💬 کامنت‌های دکتر دهدله",
+    subtitle: "سؤالات استاد مشاور",
+    sections: [
+      { title: "📝 خلاصه", content: `<ul><li>چرا ۱۷ مدل؟</li><li>چرا Deep Learning نه؟</li><li>ترتیب Pipeline</li></ul>` }
+    ]
+  },
+
+  deh_16models: {
+    title: "💬 چرا ۱۷ مدل؟",
+    subtitle: "سؤال دکتر دهدله",
+    sections: [
+      { title: "✅ پاسخ", content: `<p>۱۷ مدل از <strong>۶ خانواده مختلف</strong>:</p><ul><li><span class='tag tag-blue'>Linear (3)</span> LR L1, L2, ElasticNet</li><li><span class='tag tag-green'>Tree/Boosting (7)</span> RF, ExtraTrees, XGBoost, LightGBM, CatBoost, StackingEnsemble, SoftVoting</li><li><span class='tag tag-cyan'>Distance (3)</span> KNN, SVM_RBF, SVM_Linear</li><li><span class='tag tag-orange'>Probabilistic (1)</span> GaussianNB</li><li><span class='tag tag-pink'>Neural (2)</span> MLP, FT-Transformer</li><li><span class='tag tag-blue'>Deep Tabular (1)</span> TabNet</li></ul><div class='highlight-box'><p>تنوع خانواده‌ها مهم است: پوشش کامل فضای الگوریتمی. V3 حالا شامل FT-Transformer و TabNet هم هست!</p></div>` }
+    ]
+  },
+
+  deh_dl: {
+    title: "💬 چرا Deep Learning نه؟",
+    subtitle: "در V3 هم CatBoost بهترین!",
+    sections: [
+      { title: "✅ پاسخ V3", content: `<p>در V3 دو مدل Deep Learning هم اضافه شد:</p><ul><li><strong>FT-Transformer:</strong> AUC = 0.7112 (رتبه ۹)</li><li><strong>TabNet:</strong> AUC = 0.6428 (رتبه ۱۷ = آخر!)</li></ul><p>CatBoost (0.7738) هنوز <strong>بهترین</strong> است — تأیید عملی Grinsztajn et al. 2022.</p><div class='highlight-box'><p>📊 CatBoost <span class='tag tag-green'>0.7738</span> vs FT-Transformer <span class='tag tag-red'>0.7112</span> vs TabNet <span class='tag tag-red'>0.6428</span></p></div>` }
+    ]
+  },
+
+  deh_pipeline: {
+    title: "💬 ترتیب Pipeline",
+    subtitle: "V3: Ordinal Encoding جایگزین One-Hot+Target Encoding",
+    sections: [
+      { title: "✅ اصلاح V3", content: `<p>ترتیب pipeline V3:</p><ol><li>Ordinal Encoding برای ویژگی‌های ordinal (جایگزین one-hot → target encoding)</li><li>KNN Imputation داخل CV fold</li><li>RobustScaler داخل CV fold</li><li>SMOTE فقط روی training set</li></ol><div class='highlight-box'><p>✅ مشکل V2: ویژگی‌های ordinal ابتدا one-hot شده و سپس target-encoded شدند → <strong>data leakage</strong>. V3 با ordinal encoding مستقیم این مشکل را حل کرد.</p></div>` }
+    ]
+  },
+
+  // ===== RESULTS V3 =====
+  results: {
+    title: "📊 نتایج V3",
+    subtitle: "خلاصه نتایج pipeline اصلاح‌شده — صادقانه",
+    sections: [
+      { title: "🏆 بهترین مدل", content: `<p><strong>CatBoost</strong> با <span class='tag tag-green'>AUC = 0.7738 (95% CI: 0.7606–0.7870)</span></p><p>۴۲ ویژگی · ۲۴۰۸ نمونه · ۱۷ مدل مقایسه شده</p>` }
+    ]
+  },
+
+  res_catboost: {
+    title: "🏆 CatBoost — بهترین مدل V3",
+    subtitle: "AUC = 0.7738 (95% CI: 0.7606–0.7870)",
+    sections: [
+      { title: "⚙️ Hyperparameters", content: `<ul><li>depth = 6</li><li>iterations = 1000</li><li>learning_rate = 0.05</li><li>random_seed = 42</li><li>auto_class_weights = Balanced</li></ul>` },
+      { title: "📐 عملکرد", content: `<ul><li>AUC: <strong>0.7738 ± 0.0132</strong></li><li>Accuracy: <strong>71.80%</strong></li><li>Sensitivity: <strong>64.45%</strong></li><li>Specificity: <strong>76.08%</strong></li><li>F1 Score: <strong>0.6268</strong></li><li>Brier Score: <strong>0.1874</strong></li></ul>` }
+    ]
+  },
+
+  res_shap: {
+    title: "📊 SHAP Feature Ranking V3",
+    subtitle: "رتبه‌بندی ۴۲ ویژگی — پاتولوژی در صدر!",
+    sections: [
+      { title: "🔝 Top 20 Features", content: `<div class='shap-bar'><span class='label'>1. RT Severity</span><div class='bar-bg'><div class='bar-fill' style='width:100%;background:linear-gradient(90deg,#f87171,#f472b6);'></div></div><span class='val'>0.491</span></div><div class='shap-bar'><span class='label'>2. RT Heterogeneity</span><div class='bar-bg'><div class='bar-fill' style='width:99%;background:linear-gradient(90deg,#f87171,#f472b6);'></div></div><span class='val'>0.489</span></div><div class='shap-bar'><span class='label'>3. LT Severity</span><div class='bar-bg'><div class='bar-fill' style='width:93%;background:linear-gradient(90deg,#f472b6,#a78bfa);'></div></div><span class='val'>0.458</span></div><div class='shap-bar'><span class='label'>4. T/E2 Ratio</span><div class='bar-bg'><div class='bar-fill' style='width:58%;background:linear-gradient(90deg,#fbbf24,#f59e0b);'></div></div><span class='val'>0.287</span></div><div class='shap-bar'><span class='label'>5. RT Dominant Pattern</span><div class='bar-bg'><div class='bar-fill' style='width:55%;background:linear-gradient(90deg,#f87171,#f472b6);'></div></div><span class='val'>0.272</span></div><div class='shap-bar'><span class='label'>6. AZF Deletion</span><div class='bar-bg'><div class='bar-fill' style='width:52%;background:linear-gradient(90deg,#a78bfa,#818cf8);'></div></div><span class='val'>0.257</span></div><div class='shap-bar'><span class='label'>7. Age</span><div class='bar-bg'><div class='bar-fill' style='width:39%;background:linear-gradient(90deg,#60a5fa,#818cf8);'></div></div><span class='val'>0.192</span></div><div class='shap-bar'><span class='label'>8. LT Volume</span><div class='bar-bg'><div class='bar-fill' style='width:39%;background:linear-gradient(90deg,#22d3ee,#60a5fa);'></div></div><span class='val'>0.191</span></div><div class='shap-bar'><span class='label'>9. RT Volume</span><div class='bar-bg'><div class='bar-fill' style='width:35%;background:linear-gradient(90deg,#22d3ee,#60a5fa);'></div></div><span class='val'>0.173</span></div><div class='shap-bar'><span class='label'>10. LT Heterogeneity</span><div class='bar-bg'><div class='bar-fill' style='width:33%;background:linear-gradient(90deg,#f472b6,#a78bfa);'></div></div><span class='val'>0.165</span></div><div class='shap-bar'><span class='label'>11. Karyotype</span><div class='bar-bg'><div class='bar-fill' style='width:32%;background:linear-gradient(90deg,#a78bfa,#818cf8);'></div></div><span class='val'>0.157</span></div><div class='shap-bar'><span class='label'>12. Seminal pH</span><div class='bar-bg'><div class='bar-fill' style='width:29%;background:linear-gradient(90deg,#60a5fa,#818cf8);'></div></div><span class='val'>0.145</span></div><div class='shap-bar'><span class='label'>13. FSH</span><div class='bar-bg'><div class='bar-fill' style='width:29%;background:linear-gradient(90deg,#fbbf24,#f59e0b);'></div></div><span class='val'>0.143</span></div><div class='shap-bar'><span class='label'>14. Total Test. Vol</span><div class='bar-bg'><div class='bar-fill' style='width:28%;background:linear-gradient(90deg,#22d3ee,#60a5fa);'></div></div><span class='val'>0.136</span></div><div class='shap-bar'><span class='label'>15. LH</span><div class='bar-bg'><div class='bar-fill' style='width:26%;background:linear-gradient(90deg,#fbbf24,#f59e0b);'></div></div><span class='val'>0.129</span></div><div class='shap-bar'><span class='label'>16. RT % Favorable</span><div class='bar-bg'><div class='bar-fill' style='width:25%;background:linear-gradient(90deg,#f87171,#f472b6);'></div></div><span class='val'>0.123</span></div><div class='shap-bar'><span class='label'>17. LT Dominant Pattern</span><div class='bar-bg'><div class='bar-fill' style='width:23%;background:linear-gradient(90deg,#f472b6,#a78bfa);'></div></div><span class='val'>0.114</span></div><div class='shap-bar'><span class='label'>18. BMI</span><div class='bar-bg'><div class='bar-fill' style='width:21%;background:linear-gradient(90deg,#60a5fa,#818cf8);'></div></div><span class='val'>0.105</span></div><div class='shap-bar'><span class='label'>19. Testosterone</span><div class='bar-bg'><div class='bar-fill' style='width:20%;background:linear-gradient(90deg,#fbbf24,#f59e0b);'></div></div><span class='val'>0.096</span></div><div class='shap-bar'><span class='label'>20. TestVol RT Guess</span><div class='bar-bg'><div class='bar-fill' style='width:16%;background:linear-gradient(90deg,#22d3ee,#60a5fa);'></div></div><span class='val'>0.076</span></div>` },
+      { title: "🔑 نکته کلیدی", content: `<div class='warning-box'><p><strong>تفاوت بنیادین با V2:</strong> در V2 پاتولوژی SHAP=0 داشت. در V3 پاتولوژی <strong>برترین عامل</strong> است! (rt_severity_score=0.491)</p><p>ویژگی‌های ژنتیک هم اضافه شدند: AZF deletion (رتبه ۶) و Karyotype (رتبه ۱۱).</p></div>` }
+    ]
+  },
+
+  res_metrics: {
+    title: "📐 عملکرد CatBoost V3",
+    subtitle: "Operating Metrics",
+    sections: [
+      { title: "📊 معیارها", content: `<table style='width:100%;border-collapse:collapse;font-size:0.8rem;'><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;color:var(--text2);'>AUC</td><td style='padding:0.4rem;font-weight:700;'>0.7738 ± 0.0132</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;color:var(--text2);'>Accuracy</td><td style='padding:0.4rem;font-weight:700;'>71.80%</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;color:var(--text2);'>Sensitivity</td><td style='padding:0.4rem;font-weight:700;'>64.45%</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;color:var(--text2);'>Specificity</td><td style='padding:0.4rem;font-weight:700;'>76.08%</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;color:var(--text2);'>F1 Score</td><td style='padding:0.4rem;font-weight:700;'>0.6268</td></tr><tr><td style='padding:0.4rem;color:var(--text2);'>Brier Score</td><td style='padding:0.4rem;font-weight:700;'>0.1874</td></tr></table>` }
+    ]
+  },
+
+  res_leaderboard: {
+    title: "🏅 V3 Model Leaderboard",
+    subtitle: "رتبه‌بندی ۱۷ مدل — ۱۰ برتر",
+    sections: [
+      { title: "📊 جدول مقایسه", content: `<table style='width:100%;border-collapse:collapse;font-size:0.75rem;'><tr style='background:var(--bg3);'><th style='padding:0.4rem;text-align:right;border-bottom:1px solid var(--border);'>مدل</th><th style='padding:0.4rem;text-align:center;border-bottom:1px solid var(--border);'>AUC</th><th style='padding:0.4rem;text-align:center;border-bottom:1px solid var(--border);'>F1</th><th style='padding:0.4rem;text-align:center;border-bottom:1px solid var(--border);'>Brier</th></tr><tr style='border-bottom:1px solid var(--border);background:rgba(52,211,153,0.05);'><td style='padding:0.4rem;font-weight:700;'>🥇 CatBoost</td><td style='padding:0.4rem;text-align:center;color:var(--green);font-weight:700;'>0.7738</td><td style='padding:0.4rem;text-align:center;'>0.6268</td><td style='padding:0.4rem;text-align:center;'>0.1874</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'>🥈 XGBoost</td><td style='padding:0.4rem;text-align:center;'>0.7672</td><td style='padding:0.4rem;text-align:center;'>0.6294</td><td style='padding:0.4rem;text-align:center;'>0.19</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'>🥉 StackingEnsemble</td><td style='padding:0.4rem;text-align:center;'>0.7607</td><td style='padding:0.4rem;text-align:center;'>0.6201</td><td style='padding:0.4rem;text-align:center;'>0.1992</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'>4. LightGBM</td><td style='padding:0.4rem;text-align:center;'>0.7601</td><td style='padding:0.4rem;text-align:center;'>0.6242</td><td style='padding:0.4rem;text-align:center;'>0.193</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'>5. SoftVotingEnsemble</td><td style='padding:0.4rem;text-align:center;'>0.7598</td><td style='padding:0.4rem;text-align:center;'>0.6094</td><td style='padding:0.4rem;text-align:center;'>0.1885</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'>6. ExtraTrees</td><td style='padding:0.4rem;text-align:center;'>0.7597</td><td style='padding:0.4rem;text-align:center;'>0.6202</td><td style='padding:0.4rem;text-align:center;'>0.1924</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'>7. RandomForest</td><td style='padding:0.4rem;text-align:center;'>0.7543</td><td style='padding:0.4rem;text-align:center;'>0.6144</td><td style='padding:0.4rem;text-align:center;'>0.1959</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'>8. KNN</td><td style='padding:0.4rem;text-align:center;'>0.7152</td><td style='padding:0.4rem;text-align:center;'>0.4456</td><td style='padding:0.4rem;text-align:center;'>0.2035</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'>9. FT-Transformer</td><td style='padding:0.4rem;text-align:center;'>0.7112</td><td style='padding:0.4rem;text-align:center;'>0.569</td><td style='padding:0.4rem;text-align:center;'>0.2154</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'>10. SVM_RBF</td><td style='padding:0.4rem;text-align:center;'>0.7065</td><td style='padding:0.4rem;text-align:center;'>0.5114</td><td style='padding:0.4rem;text-align:center;'>0.202</td></tr></table>` }
+    ]
+  },
+
+  // ===== V1→V2→V3 CORRECTIONS =====
+  corrections: {
+    title: "🔧 سفر V1 → V2 → V3",
+    subtitle: "سه نسخه — هر بار صادقانه‌تر",
+    sections: [
+      { title: "📋 خلاصه سفر", content: `<table style='width:100%;border-collapse:collapse;font-size:0.78rem;'><tr style='background:var(--bg3);'><th style='padding:0.4rem;'>نسخه</th><th style='padding:0.4rem;text-align:center;'>AUC</th><th style='padding:0.4rem;'>مشکل اصلی</th></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.3rem;color:var(--red);'>V1</td><td style='padding:0.3rem;text-align:center;'>≈0.99</td><td style='padding:0.3rem;'>Pipeline leakage — پیش‌پردازش خارج CV</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.3rem;color:var(--orange);'>V2</td><td style='padding:0.3rem;text-align:center;'>0.8306</td><td style='padding:0.3rem;'>Encoding leakage — one-hot → target encoding</td></tr><tr><td style='padding:0.3rem;color:var(--green);font-weight:700;'>V3</td><td style='padding:0.3rem;text-align:center;font-weight:700;'>0.7738</td><td style='padding:0.3rem;'>✅ اصلاح شده — Ordinal Encoding صحیح</td></tr></table>` }
+    ]
+  },
+
+  cor_v1_leak: {
+    title: "🔴 V1: نشت Pipeline",
+    subtitle: "AUC ≈ 0.99 — غیرواقعی!",
+    sections: [
+      { title: "💥 مشکل", content: `<p>در V1 پیش‌پردازش (KNN Imputation, Scaling) روی <strong>کل داده</strong> (train+test) انجام شد → مدل از داده تست هم یاد گرفت → AUC نزدیک ۱.۰!</p><div class='warning-box'><p>AUC ≈ 0.99 = <strong>تقلب ناخواسته</strong>. مدل واقعاً یاد نگرفته بود.</p></div>` }
+    ]
+  },
+
+  cor_v2_leak: {
+    title: "🟡 V2: نشت Encoding",
+    subtitle: "AUC = 0.8306 — بیش‌برآورد ۶ واحد!",
+    sections: [
+      { title: "🔍 مشکل V2", content: `<p>در V2 pipeline اصلاح شد (داخل CV) اما یک مشکل encoding باقی ماند:</p><div class='warning-box'><p><strong>ویژگی‌های ordinal</strong> (مثل Karyotype, AZF) ابتدا <strong>One-Hot Encoded</strong> شدند و سپس <strong>Target Encoded</strong> → این ترکیب باعث <strong>نشت اطلاعات target</strong> به features شد.</p></div><p style='margin-top:0.5rem;'>نتیجه: AUC بیش‌برآورد شد (0.8306 به جای 0.7738)</p>` },
+      { title: "🧪 چرا مهم؟", content: `<p>Target Encoding: هر مقدار categorical با <strong>میانگین target</strong> آن گروه جایگزین می‌شود. اگر این قبل از CV split انجام شود → مدل به «جواب» دسترسی پیدا می‌کند!</p><p>حتی داخل CV fold هم اگر encoding بر اساس target باشد → <strong>subtle leakage</strong>.</p>` }
+    ]
+  },
+
+  cor_v3_fix: {
+    title: "✅ V3: اصلاح Ordinal Encoding",
+    subtitle: "AUC = 0.7738 — نتیجه صادقانه",
+    sections: [
+      { title: "🔧 اصلاحات V3", content: `<ul><li>One-Hot + Target Encoding → <strong>Ordinal Encoding مستقیم</strong></li><li>هر ویژگی ordinal با مقیاس عددی ذاتی encode شد</li><li>هیچ اطلاعات target به features نشت نکرد</li><li>تعداد ویژگی‌ها: ۲۹ → <strong>۴۲</strong> (ژنتیک اضافه شد)</li><li>نمونه: ۲۴۱۳ → <strong>۲۴۰۸</strong></li></ul>` },
+      { title: "📉 چرا AUC کاهش یافت؟", content: `<div class='highlight-box'><p>AUC از 0.8306 به 0.7738 افت کرد (<strong>−0.057</strong>) — اما این <strong>خبر خوب</strong> است!</p><ul><li>0.8306 = نتیجه <strong>inflate شده</strong> با نشت encoding</li><li>0.7738 = نتیجه <strong>واقعی و صادقانه</strong></li><li>هر چه AUC واقعی‌تر باشد، اعتماد به مدل بیشتر است</li></ul></div>` }
+    ]
+  },
+
+  // ===== PAPERS =====
+  papers_ab: {
+    title: "📄 Paper A vs Paper B",
+    subtitle: "دو مقاله با رویکردهای متفاوت",
+    sections: [
+      { title: "📋 مقایسه V3", content: `<table style='width:100%;border-collapse:collapse;font-size:0.78rem;'><tr style='background:var(--bg3);'><th style='padding:0.5rem;'></th><th style='padding:0.5rem;text-align:center;'>Paper A (Full)</th><th style='padding:0.5rem;text-align:center;'>Paper B (Pre-op)</th></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'>پاتولوژی</td><td style='padding:0.4rem;text-align:center;'>شامل ✅</td><td style='padding:0.4rem;text-align:center;'>حذف شده ❌</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.4rem;'>AUC</td><td style='padding:0.4rem;text-align:center;font-weight:700;'>0.7738</td><td style='padding:0.4rem;text-align:center;'>0.6374</td></tr><tr><td style='padding:0.4rem;'>کاربرد</td><td style='padding:0.4rem;text-align:center;'>Salvage mTESE</td><td style='padding:0.4rem;text-align:center;'>Primary mTESE</td></tr></table>` }
+    ]
+  },
+
+  paper_a: {
+    title: "📄 Paper A: ۱۷ مدل + پاتولوژی",
+    subtitle: "Full model — AUC = 0.7738",
+    sections: [
+      { title: "📋 مشخصات", content: `<p>مدل کامل با تمام ۴۲ ویژگی شامل پاتولوژی. پاتولوژی برترین عامل پیش‌بینی (SHAP=0.491). کاربرد: Salvage mTESE.</p>` }
+    ]
+  },
+
+  paper_b: {
+    title: "📄 Paper B: Pre-op only",
+    subtitle: "بدون پاتولوژی — AUC = 0.6374",
+    sections: [
+      { title: "📋 مشخصات", content: `<p>مدل فقط با ویژگی‌های قبل از عمل. سقف واقعی پیش‌بینی بدون بافت‌شناسی. کاربرد: Primary mTESE — مشاوره اولیه.</p>` }
+    ]
+  },
+
+  papers_v3_result: {
+    title: "✅ نتیجه V3: پاتولوژی مهم‌ترین!",
+    subtitle: "برخلاف V2 که SHAP=0 بود",
+    sections: [
+      { title: "🔄 تغییر بنیادین", content: `<div class='warning-box'><p><strong>V2 ادعا:</strong> پاتولوژی SHAP=0 → مدل بدون پاتولوژی کار می‌کند → پارادوکس حل شد!</p></div><div class='highlight-box' style='margin-top:0.5rem;'><p><strong>V3 واقعیت:</strong> پاتولوژی = برترین عامل (SHAP=0.491)! → مدل دو حالته → Pre-op (0.64) + Full (0.77)</p></div><p style='margin-top:0.5rem;'>V3 صادقانه‌تر ولی واقع‌بینانه‌تر است.</p>` }
+    ]
+  },
+
+  // ===== FEATURE MEDICAL =====
+  feature_medical: {
+    title: "📊 سهم ویژگی‌ها V3 + تفسیر پزشکی",
+    subtitle: "۴۲ ویژگی در ۵ گروه — پاتولوژی در صدر",
+    sections: [
+      { title: "📊 توزیع گروهی", content: `<table style='width:100%;border-collapse:collapse;font-size:0.78rem;'><tr style='background:var(--bg3);'><th style='padding:0.4rem;'>گروه</th><th style='padding:0.4rem;text-align:center;'>SHAP کل</th><th style='padding:0.4rem;text-align:center;'>سهم</th></tr><tr style='border-bottom:1px solid var(--border);background:rgba(248,113,113,0.1);'><td style='padding:0.3rem;font-weight:700;'>🔬 Pathology RT</td><td style='padding:0.3rem;text-align:center;'>1.408</td><td style='padding:0.3rem;text-align:center;'>28.7%</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.3rem;'>🧬 Other Clinical</td><td style='padding:0.3rem;text-align:center;'>1.093</td><td style='padding:0.3rem;text-align:center;'>22.3%</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.3rem;'>🔬 Pathology LT</td><td style='padding:0.3rem;text-align:center;'>0.849</td><td style='padding:0.3rem;text-align:center;'>17.3%</td></tr><tr style='border-bottom:1px solid var(--border);'><td style='padding:0.3rem;'>📏 Volume/Physical</td><td style='padding:0.3rem;text-align:center;'>0.846</td><td style='padding:0.3rem;text-align:center;'>17.2%</td></tr><tr><td style='padding:0.3rem;'>💉 Hormones</td><td style='padding:0.3rem;text-align:center;'>0.709</td><td style='padding:0.3rem;text-align:center;'>14.4%</td></tr></table>` }
+    ]
+  },
+
+  fm_path_rt: {
+    title: "🔬 Pathology RT: ۲۸.۷٪",
+    subtitle: "مهم‌ترین گروه ویژگی‌ها در V3!",
+    sections: [
+      { title: "📊 جزئیات", content: `<div class='shap-bar'><span class='label'>RT Severity</span><div class='bar-bg'><div class='bar-fill' style='width:100%;background:linear-gradient(90deg,#f87171,#f472b6);'></div></div><span class='val'>0.491</span></div><div class='shap-bar'><span class='label'>RT Heterogeneity</span><div class='bar-bg'><div class='bar-fill' style='width:99%;background:linear-gradient(90deg,#f87171,#f472b6);'></div></div><span class='val'>0.489</span></div><div class='shap-bar'><span class='label'>RT Dominant</span><div class='bar-bg'><div class='bar-fill' style='width:55%;background:linear-gradient(90deg,#f87171,#f472b6);'></div></div><span class='val'>0.272</span></div><div class='shap-bar'><span class='label'>RT % Favorable</span><div class='bar-bg'><div class='bar-fill' style='width:25%;background:linear-gradient(90deg,#f87171,#f472b6);'></div></div><span class='val'>0.123</span></div>` },
+      { title: "💡 تفسیر", content: `<div class='highlight-box'><p><strong>V2 ادعا:</strong> پاتولوژی SHAP=0 → هورمون‌ها جایگزین!<br><strong>V3 واقعیت:</strong> پاتولوژی RT <strong>تنها</strong> ۲۸.۷٪ کل قدرت پیش‌بینی را دارد. هورمون‌ها <strong>surrogate ناکامل</strong> هستند.</p></div>` }
+    ]
+  },
+
+  fm_clinical: {
+    title: "🧬 سایر بالینی: ۲۲.۳٪",
+    subtitle: "شامل ژنتیک، سن، BMI و سایر",
+    sections: [
+      { title: "📊 جزئیات", content: `<div class='shap-bar'><span class='label'>T/E2 Ratio</span><div class='bar-bg'><div class='bar-fill' style='width:58%;background:linear-gradient(90deg,#60a5fa,#818cf8);'></div></div><span class='val'>0.287</span></div><div class='shap-bar'><span class='label'>AZF Deletion</span><div class='bar-bg'><div class='bar-fill' style='width:52%;background:linear-gradient(90deg,#a78bfa,#818cf8);'></div></div><span class='val'>0.257</span></div><div class='shap-bar'><span class='label'>Age</span><div class='bar-bg'><div class='bar-fill' style='width:39%;background:linear-gradient(90deg,#60a5fa,#818cf8);'></div></div><span class='val'>0.192</span></div><div class='shap-bar'><span class='label'>Karyotype</span><div class='bar-bg'><div class='bar-fill' style='width:32%;background:linear-gradient(90deg,#a78bfa,#818cf8);'></div></div><span class='val'>0.157</span></div><div class='shap-bar'><span class='label'>BMI</span><div class='bar-bg'><div class='bar-fill' style='width:21%;background:linear-gradient(90deg,#60a5fa,#818cf8);'></div></div><span class='val'>0.105</span></div>` }
+    ]
+  },
+
+  fm_path_lt: {
+    title: "🔬 Pathology LT: ۱۷.۳٪",
+    subtitle: "بیضه چپ — دومین گروه پاتولوژی",
+    sections: [
+      { title: "📊 جزئیات", content: `<div class='shap-bar'><span class='label'>LT Severity</span><div class='bar-bg'><div class='bar-fill' style='width:93%;background:linear-gradient(90deg,#f472b6,#a78bfa);'></div></div><span class='val'>0.458</span></div><div class='shap-bar'><span class='label'>LT Heterogeneity</span><div class='bar-bg'><div class='bar-fill' style='width:33%;background:linear-gradient(90deg,#f472b6,#a78bfa);'></div></div><span class='val'>0.165</span></div><div class='shap-bar'><span class='label'>LT Dominant</span><div class='bar-bg'><div class='bar-fill' style='width:23%;background:linear-gradient(90deg,#f472b6,#a78bfa);'></div></div><span class='val'>0.114</span></div>` }
+    ]
+  },
+
+  fm_volume: {
+    title: "📏 حجم/فیزیکی: ۱۷.۲٪",
+    subtitle: "حجم بیضه و اندازه‌گیری‌های فیزیکی",
+    sections: [
+      { title: "📊 جزئیات", content: `<div class='shap-bar'><span class='label'>LT Volume</span><div class='bar-bg'><div class='bar-fill' style='width:39%;background:linear-gradient(90deg,#22d3ee,#60a5fa);'></div></div><span class='val'>0.191</span></div><div class='shap-bar'><span class='label'>RT Volume</span><div class='bar-bg'><div class='bar-fill' style='width:35%;background:linear-gradient(90deg,#22d3ee,#60a5fa);'></div></div><span class='val'>0.173</span></div><div class='shap-bar'><span class='label'>Total Vol</span><div class='bar-bg'><div class='bar-fill' style='width:28%;background:linear-gradient(90deg,#22d3ee,#60a5fa);'></div></div><span class='val'>0.136</span></div><div class='shap-bar'><span class='label'>Seminal pH</span><div class='bar-bg'><div class='bar-fill' style='width:30%;background:linear-gradient(90deg,#22d3ee,#60a5fa);'></div></div><span class='val'>0.145</span></div>` }
+    ]
+  },
+
+  fm_hormones: {
+    title: "💉 هورمون‌ها: ۱۴.۴٪",
+    subtitle: "از ۴۳٪ در V2 به ۱۴.۴٪ در V3!",
+    sections: [
+      { title: "📊 جزئیات", content: `<div class='shap-bar'><span class='label'>FSH</span><div class='bar-bg'><div class='bar-fill' style='width:29%;background:linear-gradient(90deg,#fbbf24,#f59e0b);'></div></div><span class='val'>0.143</span></div><div class='shap-bar'><span class='label'>LH</span><div class='bar-bg'><div class='bar-fill' style='width:26%;background:linear-gradient(90deg,#fbbf24,#f59e0b);'></div></div><span class='val'>0.129</span></div><div class='shap-bar'><span class='label'>Testosterone</span><div class='bar-bg'><div class='bar-fill' style='width:20%;background:linear-gradient(90deg,#fbbf24,#f59e0b);'></div></div><span class='val'>0.096</span></div>` },
+      { title: "🔄 تغییر از V2", content: `<div class='warning-box'><p><strong>V2:</strong> هورمون‌ها ۴۳٪ سهم داشتند (LH رتبه ۱ بود!)<br><strong>V3:</strong> هورمون‌ها فقط ۱۴.۴٪ سهم دارند. چرا؟ در V2 نشت encoding باعث شده بود هورمون‌ها به‌جای پاتولوژی «تقلب» کنند.</p></div>` }
+    ]
+  },
+
+  // ===== ARCHITECTURE =====
+  architecture: {
+    title: "🏗️ معماری Pipeline V3",
+    subtitle: "۱۷ مدل · ۴۲ ویژگی · ۲۴۰۸ نمونه",
+    sections: [
+      { title: "📋 خلاصه", content: `<ul><li>۱۷ مدل از ۶ خانواده (شامل FT-Transformer و TabNet)</li><li>۴۲ ویژگی (شامل ژنتیک)</li><li>Dataset: n=2408</li><li>Nested CV: 5×5</li><li>Ordinal Encoding (جایگزین One-Hot + Target)</li></ul>` }
+    ]
+  },
+
+  arch_models: {
+    title: "🤖 ۱۷ مدل از ۶ خانواده",
+    subtitle: "جامع‌ترین benchmark — شامل Deep Tabular",
+    sections: [
+      { title: "📊 خانواده‌ها", content: `<p><span class='tag tag-blue'>Linear (3)</span> LR L1, L2, ElasticNet</p><p><span class='tag tag-green'>Tree/Ensemble (7)</span> RF, ExtraTrees, XGBoost, LightGBM, CatBoost, Stacking, Voting</p><p><span class='tag tag-cyan'>Distance (3)</span> KNN, SVM_RBF, SVM_Linear</p><p><span class='tag tag-orange'>Probabilistic (1)</span> GaussianNB</p><p><span class='tag tag-pink'>Neural (1)</span> MLP</p><p><span class='tag tag-blue'>Deep Tabular (2)</span> FT-Transformer, TabNet</p>` }
+    ]
+  },
+
+  arch_features: {
+    title: "📊 ۴۲ ویژگی نهایی V3",
+    subtitle: "از ۲۹ در V2 به ۴۲ — شامل ژنتیک و پاتولوژی اصلاح‌شده",
+    sections: [
+      { title: "🆕 چه تغییر کرد؟", content: `<ul><li>ویژگی‌های ژنتیک اضافه شدند: karyotype_severity, azf_deletion_severity</li><li>پاتولوژی با encoding صحیح (ordinal) → SHAP غیرصفر!</li><li>ویژگی‌های مشتق جدید: rt_severity_score, lt_severity_score, rt_tissue_heterogeneity, ...</li><li>مجموع: <strong>۴۲ ویژگی</strong></li></ul>` }
+    ]
+  },
+
+  arch_dataset: {
+    title: "📦 Dataset: n=2408",
+    subtitle: "بزرگ‌ترین مطالعه mTESE با ML",
+    sections: [
+      { title: "📋 مشخصات V3", content: `<ul><li>منبع: <strong>پژوهشگاه رویان، تهران</strong></li><li>تحلیلی: <strong>۲۴۰۸</strong> نمونه</li><li>ویژگی‌ها: <strong>۴۲</strong></li><li>Target: <strong>886 موفق / 1522 ناموفق</strong></li></ul>` }
+    ]
+  }
+};
+
+// ===== D3 TREE VISUALIZATION =====
+const panel = document.getElementById('mindmapPanel');
+const width = panel.clientWidth;
+const height = panel.clientHeight;
+
+const svg = d3.select('#mindmapPanel')
+  .append('svg')
+  .attr('width', width)
+  .attr('height', height);
+
+const g = svg.append('g');
+
+// Zoom
+const zoom = d3.zoom()
+  .scaleExtent([0.3, 3])
+  .on('zoom', (e) => g.attr('transform', e.transform));
+
+svg.call(zoom);
+
+// Initial transform
+const initialTransform = d3.zoomIdentity.translate(width * 0.5, height * 0.5).scale(0.85);
+svg.call(zoom.transform, initialTransform);
+
+// Tree layout - horizontal
+const treeLayout = d3.tree()
+  .nodeSize([55, 220])
+  .separation((a, b) => a.parent === b.parent ? 1 : 1.2);
+
+const root = d3.hierarchy(treeData);
+root.x0 = 0;
+root.y0 = 0;
+
+// Collapse children initially (except root)
+root.children.forEach(c => {
+  if (c.children) {
+    c._children = c.children;
+    c.children = null;
+  }
+});
+
+let activeNode = null;
+
+function update(source) {
+  const duration = 400;
+  const tree = treeLayout(root);
+  const nodes = root.descendants();
+  const links = root.links();
+
+  // Links
+  const link = g.selectAll('.link').data(links, d => d.target.data.id);
+
+  const linkEnter = link.enter().append('path')
+    .attr('class', 'link')
+    .attr('d', () => {
+      const o = { x: source.x0, y: source.y0 };
+      return diagonal({ source: o, target: o });
+    });
+
+  const linkUpdate = linkEnter.merge(link);
+  linkUpdate.transition().duration(duration)
+    .attr('d', diagonal);
+
+  link.exit().transition().duration(duration)
+    .attr('d', () => {
+      const o = { x: source.x, y: source.y };
+      return diagonal({ source: o, target: o });
+    }).remove();
+
+  // Nodes
+  const node = g.selectAll('.node').data(nodes, d => d.data.id);
+
+  const nodeEnter = node.enter().append('g')
+    .attr('class', 'node')
+    .attr('transform', `translate(${source.y0},${source.x0})`)
+    .on('click', (e, d) => {
+      // Toggle children
+      if (d.children) {
+        d._children = d.children;
+        d.children = null;
+      } else if (d._children) {
+        d.children = d._children;
+        d._children = null;
+      }
+      update(d);
+      showDetail(d.data.id);
+      highlightPath(d);
+    });
+
+  nodeEnter.append('circle')
+    .attr('r', 0)
+    .attr('fill', d => d.data.color || '#60a5fa')
+    .attr('stroke', d => d.data.color || '#60a5fa')
+    .attr('stroke-opacity', 0.5)
+    .attr('fill-opacity', d => d._children ? 1 : 0.3);
+
+  nodeEnter.append('text')
+    .attr('dy', '0.35em')
+    .attr('x', d => d.children || d._children ? -15 : 15)
+    .attr('text-anchor', d => d.children || d._children ? 'end' : 'start')
+    .text(d => d.data.name)
+    .attr('fill-opacity', 0);
+
+  // Merge
+  const nodeUpdate = nodeEnter.merge(node);
+  nodeUpdate.transition().duration(duration)
+    .attr('transform', d => `translate(${d.y},${d.x})`);
+
+  nodeUpdate.select('circle')
+    .attr('r', d => d.depth === 0 ? 14 : d._children ? 10 : 7)
+    .attr('fill', d => d.data.color || '#60a5fa')
+    .attr('fill-opacity', d => d._children ? 1 : 0.3)
+    .attr('stroke', d => d.data.color || '#60a5fa');
+
+  nodeUpdate.select('text')
+    .attr('fill-opacity', 1)
+    .attr('x', d => d.children || d._children ? -15 : 15)
+    .attr('text-anchor', d => d.children || d._children ? 'end' : 'start');
+
+  // Exit
+  const nodeExit = node.exit().transition().duration(duration)
+    .attr('transform', `translate(${source.y},${source.x})`)
+    .remove();
+  nodeExit.select('circle').attr('r', 0);
+  nodeExit.select('text').attr('fill-opacity', 0);
+
+  // Save positions
+  nodes.forEach(d => {
+    d.x0 = d.x;
+    d.y0 = d.y;
+  });
+}
+
+function diagonal(d) {
+  return `M${d.source.y},${d.source.x}
+          C${(d.source.y + d.target.y) / 2},${d.source.x}
+           ${(d.source.y + d.target.y) / 2},${d.target.x}
+           ${d.target.y},${d.target.x}`;
+}
+
+function highlightPath(d) {
+  // Reset all
+  g.selectAll('.link').classed('link-active', false);
+  g.selectAll('.node').classed('node-active', false);
+
+  // Build path to root
+  let current = d;
+  const pathNodes = new Set();
+  while (current) {
+    pathNodes.add(current.data.id);
+    current = current.parent;
+  }
+
+  // Highlight links
+  g.selectAll('.link').classed('link-active', l =>
+    pathNodes.has(l.source.data.id) && pathNodes.has(l.target.data.id)
+  );
+
+  // Highlight nodes
+  g.selectAll('.node').classed('node-active', n => n.data.id === d.data.id);
+}
+
+function showDetail(id) {
+  const detail = details[id];
+  if (!detail) return;
+
+  document.getElementById('placeholder').style.display = 'none';
+  const content = document.getElementById('detailContent');
+  content.style.display = 'block';
+
+  let html = `<div class='panel-title'>${detail.title}</div>`;
+  html += `<div class='panel-subtitle'>${detail.subtitle}</div>`;
+
+  detail.sections.forEach(s => {
+    html += `<div class='detail-section'><h3>${s.title}</h3>${s.content}</div>`;
+  });
+
+  content.innerHTML = html;
+
+  // Smooth scroll to top
+  document.getElementById('detailPanel').scrollTop = 0;
+}
+
+// Zoom controls
+function zoomIn() {
+  svg.transition().duration(300).call(zoom.scaleBy, 1.3);
+}
+function zoomOut() {
+  svg.transition().duration(300).call(zoom.scaleBy, 0.7);
+}
+function resetZoom() {
+  svg.transition().duration(500).call(zoom.transform, initialTransform);
+}
+function expandAll() {
+  function expand(d) {
+    if (d._children) {
+      d.children = d._children;
+      d._children = null;
+    }
+    if (d.children) d.children.forEach(expand);
+  }
+  expand(root);
+  update(root);
+}
+
+// Initial render
+update(root);
+
+// Auto-show root detail
+showDetail('root');
+
+// Handle resize
+window.addEventListener('resize', () => {
+  const w = panel.clientWidth;
+  const h = panel.clientHeight;
+  svg.attr('width', w).attr('height', h);
+});
+
+// ===== TAB SWITCHING =====
+let guideInitialized = false;
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+  if (tab === 'guide' && !guideInitialized) {
+    guideInitialized = true;
+    setTimeout(initGuideTree, 100);
+  }
+}
+
+// ===== GUIDE TREE DATA =====
+const guideTreeData = {
+  name: "📚 راهنمای آموزشی A→Z",
+  color: "#22d3ee",
+  id: "g_root",
+  children: [
+    {
+      name: "🏥 مسئله و داده",
+      color: "#f87171",
+      id: "g_problem",
+      children: [
+        { name: "فصل ۱: بیماری NOA & micro-TESE", color: "#f87171", id: "g_ch1" },
+        { name: "فصل ۲: دیتاست ۲۴۰۸ بیمار", color: "#f87171", id: "g_ch2" }
+      ]
+    },
+    {
+      name: "🔧 آماده‌سازی داده",
+      color: "#fbbf24",
+      id: "g_prep",
+      children: [
+        { name: "فصل ۳: پاکسازی ۱۰ مرحله‌ای", color: "#fbbf24", id: "g_ch3" },
+        { name: "فصل ۴: NLP Pipeline پاتولوژی", color: "#fbbf24", id: "g_ch4" },
+        { name: "فصل ۵: مهندسی ویژگی ۵۵→۷۳", color: "#fbbf24", id: "g_ch5" },
+        { name: "فصل ۶: انتخاب ویژگی → ۴۲ نهایی", color: "#fbbf24", id: "g_ch6" }
+      ]
+    },
+    {
+      name: "⚙️ مدل‌سازی",
+      color: "#34d399",
+      id: "g_model",
+      children: [
+        { name: "فصل ۷: پیش‌پردازش Pipeline", color: "#34d399", id: "g_ch7" },
+        { name: "فصل ۸: ۱۷ مدل ML (۸ خانواده + DL)", color: "#34d399", id: "g_ch8" },
+        { name: "فصل ۹: Nested CV ۵×۵", color: "#34d399", id: "g_ch9" }
+      ]
+    },
+    {
+      name: "📊 ارزیابی و تفسیر",
+      color: "#60a5fa",
+      id: "g_eval",
+      children: [
+        { name: "فصل ۱۰: نتایج & Leaderboard V3", color: "#60a5fa", id: "g_ch10" },
+        { name: "فصل ۱۱: SHAP V3 — پاتولوژی صدرنشین!", color: "#60a5fa", id: "g_ch11" },
+        { name: "فصل ۱۲: تفسیر پزشکی (مدل دو‌حالته)", color: "#60a5fa", id: "g_ch12" },
+        { name: "فصل ۱۳: Calibration", color: "#60a5fa", id: "g_ch13" },
+        { name: "فصل ۱۴: DCA — تحلیل تصمیم", color: "#60a5fa", id: "g_ch14" }
+      ]
+    },
+    {
+      name: "🔍 کنترل کیفیت",
+      color: "#f472b6",
+      id: "g_qc",
+      children: [
+        { name: "فصل ۱۵: Data Leakage (V1+V2)", color: "#f472b6", id: "g_ch15" },
+        { name: "فصل ۱۶: سفر V1 → V2 → V3", color: "#f472b6", id: "g_ch16" }
+      ]
+    },
+    {
+      name: "🧬 دانش پایه و محصول",
+      color: "#a78bfa",
+      id: "g_product",
+      children: [
+        { name: "فصل ۱۷: بیولوژی بیضه", color: "#a78bfa", id: "g_ch17" },
+        { name: "فصل ۱۸: CDSS دو‌حالته — محصول نهایی", color: "#a78bfa", id: "g_ch18" }
+      ]
+    },
+    {
+      name: "🔄 اصلاحات V3",
+      color: "#fb923c",
+      id: "g_v3fix",
+      children: [
+        { name: "فصل ۱۹: باگ Target Encoding V2→V3", color: "#fb923c", id: "g_ch19" },
+        { name: "فصل ۲۰: ویژگی‌های ژنتیک در V3", color: "#fb923c", id: "g_ch20" }
+      ]
+    }
+  ]
+};
+
+// ===== GUIDE DETAILS =====
+const guideDetails = {
+  g_root: {
+    title: "📚 راهنمای آموزشی A→Z",
+    subtitle: "۲۰ فصل — کل Pipeline پژوهش از بیماری تا محصول نهایی CDSS (V3)",
+    sections: [
+      { title: "🗺️ نمای کلی پروژه", content: `<p>این پروژه یک <strong>سیستم پشتیبانی تصمیم بالینی (CDSS)</strong> برای پیش‌بینی موفقیت عمل <strong>micro-TESE</strong> در بیماران <strong>NOA</strong> است.</p><p>مسیر پژوهش در ۲۰ فصل:</p><ol><li>🏥 <strong>فصل ۱:</strong> شناخت بیماری NOA و عمل micro-TESE</li><li>📦 <strong>فصل ۲:</strong> دیتاست ۲۴۰۸ بیمار رویان</li><li>🧹 <strong>فصل ۳:</strong> پاکسازی ۱۰ مرحله‌ای داده خام</li><li>🧠 <strong>فصل ۴:</strong> استخراج ۲۲ ویژگی از متن پاتولوژی (NLP)</li><li>🔧 <strong>فصل ۵:</strong> مهندسی ویژگی: ۵۵ → ۷۳</li><li>🎯 <strong>فصل ۶:</strong> انتخاب ویژگی → ۴۲ ویژگی نهایی (V3)</li><li>⚙️ <strong>فصل ۷:</strong> پیش‌پردازش داخل CV</li><li>🤖 <strong>فصل ۸:</strong> مقایسه ۱۷ مدل ML (شامل FT-Transformer و TabNet)</li><li>🔄 <strong>فصل ۹:</strong> ارزیابی با Nested CV ۵×۵</li><li>📊 <strong>فصل ۱۰:</strong> نتایج V3: CatBoost AUC = 0.7738</li><li>🔍 <strong>فصل ۱۱:</strong> تفسیرپذیری SHAP V3 — پاتولوژی صدرنشین!</li><li>🧬 <strong>فصل ۱۲:</strong> تفسیر پزشکی — مدل دو‌حالته</li><li>📐 <strong>فصل ۱۳:</strong> Calibration</li><li>📈 <strong>فصل ۱۴:</strong> Decision Curve Analysis (DCA)</li><li>💥 <strong>فصل ۱۵:</strong> شناسایی و رفع Data Leakage (V1 + V2)</li><li>🔄 <strong>فصل ۱۶:</strong> مقایسه کامل V1 → V2 → V3</li><li>🧬 <strong>فصل ۱۷:</strong> دانش پایه — پاتولوژی بیضه</li><li>🖥️ <strong>فصل ۱۸:</strong> CDSS دو‌حالته — محصول نهایی</li><li>🔧 <strong>فصل ۱۹:</strong> باگ Target Encoding V2 و اصلاح V3</li><li>🧬 <strong>فصل ۲۰:</strong> ویژگی‌های ژنتیک در V3</li></ol><div class='highlight-box'><p>💡 همکار شما درست گفت: <strong>هر کدام از این مراحل خودش یک پروژه کارشناسی ارشد است!</strong></p></div>` },
+      { title: "📊 مقایسه با مطالعات مشابه", content: `<table class='guide-table'><tr style='background:var(--bg3);'><th>مطالعه</th><th>سال</th><th>n</th><th>AUC</th><th>مدل</th></tr><tr><td>Zeadna et al.</td><td>2020</td><td>119</td><td>0.807</td><td>GBT vs LR</td></tr><tr><td>Bachelot et al.</td><td>2023</td><td>201</td><td>0.900</td><td>AutoML</td></tr><tr><td>Kobayashi et al.</td><td>2023</td><td>430</td><td>0.725</td><td>8 مدل (RF)</td></tr><tr><td>Liu et al.</td><td>2023</td><td>217</td><td>0.781</td><td>LR تجمیعی</td></tr><tr style='background:rgba(52,211,153,0.15);'><td style='font-weight:bold;'>🏆 ما (V3)</td><td>2026</td><td style='font-weight:bold;'>2408</td><td style='font-weight:bold;'>0.7738</td><td>17 مدل (CatBoost)</td></tr></table><p style='font-size:0.72rem;margin-top:0.5rem;'>دیتاست ما <strong>۵.۶ برابر</strong> بزرگ‌ترین مطالعه مشابه! تنها مطالعه با <strong>Nested CV واقعی</strong>، <strong>رفع Data Leakage</strong> و <strong>اصلاح target encoding</strong>.</p><div class='warning-box' style='margin-top:0.5rem;'><p>⚠️ <strong>V3 صادقانه‌تر:</strong> AUC=0.77 (نه 0.83 V2) چون target encoding leakage رفع شد. مدل فعلی (Full/Salvage mode) از داده پاتولوژی هم استفاده می‌کند — مدل pre-op خالص AUC=0.6374.</p></div>` }
+    ]
+  },
+  g_problem: {
+    title: "🏥 مسئله و داده",
+    subtitle: "NOA + دیتاست رویان — مبنای پژوهش",
+    sections: [
+      { title: "📋 شامل", content: `<ul><li><strong>فصل ۱:</strong> بیماری NOA و عمل micro-TESE</li><li><strong>فصل ۲:</strong> دیتاست ۲۴۰۸ بیمار رویان</li></ul><div class='highlight-box'><p>💡 بدون درک مسئله بالینی، هیچ مدل ML معنا ندارد. اول باید بدانیم <strong>چه چیزی</strong> پیش‌بینی می‌کنیم و <strong>چرا</strong> مهم است.</p></div>` }
+    ]
+  },
+  g_ch1: {
+    title: "🏥 فصل ۱: بیماری NOA و micro-TESE",
+    subtitle: "شناخت مسئله بالینی و چرایی نیاز به CDSS",
+    sections: [
+      { title: "🔬 NOA چیست؟", content: `<table class='guide-table'><tr><th style='width:35%'>ویژگی</th><th>آزواسپرمی انسدادی (OA)</th><th>آزواسپرمی غیرانسدادی (NOA)</th></tr><tr><td><strong>علت</strong></td><td>انسداد فیزیکی مجرا</td><td>اختلال در تولید اسپرم</td></tr><tr><td><strong>بیضه</strong></td><td>تولید اسپرم طبیعی</td><td>تولید مختل/متوقف</td></tr><tr><td><strong>درمان</strong></td><td>جراحی ترمیمی ساده</td><td>micro-TESE (تنها گزینه)</td></tr><tr><td><strong>موفقیت</strong></td><td>> ۹۰٪</td><td>۴۰–۶۰٪ (متاآنالیز)</td></tr></table><p style='margin-top:0.5rem;font-size:0.72rem;'>NOA شدیدترین شکل ناباروری مردانه است — اسپرم در مایع منی وجود ندارد ولی ممکن است <strong>جزایر کوچک اسپرم‌سازی</strong> در بافت بیضه باقی مانده باشد.</p>` },
+      { title: "🔪 عمل micro-TESE چیست؟", content: `<p><strong>Microdissection Testicular Sperm Extraction</strong> — جراحی میکروسکوپی بیضه:</p><ol><li>بیهوشی عمومی + باز کردن بیضه</li><li>بررسی بافت بیضه زیر <strong>میکروسکوپ ۲۰-۲۵× بزرگ‌نمایی</strong></li><li>شناسایی لوله‌های منی‌ساز <strong>متسع و مات</strong> (نشانه اسپرم‌سازی فعال)</li><li>برداشت حداقل بافت + ارسال فوری به آزمایشگاه اندرولوژی</li><li>بررسی فوری: آیا اسپرم زنده پیدا شد؟ → بله = موفقیت</li></ol><div class='highlight-box'><p>⏱️ عمل ۲-۴ ساعت، تهاجمی، گران، و از نظر روحی فرسایشی. <strong>بیمار قبل از عمل نمی‌داند آیا اسپرم پیدا می‌شود یا نه!</strong></p></div>` },
+      { title: "📊 نرخ موفقیت: ادبیات جهانی", content: `<table class='guide-table'><tr><th>منبع</th><th>نرخ گزارش‌شده</th><th>جزئیات</th></tr><tr><td>Bernie et al. 2015 (متاآنالیز)</td><td>~۵۲٪</td><td>pooled SRR برای micro-TESE</td></tr><tr><td>Corona et al. 2019 (مرور سیستماتیک)</td><td>۴۰–۶۰٪</td><td>بسته به پاتولوژی و مرکز</td></tr><tr><td>Deruyver et al. 2014 (متاآنالیز)</td><td>~۴۷٪</td><td>مقایسه micro-TESE vs cTESE</td></tr><tr><td>مطالعه ۹۶۸ بیمار (2022)</td><td>۴۴.۶٪</td><td>retrospective large-scale</td></tr><tr style='background:rgba(52,211,153,0.15);'><td><strong>🏆 دیتاست رویان</strong></td><td><strong>۳۶.۸٪</strong></td><td>۸۸۶ از ۲۴۰۸ — پایین‌تر از میانگین جهانی</td></tr></table><div class='warning-box' style='margin-top:0.7rem;'><p>⚠️ <strong>چرا نرخ ما پایین‌تر است؟</strong> دیتاست رویان شامل همه بیماران NOA بدون پیش‌غربالگری است — بسیاری از مراکز فقط بیماران با شانس بالا را عمل می‌کنند. این نرخ <strong>واقعی‌تر</strong> اما <strong>imbalanced</strong> است (نسبت ۱.۷۲ : ۱ شکست به موفقیت).</p></div>` },
+      { title: "⚡ چالش‌های دیتاست و اقدامات", content: `<table class='guide-table'><tr><th>چالش</th><th>جزئیات</th><th>اقدام ما</th></tr><tr><td><strong>🔴 عدم تعادل کلاس</strong></td><td>۶۳.۲٪ شکست vs ۳۶.۸٪ موفقیت</td><td>SMOTE + stratified CV + auto_class_weights</td></tr><tr><td><strong>🟡 تعدد جراحان</strong></td><td>جراحان مختلف با تجربه متفاوت → واریانس بالا</td><td>متغیر is_Primary و Salvage_Count ساختیم تا تأثیر تجربه قبلی جدا شود</td></tr><tr><td><strong>🟡 Missing Data</strong></td><td>۹ ستون ۱۰۰٪ خالی، FSH ۲۲٪، پاتولوژی ۲۲-۴۹٪</td><td>KNN Imputation + Missingness Indicator</td></tr><tr><td><strong>🟡 Outlier هورمونی</strong></td><td>مقادیر افراطی FSH/LH بالینی معنادار هستند</td><td>RobustScaler (نه Z-Score) — از median و IQR استفاده می‌کند</td></tr><tr><td><strong>🔴 متن آزاد پاتولوژی</strong></td><td>گزارش‌ پاتولوژیست فارسی/انگلیسی/مختلط بدون ساختار</td><td>NLP Pipeline اختصاصی: ۲۲ ویژگی باینری + عددی</td></tr></table>` },
+      { title: "🎯 چرا CDSS لازم است؟", content: `<p>در حال حاضر تصمیم‌گیری برای micro-TESE بر اساس <strong>شهود بالینی</strong> و <strong>چند آزمایش ساده</strong> انجام می‌شود.</p>
+<div class='expandable-box' style='border-right:3px solid #f59e0b;padding:0.7rem;margin:0.5rem 0;background:rgba(245,158,11,0.08);border-radius:8px;'>
+<p><strong>🧩 مشکل ۱: تعامل غیرخطی ویژگی‌ها</strong></p>
+<p>هیچ پزشکی نمی‌تواند همزمان تأثیر ۴۲ ویژگی + تعاملات آنها را محاسبه کند.</p></div>
+<div class='expandable-box' style='border-right:3px solid #3b82f6;padding:0.7rem;margin:0.5rem 0;background:rgba(59,130,246,0.08);border-radius:8px;'>
+<p><strong>🔬 مشکل ۲: مدل دو‌حالته (نوآوری V3)</strong></p>
+<p>V3 نشان داد مدل <strong>دو حالت</strong> دارد: حالت pre-op (فقط هورمون+سونو، AUC=0.6374) و حالت Full/Salvage (با پاتولوژی، AUC=0.7738). CDSS هر دو حالت را پشتیبانی می‌کند.</p></div>
+<div class='expandable-box' style='border-right:3px solid #10b981;padding:0.7rem;margin:0.5rem 0;background:rgba(16,185,129,0.08);border-radius:8px;'>
+<p><strong>🎯 مشکل ۳: Personalization</strong></p>
+<p>CDSS برای <strong>هر بیمار خاص</strong> یک احتمال عددی دقیق می‌دهد + با SHAP توضیح می‌دهد <strong>کدام ویژگی‌ها</strong> به نفع یا ضرر آن بیمار خاص هستند.</p></div>` },
+      { title: "🧬 داده ژنتیک: Karyotype و AZF", content: `<div class='warning-box'><p>⚠️ <strong>نکته بسیار مهم بالینی:</strong> در بیماران NOA، حذف ژن‌های AZF روی کروموزوم Y تعیین‌کننده است:</p></div>
+<table class='guide-table'><tr style='background:var(--bg3);'><th>حذف</th><th>پیش‌آگهی</th><th>توصیه بالینی</th></tr>
+<tr style='background:rgba(239,68,68,0.1);'><td><strong>AZFa</strong></td><td>🔴 <strong>شانس صفر</strong></td><td>micro-TESE <strong>منع مطلق</strong></td></tr>
+<tr style='background:rgba(239,68,68,0.1);'><td><strong>AZFb</strong></td><td>🔴 <strong>شانس تقریباً صفر</strong></td><td>micro-TESE <strong>منع مطلق</strong></td></tr>
+<tr style='background:rgba(52,211,153,0.1);'><td><strong>AZFc</strong></td><td>🟢 شانس ۵۰-۵۶٪</td><td>micro-TESE توصیه می‌شود</td></tr>
+<tr><td><strong>بدون حذف</strong></td><td>🟡 بسته به سایر عوامل</td><td>ارزیابی جامع نیاز است</td></tr></table>
+<div class='highlight-box' style='margin-top:6px;'><p>🧬 <strong>نوآوری V3:</strong> ویژگی‌های ژنتیک (karyotype_severity و azf_deletion_severity) برای اولین بار با encoding عددی وارد مدل شدند! karyotype_severity رتبه ۱۱ SHAP (0.148) و azf_deletion_severity رتبه ۶ SHAP (0.205). → فصل ۲۰</p></div>` }
+    ]
+  },
+  g_ch2: {
+    title: "📦 فصل ۲: دیتاست رویان",
+    subtitle: "۲۴۰۸ بیمار — بزرگ‌ترین دیتاست NOA-ML در جهان",
+    sections: [
+      { title: "📋 مشخصات دیتاست", content: `<table class='guide-table'><tr><th>پارامتر</th><th>مقدار V3</th></tr><tr><td>منبع</td><td>پژوهشگاه رویان، تهران</td></tr><tr><td>بیماران غربال‌شده</td><td>۲۴۵۰</td></tr><tr><td>کوهورت تحلیلی</td><td><strong>۲۴۰۸</strong> (بعد حذف missing Outcome1)</td></tr><tr><td>ستون‌های اصلی</td><td>۵۵</td></tr><tr><td>بعد مهندسی ویژگی</td><td>۷۳</td></tr><tr><td>بعد انتخاب ویژگی (V3)</td><td><strong>۴۲ ویژگی</strong></td></tr><tr><td>بازه زمانی</td><td>۱۳۹۸–۱۴۰۳ (≈2019–2025)</td></tr><tr><td>Outcome</td><td>موفقیت بازیابی اسپرم (۰/۱)</td></tr><tr><td>Target: Negative</td><td>۱۵۲۲ (۶۳.۲٪)</td></tr><tr><td>Target: Positive</td><td>۸۸۶ (۳۶.۸٪)</td></tr><tr><td>نسبت عدم تعادل</td><td>≈ ۱.۷۲:۱ (شکست:موفقیت)</td></tr></table>` },
+      { title: "📊 دسته‌بندی ویژگی‌ها (V3)", content: `<table class='guide-table'><tr><th>#</th><th>گروه</th><th>نمونه متغیرها</th><th>Missing</th></tr><tr><td>1</td><td>دموگرافیک</td><td>Age, Race</td><td>0%</td></tr><tr><td>2</td><td>آنتروپومتری</td><td>Height, Weight, BMI</td><td>64-67%</td></tr><tr><td>3</td><td>هورمونی</td><td>FSH, LH, Testosterone, E2, Prolactin, T/E2 ratio</td><td>22-42%</td></tr><tr><td>4</td><td>بیضه‌سنجی</td><td>حجم سونو + ارکیدومتر + ساکاموتو</td><td>82-83%</td></tr><tr><td>5</td><td>پاتولوژی (NLP+severity)</td><td>rt_severity_score, lt_severity_score, dominant_pattern, tissue_heterogeneity</td><td>22-49%</td></tr><tr><td>6</td><td><strong>ژنتیک (V3 جدید!)</strong></td><td>karyotype_severity, azf_deletion_severity</td><td>62%</td></tr><tr><td>7</td><td>سابقه پزشکی</td><td>Varicocele, Surgery, T.BX</td><td>متفاوت</td></tr><tr><td>8</td><td>سبک زندگی</td><td>Habits, Occupation</td><td>متفاوت</td></tr><tr><td>9</td><td>باروری</td><td>Infertility length, pH</td><td>متفاوت</td></tr><tr><td>10</td><td>سابقه جراحی</td><td>is_Primary, Salvage_Count</td><td>مهندسی‌شده</td></tr></table>` }
+    ]
+  },
+  g_prep: {
+    title: "🧹 آماده‌سازی داده",
+    subtitle: "پاکسازی، استخراج، مهندسی و انتخاب ویژگی",
+    sections: [
+      { title: "📋 شامل", content: `<ul><li><strong>فصل ۳:</strong> پاکسازی ۱۰ مرحله‌ای</li><li><strong>فصل ۴:</strong> استخراج ویژگی پاتولوژی (NLP)</li><li><strong>فصل ۵:</strong> مهندسی ویژگی</li><li><strong>فصل ۶:</strong> انتخاب ویژگی</li></ul>` }
+    ]
+  },
+  g_ch3: {
+    title: "🧹 فصل ۳: پاکسازی داده",
+    subtitle: "۱۰ مرحله سیستماتیک — از Excel خام تا داده تمیز",
+    sections: [
+      { title: "📋 ۱۰ مرحله پاکسازی", content: `<table class='guide-table'><tr><th>#</th><th>مرحله</th><th>جزئیات</th></tr><tr><td>1</td><td>بارگذاری فایل xlsb</td><td>Sheet «Final Sheet» — ۲۴۵۰ × ۵۵</td></tr><tr><td>2</td><td>ثبت ۵۵ ستون اصلی</td><td>ID تا Outcome4</td></tr><tr><td>3</td><td>بررسی Missing</td><td>۹ ستون ۱۰۰٪ خالی / ۴۰ ستون > ۵۰٪</td></tr><tr><td>4</td><td>حذف ۹ ستون خالی</td><td>Cancer, Torsion, SSR-2/3/4, Outcome 2/3/4</td></tr><tr><td>5</td><td>حذف Outcome خالی</td><td>۲۴۵۰ → ۲۴۱۳ → ۲۴۰۸ (V3)</td></tr><tr><td>6</td><td>تبدیل نوع داده</td><td>عددی → float, دسته‌ای → category</td></tr><tr><td>7</td><td>شناسایی Outcome1</td><td>۸۸۶ موفق (۳۶.۸٪) / ۱۵۲۲ ناموفق</td></tr><tr><td>8</td><td>Primary vs Salvage</td><td>ساخت is_Primary + Salvage_Count</td></tr><tr><td>9</td><td>پردازش پاتولوژی</td><td>→ فصل ۴ (NLP Pipeline)</td></tr><tr><td>10</td><td>ذخیره CSV نهایی</td><td>داده تمیز آماده مهندسی ویژگی</td></tr></table>` },
+      { title: "💡 نوآوری: Missingness Indicator", content: `<p>برای متغیرهایی مثل FSH (۲۲٪ خالی)، یک ستون باینری اضافه کردیم: <code>FSH_missing = 1 اگر خالی</code>. <strong>چرا؟</strong> خود «خالی بودن» اطلاعات دارد.</p>` }
+    ]
+  },
+  g_ch4: {
+    title: "🧠 فصل ۴: استخراج ویژگی پاتولوژی (NLP)",
+    subtitle: "تبدیل متن آزاد پاتولوژیست به ویژگی‌های ساختاریافته — بزرگ‌ترین نوآوری",
+    sections: [
+      { title: "🏷️ انواع پاتولوژی بیضه", content: `<table class='guide-table'><tr><th>نوع</th><th>توضیح ساده</th><th>پیش‌آگهی</th></tr><tr><td><strong>SCO</strong> (Sertoli Cell Only)</td><td>فقط سلول‌های پشتیبان — بدون سلول جنسی</td><td>🔴 بد (SRR ~۳۲٪)</td></tr><tr><td><strong>MA</strong> (Maturation Arrest)</td><td>توقف در مراحل مختلف بلوغ</td><td>🟡 متوسط (بسته به مرحله)</td></tr><tr><td><strong>Hypospermatogenesis</strong></td><td>تولید کم اسپرم</td><td>🟢 خوب (SRR ~۸۰-۹۱٪)</td></tr><tr><td><strong>CSTH</strong> (Combined)</td><td>ترکیبی از چند پاتولوژی</td><td>🟡 متوسط (SRR ~۴۳٪)</td></tr></table>` },
+      { title: "⚙️ خروجی NLP Pipeline در V3", content: `<p>در V3، خروجی NLP Pipeline شامل ویژگی‌های <strong>severity عددی</strong> است:</p><ul><li><strong>rt_severity_score / lt_severity_score:</strong> امتیاز شدت پاتولوژی (عددی ۰-۱۰) — <span style='color:#ef4444;font-weight:bold;'>SHAP رتبه ۱ و ۳!</span></li><li><strong>rt_tissue_heterogeneity / lt_tissue_heterogeneity:</strong> ناهمگونی بافتی — <span style='color:#ef4444;font-weight:bold;'>SHAP رتبه ۲!</span></li><li><strong>rt_dominant_pattern / lt_dominant_pattern:</strong> الگوی غالب (SCO, MA, Hypo, ...)</li></ul><div class='highlight-box'><p>🔴 <strong>تحول V3:</strong> در V2 پاتولوژی SHAP=0 بود (encoding باینری ضعیف). در V3 با severity scoring عددی، پاتولوژی <strong>صدرنشین SHAP</strong> شد!</p></div>` }
+    ]
+  },
+  g_ch5: {
+    title: "🔧 فصل ۵: مهندسی ویژگی",
+    subtitle: "از ۵۵ ستون خام → ۷۳ ویژگی مهندسی‌شده",
+    sections: [
+      { title: "🛠️ نوآوری‌های مهندسی V3", content: `<ul><li><strong>T/E2 ratio:</strong> نسبت تستوسترون به استرادیول — SHAP رتبه ۴ (0.287)</li><li><strong>Severity scoring:</strong> تبدیل پاتولوژی باینری → امتیاز عددی شدت</li><li><strong>Tissue heterogeneity:</strong> سنجش تنوع بافتی از گزارش پاتولوژی</li><li><strong>karyotype_severity:</strong> encoding عددی طبقه‌بندی‌شده کاریوتایپ</li><li><strong>azf_deletion_severity:</strong> encoding عددی نوع حذف AZF</li></ul><div class='highlight-box'><p>💡 این مهندسی ویژگی‌های جدید باعث شد تعداد ویژگی‌ها از ۲۹ (V2) به <strong>۴۲ (V3)</strong> برسد و پاتولوژی+ژنتیک فعال شوند.</p></div>` }
+    ]
+  },
+  g_ch6: {
+    title: "🎯 فصل ۶: انتخاب ویژگی",
+    subtitle: "سه مرحله انتخاب → ۴۲ ویژگی نهایی V3",
+    sections: [
+      { title: "🔗 سه مرحله انتخاب", content: `<table class='guide-table'><tr><th>مرحله</th><th>روش</th><th>ویژگی‌ انتخابی</th></tr><tr><td>1</td><td>Filter (آماری)</td><td>chi-square, mutual information</td></tr><tr><td>2</td><td>Wrapper (RFECV)</td><td>حذف بازگشتی با CV</td></tr><tr><td>3</td><td>Embedded (Tree importance)</td><td>Feature importance مدل‌های درختی</td></tr></table>` },
+      { title: "🔗 نتیجه: Union سه روش → ۴۲ ویژگی V3", content: `<div style='padding:6px;background:rgba(16,185,129,0.08);border-radius:6px;border-right:3px solid #10b981;margin-bottom:6px;'>
+<p style='font-size:0.68rem;'><strong>V2:</strong> 73 → 29 ویژگی (پاتولوژی باینری، بدون ژنتیک)<br>
+<strong>V3:</strong> 73+ → <strong>42 ویژگی</strong> (severity scores عددی + ژنتیک engineering شده)</p></div>
+<div class='warning-box'><p>⚠️ <strong>تفاوت کلیدی V2 vs V3:</strong> در V2 پاتولوژی NLP باینری بود و SHAP=0 داشت. در V3 با severity scoring (عددی ۰-۱۰)، پاتولوژی <strong>بالاترین SHAP</strong> را گرفت!</p></div>` }
+    ]
+  },
+  g_model: {
+    title: "🤖 مدل‌سازی",
+    subtitle: "پیش‌پردازش + ۱۷ مدل + Nested CV",
+    sections: [
+      { title: "📋 شامل", content: `<ul><li><strong>فصل ۷:</strong> پیش‌پردازش (KNN + RobustScaler + SMOTE)</li><li><strong>فصل ۸:</strong> ۱۷ مدل ML از ۸ خانواده + Deep Learning</li><li><strong>فصل ۹:</strong> Nested Cross-Validation</li></ul>` }
+    ]
+  },
+  g_ch7: {
+    title: "⚙️ فصل ۷: پیش‌پردازش",
+    subtitle: "قانون طلایی: همه چیز داخل CV — هیچ‌چیز قبل از آن!",
+    sections: [
+      { title: "🥇 قانون طلایی", content: `<div class='warning-box'><p>⚠️ <strong>قانون طلایی ML:</strong> هرگز پیش‌پردازش را روی کل داده انجام ندهید! Imputation, Scaling, SMOTE باید <strong>فقط روی training fold</strong> fit شوند. در غیر این صورت → <strong>Data Leakage</strong> (فصل ۱۵).</p></div>` },
+      { title: "🔧 سه مرحله پیش‌پردازش", content: `<table class='guide-table'><tr><th>مرحله</th><th>روش</th><th>چرا؟</th></tr><tr><td><strong>1. Imputation</strong></td><td>KNN (k=5)</td><td>از الگوی همسایگان استفاده می‌کند — بهتر از mean برای داده پزشکی</td></tr><tr><td><strong>2. Scaling</strong></td><td>RobustScaler</td><td>از median + IQR استفاده می‌کند. مقاوم به outlier</td></tr><tr><td><strong>3. Oversampling</strong></td><td>SMOTE</td><td>نمونه‌های مصنوعی minority class می‌سازد تا عدم تعادل ۶۳/۳۷ جبران شود</td></tr></table>` }
+    ]
+  },
+  g_ch8: {
+    title: "🤖 فصل ۸: مدل‌سازی — ۱۷ مدل از ۸ خانواده + DL",
+    subtitle: "جامع‌ترین مقایسه ML در ادبیات NOA — اکنون شامل FT-Transformer و TabNet",
+    sections: [
+      { title: "🏠 خانواده‌ها و مدل‌ها (V3)", content: `<table class='guide-table'><tr style='background:var(--bg3);'><th style='width:5%'>#</th><th style='width:22%'>خانواده</th><th style='width:35%'>مدل‌ها</th><th style='width:38%'>مکانیزم کلیدی</th></tr>
+<tr><td>1</td><td>🔵 <strong>خطی</strong></td><td>Logistic Regression, Ridge, Lasso, Elastic Net</td><td>خط مرز تصمیم + regularization</td></tr>
+<tr><td>2</td><td>🌳 <strong>درخت</strong></td><td>Decision Tree</td><td>سؤالات بله/خیر</td></tr>
+<tr><td>3</td><td>🌲 <strong>Bagging</strong></td><td>Random Forest</td><td>رأی اکثریت درخت‌های مستقل</td></tr>
+<tr><td>4</td><td>🚀 <strong>Boosting</strong></td><td>Gradient Boosting, XGBoost, LightGBM, CatBoost</td><td>اصلاح متوالی اشتباهات. CatBoost: ordered boosting</td></tr>
+<tr><td>5</td><td>📐 <strong>SVM</strong></td><td>SVM (RBF kernel)</td><td>مرز غیرخطی در فضای بالابعدی</td></tr>
+<tr><td>6</td><td>👥 <strong>Instance</strong></td><td>KNN</td><td>مقایسه با k نزدیک‌ترین</td></tr>
+<tr><td>7</td><td>🧠 <strong>شبکه عصبی</strong></td><td>MLP</td><td>لایه‌های نورون مصنوعی</td></tr>
+<tr><td>8</td><td>📊 <strong>احتمالاتی</strong></td><td>Naive Bayes</td><td>قضیه Bayes + فرض استقلال</td></tr>
+<tr><td>9</td><td>🔗 <strong>Meta</strong></td><td>Stacking, Voting</td><td>ترکیب خروجی چند مدل</td></tr>
+<tr style='background:rgba(251,146,60,0.1);'><td>🆕</td><td>🔥 <strong>Deep Tabular (V3)</strong></td><td>FT-Transformer, TabNet</td><td>توجه (attention) روی ویژگی‌های جدولی. FT-Transformer: self-attention. TabNet: sequential attention</td></tr></table>` },
+      { title: "🎯 چرا ۴۲ ویژگی V3 بهتر از ۲۹ V2؟", content: `<div class='expandable-box' style='border-right:3px solid #f59e0b;padding:0.7rem;margin:0.5rem 0;background:rgba(245,158,11,0.08);border-radius:8px;'>
+<p><strong>📊 داده جدولی با ۴۲ feature (V3)</strong></p>
+<p>V3 با severity scoring پاتولوژی و encoding عددی ژنتیک، ۱۳ ویژگی بیشتر دارد. این باعث شد CatBoost اطلاعات واقعی پاتولوژی و ژنتیک را ببیند.</p></div>
+<div class='expandable-box' style='border-right:3px solid #ef4444;padding:0.7rem;margin:0.5rem 0;background:rgba(239,68,68,0.08);border-radius:8px;'>
+<p><strong>📏 n=2408 با ۴۲ ویژگی</strong></p>
+<p>نسبت n/p ≈ ۵۷ — هنوز کافی برای tree ensembles. اما deep learning (FT-Transformer: AUC=0.7112, TabNet: AUC=0.6428) با این حجم عملکرد ضعیف‌تر دارد.</p></div>` },
+      { title: "🏆 نتیجه مقایسه (V1 → V2 → V3)", content: `<p><strong>V1 (با leakage):</strong> LightGBM رتبه ۱ (AUC=0.733)</p><p><strong>V2 (target encoding leaky):</strong> CatBoost (AUC=0.831) — inflate شده!</p><p><strong>V3 (اصلاح نهایی):</strong> CatBoost رتبه ۱ (<strong>AUC=0.7738</strong>) — صادقانه</p><div class='highlight-box'><p>💡 V2→V3: رفع target encoding leakage باعث افت AUC از 0.83 به 0.77 شد — اما این عدد <strong>واقعی</strong> است.</p></div>` }
+    ]
+  },
+  g_ch9: {
+    title: "🔄 فصل ۹: Nested Cross-Validation",
+    subtitle: "ارزیابی بدون خوش‌بینی — چرا CV ساده کافی نیست؟",
+    sections: [
+      { title: "❌ مشکل CV ساده", content: `<p>اگر از <strong>یک حلقه CV</strong> هم برای tune و هم برای ارزیابی استفاده کنید → AUC واقعی <strong>خوش‌بینانه</strong> گزارش می‌شود.</p>` },
+      { title: "✅ Nested CV: دو حلقه", content: `<div class='expandable-box' style='border-right:3px solid #10b981;padding:0.7rem;margin:0.5rem 0;background:rgba(16,185,129,0.08);border-radius:8px;'><p><strong>حلقه بیرونی (Outer):</strong> داده را به train/test تقسیم می‌کند → ارزیابی نهایی</p></div><div class='expandable-box' style='border-right:3px solid #3b82f6;padding:0.7rem;margin:0.5rem 0;background:rgba(59,130,246,0.08);border-radius:8px;'><p><strong>حلقه درونی (Inner):</strong> فقط روی train → hyperparameter tuning</p></div>` },
+      { title: "📊 V1 vs V2 vs V3", content: `<table class='guide-table'><tr><th>پارامتر</th><th>V1</th><th>V2</th><th>V3</th></tr><tr><td>Outer folds</td><td>2</td><td>5</td><td>5</td></tr><tr><td>Inner folds</td><td>5</td><td>5</td><td>5</td></tr><tr><td>Best model</td><td>LightGBM (0.733)</td><td>CatBoost (0.831*)</td><td>CatBoost (0.7738)</td></tr><tr><td>Leakage</td><td>⚠️ پیش‌پردازش</td><td>⚠️ target encoding</td><td>✅ رفع شد</td></tr></table><p style='font-size:0.65rem;color:var(--txt2);'>* V2 AUC=0.831 به‌خاطر target encoding leakage inflate شده بود.</p>` }
+    ]
+  },
+  g_eval: {
+    title: "📊 ارزیابی و تفسیر",
+    subtitle: "نتایج V3 + SHAP + تفسیر پزشکی + Calibration + DCA",
+    sections: [
+      { title: "📋 شامل", content: `<ul><li><strong>فصل ۱۰:</strong> نتایج V3 — Leaderboard ۱۷ مدل</li><li><strong>فصل ۱۱:</strong> SHAP V3 — پاتولوژی صدرنشین!</li><li><strong>فصل ۱۲:</strong> تفسیر پزشکی (مدل دو‌حالته)</li><li><strong>فصل ۱۳:</strong> Calibration</li><li><strong>فصل ۱۴:</strong> Decision Curve Analysis</li></ul>` }
+    ]
+  },
+  g_ch10: {
+    title: "📊 فصل ۱۰: نتایج V3",
+    subtitle: "Leaderboard ۱۷ مدل — CatBoost چمپیون (AUC=0.7738)",
+    sections: [
+      { title: "🏆 Leaderboard V3 (کامل ۱۷ مدل)", content: `<table class='guide-table'><tr style='background:var(--bg3);'><th>رتبه</th><th>مدل</th><th>AUC</th><th>Acc</th><th>Sens</th><th>Spec</th><th>F1</th><th>Brier</th></tr>
+<tr style='background:rgba(52,211,153,0.15);'><td>🥇</td><td><strong>CatBoost</strong></td><td><strong>0.7738</strong></td><td>0.718</td><td>0.6445</td><td>0.7608</td><td>0.6268</td><td>0.1874</td></tr>
+<tr><td>🥈</td><td>XGBoost</td><td>0.7672</td><td>0.7147</td><td>0.6468</td><td>0.7542</td><td>0.6225</td><td>0.1899</td></tr>
+<tr><td>🥉</td><td>LightGBM</td><td>0.7601</td><td>0.707</td><td>0.6355</td><td>0.7486</td><td>0.6115</td><td>0.1916</td></tr>
+<tr><td>4</td><td>Random Forest</td><td>0.7524</td><td>0.7059</td><td>0.618</td><td>0.757</td><td>0.6018</td><td>0.1965</td></tr>
+<tr><td>5</td><td>Gradient Boosting</td><td>0.7518</td><td>0.6992</td><td>0.636</td><td>0.736</td><td>0.6025</td><td>0.1949</td></tr>
+<tr><td>6</td><td>Stacking</td><td>0.7498</td><td>0.699</td><td>0.5959</td><td>0.759</td><td>0.5831</td><td>0.1949</td></tr>
+<tr><td>7</td><td>Voting</td><td>0.7487</td><td>0.7044</td><td>0.5855</td><td>0.7736</td><td>0.5829</td><td>0.1916</td></tr>
+<tr><td>8</td><td>LR</td><td>0.7292</td><td>0.6805</td><td>0.6047</td><td>0.7247</td><td>0.5779</td><td>0.2041</td></tr>
+<tr><td>9</td><td>FT-Transformer 🆕</td><td>0.7112</td><td>0.671</td><td>0.590</td><td>0.718</td><td>0.562</td><td>0.211</td></tr>
+<tr><td>10</td><td>Ridge</td><td>0.7098</td><td>0.6702</td><td>0.5826</td><td>0.7212</td><td>0.5592</td><td>0.2098</td></tr>
+<tr><td>11</td><td>Elastic Net</td><td>0.7066</td><td>0.675</td><td>0.5734</td><td>0.734</td><td>0.558</td><td>0.2086</td></tr>
+<tr><td>12</td><td>SVM</td><td>0.7008</td><td>0.668</td><td>0.6059</td><td>0.704</td><td>0.5638</td><td>0.2122</td></tr>
+<tr><td>13</td><td>KNN</td><td>0.6746</td><td>0.64</td><td>0.605</td><td>0.661</td><td>0.548</td><td>0.228</td></tr>
+<tr><td>14</td><td>MLP</td><td>0.6722</td><td>0.643</td><td>0.535</td><td>0.706</td><td>0.518</td><td>0.233</td></tr>
+<tr><td>15</td><td>Decision Tree</td><td>0.6526</td><td>0.622</td><td>0.603</td><td>0.633</td><td>0.543</td><td>0.261</td></tr>
+<tr><td>16</td><td>Naive Bayes</td><td>0.6524</td><td>0.628</td><td>0.602</td><td>0.643</td><td>0.534</td><td>0.243</td></tr>
+<tr><td>17</td><td>TabNet 🆕</td><td>0.6428</td><td>0.612</td><td>0.588</td><td>0.626</td><td>0.525</td><td>0.252</td></tr></table>
+<div class='highlight-box' style='margin-top:6px;'><p>💡 <strong>CatBoost AUC=0.7738 (CI: 0.7606–0.7870)</strong> — صادقانه‌تر از V2 (0.831). FT-Transformer و TabNet (deep learning جدولی) با n=2408 عملکرد ضعیف‌تر از tree-based دارند.</p></div>` },
+      { title: "📖 توضیح معیارها", content: `<table class='guide-table'><tr><th>معیار</th><th>مقدار V3</th><th>به زبان ساده</th></tr><tr><td><strong>AUC</strong></td><td>0.7738</td><td>تفکیک خوب (۰.۵=شانس، ۱.۰=عالی)</td></tr><tr><td><strong>CI 95%</strong></td><td>0.7606–0.7870</td><td>بازه اطمینان باریک (n بزرگ)</td></tr><tr><td><strong>Sensitivity</strong></td><td>0.6445</td><td>۶۴.۵٪ موفق‌ها شناسایی شدند</td></tr><tr><td><strong>Specificity</strong></td><td>0.7608</td><td>۷۶.۱٪ ناموفق‌ها درست گفته شد</td></tr><tr><td><strong>F1</strong></td><td>0.6268</td><td>تعادل Precision و Recall</td></tr><tr><td><strong>Brier</strong></td><td>0.1874</td><td>هرچه نزدیک‌تر به ۰ = بهتر</td></tr></table>` }
+    ]
+  },
+  g_ch11: {
+    title: "🔍 فصل ۱۱: SHAP V3 — پاتولوژی صدرنشین!",
+    subtitle: "تحول بزرگ: پاتولوژی از SHAP=0 به رتبه ۱ رسید",
+    sections: [
+      { title: "🎮 نظریه بازی SHAP", content: `<p><strong>SHAP</strong> (SHapley Additive exPlanations) از نظریه بازی می‌آید: هر ویژگی مثل یک «بازیکن» و SHAP سهم هر بازیکن را محاسبه می‌کند.</p><div class='highlight-box'><p>💡 V3: مجموع SHAP ≈ <strong>4.91</strong> (بسیار بالاتر از V2: 2.58). پاتولوژی اکنون <strong>بزرگ‌ترین سهم</strong> را دارد!</p></div>` },
+      { title: "📊 Top 15 ویژگی SHAP V3", content: `<div style='font-size:0.72rem;'>
+<p style='font-weight:bold;margin-bottom:0.3rem;'>Mean |SHAP| — ۱۵ ویژگی برتر CatBoost V3 (n=2408, 42 feature)</p>
+<div style='display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;padding:6px 8px;background:rgba(255,255,255,0.04);border-radius:6px;border:1px solid rgba(255,255,255,0.1);'>
+<span style='font-weight:bold;font-size:0.65rem;color:var(--txt2);margin-left:4px;'>🎨 رنگ‌ها:</span>
+<span style='display:flex;align-items:center;gap:3px;'><span style='width:12px;height:12px;background:#ef4444;border-radius:2px;display:inline-block;'></span><span style='font-size:0.65rem;'>پاتولوژی</span></span>
+<span style='display:flex;align-items:center;gap:3px;'><span style='width:12px;height:12px;background:#10b981;border-radius:2px;display:inline-block;'></span><span style='font-size:0.65rem;'>هورمونی</span></span>
+<span style='display:flex;align-items:center;gap:3px;'><span style='width:12px;height:12px;background:#f59e0b;border-radius:2px;display:inline-block;'></span><span style='font-size:0.65rem;'>آنتروپومتری/سن</span></span>
+<span style='display:flex;align-items:center;gap:3px;'><span style='width:12px;height:12px;background:#8b5cf6;border-radius:2px;display:inline-block;'></span><span style='font-size:0.65rem;'>بیضه‌سنجی</span></span>
+<span style='display:flex;align-items:center;gap:3px;'><span style='width:12px;height:12px;background:#06b6d4;border-radius:2px;display:inline-block;'></span><span style='font-size:0.65rem;'>ژنتیک</span></span>
+</div>
+<div style='display:flex;flex-direction:column;gap:2px;'>
+<div style='display:flex;align-items:center;gap:4px;height:20px;'><span style='width:155px;text-align:left;font-size:0.66rem;color:#ef4444;font-weight:bold;flex-shrink:0;'>🔬 rt_severity_score</span><div style='flex:1;position:relative;height:16px;'><div style='position:absolute;left:0;top:0;height:16px;background:#ef4444;border-radius:0 3px 3px 0;width:100%;'></div></div><span style='min-width:55px;font-size:0.65rem;text-align:right;flex-shrink:0;'>0.491</span></div>
+<div style='display:flex;align-items:center;gap:4px;height:20px;'><span style='width:155px;text-align:left;font-size:0.66rem;color:#ef4444;flex-shrink:0;'>🔬 rt_tissue_heterogeneity</span><div style='flex:1;position:relative;height:16px;'><div style='position:absolute;left:0;top:0;height:16px;background:#ef4444;border-radius:0 3px 3px 0;width:99.6%;'></div></div><span style='min-width:55px;font-size:0.65rem;text-align:right;flex-shrink:0;'>0.489</span></div>
+<div style='display:flex;align-items:center;gap:4px;height:20px;'><span style='width:155px;text-align:left;font-size:0.66rem;color:#ef4444;flex-shrink:0;'>🔬 lt_severity_score</span><div style='flex:1;position:relative;height:16px;'><div style='position:absolute;left:0;top:0;height:16px;background:#ef4444;border-radius:0 3px 3px 0;width:93.3%;'></div></div><span style='min-width:55px;font-size:0.65rem;text-align:right;flex-shrink:0;'>0.458</span></div>
+<div style='display:flex;align-items:center;gap:4px;height:20px;'><span style='width:155px;text-align:left;font-size:0.66rem;color:#10b981;flex-shrink:0;'>🔬 T/E2 ratio</span><div style='flex:1;position:relative;height:16px;'><div style='position:absolute;left:0;top:0;height:16px;background:#10b981;border-radius:0 3px 3px 0;width:58.5%;'></div></div><span style='min-width:55px;font-size:0.65rem;text-align:right;flex-shrink:0;'>0.287</span></div>
+<div style='display:flex;align-items:center;gap:4px;height:20px;'><span style='width:155px;text-align:left;font-size:0.66rem;color:#ef4444;flex-shrink:0;'>🔬 rt_dominant_pattern</span><div style='flex:1;position:relative;height:16px;'><div style='position:absolute;left:0;top:0;height:16px;background:#ef4444;border-radius:0 3px 3px 0;width:55.4%;'></div></div><span style='min-width:55px;font-size:0.65rem;text-align:right;flex-shrink:0;'>0.272</span></div>
+<div style='display:flex;align-items:center;gap:4px;height:20px;'><span style='width:155px;text-align:left;font-size:0.66rem;color:#06b6d4;flex-shrink:0;'>🧬 azf_deletion_severity</span><div style='flex:1;position:relative;height:16px;'><div style='position:absolute;left:0;top:0;height:16px;background:#06b6d4;border-radius:0 3px 3px 0;width:41.8%;'></div></div><span style='min-width:55px;font-size:0.65rem;text-align:right;flex-shrink:0;'>0.205</span></div>
+<div style='display:flex;align-items:center;gap:4px;height:20px;'><span style='width:155px;text-align:left;font-size:0.66rem;color:#10b981;flex-shrink:0;'>🔬 LH</span><div style='flex:1;position:relative;height:16px;'><div style='position:absolute;left:0;top:0;height:16px;background:#10b981;border-radius:0 3px 3px 0;width:40.9%;'></div></div><span style='min-width:55px;font-size:0.65rem;text-align:right;flex-shrink:0;'>0.201</span></div>
+<div style='display:flex;align-items:center;gap:4px;height:20px;'><span style='width:155px;text-align:left;font-size:0.66rem;color:#f59e0b;flex-shrink:0;'>👤 Age</span><div style='flex:1;position:relative;height:16px;'><div style='position:absolute;left:0;top:0;height:16px;background:#f59e0b;border-radius:0 3px 3px 0;width:39.3%;'></div></div><span style='min-width:55px;font-size:0.65rem;text-align:right;flex-shrink:0;'>0.193</span></div>
+<div style='display:flex;align-items:center;gap:4px;height:20px;'><span style='width:155px;text-align:left;font-size:0.66rem;color:#10b981;flex-shrink:0;'>🔬 FSH</span><div style='flex:1;position:relative;height:16px;'><div style='position:absolute;left:0;top:0;height:16px;background:#10b981;border-radius:0 3px 3px 0;width:37.1%;'></div></div><span style='min-width:55px;font-size:0.65rem;text-align:right;flex-shrink:0;'>0.182</span></div>
+<div style='display:flex;align-items:center;gap:4px;height:20px;'><span style='width:155px;text-align:left;font-size:0.66rem;color:#ef4444;flex-shrink:0;'>🔬 lt_dominant_pattern</span><div style='flex:1;position:relative;height:16px;'><div style='position:absolute;left:0;top:0;height:16px;background:#ef4444;border-radius:0 3px 3px 0;width:35.0%;'></div></div><span style='min-width:55px;font-size:0.65rem;text-align:right;flex-shrink:0;'>0.172</span></div>
+<div style='display:flex;align-items:center;gap:4px;height:20px;'><span style='width:155px;text-align:left;font-size:0.66rem;color:#06b6d4;flex-shrink:0;'>🧬 karyotype_severity</span><div style='flex:1;position:relative;height:16px;'><div style='position:absolute;left:0;top:0;height:16px;background:#06b6d4;border-radius:0 3px 3px 0;width:30.1%;'></div></div><span style='min-width:55px;font-size:0.65rem;text-align:right;flex-shrink:0;'>0.148</span></div>
+<div style='display:flex;align-items:center;gap:4px;height:20px;'><span style='width:155px;text-align:left;font-size:0.66rem;color:#10b981;flex-shrink:0;'>🔬 Testosterone</span><div style='flex:1;position:relative;height:16px;'><div style='position:absolute;left:0;top:0;height:16px;background:#10b981;border-radius:0 3px 3px 0;width:28.7%;'></div></div><span style='min-width:55px;font-size:0.65rem;text-align:right;flex-shrink:0;'>0.141</span></div>
+<div style='display:flex;align-items:center;gap:4px;height:20px;'><span style='width:155px;text-align:left;font-size:0.66rem;color:#f59e0b;flex-shrink:0;'>👤 Weight</span><div style='flex:1;position:relative;height:16px;'><div style='position:absolute;left:0;top:0;height:16px;background:#f59e0b;border-radius:0 3px 3px 0;width:26.3%;'></div></div><span style='min-width:55px;font-size:0.65rem;text-align:right;flex-shrink:0;'>0.129</span></div>
+<div style='display:flex;align-items:center;gap:4px;height:20px;'><span style='width:155px;text-align:left;font-size:0.66rem;color:#8b5cf6;flex-shrink:0;'>📐 Sakamoto LT</span><div style='flex:1;position:relative;height:16px;'><div style='position:absolute;left:0;top:0;height:16px;background:#8b5cf6;border-radius:0 3px 3px 0;width:25.5%;'></div></div><span style='min-width:55px;font-size:0.65rem;text-align:right;flex-shrink:0;'>0.125</span></div>
+<div style='display:flex;align-items:center;gap:4px;height:20px;'><span style='width:155px;text-align:left;font-size:0.66rem;color:#ef4444;flex-shrink:0;'>🔬 lt_tissue_heterogeneity</span><div style='flex:1;position:relative;height:16px;'><div style='position:absolute;left:0;top:0;height:16px;background:#ef4444;border-radius:0 3px 3px 0;width:24.4%;'></div></div><span style='min-width:55px;font-size:0.65rem;text-align:right;flex-shrink:0;'>0.120</span></div>
+</div></div>` },
+      { title: "📊 سهم گروهی V3", content: `<table class='guide-table'><tr style='background:var(--bg3);'><th>گروه</th><th>مجموع SHAP</th><th>سهم نسبی</th></tr>
+<tr style='background:rgba(239,68,68,0.08);'><td>🔬 <strong>پاتولوژی RT</strong></td><td>1.408</td><td><strong>۲۸.۷٪</strong> 🏆</td></tr>
+<tr style='background:rgba(245,158,11,0.08);'><td>👤 <strong>سایر بالینی</strong> (Age, Weight, BMI, ...)</td><td>1.093</td><td><strong>۲۲.۳٪</strong></td></tr>
+<tr style='background:rgba(239,68,68,0.06);'><td>🔬 <strong>پاتولوژی LT</strong></td><td>0.849</td><td><strong>۱۷.۳٪</strong></td></tr>
+<tr style='background:rgba(139,92,246,0.08);'><td>📐 <strong>حجم/فیزیکی</strong></td><td>0.846</td><td><strong>۱۷.۲٪</strong></td></tr>
+<tr style='background:rgba(16,185,129,0.08);'><td>🔬 <strong>هورمونی</strong></td><td>0.709</td><td><strong>۱۴.۴٪</strong></td></tr></table>
+<div class='warning-box'><p>⚠️ <strong>تحول بزرگ V2→V3:</strong> در V2 پاتولوژی ۰٪ سهم داشت و هورمون‌ها ۴۲٪. در V3 پاتولوژی RT+LT = <strong>۴۶٪</strong> (صدرنشین!) و هورمون‌ها به ۱۴.۴٪ کاهش یافت. دلیل: severity scoring عددی به‌جای encoding باینری ضعیف.</p></div>` }
+    ]
+  },
+  g_ch12: {
+    title: "🧬 فصل ۱۲: تفسیر پزشکی — مدل دو‌حالته",
+    subtitle: "حالت Pre-op (AUC=0.6374) vs Full/Salvage (AUC=0.7738)",
+    sections: [
+      { title: "🔬 دو حالت مدل V3", content: `<table class='guide-table'><tr style='background:var(--bg3);'><th>حالت</th><th>ورودی</th><th>AUC</th><th>کاربرد</th></tr>
+<tr style='background:rgba(59,130,246,0.08);'><td><strong>Pre-op</strong></td><td>فقط هورمون + سونو + آنتروپومتری</td><td><strong>0.6374</strong></td><td>قبل از اولین عمل — بدون پاتولوژی</td></tr>
+<tr style='background:rgba(52,211,153,0.08);'><td><strong>Full/Salvage</strong></td><td>همه ۴۲ ویژگی شامل پاتولوژی + ژنتیک</td><td><strong>0.7738</strong></td><td>salvage mTESE یا وقتی پاتولوژی قبلی موجود است</td></tr></table>
+<div class='warning-box'><p>⚠️ <strong>سقف pre-op:</strong> AUC=0.64 نشان می‌دهد بدون پاتولوژی، پیش‌بینی NOA <strong>محدود</strong> است. هورمون‌ها proxy خوبی هستند ولی جایگزین کامل نیستند. V2 با AUC=0.83 claim می‌کرد «بدون پاتولوژی عالی کار می‌کند» — اشتباه بود!</p></div>` },
+      { title: "🔬 محور HPG و پاتولوژی", content: `<table class='guide-table'><tr><th>هورمون</th><th>SHAP V3</th><th>تفسیر پزشکی</th></tr><tr><td><strong>T/E2 ratio</strong></td><td>0.287 (رتبه ۴)</td><td>تعادل هورمونی — نشان‌دهنده عملکرد بیضه</td></tr><tr><td><strong>LH</strong></td><td>0.201 (رتبه ۷)</td><td>آسیب سلول‌های لایدیگ → LH بالا</td></tr><tr><td><strong>FSH</strong></td><td>0.182 (رتبه ۹)</td><td>آسیب سلول‌های سرتولی → FSH بالا</td></tr><tr><td><strong>Testosterone</strong></td><td>0.141 (رتبه ۱۲)</td><td>تولید تستوسترون = بیضه فعال</td></tr></table>
+<div class='highlight-box'><p>💡 <strong>کشف V3:</strong> هورمون‌ها هنوز مهمند ولی <strong>proxy ناقص</strong> پاتولوژی‌اند. وقتی severity score مستقیم وارد شد، هورمون‌ها از ۴۲٪ (V2) به ۱۴.۴٪ (V3) افت کردند — اطلاعاتشان تکرار بود!</p></div>` },
+      { title: "🧬 Salvage mTESE — مفهوم جدید V3", content: `<p><strong>Salvage mTESE:</strong> عمل دوم (یا بیشتر) برای بیمارانی که عمل اول ناموفق بود.</p><div class='expandable-box' style='border-right:3px solid #10b981;padding:0.7rem;margin:0.5rem 0;background:rgba(16,185,129,0.08);border-radius:8px;'>
+<p><strong>🔑 چرا مدل Full/Salvage قوی‌تر است:</strong></p>
+<ul><li>پاتولوژی عمل قبلی = <strong>اطلاعات مستقیم</strong> از بافت بیضه</li>
+<li>severity_score = خلاصه عددی شدت آسیب</li>
+<li>tissue_heterogeneity = آیا بافت یکدست آسیب دیده یا جزایر سالم دارد؟</li>
+<li>dominant_pattern = نوع غالب پاتولوژی (SCO, MA, Hypo)</li></ul></div>` }
+    ]
+  },
+  g_ch13: {
+    title: "📐 فصل ۱۳: Calibration",
+    subtitle: "آیا وقتی مدل ۷۰٪ می‌گوید واقعاً ۷۰٪ از بیماران موفق‌اند؟",
+    sections: [
+      { title: "📏 Calibration چیست؟", content: `<p>AUC فقط <strong>ترتیب</strong> را می‌سنجد، Calibration <strong>مقدار واقعی</strong> احتمال را.</p><div class='highlight-box'><p>💡 برای مشاوره بالینی <strong>calibration ضروری</strong> است — نمی‌توانید به بیمار بگویید «۷۰٪ شانس» اگر واقعاً ۴۰٪ باشد!</p></div>` },
+      { title: "📊 Brier Score V3", content: `<p><strong>Brier Score = 0.1874</strong> (V2: 0.177). مدل V3 <strong>calibration مشابه</strong> V2 دارد. در بازه ۲۰-۶۰٪ (بازه بالینی مهم) عملکرد قابل‌قبول.</p>` }
+    ]
+  },
+  g_ch14: {
+    title: "📈 فصل ۱۴: Decision Curve Analysis (DCA)",
+    subtitle: "آیا استفاده از مدل بهتر از «همه را عمل کن» یا «هیچ‌کس را عمل نکن» است؟",
+    sections: [
+      { title: "📊 سه استراتژی", content: `<table class='guide-table'><tr><th>استراتژی</th><th>توضیح</th><th>مشکل</th></tr><tr><td><strong>Treat All</strong></td><td>همه بیماران را عمل کن</td><td>۶۳٪ بیهوده عمل می‌شوند!</td></tr><tr><td><strong>Treat None</strong></td><td>هیچ‌کس را عمل نکن</td><td>۳۷٪ شانس موفقیت را از دست می‌دهند!</td></tr><tr><td><strong>Use Model</strong></td><td>فقط بیمارانی با احتمال بالا</td><td>✅ بهینه</td></tr></table>` },
+      { title: "📈 Net Benefit", content: `<p>DCA نشان می‌دهد مدل V3 در بازه <strong>threshold ۲۰-۶۰٪</strong> net benefit مثبت دارد.</p>` }
+    ]
+  },
+  g_qc: {
+    title: "🛡️ کنترل کیفیت",
+    subtitle: "Data Leakage (V1+V2) + مقایسه V1 → V2 → V3",
+    sections: [
+      { title: "📋 شامل", content: `<ul><li><strong>فصل ۱۵:</strong> شناسایی و رفع Data Leakage (شامل باگ V2)</li><li><strong>فصل ۱۶:</strong> مقایسه جامع V1 → V2 → V3</li></ul>` }
+    ]
+  },
+  g_ch15: {
+    title: "💥 فصل ۱۵: Data Leakage",
+    subtitle: "بزرگ‌ترین دشمن ML — V1: پیش‌پردازش، V2: target encoding",
+    sections: [
+      { title: "🔍 Data Leakage چیست؟", content: `<p><strong>تعریف ساده:</strong> وقتی اطلاعاتی از <strong>آینده</strong> یا از <strong>داده تست</strong> به مدل نشت کند.</p><div class='warning-box'><p>⚠️ <strong>V1:</strong> AUC=0.733 (leakage پیش‌پردازش). <strong>V2:</strong> AUC=0.831 (leakage target encoding). <strong>V3:</strong> AUC=0.7738 (صادقانه!).</p></div>` },
+      { title: "💥 ۵ باگ V1 + ۱ باگ V2", content: `
+<div class='bug-card' style='border-right:4px solid #ef4444;padding:0.7rem;margin:0.5rem 0;background:rgba(239,68,68,0.06);border-radius:8px;'>
+<p><strong>🔴 V1 باگ ۱: پیش‌پردازش خارج CV</strong></p>
+<p style='font-size:0.72rem;'>KNN Imputation و Scaling روی کل داده (train+test) → leakage. اصلاح V2: فقط روی training fold.</p></div>
+<div class='bug-card' style='border-right:4px solid #f59e0b;padding:0.7rem;margin:0.5rem 0;background:rgba(245,158,11,0.06);border-radius:8px;'>
+<p><strong>🟡 V1 باگ ۲: Partner_Age confound</strong></p>
+<p style='font-size:0.72rem;'>سن همسر SHAP رتبه ۲ ولی بدون مکانیزم بیولوژیکی. اصلاح V2: حذف کامل.</p></div>
+<div class='bug-card' style='border-right:4px solid #f59e0b;padding:0.7rem;margin:0.5rem 0;background:rgba(245,158,11,0.06);border-radius:8px;'>
+<p><strong>🟡 V1 باگ ۳-۴: مستندات Scaler + Regex پاتولوژی</strong></p>
+<p style='font-size:0.72rem;'>مستندات Z-Score (واقعی RobustScaler) + ۲۲۱ رکورد NLP خطا. اصلاح V2.</p></div>
+<div class='bug-card' style='border-right:4px solid #ef4444;padding:0.7rem;margin:0.5rem 0;background:rgba(239,68,68,0.06);border-radius:8px;'>
+<p><strong>🔴 V1 باگ ۵: Nested CV 2×5 ناکافی</strong></p>
+<p style='font-size:0.72rem;'>فقط ۲ outer fold. اصلاح V2: ۵×۵.</p></div>
+
+<div class='bug-card' style='border-right:4px solid #ef4444;padding:0.7rem;margin:0.5rem 0;background:rgba(239,68,68,0.12);border-radius:8px;'>
+<p><strong>🔴🆕 V2 باگ ۶: Target Encoding Leakage!</strong></p>
+<p style='font-size:0.72rem;'><strong>مسیر:</strong> Ordinal → One-Hot → Target Encoding. مقادیر دسته‌ای با میانگین target (نرخ موفقیت هر دسته) جایگزین شدند → مدل از اطلاعات target داخل ویژگی‌ها استفاده کرد → AUC inflate شد (0.831 ← 0.7738).</p>
+<p style='font-size:0.72rem;'><strong>اصلاح V3:</strong> حذف target encoding + استفاده از severity scoring عددی (بر اساس دانش پزشکی) به‌جای encoding آماری.</p>
+</div>` },
+      { title: "🏛️ درس کلیدی", content: `<p>هر نسخه یک لایه leakage کشف و رفع کرد. V3 <strong>صادقانه‌ترین</strong> ارزیابی است — AUC=0.77 واقعی بهتر از AUC=0.83 inflate شده!</p>` }
+    ]
+  },
+  g_ch16: {
+    title: "🔄 فصل ۱۶: مقایسه V1 → V2 → V3",
+    subtitle: "سه نسل — هر بار صادقانه‌تر و دقیق‌تر",
+    sections: [
+      { title: "📊 جدول مقایسه سه نسل", content: `<table class='guide-table'><tr style='background:var(--bg3);'><th>بُعد</th><th>V1 ❌</th><th>V2 ⚠️</th><th>V3 ✅</th></tr>
+<tr><td><strong>بهترین مدل</strong></td><td>LightGBM (0.733)</td><td>CatBoost (0.831*)</td><td>CatBoost (0.7738)</td></tr>
+<tr><td><strong>تعداد مدل</strong></td><td>—</td><td>16</td><td>17 (+FT-Transformer, TabNet)</td></tr>
+<tr><td><strong>ویژگی‌ها</strong></td><td>—</td><td>29</td><td>42</td></tr>
+<tr><td><strong>n</strong></td><td>—</td><td>2413</td><td>2408</td></tr>
+<tr><td><strong>Nested CV</strong></td><td>2×5</td><td>5×5</td><td>5×5</td></tr>
+<tr><td><strong>Leakage</strong></td><td>پیش‌پردازش خارج CV</td><td>Target encoding!</td><td>✅ رفع شد</td></tr>
+<tr><td><strong>پاتولوژی SHAP</strong></td><td>—</td><td>0.000 (صفر!)</td><td>0.491 (رتبه ۱!)</td></tr>
+<tr><td><strong>ژنتیک</strong></td><td>❌ نیست</td><td>❌ نیست</td><td>✅ karyotype + AZF</td></tr>
+<tr><td><strong>مدل Pre-op</strong></td><td>—</td><td>ادعای AUC=0.83</td><td>AUC=0.6374 (واقعی)</td></tr>
+<tr><td><strong>CI 95%</strong></td><td>—</td><td>0.823–0.845</td><td>0.7606–0.7870</td></tr></table>
+<p style='font-size:0.65rem;color:var(--txt2);'>* V2 AUC inflate شده به‌خاطر target encoding leakage.</p>` },
+      { title: "💡 داستان Target Encoding (V2→V3)", content: `<div class='expandable-box' style='border-right:3px solid #ef4444;padding:0.7rem;margin:0.5rem 0;background:rgba(239,68,68,0.08);border-radius:8px;'>
+<p><strong>❌ مسیر V2:</strong> Ordinal → One-Hot → Target Encoding</p>
+<p style='font-size:0.72rem;'>مقادیر categorical (مثلاً نوع پاتولوژی) با <strong>میانگین target</strong> (نرخ موفقیت آن دسته) جایگزین شدند. این یعنی اطلاعات outcome در features نشت کرده!</p></div>
+<div class='expandable-box' style='border-right:3px solid #10b981;padding:0.7rem;margin:0.5rem 0;background:rgba(16,185,129,0.08);border-radius:8px;'>
+<p><strong>✅ مسیر V3:</strong> Severity scoring بر اساس دانش پزشکی</p>
+<p style='font-size:0.72rem;'>به‌جای target encoding آماری، از <strong>دانش دامنه</strong> استفاده شد: SCO=10 (بدترین)، MA_Spermatogonial=8، ... Hypo=2 (بهترین). هیچ اطلاعات target نشت نمی‌کند.</p></div>` },
+      { title: "📋 ۸ اقدام اصلاحی V3", content: `<ol><li>حذف target encoding leaky</li><li>severity scoring عددی پاتولوژی (بر اساس دانش پزشکی)</li><li>اضافه شدن tissue_heterogeneity</li><li>engineering عددی ژنتیک (karyotype_severity, azf_deletion_severity)</li><li>اضافه شدن T/E2 ratio</li><li>گسترش benchmark به ۱۷ مدل (+FT-Transformer, TabNet)</li><li>تعریف مدل دو‌حالته (pre-op vs full/salvage)</li><li>اصلاح n: 2413→2408</li></ol>` }
+    ]
+  },
+  g_product: {
+    title: "🧬 دانش پایه + محصول",
+    subtitle: "پاتولوژی بیضه + CDSS دو‌حالته نهایی",
+    sections: [
+      { title: "📋 شامل", content: `<ul><li><strong>فصل ۱۷:</strong> دانش پایه — پاتولوژی بیضه</li><li><strong>فصل ۱۸:</strong> CDSS دو‌حالته — محصول نهایی</li></ul>` }
+    ]
+  },
+  g_ch17: {
+    title: "🧬 فصل ۱۷: پاتولوژی بیضه",
+    subtitle: "دانش پایه — سلول‌ها و مراحل اسپرم‌سازی",
+    sections: [
+      { title: "🔬 سلول‌های کلیدی بیضه", content: `<table class='guide-table'><tr><th>سلول</th><th>نقش</th><th>ارتباط با NOA</th></tr><tr><td><strong>سلول‌های سرتولی</strong></td><td>پشتیبانی و تغذیه سلول‌های جنسی</td><td>SCO = فقط سرتولی باقی مانده (بدترین)</td></tr><tr><td><strong>سلول‌های لایدیگ</strong></td><td>تولید تستوسترون</td><td>آسیب = LH↑ + Testosterone↓</td></tr><tr><td><strong>اسپرماتوگونی</strong></td><td>سلول بنیادی اسپرم</td><td>توقف در این مرحله = MA شدید</td></tr></table>` },
+      { title: "📊 ارتباط با SHAP V3", content: `<p>در V3، severity_score (امتیاز عددی شدت پاتولوژی) <strong>مستقیماً</strong> از این دانش پایه ساخته شده:</p><table class='guide-table'><tr><th>پاتولوژی</th><th>Severity Score</th><th>SHAP Effect</th></tr><tr><td>SCO (بدترین)</td><td>10</td><td>🔴 منفی قوی</td></tr><tr><td>MA Spermatogonial</td><td>8</td><td>🔴 منفی</td></tr><tr><td>MA Spermatocytic</td><td>6</td><td>🟡 متوسط</td></tr><tr><td>Hypospermatogenesis</td><td>2</td><td>🟢 مثبت</td></tr></table>` }
+    ]
+  },
+  g_ch18: {
+    title: "🖥️ فصل ۱۸: CDSS دو‌حالته — محصول نهایی",
+    subtitle: "سیستم پشتیبانی تصمیم بالینی — اکنون با دو حالت Pre-op و Full/Salvage",
+    sections: [
+      { title: "⚙️ مشخصات فنی V3", content: `<table class='guide-table'><tr><th>پارامتر</th><th>مقدار V3</th></tr><tr><td>مدل</td><td>CatBoost (iterations=1000, lr=0.05, depth=6)</td></tr><tr><td>AUC (Full/Salvage)</td><td><strong>0.7738</strong> (CI: 0.7606–0.7870)</td></tr><tr><td>AUC (Pre-op only)</td><td>0.6374</td></tr><tr><td>ویژگی‌های ورودی</td><td>۴۲ ویژگی</td></tr><tr><td>خروجی</td><td>احتمال موفقیت (۰-۱۰۰٪) + SHAP explanation</td></tr><tr><td>auto_class_weights</td><td>Balanced</td></tr><tr><td>random_seed</td><td>42</td></tr></table>` },
+      { title: "🔬 مدل دو‌حالته — نوآوری V3", content: `<div class='expandable-box' style='border-right:3px solid #3b82f6;padding:0.7rem;margin:0.5rem 0;background:rgba(59,130,246,0.08);border-radius:8px;'>
+<p><strong>حالت ۱: Pre-op (قبل از اولین عمل)</strong></p>
+<p>فقط هورمون‌ها + سونو + آنتروپومتری. AUC=0.6374. مفید برای مشاوره اولیه ولی <strong>سقف پایین</strong> — بدون پاتولوژی، پیش‌بینی NOA محدود است.</p></div>
+<div class='expandable-box' style='border-right:3px solid #10b981;padding:0.7rem;margin:0.5rem 0;background:rgba(16,185,129,0.08);border-radius:8px;'>
+<p><strong>حالت ۲: Full/Salvage (پاتولوژی + ژنتیک موجود)</strong></p>
+<p>همه ۴۲ ویژگی. AUC=0.7738. برای salvage mTESE (عمل دوم) یا وقتی پاتولوژی قبلی موجود است. پاتولوژی <strong>۴۶٪ قدرت پیش‌بینی</strong> را تأمین می‌کند!</p></div>
+<div class='warning-box'><p>⚠️ <strong>تصحیح مهم نسبت به V2:</strong> V2 ادعا می‌کرد «بدون پاتولوژی AUC=0.83» — اشتباه بود! پاتولوژی SHAP=0 V2 به‌خاطر encoding باینری ضعیف بود، نه بی‌اهمیتی واقعی. V3 نشان داد پاتولوژی <strong>مهم‌ترین</strong> عامل است.</p></div>` },
+      { title: "📊 سهم هر گروه (نمودار V3)", content: `<div style='font-size:0.7rem;'>
+<p style='font-weight:bold;margin-bottom:0.5rem;'>توزیع قدرت پیش‌بینی V3 (مجموع SHAP ≈ 4.91):</p>
+<div style='display:flex;height:28px;border-radius:6px;overflow:hidden;margin:0.5rem 0;'>
+<div style='width:29%;background:#ef4444;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.6rem;'>🔬 پاتولوژی RT ۲۹٪</div>
+<div style='width:22%;background:#f59e0b;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.6rem;'>👤 سایر ۲۲٪</div>
+<div style='width:17%;background:#fb923c;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.6rem;'>🔬 پاتولوژی LT ۱۷٪</div>
+<div style='width:17%;background:#8b5cf6;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.6rem;'>📐 حجم ۱۷٪</div>
+<div style='width:15%;background:#10b981;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.6rem;'>🔬 هورمون ۱۵٪</div>
+</div>
+<p>🔴 <strong>پاتولوژی (RT+LT) = ۴۶٪</strong> → صدرنشین مطلق!</p>
+<p>🟡 هورمون‌ها از ۴۲٪ (V2) به ۱۵٪ (V3) کاهش یافت</p>
+</div>` },
+      { title: "🏆 نوآوری V3", content: `<table class='guide-table'><tr style='background:var(--bg3);'><th>جنبه</th><th>مطالعات قبلی</th><th>🏆 V3 ما</th></tr>
+<tr><td><strong>تعداد بیمار</strong></td><td>۱۱۹–۴۳۰</td><td style='font-weight:bold;'>۲۴۰۸ (۵.۶ برابر بزرگ‌ترین)</td></tr>
+<tr><td><strong>تعداد مدل</strong></td><td>۱–۸</td><td style='font-weight:bold;'>۱۷ مدل (شامل DL)</td></tr>
+<tr><td><strong>Leakage rework</strong></td><td>هیچ‌کدام</td><td style='font-weight:bold;'>۳ نسل اصلاح (V1→V2→V3)</td></tr>
+<tr><td><strong>مدل دو‌حالته</strong></td><td>هیچ‌کدام</td><td style='font-weight:bold;'>Pre-op (0.64) + Full (0.77)</td></tr>
+<tr><td><strong>ویژگی ژنتیک</strong></td><td>هیچ‌کدام در ML</td><td style='font-weight:bold;'>karyotype + AZF severity</td></tr></table>` }
+    ]
+  },
+  g_v3fix: {
+    title: "🔄 اصلاحات V3",
+    subtitle: "باگ Target Encoding + ویژگی‌های ژنتیک جدید",
+    sections: [
+      { title: "📋 شامل", content: `<ul><li><strong>فصل ۱۹:</strong> داستان کامل باگ Target Encoding V2→V3</li><li><strong>فصل ۲۰:</strong> ویژگی‌های ژنتیک — اولین بار در ML برای NOA</li></ul>` }
+    ]
+  },
+  g_ch19: {
+    title: "🔧 فصل ۱۹: باگ Target Encoding — داستان V2→V3",
+    subtitle: "چگونه ordinal→one-hot→target encoding باعث inflate شدن AUC شد",
+    sections: [
+      { title: "❓ Target Encoding چیست؟", content: `<p><strong>Target Encoding:</strong> جایگزینی مقادیر categorical با <strong>میانگین target</strong> (نرخ موفقیت) آن دسته.</p>
+<div class='expandable-box' style='border-right:3px solid #ef4444;padding:0.7rem;margin:0.5rem 0;background:rgba(239,68,68,0.08);border-radius:8px;'>
+<p><strong>مثال:</strong> اگر پاتولوژی «SCO» نرخ موفقیت ۳۲٪ داشته باشد → مقدار SCO = 0.32 می‌شود.</p>
+<p><strong>مشکل:</strong> مدل حالا <strong>مستقیماً</strong> نرخ موفقیت را در ویژگی ورودی می‌بیند! این Data Leakage است.</p></div>` },
+      { title: "🔍 مسیر باگ V2", content: `<table class='guide-table'><tr><th>مرحله</th><th>عمل</th><th>مشکل</th></tr>
+<tr><td>1</td><td>مقادیر دسته‌ای (مثلاً Race, Pathology type)</td><td>—</td></tr>
+<tr><td>2</td><td>Ordinal Encoding (تبدیل به عدد ترتیبی)</td><td>ترتیب دلخواه</td></tr>
+<tr><td>3</td><td>One-Hot Encoding (هر دسته یک ستون باینری)</td><td>ابعاد بالا</td></tr>
+<tr><td>4</td><td><strong>Target Encoding (میانگین target هر دسته)</strong></td><td>🔴 <strong>LEAKAGE!</strong></td></tr></table>
+<div class='warning-box'><p>⚠️ target encoding <strong>بیرون از CV</strong> انجام شده بود → اطلاعات target کل داده در هر ویژگی encoded نشت کرد → مدل از «جواب» برای پیش‌بینی استفاده کرد.</p></div>` },
+      { title: "📊 تأثیر عددی", content: `<table class='guide-table'><tr><th>معیار</th><th>V2 (leaky)</th><th>V3 (fixed)</th><th>تغییر</th></tr>
+<tr><td>AUC</td><td>0.8306</td><td>0.7738</td><td>📉 −0.057</td></tr>
+<tr><td>CI 95%</td><td>0.823–0.845</td><td>0.7606–0.7870</td><td>—</td></tr>
+<tr><td>ویژگی‌ها</td><td>29</td><td>42</td><td>📈 +13</td></tr>
+<tr><td>پاتولوژی SHAP</td><td>0.000</td><td>0.491 (رتبه ۱)</td><td>📈 عظیم!</td></tr></table>
+<div class='highlight-box'><p>💡 <strong>paradox:</strong> AUC کاهش یافت ولی مدل <strong>بهتر</strong> شد! V2 AUC inflate بود. V3 AUC=0.77 واقعی و قابل اعتماد است.</p></div>` },
+      { title: "✅ راه‌حل V3", content: `<p><strong>به‌جای target encoding آماری → severity scoring بر اساس دانش پزشکی:</strong></p>
+<ul><li>SCO (بدترین) → severity = 10</li><li>MA Spermatogonial → 8</li><li>MA Spermatocytic → 6</li><li>MA Round Spermatid → 4</li><li>Hypospermatogenesis → 2</li><li>Normal → 0</li></ul>
+<p>این scoring <strong>هیچ اطلاعات target</strong> ندارد — فقط از دانش بالینی آمده. به همین دلیل SHAP آن بسیار بالاست: واقعاً اطلاعات مفید دارد!</p>` }
+    ]
+  },
+  g_ch20: {
+    title: "🧬 فصل ۲۰: ویژگی‌های ژنتیک در V3",
+    subtitle: "اولین بار: karyotype و AZF با encoding عددی وارد مدل ML شدند",
+    sections: [
+      { title: "🧬 چرا ژنتیک در V2 کار نکرد؟", content: `<table class='guide-table'><tr><th>مشکل V2</th><th>جزئیات</th></tr>
+<tr><td><strong>Missing بالا</strong></td><td>۶۲٪ داده ژنتیک خالی بود</td></tr>
+<tr><td><strong>Encoding ضعیف</strong></td><td>Label/One-Hot نمی‌تواند ارتباط بیولوژیکی بین کاریوتایپ‌ها را بفهمد</td></tr>
+<tr><td><strong>نتیجه</strong></td><td>SHAP = 0 — مدل از ژنتیک استفاده نکرد</td></tr></table>` },
+      { title: "✅ راه‌حل V3: Severity Engineering", content: `<table class='guide-table'><tr style='background:var(--bg3);'><th>ویژگی V3</th><th>Encoding</th><th>SHAP</th><th>رتبه</th></tr>
+<tr><td><strong>karyotype_severity</strong></td><td>47,XXY=3, 46,XX=2, mosaic=1, 46,XY=0</td><td>0.148</td><td>رتبه ۱۱</td></tr>
+<tr><td><strong>azf_deletion_severity</strong></td><td>AZFa/b=3(بدترین), AZFc=1(شانس), none=0</td><td>0.205</td><td>رتبه ۶</td></tr></table>
+<div class='highlight-box'><p>💡 با engineering عددی مبتنی بر دانش بالینی، ژنتیک از SHAP=0 به <strong>رتبه‌های ۶ و ۱۱</strong> رسید! حتی با ۶۲٪ missing!</p></div>` },
+      { title: "🔬 تفسیر بالینی", content: `<div class='expandable-box' style='border-right:3px solid #06b6d4;padding:0.7rem;margin:0.5rem 0;background:rgba(6,182,212,0.08);border-radius:8px;'>
+<p><strong>azf_deletion_severity (SHAP=0.205, رتبه ۶):</strong></p>
+<ul><li>AZFa/b deletion (severity=3) → SHAP قوی منفی → شانس تقریباً صفر</li>
+<li>AZFc deletion (severity=1) → SHAP خنثی/مثبت → شانس ۵۰-۵۶٪</li>
+<li>بدون deletion (severity=0) → بسته به سایر عوامل</li></ul>
+<p>این دقیقاً با guideline بالینی مطابقت دارد: AZFa/b = contraindication مطلق!</p></div>
+<div class='expandable-box' style='border-right:3px solid #06b6d4;padding:0.7rem;margin:0.5rem 0;background:rgba(6,182,212,0.08);border-radius:8px;'>
+<p><strong>karyotype_severity (SHAP=0.148, رتبه ۱۱):</strong></p>
+<ul><li>47,XXY (Klinefelter, severity=3) → پیش‌آگهی مختلط</li>
+<li>46,XY (نرمال, severity=0) → بسته به سایر عوامل</li></ul></div>` },
+      { title: "🔮 Future Work ژنتیک", content: `<ul><li>🧬 <strong>کاهش Missing:</strong> جمع‌آوری فعال‌تر داده ژنتیک (هدف: <20% missing)</li><li>🔬 <strong>Granular encoding:</strong> تفکیک بیشتر subtypes (مثلاً mosaicism)</li><li>📊 <strong>Interaction analysis:</strong> ژنتیک × پاتولوژی × هورمون</li><li>🤖 <strong>مدل ژنتیک-محور:</strong> برای بیماران با داده ژنتیک کامل</li></ul>` }
+    ]
+  }
+};
+
+// ===== GUIDE TREE D3 =====
+var gRoot = null;
+var gG = null;
+function initGuideTree() {
+  const gPanel = document.getElementById('guideMindmapPanel');
+  const gw = gPanel.clientWidth;
+  const gh = gPanel.clientHeight;
+
+  const gSvg = d3.select('#guideMindmapPanel')
+    .append('svg')
+    .attr('width', gw)
+    .attr('height', gh);
+
+  gG = gSvg.append('g')
+    .attr('transform', `translate(${gw - 80}, 40)`);
+
+  const gZoom = d3.zoom()
+    .scaleExtent([0.2, 3])
+    .on('zoom', e => gG.attr('transform', e.transform));
+  gSvg.call(gZoom);
+
+  gRoot = d3.hierarchy(guideTreeData);
+  gRoot.x0 = gh / 2;
+  gRoot.y0 = 0;
+
+  const gTreeLayout = d3.tree().nodeSize([42, 220]);
+  let gi = 0;
+
+  function gCollapse(d) {
+    if (d.children) {
+      d._children = d.children;
+      d._children.forEach(gCollapse);
+      d.children = null;
+    }
+  }
+
+  function gExpand(d) {
+    if (d._children) {
+      d.children = d._children;
+      d._children = null;
+    }
+    if (d.children) d.children.forEach(gExpand);
+  }
+
+  function gToggle(d) {
+    if (d.children) { d._children = d.children; d.children = null; }
+    else if (d._children) { d.children = d._children; d._children = null; }
+  }
+
+  window.gShowDetail = function(id) {
+    const detail = guideDetails[id];
+    if (!detail) return;
+    const ph = document.getElementById('guidePlaceholder');
+    const dc = document.getElementById('guideDetailContent');
+    ph.style.display = 'none';
+    dc.style.display = 'block';
+    let html = `<div class='panel-title'>${detail.title}</div>`;
+    html += `<div class='panel-subtitle'>${detail.subtitle}</div>`;
+    detail.sections.forEach(s => {
+      html += `<div class='detail-section'><h3>${s.title}</h3>${s.content}</div>`;
+    });
+    dc.innerHTML = html;
+    dc.scrollTop = 0;
+  }
+
+  function gUpdate(source) {
+    const treeData = gTreeLayout(gRoot);
+    const nodes = treeData.descendants();
+    const links = treeData.links();
+
+    nodes.forEach(d => { d.y = -d.depth * 220; });
+
+    const node = gG.selectAll('g.gnode')
+      .data(nodes, d => d.id || (d.id = ++gi));
+
+    const nodeEnter = node.enter().append('g')
+      .attr('class', 'gnode')
+      .attr('transform', d => `translate(${source.y0},${source.x0})`)
+      .on('click', (event, d) => {
+        const nodeId = d.data.id;
+        if (nodeId) gShowDetail(nodeId);
+        if (typeof gHighlightPath === 'function') gHighlightPath(d);
+        if (typeof updateGuideBreadcrumb === 'function') updateGuideBreadcrumb(d);
+        gToggle(d);
+        gUpdate(d);
+      });
+
+    nodeEnter.append('circle')
+      .attr('r', 4)
+      .style('fill', d => d._children ? (d.data.color || '#60a5fa') : 'var(--bg2)')
+      .style('stroke', d => d.data.color || '#60a5fa')
+      .style('stroke-width', '2px')
+      .style('cursor', 'pointer')
+      .style('opacity', d => (d.children || d._children) ? 0.6 : 0.3);
+
+    nodeEnter.append('text')
+      .attr('dy', '0.35em')
+      .attr('x', d => d.children || d._children ? 10 : -10)
+      .attr('text-anchor', d => d.children || d._children ? 'start' : 'end')
+      .text(d => d.data.name)
+      .style('font-size', '0.8rem')
+      .style('fill', d => d.data.color || 'var(--text)')
+      .style('font-family', 'Vazirmatn')
+      .style('font-weight', d => d.depth < 2 ? '700' : '400')
+      .style('cursor', 'pointer');
+
+    const nodeUpdate = nodeEnter.merge(node);
+    nodeUpdate.transition().duration(400)
+      .attr('transform', d => `translate(${d.y},${d.x})`);
+
+    nodeUpdate.select('circle')
+      .style('fill', d => d._children ? (d.data.color || '#60a5fa') : 'var(--bg2)')
+      .style('opacity', d => (d.children || d._children) ? 0.6 : 0.3);
+
+    const nodeExit = node.exit().transition().duration(400)
+      .attr('transform', d => `translate(${source.y},${source.x})`)
+      .remove();
+    nodeExit.select('circle').attr('r', 1e-6);
+
+    const link = gG.selectAll('path.glink')
+      .data(links, d => d.target.id);
+
+    const linkEnter = link.enter().insert('path', 'g')
+      .attr('class', 'glink')
+      .attr('fill', 'none')
+      .attr('stroke', 'var(--border)')
+      .attr('stroke-width', 1.5)
+      .attr('d', d => {
+        const o = { x: source.x0, y: source.y0 };
+        return `M${o.y},${o.x}C${(o.y + o.y)/2},${o.x} ${(o.y + o.y)/2},${o.x} ${o.y},${o.x}`;
+      });
+
+    linkEnter.merge(link).transition().duration(400)
+      .attr('d', d => `M${d.source.y},${d.source.x}C${(d.source.y + d.target.y)/2},${d.source.x} ${(d.source.y + d.target.y)/2},${d.target.x} ${d.target.y},${d.target.x}`);
+
+    link.exit().transition().duration(400)
+      .attr('d', d => {
+        const o = { x: source.x, y: source.y };
+        return `M${o.y},${o.x}C${(o.y + o.y)/2},${o.x} ${(o.y + o.y)/2},${o.x} ${o.y},${o.x}`;
+      }).remove();
+
+    nodes.forEach(d => { d.x0 = d.x; d.y0 = d.y; });
+  }
+
+  // Start expanded
+  gExpand(gRoot);
+  gUpdate(gRoot);
+  gShowDetail('g_root');
+
+  // Zoom controls
+  window.guideZoomIn = () => gSvg.transition().duration(300).call(gZoom.scaleBy, 1.3);
+  window.guideZoomOut = () => gSvg.transition().duration(300).call(gZoom.scaleBy, 0.7);
+  window.guideResetZoom = () => gSvg.transition().duration(500).call(gZoom.transform, d3.zoomIdentity.translate(gw - 80, 40));
+  window.guideExpandAll = () => { gExpand(gRoot); gUpdate(gRoot); };
+
+  window.addEventListener('resize', () => {
+    const w2 = gPanel.clientWidth;
+    const h2 = gPanel.clientHeight;
+    gSvg.attr('width', w2).attr('height', h2);
+  });
+}
+
+
+
+// ===== GUIDE PATH HIGHLIGHTING =====
+function gHighlightPath(d) {
+  if (!gG) return;
+  // Reset all
+  gG.selectAll('.glink').classed('glink-active', false);
+  gG.selectAll('.gnode').classed('gnode-active', false);
+  
+  // Build path to root
+  let current = d;
+  const pathNodes = new Set();
+  while (current) {
+    pathNodes.add(current.data ? (current.data.id || current.data.name) : current.id);
+    current = current.parent;
+  }
+  
+  // Highlight links on path
+  gG.selectAll('.glink').classed('glink-active', l =>
+    pathNodes.has(l.source.data ? (l.source.data.id || l.source.data.name) : '') && 
+    pathNodes.has(l.target.data ? (l.target.data.id || l.target.data.name) : '')
+  );
+  
+  // Highlight selected node
+  gG.selectAll('.gnode').classed('gnode-active', n => {
+    const nid = n.data ? (n.data.id || n.data.name) : '';
+    return nid === (d.data ? (d.data.id || d.data.name) : d.id);
+  });
+}
+
+// ===== GUIDE BREADCRUMB =====
+function updateGuideBreadcrumb(nodeData) {
+  const bc = document.getElementById('guideBreadcrumb');
+  if (!bc) return;
+  bc.style.display = 'flex';
+  
+  // Build path from root to current node
+  const path = [];
+  let current = nodeData;
+  while (current) {
+    path.unshift(current.data || current);
+    current = current.parent;
+  }
+  
+  bc.innerHTML = '';
+  path.forEach((n, i) => {
+    const d = n.data || n;
+    const name = d.name || d.id || '';
+    const span = document.createElement('span');
+    if (i === path.length - 1) {
+      span.className = 'bc-current';
+      span.textContent = name;
+    } else {
+      span.className = 'bc-item';
+      span.textContent = name;
+      span.onclick = () => {
+        // Find the matching D3 node and click it
+        const matchNode = gRoot ? gRoot.descendants().find(nd => (nd.data.id || nd.data.name) === (d.id || d.name)) : null;
+        if (matchNode) {
+          showGuideDetail(matchNode.data.id || matchNode.data.name);
+          updateGuideBreadcrumb(matchNode);
+        }
+      };
+    }
+    bc.appendChild(span);
+    if (i < path.length - 1) {
+      const sep = document.createElement('span');
+      sep.className = 'bc-sep';
+      sep.textContent = ' ← ';
+      bc.appendChild(sep);
+    }
+  });
+}
+
+</script>
+</body>
+</html>
