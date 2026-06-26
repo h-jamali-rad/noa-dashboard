@@ -728,8 +728,8 @@ body.view-mindmap .page-title { margin-bottom: 26px; }
 
 .mm-stage {
   position: absolute;
-  top: 0; right: 0;
-  transform-origin: top right;
+  top: 0; left: 0;
+  transform-origin: top left;
   transition: transform .18s ease;
 }
 .mm-links {
@@ -4793,7 +4793,7 @@ document.addEventListener('DOMContentLoaded', () => {
   "use strict";
   var DATA = {"id":"page-top","icon":"🎯","label":"پیش‌بینی نتایج micro-TESE","summary":"نمای کلی پروژه: ساخت یک سامانه تصمیم‌یار مبتنی بر یادگیری ماشین برای پیش‌بینی موفقیت micro-TESE در بیماران NOA، با داده‌ی ۲٬۴۰۸ بیمار پژوهشگاه رویان و بهترین مدل CatBoost با AUC=۰٫۷۷۳۸.","children":[{"id":"ch1","icon":"🔬","label":"فصل ۱: آزواسپرمی و micro-TESE","summary":"مبانی زیستی و بالینی مسئله: آزواسپرمی غیرانسدادی (NOA) چیست، اسپرماتوژنز چگونه کار می‌کند و چرا micro-TESE روش انتخابی برای بازیابی اسپرم است.","children":[{"id":"s-sperm","icon":"🧫","label":"اسپرماتوژنز","summary":"اسپرماتوژنز فرآیند تولید اسپرم از سلول‌های بنیادی زایا در لوله‌های منی‌ساز است؛ شناخت آن برای درک اینکه چرا در NOA این فرآیند مختل می‌شود ضروری است.","children":[{"id":"s-sperm-stages","icon":"📊","label":"مراحل اسپرماتوژنز","summary":"مراحل پیوسته‌ی تبدیل اسپرماتوگونی به اسپرماتوزوآ (تکثیر، میوز و اسپرمیوژنز) که هر اختلال در آن‌ها می‌تواند به توقف تولید اسپرم بینجامد."},{"id":"s-sperm-focal","icon":"🔍","label":"اسپرماتوژنز کانونی","summary":"اسپرماتوژنز کانونی یعنی وجود جزایر کوچک و پراکنده‌ای از تولید اسپرم در بیضه‌ی بیماری که در کل ناتوان به‌نظر می‌رسد؛ همین جزایر هدف اصلی جست‌وجوی micro-TESE هستند."}]},{"id":"s-noa","icon":"⚠️","label":"آزواسپرمی غیرانسدادی","summary":"آزواسپرمی غیرانسدادی نبود اسپرم در منی به‌دلیل نارسایی تولید آن در بیضه است، نه انسداد مسیر؛ این تمایز کل رویکرد درمانی را تعیین می‌کند.","children":[{"id":"s-noa-types","icon":"📋","label":"انواع و طبقه‌بندی","summary":"طبقه‌بندی NOA بر پایه‌ی علت (پیش‌بیضه‌ای، بیضه‌ای و پس‌بیضه‌ای) و الگوی بافتی، که پیش‌آگهی بازیابی اسپرم را شکل می‌دهد."},{"id":"s-noa-genetic","icon":"🧬","label":"علل ژنتیکی","summary":"علل ژنتیکی مهم NOA شامل سندرم کلاین‌فلتر (47,XXY) و ریزحذف‌های کروموزوم Y در نواحی AZFa/b/c که هرکدام شانس بازیابی اسپرم را متفاوت می‌کنند."},{"id":"s-noa-histo","icon":"🔬","label":"الگوهای هیستوپاتولوژی","summary":"الگوهای هیستوپاتولوژی بیضه — سندرم تنها سلول سرتولی (SCO)، توقف بلوغ (MA) و هیپواسپرماتوژنز — قوی‌ترین نشانگرهای پیش‌آگهی موفقیت micro-TESE هستند."}]},{"id":"s-mtese","icon":"🏥","label":"روش micro-TESE","summary":"micro-TESE استخراج میکروسکوپی اسپرم از بیضه است که با بزرگ‌نمایی، لوله‌های منی‌ساز پرمحتواتر را شناسایی می‌کند و شانس یافتن اسپرم را بالا می‌برد.","children":[{"id":"s-mtese-vs","icon":"⚖️","label":"مقایسه با TESE مرسوم","summary":"در مقایسه با TESE مرسوم، روش میکروسکوپی بافت کمتری برمی‌دارد، آسیب عروقی کمتری دارد و نرخ بازیابی اسپرم بالاتری ارائه می‌دهد."},{"id":"s-mtese-rates","icon":"📈","label":"نرخ موفقیت در ادبیات","summary":"نرخ بازیابی اسپرم (SRR) در ادبیات بسته به مرکز و الگوی بافتی متغیر است (تقریباً ۴۰ تا ۶۰٪)؛ همین تغییرپذیری انگیزه‌ی ساخت مدل پیش‌بینی را تقویت می‌کند."}]},{"id":"s-why-predict","icon":"💡","label":"چرا پیش‌بینی مهم است","summary":"پیش‌بینی دقیق پیش از عمل به زوج‌ها و پزشک کمک می‌کند درباره‌ی انجام جراحی، آماده‌سازی روانی و گزینه‌های جایگزین تصمیم آگاهانه بگیرند."}],"color":"#4fc3f7"},{"id":"ch2","icon":"📊","label":"فصل ۲: مجموعه‌داده و ویژگی‌ها","summary":"معرفی مجموعه‌داده‌ی ۲٬۴۰۸ بیمار پژوهشگاه رویان، ۴۲ ویژگی بالینی واقعی و فلسفه‌ی طراحی بدون نشت اطلاعات.","children":[{"id":"s-dataset","icon":"🏛️","label":"معرفی مجموعه‌داده","summary":"داده‌ی ۲٬۴۰۸ بیمار NOA از پژوهشگاه رویان تهران؛ یکی از بزرگ‌ترین مجموعه‌های تک‌مرکزی برای این مسئله که اعتبار آماری مدل را پشتیبانی می‌کند."},{"id":"s-features","icon":"📐","label":"ویژگی‌های بالینی","summary":"۴۲ ویژگی بالینی، هورمونی و ژنتیکی واقعی بدون هیچ ویژگی مهندسی‌شده، تا مدل صرفاً بر پایه‌ی اطلاعات قابل‌اتکای بالینی آموزش ببیند.","children":[{"id":"s-feat-hormonal","icon":"💉","label":"هورمونی","summary":"ویژگی‌های هورمونی مانند FSH، LH، تستوسترون و پرولاکتین که وضعیت محور هیپوتالاموس–هیپوفیز–بیضه و توان اسپرم‌سازی را بازتاب می‌دهند."},{"id":"s-feat-genetic","icon":"🧬","label":"ژنتیکی","summary":"ویژگی‌های ژنتیکی مانند کاریوتایپ و وضعیت ریزحذف‌های Y که اطلاعات تعیین‌کننده‌ای درباره‌ی علت و پیش‌آگهی NOA فراهم می‌کنند."},{"id":"s-feat-clinical","icon":"🩺","label":"بالینی و دموگرافیک","summary":"ویژگی‌های بالینی و دموگرافیک نظیر سن، حجم بیضه و سابقه‌ی بالینی که تصویر کامل‌تری از وضعیت بیمار به مدل می‌دهند."}]},{"id":"s-leakfree","icon":"🛡️","label":"طراحی بدون نشت اطلاعات","summary":"طراحی بدون نشت اطلاعات تضمین می‌کند هیچ ویژگی‌ای که فقط حین یا پس از عمل در دسترس است وارد مدل نشود، تا برآورد عملکرد واقع‌بینانه بماند."},{"id":"s-target","icon":"🎯","label":"متغیر هدف","summary":"متغیر هدف یک نتیجه‌ی دودویی است: موفقیت یا شکست بازیابی اسپرم در micro-TESE، که مدل تلاش می‌کند آن را پیش‌بینی کند."}],"color":"#66bb6a"},{"id":"ch3","icon":"⚙️","label":"فصل ۳: پیش‌پردازش داده‌ها","summary":"گام‌های پیش‌پردازش داده: کدگذاری متغیرها، مدیریت داده‌های گمشده، مقیاس‌بندی و مقابله با عدم تعادل کلاسی، همگی با رعایت اصل بدون نشت.","children":[{"id":"s-encoding","icon":"🔤","label":"کدگذاری متغیرها","summary":"کدگذاری متغیرهای کیفی به عددی؛ انتخاب روش درست اینجا حیاتی است چون روش نادرست می‌تواند به نشت اطلاعات و خوش‌بینی کاذب منجر شود.","children":[{"id":"s-enc-ordinal","icon":"📊","label":"کدگذاری ترتیبی","summary":"کدگذاری ترتیبی برای متغیرهایی با ترتیب طبیعی (مانند شدت یک یافته) که رابطه‌ی رتبه‌ای میان مقادیر را حفظ می‌کند."},{"id":"s-enc-target","icon":"⚠️","label":"کدگذاری هدف و نشت اطلاعات","summary":"کدگذاری هدف می‌تواند با استفاده از مقدار هدف، اطلاعات برچسب را به ویژگی‌ها نشت دهد؛ در خط‌لوله‌ی ما همین مسئله موجب برآورد خوش‌بینانه‌ی نادرست می‌شد و کنار گذاشته شد."},{"id":"s-enc-onehot","icon":"🔢","label":"کدگذاری یک‌داغ","summary":"کدگذاری یک‌داغ هر دسته را به یک ستون دودویی مستقل تبدیل می‌کند و برای متغیرهای اسمی بدون ترتیب مناسب است."}]},{"id":"s-missing","icon":"❓","label":"مدیریت داده‌های گمشده","summary":"مدیریت داده‌های گمشده با راهبردهایی که از نشت جلوگیری می‌کنند؛ جای‌گذاری مقادیر باید درون چرخه‌ی اعتبارسنجی و فقط بر پایه‌ی داده‌ی آموزش انجام شود."},{"id":"s-scaling","icon":"📏","label":"مقیاس‌بندی ویژگی‌ها","summary":"مقیاس‌بندی ویژگی‌ها برای مدل‌های حساس به بزرگی مقادیر لازم است؛ مدل‌های درختی مانند CatBoost به آن نیاز چندانی ندارند."},{"id":"s-imbalance","icon":"⚖️","label":"مدیریت عدم تعادل کلاسی","summary":"عدم تعادل کلاسی (تفاوت تعداد موارد موفق و ناموفق) می‌تواند مدل را به‌سمت کلاس پرتعداد سوق دهد؛ اینجا با وزن‌دهی و نمونه‌گیری هوشمند کنترل شد.","children":[{"id":"s-imb-weights","icon":"🏋️","label":"وزن‌دهی کلاسی","summary":"وزن‌دهی کلاسی با افزایش جریمه‌ی خطای کلاس کم‌تعداد، مدل را وادار می‌کند به موارد نادرتر اما بالینی‌مهم توجه بیشتری کند."},{"id":"s-imb-smote","icon":"🔄","label":"SMOTE-NC","summary":"SMOTE-NC نمونه‌های مصنوعی از کلاس اقلیت برای داده‌های ترکیبی عددی-اسمی می‌سازد؛ این کار فقط روی داده‌ی آموزش و درون چرخه‌ی CV انجام شد تا نشتی رخ ندهد."}]},{"id":"s-no-feat-eng","icon":"🚫","label":"عدم مهندسی ویژگی","summary":"تصمیم آگاهانه به پرهیز از مهندسی ویژگی؛ ساختن ویژگی‌های ترکیبی می‌توانست نشت ایجاد کند و تفسیرپذیری بالینی را کاهش دهد."}],"color":"#ffa726"},{"id":"ch4","icon":"🔍","label":"فصل ۴: انتخاب ویژگی","summary":"انتخاب ویژگی: مرور روش‌های فیلتری، پوششی و تعبیه‌شده و توضیح اینکه چرا انتخاب مبتنی بر SHAP برای این پروژه برگزیده شد.","children":[{"id":"s-fs-methods","icon":"📋","label":"روش‌های انتخاب ویژگی","summary":"سه خانواده‌ی اصلی انتخاب ویژگی — فیلتری، پوششی و تعبیه‌شده — که از نظر دقت، هزینه‌ی محاسباتی و خطر بیش‌برازش با هم تفاوت دارند.","children":[{"id":"s-fs-filter","icon":"🔽","label":"روش‌های فیلتری","summary":"روش‌های فیلتری ویژگی‌ها را پیش از مدل‌سازی و بر پایه‌ی معیارهای آماری (مانند همبستگی) رتبه‌بندی می‌کنند؛ سریع‌اند اما تعامل میان ویژگی‌ها را نادیده می‌گیرند."},{"id":"s-fs-wrapper","icon":"🔁","label":"روش‌های پوششی","summary":"روش‌های پوششی زیرمجموعه‌های ویژگی را با آموزش مکرر مدل ارزیابی می‌کنند؛ دقیق‌ترند ولی پرهزینه و مستعد بیش‌برازش."},{"id":"s-fs-embedded","icon":"🌲","label":"روش‌های تعبیه‌شده","summary":"روش‌های تعبیه‌شده انتخاب ویژگی را درون خود فرآیند آموزش انجام می‌دهند (مانند اهمیت ویژگی در مدل‌های درختی) و تعادل خوبی میان دقت و هزینه دارند."}]},{"id":"s-shap-explain","icon":"🎯","label":"مقادیر شپلی و SHAP","summary":"مقادیر شپلی از نظریه‌ی بازی‌ها سهم منصفانه‌ی هر ویژگی در پیش‌بینی را می‌سنجند؛ ما از SHAP برای انتخاب ویژگی شفاف و قابل‌دفاع بالینی استفاده کردیم."},{"id":"s-feat-journey","icon":"🔽","label":"مسیر کاهش ویژگی‌ها","summary":"مسیر کاهش ویژگی‌ها از مجموعه‌ی خام تا ۴۲ ویژگی نهایی؛ ویژگی‌های با واریانس پایین، بدون معناداری بالینی یا همبستگی بالا حذف شدند."},{"id":"s-top-features","icon":"⭐","label":"مهم‌ترین ویژگی‌ها","summary":"مهم‌ترین ویژگی‌ها بر پایه‌ی تحلیل، عمدتاً الگوی هیستوپاتولوژی، نمره‌ی جانسن و نشانگرهای هورمونی که بیشترین قدرت پیش‌بینی را داشتند."}],"color":"#ab47bc"},{"id":"ch5","icon":"🤖","label":"فصل ۵: توسعه مدل و محک‌زنی","summary":"توسعه و محک‌زنی مدل: مقایسه‌ی ۱۶ الگوریتم با اعتبارسنجی متقاطع تودرتوی ۵×۵ و چرایی برتری CatBoost.","children":[{"id":"s-nested-cv","icon":"🔄","label":"اعتبارسنجی متقاطع تودرتو","summary":"اعتبارسنجی متقاطع تودرتو با جداسازی تنظیم ابرپارامتر (حلقه‌ی داخلی) از ارزیابی عملکرد (حلقه‌ی بیرونی) از نشت اطلاعات و خوش‌بینی کاذب جلوگیری می‌کند."},{"id":"s-all-models","icon":"📊","label":"۱۶ مدل ارزیابی‌شده","summary":"۱۶ مدل از رگرسیون لجستیک ساده تا گرادیان‌بوستینگ پیشرفته محک خوردند تا انتخاب بهترین الگوریتم بر پایه‌ی شواهد و نه حدس باشد."},{"id":"s-catboost","icon":"🏆","label":"CatBoost: مدل برنده","summary":"CatBoost با AUC=۰٫۷۷۳۸±۰٫۰۱۳۲ برنده شد؛ مدیریت بومی متغیرهای اسمی و بوستینگ ترتیبی آن مانع نشت هدف و بیش‌برازش می‌شود."},{"id":"s-preop-full","icon":"⚖️","label":"مدل پیش‌عملیاتی vs. کامل","summary":"مدل پیش‌عملیاتی (AUC=۰٫۶۳۷۴) فقط با داده‌ی پیش از جراحی و مدل کامل (AUC=۰٫۷۷۳۸) با همه‌ی ویژگی‌ها؛ فاصله‌ی این دو نشان‌دهنده‌ی اهمیت اطلاعات حین عمل است."}],"color":"#ef5350"},{"id":"ch6","icon":"🚀","label":"فصل ۶: کاربرد بالینی و آینده","summary":"کاربرد بالینی و آینده: نحوه‌ی استفاده‌ی واقعی از مدل، مقایسه با ادبیات، محدودیت‌ها، مسیرهای آینده و ملاحظات اخلاقی.","children":[{"id":"s-clinical-use","icon":"🏥","label":"سیستم تصمیم‌یار بالینی","summary":"سامانه‌ی تصمیم‌یار بالینی احتمال موفقیت را برای هر بیمار برآورد می‌کند تا مشاوره‌ی پیش از عمل دقیق‌تر و تصمیم‌گیری مشترک ممکن شود."},{"id":"s-lit-compare","icon":"📚","label":"مقایسه با ادبیات","summary":"مقایسه‌ی AUC مدل ما با مدل‌های پیش‌بینی منتشرشده نشان می‌دهد عملکرد آن رقابتی و در بسیاری موارد بهتر از کارهای پیشین است."},{"id":"s-limitations","icon":"⚠️","label":"محدودیت‌های مطالعه","summary":"محدودیت‌های مطالعه شامل ماهیت تک‌مرکزی و گذشته‌نگر بودن داده است که تعمیم‌پذیری نتایج را نیازمند اعتبارسنجی بیرونی می‌کند."},{"id":"s-future","icon":"🔮","label":"مسیرهای آینده","summary":"مسیرهای آینده: اعتبارسنجی چندمرکزی، مطالعات آینده‌نگر، یکپارچه‌سازی داده‌های ژنتیکی عمیق‌تر و بررسی مدل‌های یادگیری عمیق."},{"id":"s-ethics","icon":"⚖️","label":"ملاحظات اخلاقی","summary":"ملاحظات اخلاقی کاربرد هوش مصنوعی در طب تولیدمثل: شفافیت، عدالت، حفظ تصمیم نهایی نزد پزشک و بیمار، و پرهیز از قطعیت‌نمایی کاذب."}],"color":"#26c6da"},{"id":"ch7","icon":"📊","label":"فصل ۷: تحلیل SHAP و تفسیرپذیری","summary":"تحلیل SHAP و تفسیرپذیری: چگونه مدل تصمیم می‌گیرد، کدام ویژگی‌ها بیشترین نقش را دارند و چرا شفافیت در طب حیاتی است.","children":[{"id":"s-shapley-theory","icon":"🎲","label":"مقادیر شپلی و نظریه بازی","summary":"مقادیر شپلی ریشه در نظریه‌ی بازی‌های همکارانه دارند و سهم هر «بازیکن» (ویژگی) در نتیجه‌ی نهایی را به‌صورت منصفانه و یکتا تقسیم می‌کنند."},{"id":"s-shap-summary","icon":"📈","label":"نمودارهای خلاصه SHAP","summary":"نمودارهای خلاصه‌ی SHAP جهت و شدت اثر هر ویژگی بر پیش‌بینی را هم‌زمان نشان می‌دهند و دید کلی از رفتار مدل می‌دهند."},{"id":"s-top-shap","icon":"⭐","label":"مهم‌ترین ویژگی‌ها بر اساس SHAP","summary":"بر پایه‌ی SHAP، الگوی هیستوپاتولوژی و نمره‌ی جانسن بیشترین تأثیر را بر خروجی مدل دارند، هم‌سو با شهود بالینی متخصصان."},{"id":"s-shap-interaction","icon":"🔗","label":"اثرات تعاملی ویژگی‌ها","summary":"اثرات تعاملی نشان می‌دهند تأثیر یک ویژگی به مقدار ویژگی دیگر وابسته است؛ مثلاً ترکیب سطح FSH و حجم بیضه معنای متفاوتی می‌یابد."},{"id":"s-shap-vs-others","icon":"⚖️","label":"SHAP در مقابل LIME و سایر روش‌ها","summary":"در مقایسه با LIME و اهمیت جایگشتی، SHAP مبنای نظری محکم‌تر، سازگاری محلی-کلی و تضمین‌های ریاضی بهتری برای تفسیر ارائه می‌دهد."},{"id":"s-clinical-xai","icon":"🏥","label":"تفسیرپذیری در پزشکی بالینی","summary":"تفسیرپذیری در پزشکی بالینی برای جلب اعتماد پزشک، پاسخ‌گویی قانونی و پذیرش مدل در عمل ضروری است؛ جعبه‌ی سیاه در تصمیم‌های درمانی قابل‌قبول نیست."}],"color":"#ffca28"},{"id":"ch8","icon":"🎯","label":"فصل ۸: کالیبراسیون و تحلیل آستانه","summary":"کالیبراسیون و تحلیل آستانه: چرا AUC به‌تنهایی کافی نیست و چگونه آستانه‌ی تصمیم را متناسب با هدف بالینی انتخاب کنیم.","children":[{"id":"s-calibration","icon":"📐","label":"مفهوم کالیبراسیون مدل","summary":"کالیبراسیون یعنی احتمال‌های پیش‌بینی‌شده با فراوانی واقعی رخدادها هم‌خوان باشند؛ مدلی با AUC خوب ممکن است هنوز بد-کالیبره باشد."},{"id":"s-calibration-curve","icon":"📉","label":"منحنی کالیبراسیون و نمره بریر","summary":"منحنی کالیبراسیون (نمودار اطمینان) و نمره‌ی بریر کیفیت احتمال‌های خروجی را می‌سنجند؛ نمره‌ی بریر کمتر یعنی کالیبراسیون بهتر."},{"id":"s-threshold","icon":"🎚️","label":"انتخاب آستانه بهینه","summary":"انتخاب آستانه‌ی بهینه‌ی احتمال تعیین می‌کند مدل چه زمانی «مثبت» پیش‌بینی کند؛ این انتخاب باید با هزینه‌ی بالینی خطاها هم‌سو باشد."},{"id":"s-sens-spec","icon":"⚖️","label":"حساسیت در برابر ویژگی","summary":"توازن میان حساسیت و ویژگی: افزایش یکی معمولاً به‌بهای دیگری است و آستانه بسته به اینکه نگران از دست‌دادن موارد موفق باشیم یا جراحی بیهوده، تنظیم می‌شود."},{"id":"s-confusion","icon":"🧮","label":"ماتریس درهم‌ریختگی و سناریوهای بالینی","summary":"ماتریس درهم‌ریختگی در آستانه‌های مختلف نشان می‌دهد مدل در سناریوهای «رد قطعی» و «تأیید قطعی» چگونه عمل می‌کند و کدام خطاها رخ می‌دهند."}],"color":"#ec407a"},{"id":"ch9","icon":"📏","label":"فصل ۹: تحلیل واریانس و پایداری","summary":"تحلیل واریانس و پایداری: نوسان عملکرد مدل بین foldها، فواصل اطمینان و چرا پایداری برای استقرار بالینی مهم است.","children":[{"id":"s-variance-cv","icon":"📊","label":"واریانس بین foldها","summary":"واریانس عملکرد بین foldهای اعتبارسنجی نشان می‌دهد مدل چقدر به داده‌ی آموزشی خاص حساس است؛ واریانس کم یعنی نتیجه‌ی قابل‌اتکاتر."},{"id":"s-ci-boot","icon":"📐","label":"فواصل اطمینان و بوت‌استرپ","summary":"فواصل اطمینان (CI: ۰٫۷۶۰۶–۰٫۷۸۷۰) و تحلیل بوت‌استرپ بازه‌ی واقع‌بینانه‌ی عملکرد مدل را به‌جای یک عدد منفرد ارائه می‌دهند."},{"id":"s-variance-compare","icon":"⚖️","label":"مقایسه پایداری ۱۶ مدل","summary":"مقایسه‌ی پایداری ۱۶ مدل نشان می‌دهد CatBoost با واریانس پایین (±۰٫۰۱۳۲) هم دقیق و هم پایدار است، که آن را برای کاربرد بالینی مناسب می‌سازد."},{"id":"s-overfit","icon":"⚠️","label":"شاخص‌های بیش‌برازش","summary":"شاخص‌های بیش‌برازش با مقایسه‌ی عملکرد آموزش و آزمون سنجیده می‌شوند؛ فاصله‌ی بزرگ هشدار بیش‌برازش است که اینجا کنترل شده است."},{"id":"s-clinical-stability","icon":"🏥","label":"اهمیت پایداری در استقرار بالینی","summary":"پایداری در استقرار بالینی یعنی مدل روی بیماران و زمان‌های مختلف رفتار یکنواخت داشته باشد؛ بدون آن اعتماد بالینی شکل نمی‌گیرد."}],"color":"#7e57c2"},{"id":"ch10","icon":"🏆","label":"فصل ۱۰: خلاصه جامع و مقایسه نهایی","summary":"خلاصه‌ی جامع نتایج: جدول کامل ۱۶ مدل، تحلیل رتبه‌بندی، یافته‌های کلیدی و جایگاه پروژه در میان مطالعات جهانی.","children":[{"id":"s-full-results","icon":"📋","label":"جدول جامع نتایج ۱۶ مدل","summary":"جدول جامع عملکرد ۱۶ مدل شامل AUC، حساسیت، ویژگی و F1 که امکان مقایسه‌ی شفاف و مبتنی بر شواهد را فراهم می‌کند."},{"id":"s-ranking","icon":"🥇","label":"تحلیل رتبه‌بندی مدل‌ها","summary":"تحلیل رتبه‌بندی توضیح می‌دهد چرا CatBoost در صدر ایستاد و مدل‌های خطی به‌دلیل روابط غیرخطی داده در رتبه‌های پایین‌تر قرار گرفتند."},{"id":"s-preop-full-detail","icon":"🔬","label":"مقایسه تفصیلی پیش‌عملیاتی و کامل","summary":"مقایسه‌ی تفصیلی مدل پیش‌عملیاتی و کامل: کدام ویژگی‌ها فاصله‌ی AUC را می‌سازند و هر مدل برای چه تصمیمی سودمندتر است."},{"id":"s-key-findings","icon":"💎","label":"یافته‌های کلیدی پروژه","summary":"یافته‌های کلیدی پروژه: برتری CatBoost، نقش محوری الگوی بافتی، اهمیت طراحی بدون نشت و دستیابی به AUC=۰٫۷۷۳۸ روی داده‌ی واقعی."},{"id":"s-intl-compare","icon":"🌍","label":"مقایسه با مطالعات بین‌المللی","summary":"مقایسه با مطالعات بین‌المللی نشان می‌دهد عملکرد مدل با بزرگ‌ترین کارهای منتشرشده رقابتی است و در بستر تک‌مرکزی رویان معتبر است."},{"id":"s-stat-sig","icon":"📊","label":"معناداری آماری","summary":"آزمون‌های معناداری آماری تأیید می‌کنند که تفاوت عملکرد میان مدل‌ها تصادفی نیست و برتری CatBoost از نظر آماری معنادار است."}],"color":"#9ccc65"}]};
 
-  var ROW = 48, GAPX = 240, PAD = 50, ROOT_OFFSET = 140;
+  var ROWH = 54, FIRSTX = 300, LEVELX = 235, MARGIN = 190;
   var FA = '۰۱۲۳۴۵۶۷۸۹';
   function toFa(n){ return String(n).replace(/[0-9]/g, function(d){ return FA[+d]; }); }
 
@@ -4821,30 +4821,69 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   prep(DATA, null, '#4fc3f7', 0);
 
-  // --- layout (tidy horizontal tree, RTL = root on right) ---
+  // --- layout (two-sided radial mindmap: root centered, chapters branch left & right) ---
   function layout(){
-    var rows = 0; maxDepth = 0;
-    (function walk(node, depth){
-      if (depth > maxDepth) maxDepth = depth;
-      node._d = depth;
-      var open = node._expanded && node.children && node.children.length;
-      if (open){
-        node.children.forEach(function(c){ walk(c, depth + 1); });
-        node._y = (node.children[0]._y + node.children[node.children.length - 1]._y) / 2;
-      } else {
-        node._y = rows * ROW + ROW / 2;
-        rows++;
+    maxDepth = 0;
+    var kids = (DATA._expanded && DATA.children) ? DATA.children : [];
+    // split chapters into right half and left half
+    var half = Math.ceil(kids.length / 2);
+    kids.forEach(function(c, i){ c._sideRoot = (i < half) ? 1 : -1; });
+    var right = kids.filter(function(c){ return c._sideRoot === 1; });
+    var left  = kids.filter(function(c){ return c._sideRoot === -1; });
+
+    // tidy-tree layout for one side; dir = +1 (right) or -1 (left)
+    function layoutSide(roots, dir){
+      var leaf = 0;
+      function walk(node, depth){
+        if (depth > maxDepth) maxDepth = depth;
+        node._d = depth;
+        node._side = dir;
+        node._rx = dir * (FIRSTX + (depth - 1) * LEVELX);
+        var open = node._expanded && node.children && node.children.length;
+        if (open){
+          node.children.forEach(function(ch){ walk(ch, depth + 1); });
+          node._ry = (node.children[0]._ry + node.children[node.children.length - 1]._ry) / 2;
+        } else {
+          node._ry = leaf * ROWH;
+          leaf++;
+        }
       }
-    })(DATA, 0);
+      roots.forEach(function(r){ walk(r, 1); });
+      return leaf;
+    }
+    // vertically center a side block around the y=0 axis
+    function shiftSide(roots, leaves){
+      if (!roots.length) return;
+      var shift = -((leaves - 1) * ROWH) / 2;
+      (function apply(list){
+        list.forEach(function(node){
+          node._ry += shift;
+          if (node._expanded && node.children) apply(node.children);
+        });
+      })(roots);
+    }
 
-    var stageH = rows * ROW + PAD * 2;
-    var stageW = (maxDepth + 1) * GAPX + PAD * 2 + ROOT_OFFSET;
+    var rLeaves = layoutSide(right, 1);
+    var lLeaves = layoutSide(left, -1);
+    shiftSide(right, rLeaves);
+    shiftSide(left, lLeaves);
 
-    (function ax(node){
-      node._cx = stageW - PAD - ROOT_OFFSET - node._d * GAPX;
-      node._cy = node._y + PAD;
-      if (node._expanded && node.children) node.children.forEach(ax);
-    })(DATA);
+    // root at the very center
+    DATA._d = 0; DATA._side = 0; DATA._rx = 0; DATA._ry = 0;
+
+    // compute bounds over visible nodes, then shift into positive stage space
+    var vis = visibleNodes();
+    var minX = 0, maxX = 0, minY = 0, maxY = 0;
+    vis.forEach(function(n){
+      if (n._rx < minX) minX = n._rx;
+      if (n._rx > maxX) maxX = n._rx;
+      if (n._ry < minY) minY = n._ry;
+      if (n._ry > maxY) maxY = n._ry;
+    });
+    var offX = -minX + MARGIN, offY = -minY + MARGIN;
+    var stageW = (maxX - minX) + MARGIN * 2;
+    var stageH = (maxY - minY) + MARGIN * 2;
+    vis.forEach(function(n){ n._cx = n._rx + offX; n._cy = n._ry + offY; });
 
     stage.style.width = stageW + 'px';
     stage.style.height = stageH + 'px';
@@ -4888,13 +4927,14 @@ document.addEventListener('DOMContentLoaded', () => {
     vis.forEach(function(n){
       if (!(n._expanded && n.children && n.children.length)) return;
       var phw = n._el.offsetWidth / 2;
-      var px = n._cx - phw, py = n._cy;
       n.children.forEach(function(c){
         var chw = c._el.offsetWidth / 2;
-        var cx = c._cx + chw, cy = c._cy;
-        var mx = (px + cx) / 2;
+        var dir = c._side; // +1 = right branch, -1 = left branch
+        var sx = n._cx + dir * phw, sy = n._cy;   // exit from parent edge facing the child
+        var ex = c._cx - dir * chw, ey = c._cy;   // enter at child edge facing the parent
+        var mx = (sx + ex) / 2;
         d += '<path class="mm-link" data-uid="' + c._uid + '" stroke="' + c._color +
-             '" d="M ' + px + ' ' + py + ' C ' + mx + ' ' + py + ' ' + mx + ' ' + cy + ' ' + cx + ' ' + cy + '"/>';
+             '" d="M ' + sx + ' ' + sy + ' C ' + mx + ' ' + sy + ' ' + mx + ' ' + ey + ' ' + ex + ' ' + ey + '"/>';
       });
     });
     svg.innerHTML = d;
@@ -5000,10 +5040,10 @@ document.addEventListener('DOMContentLoaded', () => {
     zoomVal.textContent = toFa(Math.round(zoom * 100)) + '٪';
   }
   function mmFit(){
-    // center root vertically, show right side (root) first
+    // center the root node in the viewport (it sits in the middle of the map)
     if (!DATA._el) return;
-    viewport.scrollLeft = viewport.scrollWidth;
-    viewport.scrollTop = Math.max(0, (DATA._cy * zoom) - viewport.clientHeight / 2);
+    viewport.scrollLeft = Math.max(0, (DATA._cx * zoom) - viewport.clientWidth / 2);
+    viewport.scrollTop  = Math.max(0, (DATA._cy * zoom) - viewport.clientHeight / 2);
   }
   window.mmZoom = function(d){ zoom = Math.min(2, Math.max(0.4, Math.round((zoom + d) * 10) / 10)); applyZoom(); };
   window.mmResetView = function(){ zoom = 1; applyZoom(); render(); setTimeout(mmFit, 30); };
