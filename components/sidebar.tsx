@@ -30,6 +30,7 @@ import {
   Trophy,
   FileText,
   Send,
+  GitBranch,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -40,6 +41,7 @@ type NavItem = {
   icon: typeof Home
   badge?: string
   description?: string
+  external?: boolean
 }
 
 const MAIN_NAV: NavItem[] = [
@@ -73,6 +75,7 @@ const EXTRA_NAV: NavItem[] = [
   { href: '/podcast', label: 'Research Podcast', icon: Mic, description: 'AI-generated expert dialogue transcripts' },
   { href: '/roadmap', label: 'Project Roadmap', icon: Map, description: '3D interactive project mind map' },
   { href: '/contact', label: 'Contact & Beyond', icon: Send, description: 'Get in touch & services beyond NOA' },
+  { href: '/Comments-On-Rads-Project.html', label: 'Project Map', icon: GitBranch, description: 'Interactive project map & comments', external: true },
 ]
 
 export default function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -197,23 +200,37 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
           <ul className="space-y-0.5">
             {EXTRA_NAV.map((item) => {
               const Icon = item.icon
-              const active = isActive(item.href)
+              const active = !item.external && isActive(item.href)
+              const linkClassName = cn(
+                'group flex items-start gap-3 rounded-md px-3 py-2.5 text-sm transition-colors duration-150',
+                active ? 'bg-primary/10 text-primary font-medium' : 'text-foreground/80 hover:bg-accent hover:text-accent-foreground'
+              )
+              const linkInner = (
+                <>
+                  <Icon className="h-4 w-4 shrink-0 mt-0.5 opacity-80" />
+                  <span className="min-w-0 flex-1">
+                    <span className="truncate block">{item.label}</span>
+                    {item.description && <span className="block text-[11px] text-muted-foreground mt-0.5 leading-snug">{item.description}</span>}
+                  </span>
+                </>
+              )
               return (
                 <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    title={item.description ?? item.label}
-                    className={cn(
-                      'group flex items-start gap-3 rounded-md px-3 py-2.5 text-sm transition-colors duration-150',
-                      active ? 'bg-primary/10 text-primary font-medium' : 'text-foreground/80 hover:bg-accent hover:text-accent-foreground'
-                    )}
-                  >
-                    <Icon className="h-4 w-4 shrink-0 mt-0.5 opacity-80" />
-                    <span className="min-w-0 flex-1">
-                      <span className="truncate block">{item.label}</span>
-                      {item.description && <span className="block text-[11px] text-muted-foreground mt-0.5 leading-snug">{item.description}</span>}
-                    </span>
-                  </Link>
+                  {item.external ? (
+                    <a
+                      href={item.href}
+                      title={item.description ?? item.label}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className={linkClassName}
+                    >
+                      {linkInner}
+                    </a>
+                  ) : (
+                    <Link href={item.href} title={item.description ?? item.label} className={linkClassName}>
+                      {linkInner}
+                    </Link>
+                  )}
                 </li>
               )
             })}
