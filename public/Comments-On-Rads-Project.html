@@ -559,6 +559,70 @@ a.cite:hover { text-decoration: underline; }
 .feat-badge.clinical { background: rgba(255, 152, 0, 0.15); color: #ffb74d; }
 .feat-badge.histopath { background: rgba(244, 67, 54, 0.15); color: #e57373; }
 .feat-badge.imaging { background: rgba(0, 188, 212, 0.15); color: #4dd0e1; }
+
+/* ===== MINDMAP NODE TOOLTIP + ENHANCED HOVER ===== */
+.tree-toggle { position: relative; }
+.tree-toggle:hover {
+  transform: translateX(-4px);
+  box-shadow: inset 3px 0 0 0 var(--accent, #4fc3f7);
+}
+#mm-tooltip {
+  position: fixed;
+  z-index: 9999;
+  max-width: 290px;
+  background: var(--bg-card, #1a2d40);
+  color: var(--text-primary, #e8edf2);
+  border: 1px solid var(--accent, #4fc3f7);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.8rem;
+  line-height: 1.7;
+  direction: rtl;
+  text-align: right;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: opacity .18s ease, transform .18s ease, visibility .18s;
+  pointer-events: none;
+}
+#mm-tooltip.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+#mm-tooltip .mm-tip-text { margin: 0 0 10px 0; color: var(--text-secondary, #a0b4c8); }
+#mm-tooltip .mm-tip-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: var(--accent, #4fc3f7);
+  font-weight: 700;
+  font-size: 0.82rem;
+  background: rgba(79,195,247,0.12);
+  border: 1px solid rgba(79,195,247,0.4);
+  border-radius: 6px;
+  padding: 5px 10px;
+  transition: background .15s, transform .15s;
+  user-select: none;
+}
+#mm-tooltip .mm-tip-link:hover { background: rgba(79,195,247,0.25); transform: translateX(-2px); }
+#mm-tooltip::after {
+  content: "";
+  position: absolute;
+  top: var(--arrow-top, 18px);
+  right: -7px;
+  width: 12px; height: 12px;
+  background: var(--bg-card, #1a2d40);
+  border-top: 1px solid var(--accent, #4fc3f7);
+  border-right: 1px solid var(--accent, #4fc3f7);
+  transform: rotate(45deg);
+}
+@media (max-width: 720px) { #mm-tooltip { display: none !important; } }
+
 </style>
 </head>
 <body>
@@ -573,7 +637,7 @@ a.cite:hover { text-decoration: underline; }
   <ul class="tree-root" id="mindmapTree">
     <!-- Root -->
     <li class="tree-item">
-      <button class="tree-toggle" data-target="page-top" onclick="navigateTo('page-top', this)">
+      <button class="tree-toggle" data-target="page-top" data-summary="نمای کلی پروژه: ساخت یک سامانه تصمیم‌یار مبتنی بر یادگیری ماشین برای پیش‌بینی موفقیت micro-TESE در بیماران NOA، با داده‌ی ۲٬۴۰۸ بیمار پژوهشگاه رویان و بهترین مدل CatBoost با AUC=۰٫۷۷۳۸." onclick="navigateTo('page-top', this)">
         <span class="tree-arrow expanded">▶</span>
         <span class="tree-icon">🎯</span>
         <span class="tree-label">پیش‌بینی نتایج micro-TESE</span>
@@ -581,28 +645,28 @@ a.cite:hover { text-decoration: underline; }
       <ul class="tree-children open">
         <!-- Chapter 1 -->
         <li class="tree-item">
-          <button class="tree-toggle" data-target="ch1" onclick="navigateTo('ch1', this)">
+          <button class="tree-toggle" data-target="ch1" data-summary="مبانی زیستی و بالینی مسئله: آزواسپرمی غیرانسدادی (NOA) چیست، اسپرماتوژنز چگونه کار می‌کند و چرا micro-TESE روش انتخابی برای بازیابی اسپرم است." onclick="navigateTo('ch1', this)">
             <span class="tree-arrow">▶</span>
             <span class="tree-icon">🔬</span>
             <span class="tree-label">فصل ۱: آزواسپرمی و micro-TESE</span>
           </button>
           <ul class="tree-children">
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-sperm" onclick="navigateTo('s-sperm', this)">
+              <button class="tree-toggle" data-target="s-sperm" data-summary="اسپرماتوژنز فرآیند تولید اسپرم از سلول‌های بنیادی زایا در لوله‌های منی‌ساز است؛ شناخت آن برای درک اینکه چرا در NOA این فرآیند مختل می‌شود ضروری است." onclick="navigateTo('s-sperm', this)">
                 <span class="tree-arrow">▶</span>
                 <span class="tree-icon">🧫</span>
                 <span class="tree-label">اسپرماتوژنز</span>
               </button>
               <ul class="tree-children">
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-sperm-stages" onclick="navigateTo('s-sperm-stages', this)">
+                  <button class="tree-toggle" data-target="s-sperm-stages" data-summary="مراحل پیوسته‌ی تبدیل اسپرماتوگونی به اسپرماتوزوآ (تکثیر، میوز و اسپرمیوژنز) که هر اختلال در آن‌ها می‌تواند به توقف تولید اسپرم بینجامد." onclick="navigateTo('s-sperm-stages', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">📊</span>
                     <span class="tree-label">مراحل اسپرماتوژنز</span>
                   </button>
                 </li>
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-sperm-focal" onclick="navigateTo('s-sperm-focal', this)">
+                  <button class="tree-toggle" data-target="s-sperm-focal" data-summary="اسپرماتوژنز کانونی یعنی وجود جزایر کوچک و پراکنده‌ای از تولید اسپرم در بیضه‌ی بیماری که در کل ناتوان به‌نظر می‌رسد؛ همین جزایر هدف اصلی جست‌وجوی micro-TESE هستند." onclick="navigateTo('s-sperm-focal', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">🔍</span>
                     <span class="tree-label">اسپرماتوژنز کانونی</span>
@@ -611,28 +675,28 @@ a.cite:hover { text-decoration: underline; }
               </ul>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-noa" onclick="navigateTo('s-noa', this)">
+              <button class="tree-toggle" data-target="s-noa" data-summary="آزواسپرمی غیرانسدادی نبود اسپرم در منی به‌دلیل نارسایی تولید آن در بیضه است، نه انسداد مسیر؛ این تمایز کل رویکرد درمانی را تعیین می‌کند." onclick="navigateTo('s-noa', this)">
                 <span class="tree-arrow">▶</span>
                 <span class="tree-icon">⚠️</span>
                 <span class="tree-label">آزواسپرمی غیرانسدادی</span>
               </button>
               <ul class="tree-children">
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-noa-types" onclick="navigateTo('s-noa-types', this)">
+                  <button class="tree-toggle" data-target="s-noa-types" data-summary="طبقه‌بندی NOA بر پایه‌ی علت (پیش‌بیضه‌ای، بیضه‌ای و پس‌بیضه‌ای) و الگوی بافتی، که پیش‌آگهی بازیابی اسپرم را شکل می‌دهد." onclick="navigateTo('s-noa-types', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">📋</span>
                     <span class="tree-label">انواع و طبقه‌بندی</span>
                   </button>
                 </li>
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-noa-genetic" onclick="navigateTo('s-noa-genetic', this)">
+                  <button class="tree-toggle" data-target="s-noa-genetic" data-summary="علل ژنتیکی مهم NOA شامل سندرم کلاین‌فلتر (47,XXY) و ریزحذف‌های کروموزوم Y در نواحی AZFa/b/c که هرکدام شانس بازیابی اسپرم را متفاوت می‌کنند." onclick="navigateTo('s-noa-genetic', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">🧬</span>
                     <span class="tree-label">علل ژنتیکی</span>
                   </button>
                 </li>
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-noa-histo" onclick="navigateTo('s-noa-histo', this)">
+                  <button class="tree-toggle" data-target="s-noa-histo" data-summary="الگوهای هیستوپاتولوژی بیضه — سندرم تنها سلول سرتولی (SCO)، توقف بلوغ (MA) و هیپواسپرماتوژنز — قوی‌ترین نشانگرهای پیش‌آگهی موفقیت micro-TESE هستند." onclick="navigateTo('s-noa-histo', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">🔬</span>
                     <span class="tree-label">الگوهای هیستوپاتولوژی</span>
@@ -641,21 +705,21 @@ a.cite:hover { text-decoration: underline; }
               </ul>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-mtese" onclick="navigateTo('s-mtese', this)">
+              <button class="tree-toggle" data-target="s-mtese" data-summary="micro-TESE استخراج میکروسکوپی اسپرم از بیضه است که با بزرگ‌نمایی، لوله‌های منی‌ساز پرمحتواتر را شناسایی می‌کند و شانس یافتن اسپرم را بالا می‌برد." onclick="navigateTo('s-mtese', this)">
                 <span class="tree-arrow">▶</span>
                 <span class="tree-icon">🏥</span>
                 <span class="tree-label">روش micro-TESE</span>
               </button>
               <ul class="tree-children">
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-mtese-vs" onclick="navigateTo('s-mtese-vs', this)">
+                  <button class="tree-toggle" data-target="s-mtese-vs" data-summary="در مقایسه با TESE مرسوم، روش میکروسکوپی بافت کمتری برمی‌دارد، آسیب عروقی کمتری دارد و نرخ بازیابی اسپرم بالاتری ارائه می‌دهد." onclick="navigateTo('s-mtese-vs', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">⚖️</span>
                     <span class="tree-label">مقایسه با TESE مرسوم</span>
                   </button>
                 </li>
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-mtese-rates" onclick="navigateTo('s-mtese-rates', this)">
+                  <button class="tree-toggle" data-target="s-mtese-rates" data-summary="نرخ بازیابی اسپرم (SRR) در ادبیات بسته به مرکز و الگوی بافتی متغیر است (تقریباً ۴۰ تا ۶۰٪)؛ همین تغییرپذیری انگیزه‌ی ساخت مدل پیش‌بینی را تقویت می‌کند." onclick="navigateTo('s-mtese-rates', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">📈</span>
                     <span class="tree-label">نرخ موفقیت در ادبیات</span>
@@ -664,7 +728,7 @@ a.cite:hover { text-decoration: underline; }
               </ul>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-why-predict" onclick="navigateTo('s-why-predict', this)">
+              <button class="tree-toggle" data-target="s-why-predict" data-summary="پیش‌بینی دقیق پیش از عمل به زوج‌ها و پزشک کمک می‌کند درباره‌ی انجام جراحی، آماده‌سازی روانی و گزینه‌های جایگزین تصمیم آگاهانه بگیرند." onclick="navigateTo('s-why-predict', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">💡</span>
                 <span class="tree-label">چرا پیش‌بینی مهم است</span>
@@ -674,42 +738,42 @@ a.cite:hover { text-decoration: underline; }
         </li>
         <!-- Chapter 2 -->
         <li class="tree-item">
-          <button class="tree-toggle" data-target="ch2" onclick="navigateTo('ch2', this)">
+          <button class="tree-toggle" data-target="ch2" data-summary="معرفی مجموعه‌داده‌ی ۲٬۴۰۸ بیمار پژوهشگاه رویان، ۴۲ ویژگی بالینی واقعی و فلسفه‌ی طراحی بدون نشت اطلاعات." onclick="navigateTo('ch2', this)">
             <span class="tree-arrow">▶</span>
             <span class="tree-icon">📊</span>
             <span class="tree-label">فصل ۲: مجموعه‌داده و ویژگی‌ها</span>
           </button>
           <ul class="tree-children">
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-dataset" onclick="navigateTo('s-dataset', this)">
+              <button class="tree-toggle" data-target="s-dataset" data-summary="داده‌ی ۲٬۴۰۸ بیمار NOA از پژوهشگاه رویان تهران؛ یکی از بزرگ‌ترین مجموعه‌های تک‌مرکزی برای این مسئله که اعتبار آماری مدل را پشتیبانی می‌کند." onclick="navigateTo('s-dataset', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🏛️</span>
                 <span class="tree-label">معرفی مجموعه‌داده</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-features" onclick="navigateTo('s-features', this)">
+              <button class="tree-toggle" data-target="s-features" data-summary="۴۲ ویژگی بالینی، هورمونی و ژنتیکی واقعی بدون هیچ ویژگی مهندسی‌شده، تا مدل صرفاً بر پایه‌ی اطلاعات قابل‌اتکای بالینی آموزش ببیند." onclick="navigateTo('s-features', this)">
                 <span class="tree-arrow">▶</span>
                 <span class="tree-icon">📐</span>
                 <span class="tree-label">ویژگی‌های بالینی</span>
               </button>
               <ul class="tree-children">
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-feat-hormonal" onclick="navigateTo('s-feat-hormonal', this)">
+                  <button class="tree-toggle" data-target="s-feat-hormonal" data-summary="ویژگی‌های هورمونی مانند FSH، LH، تستوسترون و پرولاکتین که وضعیت محور هیپوتالاموس–هیپوفیز–بیضه و توان اسپرم‌سازی را بازتاب می‌دهند." onclick="navigateTo('s-feat-hormonal', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">💉</span>
                     <span class="tree-label">هورمونی</span>
                   </button>
                 </li>
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-feat-genetic" onclick="navigateTo('s-feat-genetic', this)">
+                  <button class="tree-toggle" data-target="s-feat-genetic" data-summary="ویژگی‌های ژنتیکی مانند کاریوتایپ و وضعیت ریزحذف‌های Y که اطلاعات تعیین‌کننده‌ای درباره‌ی علت و پیش‌آگهی NOA فراهم می‌کنند." onclick="navigateTo('s-feat-genetic', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">🧬</span>
                     <span class="tree-label">ژنتیکی</span>
                   </button>
                 </li>
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-feat-clinical" onclick="navigateTo('s-feat-clinical', this)">
+                  <button class="tree-toggle" data-target="s-feat-clinical" data-summary="ویژگی‌های بالینی و دموگرافیک نظیر سن، حجم بیضه و سابقه‌ی بالینی که تصویر کامل‌تری از وضعیت بیمار به مدل می‌دهند." onclick="navigateTo('s-feat-clinical', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">🩺</span>
                     <span class="tree-label">بالینی و دموگرافیک</span>
@@ -718,14 +782,14 @@ a.cite:hover { text-decoration: underline; }
               </ul>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-leakfree" onclick="navigateTo('s-leakfree', this)">
+              <button class="tree-toggle" data-target="s-leakfree" data-summary="طراحی بدون نشت اطلاعات تضمین می‌کند هیچ ویژگی‌ای که فقط حین یا پس از عمل در دسترس است وارد مدل نشود، تا برآورد عملکرد واقع‌بینانه بماند." onclick="navigateTo('s-leakfree', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🛡️</span>
                 <span class="tree-label">طراحی بدون نشت اطلاعات</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-target" onclick="navigateTo('s-target', this)">
+              <button class="tree-toggle" data-target="s-target" data-summary="متغیر هدف یک نتیجه‌ی دودویی است: موفقیت یا شکست بازیابی اسپرم در micro-TESE، که مدل تلاش می‌کند آن را پیش‌بینی کند." onclick="navigateTo('s-target', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🎯</span>
                 <span class="tree-label">متغیر هدف</span>
@@ -735,35 +799,35 @@ a.cite:hover { text-decoration: underline; }
         </li>
         <!-- Chapter 3 -->
         <li class="tree-item">
-          <button class="tree-toggle" data-target="ch3" onclick="navigateTo('ch3', this)">
+          <button class="tree-toggle" data-target="ch3" data-summary="گام‌های پیش‌پردازش داده: کدگذاری متغیرها، مدیریت داده‌های گمشده، مقیاس‌بندی و مقابله با عدم تعادل کلاسی، همگی با رعایت اصل بدون نشت." onclick="navigateTo('ch3', this)">
             <span class="tree-arrow">▶</span>
             <span class="tree-icon">⚙️</span>
             <span class="tree-label">فصل ۳: پیش‌پردازش داده‌ها</span>
           </button>
           <ul class="tree-children">
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-encoding" onclick="navigateTo('s-encoding', this)">
+              <button class="tree-toggle" data-target="s-encoding" data-summary="کدگذاری متغیرهای کیفی به عددی؛ انتخاب روش درست اینجا حیاتی است چون روش نادرست می‌تواند به نشت اطلاعات و خوش‌بینی کاذب منجر شود." onclick="navigateTo('s-encoding', this)">
                 <span class="tree-arrow">▶</span>
                 <span class="tree-icon">🔤</span>
                 <span class="tree-label">کدگذاری متغیرها</span>
               </button>
               <ul class="tree-children">
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-enc-ordinal" onclick="navigateTo('s-enc-ordinal', this)">
+                  <button class="tree-toggle" data-target="s-enc-ordinal" data-summary="کدگذاری ترتیبی برای متغیرهایی با ترتیب طبیعی (مانند شدت یک یافته) که رابطه‌ی رتبه‌ای میان مقادیر را حفظ می‌کند." onclick="navigateTo('s-enc-ordinal', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">📊</span>
                     <span class="tree-label">کدگذاری ترتیبی</span>
                   </button>
                 </li>
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-enc-target" onclick="navigateTo('s-enc-target', this)">
+                  <button class="tree-toggle" data-target="s-enc-target" data-summary="کدگذاری هدف می‌تواند با استفاده از مقدار هدف، اطلاعات برچسب را به ویژگی‌ها نشت دهد؛ در خط‌لوله‌ی ما همین مسئله موجب برآورد خوش‌بینانه‌ی نادرست می‌شد و کنار گذاشته شد." onclick="navigateTo('s-enc-target', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">⚠️</span>
                     <span class="tree-label">کدگذاری هدف و نشت اطلاعات</span>
                   </button>
                 </li>
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-enc-onehot" onclick="navigateTo('s-enc-onehot', this)">
+                  <button class="tree-toggle" data-target="s-enc-onehot" data-summary="کدگذاری یک‌داغ هر دسته را به یک ستون دودویی مستقل تبدیل می‌کند و برای متغیرهای اسمی بدون ترتیب مناسب است." onclick="navigateTo('s-enc-onehot', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">🔢</span>
                     <span class="tree-label">کدگذاری یک‌داغ</span>
@@ -772,35 +836,35 @@ a.cite:hover { text-decoration: underline; }
               </ul>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-missing" onclick="navigateTo('s-missing', this)">
+              <button class="tree-toggle" data-target="s-missing" data-summary="مدیریت داده‌های گمشده با راهبردهایی که از نشت جلوگیری می‌کنند؛ جای‌گذاری مقادیر باید درون چرخه‌ی اعتبارسنجی و فقط بر پایه‌ی داده‌ی آموزش انجام شود." onclick="navigateTo('s-missing', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">❓</span>
                 <span class="tree-label">مدیریت داده‌های گمشده</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-scaling" onclick="navigateTo('s-scaling', this)">
+              <button class="tree-toggle" data-target="s-scaling" data-summary="مقیاس‌بندی ویژگی‌ها برای مدل‌های حساس به بزرگی مقادیر لازم است؛ مدل‌های درختی مانند CatBoost به آن نیاز چندانی ندارند." onclick="navigateTo('s-scaling', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">📏</span>
                 <span class="tree-label">مقیاس‌بندی ویژگی‌ها</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-imbalance" onclick="navigateTo('s-imbalance', this)">
+              <button class="tree-toggle" data-target="s-imbalance" data-summary="عدم تعادل کلاسی (تفاوت تعداد موارد موفق و ناموفق) می‌تواند مدل را به‌سمت کلاس پرتعداد سوق دهد؛ اینجا با وزن‌دهی و نمونه‌گیری هوشمند کنترل شد." onclick="navigateTo('s-imbalance', this)">
                 <span class="tree-arrow">▶</span>
                 <span class="tree-icon">⚖️</span>
                 <span class="tree-label">مدیریت عدم تعادل کلاسی</span>
               </button>
               <ul class="tree-children">
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-imb-weights" onclick="navigateTo('s-imb-weights', this)">
+                  <button class="tree-toggle" data-target="s-imb-weights" data-summary="وزن‌دهی کلاسی با افزایش جریمه‌ی خطای کلاس کم‌تعداد، مدل را وادار می‌کند به موارد نادرتر اما بالینی‌مهم توجه بیشتری کند." onclick="navigateTo('s-imb-weights', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">🏋️</span>
                     <span class="tree-label">وزن‌دهی کلاسی</span>
                   </button>
                 </li>
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-imb-smote" onclick="navigateTo('s-imb-smote', this)">
+                  <button class="tree-toggle" data-target="s-imb-smote" data-summary="SMOTE-NC نمونه‌های مصنوعی از کلاس اقلیت برای داده‌های ترکیبی عددی-اسمی می‌سازد؛ این کار فقط روی داده‌ی آموزش و درون چرخه‌ی CV انجام شد تا نشتی رخ ندهد." onclick="navigateTo('s-imb-smote', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">🔄</span>
                     <span class="tree-label">SMOTE-NC</span>
@@ -809,7 +873,7 @@ a.cite:hover { text-decoration: underline; }
               </ul>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-no-feat-eng" onclick="navigateTo('s-no-feat-eng', this)">
+              <button class="tree-toggle" data-target="s-no-feat-eng" data-summary="تصمیم آگاهانه به پرهیز از مهندسی ویژگی؛ ساختن ویژگی‌های ترکیبی می‌توانست نشت ایجاد کند و تفسیرپذیری بالینی را کاهش دهد." onclick="navigateTo('s-no-feat-eng', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🚫</span>
                 <span class="tree-label">عدم مهندسی ویژگی</span>
@@ -819,35 +883,35 @@ a.cite:hover { text-decoration: underline; }
         </li>
         <!-- Chapter 4 -->
         <li class="tree-item">
-          <button class="tree-toggle" data-target="ch4" onclick="navigateTo('ch4', this)">
+          <button class="tree-toggle" data-target="ch4" data-summary="انتخاب ویژگی: مرور روش‌های فیلتری، پوششی و تعبیه‌شده و توضیح اینکه چرا انتخاب مبتنی بر SHAP برای این پروژه برگزیده شد." onclick="navigateTo('ch4', this)">
             <span class="tree-arrow">▶</span>
             <span class="tree-icon">🔍</span>
             <span class="tree-label">فصل ۴: انتخاب ویژگی</span>
           </button>
           <ul class="tree-children">
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-fs-methods" onclick="navigateTo('s-fs-methods', this)">
+              <button class="tree-toggle" data-target="s-fs-methods" data-summary="سه خانواده‌ی اصلی انتخاب ویژگی — فیلتری، پوششی و تعبیه‌شده — که از نظر دقت، هزینه‌ی محاسباتی و خطر بیش‌برازش با هم تفاوت دارند." onclick="navigateTo('s-fs-methods', this)">
                 <span class="tree-arrow">▶</span>
                 <span class="tree-icon">📋</span>
                 <span class="tree-label">روش‌های انتخاب ویژگی</span>
               </button>
               <ul class="tree-children">
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-fs-filter" onclick="navigateTo('s-fs-filter', this)">
+                  <button class="tree-toggle" data-target="s-fs-filter" data-summary="روش‌های فیلتری ویژگی‌ها را پیش از مدل‌سازی و بر پایه‌ی معیارهای آماری (مانند همبستگی) رتبه‌بندی می‌کنند؛ سریع‌اند اما تعامل میان ویژگی‌ها را نادیده می‌گیرند." onclick="navigateTo('s-fs-filter', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">🔽</span>
                     <span class="tree-label">روش‌های فیلتری</span>
                   </button>
                 </li>
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-fs-wrapper" onclick="navigateTo('s-fs-wrapper', this)">
+                  <button class="tree-toggle" data-target="s-fs-wrapper" data-summary="روش‌های پوششی زیرمجموعه‌های ویژگی را با آموزش مکرر مدل ارزیابی می‌کنند؛ دقیق‌ترند ولی پرهزینه و مستعد بیش‌برازش." onclick="navigateTo('s-fs-wrapper', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">🔁</span>
                     <span class="tree-label">روش‌های پوششی</span>
                   </button>
                 </li>
                 <li class="tree-item">
-                  <button class="tree-toggle" data-target="s-fs-embedded" onclick="navigateTo('s-fs-embedded', this)">
+                  <button class="tree-toggle" data-target="s-fs-embedded" data-summary="روش‌های تعبیه‌شده انتخاب ویژگی را درون خود فرآیند آموزش انجام می‌دهند (مانند اهمیت ویژگی در مدل‌های درختی) و تعادل خوبی میان دقت و هزینه دارند." onclick="navigateTo('s-fs-embedded', this)">
                     <span class="tree-arrow leaf">▶</span>
                     <span class="tree-icon">🌲</span>
                     <span class="tree-label">روش‌های تعبیه‌شده</span>
@@ -856,21 +920,21 @@ a.cite:hover { text-decoration: underline; }
               </ul>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-shap-explain" onclick="navigateTo('s-shap-explain', this)">
+              <button class="tree-toggle" data-target="s-shap-explain" data-summary="مقادیر شپلی از نظریه‌ی بازی‌ها سهم منصفانه‌ی هر ویژگی در پیش‌بینی را می‌سنجند؛ ما از SHAP برای انتخاب ویژگی شفاف و قابل‌دفاع بالینی استفاده کردیم." onclick="navigateTo('s-shap-explain', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🎯</span>
                 <span class="tree-label">مقادیر شپلی و SHAP</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-feat-journey" onclick="navigateTo('s-feat-journey', this)">
+              <button class="tree-toggle" data-target="s-feat-journey" data-summary="مسیر کاهش ویژگی‌ها از مجموعه‌ی خام تا ۴۲ ویژگی نهایی؛ ویژگی‌های با واریانس پایین، بدون معناداری بالینی یا همبستگی بالا حذف شدند." onclick="navigateTo('s-feat-journey', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🔽</span>
                 <span class="tree-label">مسیر کاهش ویژگی‌ها</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-top-features" onclick="navigateTo('s-top-features', this)">
+              <button class="tree-toggle" data-target="s-top-features" data-summary="مهم‌ترین ویژگی‌ها بر پایه‌ی تحلیل، عمدتاً الگوی هیستوپاتولوژی، نمره‌ی جانسن و نشانگرهای هورمونی که بیشترین قدرت پیش‌بینی را داشتند." onclick="navigateTo('s-top-features', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">⭐</span>
                 <span class="tree-label">مهم‌ترین ویژگی‌ها</span>
@@ -880,35 +944,35 @@ a.cite:hover { text-decoration: underline; }
         </li>
         <!-- Chapter 5 -->
         <li class="tree-item">
-          <button class="tree-toggle" data-target="ch5" onclick="navigateTo('ch5', this)">
+          <button class="tree-toggle" data-target="ch5" data-summary="توسعه و محک‌زنی مدل: مقایسه‌ی ۱۶ الگوریتم با اعتبارسنجی متقاطع تودرتوی ۵×۵ و چرایی برتری CatBoost." onclick="navigateTo('ch5', this)">
             <span class="tree-arrow">▶</span>
             <span class="tree-icon">🤖</span>
             <span class="tree-label">فصل ۵: توسعه مدل و محک‌زنی</span>
           </button>
           <ul class="tree-children">
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-nested-cv" onclick="navigateTo('s-nested-cv', this)">
+              <button class="tree-toggle" data-target="s-nested-cv" data-summary="اعتبارسنجی متقاطع تودرتو با جداسازی تنظیم ابرپارامتر (حلقه‌ی داخلی) از ارزیابی عملکرد (حلقه‌ی بیرونی) از نشت اطلاعات و خوش‌بینی کاذب جلوگیری می‌کند." onclick="navigateTo('s-nested-cv', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🔄</span>
                 <span class="tree-label">اعتبارسنجی متقاطع تودرتو</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-all-models" onclick="navigateTo('s-all-models', this)">
+              <button class="tree-toggle" data-target="s-all-models" data-summary="۱۶ مدل از رگرسیون لجستیک ساده تا گرادیان‌بوستینگ پیشرفته محک خوردند تا انتخاب بهترین الگوریتم بر پایه‌ی شواهد و نه حدس باشد." onclick="navigateTo('s-all-models', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">📊</span>
                 <span class="tree-label">۱۶ مدل ارزیابی‌شده</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-catboost" onclick="navigateTo('s-catboost', this)">
+              <button class="tree-toggle" data-target="s-catboost" data-summary="CatBoost با AUC=۰٫۷۷۳۸±۰٫۰۱۳۲ برنده شد؛ مدیریت بومی متغیرهای اسمی و بوستینگ ترتیبی آن مانع نشت هدف و بیش‌برازش می‌شود." onclick="navigateTo('s-catboost', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🏆</span>
                 <span class="tree-label">CatBoost: مدل برنده</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-preop-full" onclick="navigateTo('s-preop-full', this)">
+              <button class="tree-toggle" data-target="s-preop-full" data-summary="مدل پیش‌عملیاتی (AUC=۰٫۶۳۷۴) فقط با داده‌ی پیش از جراحی و مدل کامل (AUC=۰٫۷۷۳۸) با همه‌ی ویژگی‌ها؛ فاصله‌ی این دو نشان‌دهنده‌ی اهمیت اطلاعات حین عمل است." onclick="navigateTo('s-preop-full', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">⚖️</span>
                 <span class="tree-label">مدل پیش‌عملیاتی vs. کامل</span>
@@ -918,42 +982,42 @@ a.cite:hover { text-decoration: underline; }
         </li>
         <!-- Chapter 6 -->
         <li class="tree-item">
-          <button class="tree-toggle" data-target="ch6" onclick="navigateTo('ch6', this)">
+          <button class="tree-toggle" data-target="ch6" data-summary="کاربرد بالینی و آینده: نحوه‌ی استفاده‌ی واقعی از مدل، مقایسه با ادبیات، محدودیت‌ها، مسیرهای آینده و ملاحظات اخلاقی." onclick="navigateTo('ch6', this)">
             <span class="tree-arrow">▶</span>
             <span class="tree-icon">🚀</span>
             <span class="tree-label">فصل ۶: کاربرد بالینی و آینده</span>
           </button>
           <ul class="tree-children">
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-clinical-use" onclick="navigateTo('s-clinical-use', this)">
+              <button class="tree-toggle" data-target="s-clinical-use" data-summary="سامانه‌ی تصمیم‌یار بالینی احتمال موفقیت را برای هر بیمار برآورد می‌کند تا مشاوره‌ی پیش از عمل دقیق‌تر و تصمیم‌گیری مشترک ممکن شود." onclick="navigateTo('s-clinical-use', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🏥</span>
                 <span class="tree-label">سیستم تصمیم‌یار بالینی</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-lit-compare" onclick="navigateTo('s-lit-compare', this)">
+              <button class="tree-toggle" data-target="s-lit-compare" data-summary="مقایسه‌ی AUC مدل ما با مدل‌های پیش‌بینی منتشرشده نشان می‌دهد عملکرد آن رقابتی و در بسیاری موارد بهتر از کارهای پیشین است." onclick="navigateTo('s-lit-compare', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">📚</span>
                 <span class="tree-label">مقایسه با ادبیات</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-limitations" onclick="navigateTo('s-limitations', this)">
+              <button class="tree-toggle" data-target="s-limitations" data-summary="محدودیت‌های مطالعه شامل ماهیت تک‌مرکزی و گذشته‌نگر بودن داده است که تعمیم‌پذیری نتایج را نیازمند اعتبارسنجی بیرونی می‌کند." onclick="navigateTo('s-limitations', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">⚠️</span>
                 <span class="tree-label">محدودیت‌های مطالعه</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-future" onclick="navigateTo('s-future', this)">
+              <button class="tree-toggle" data-target="s-future" data-summary="مسیرهای آینده: اعتبارسنجی چندمرکزی، مطالعات آینده‌نگر، یکپارچه‌سازی داده‌های ژنتیکی عمیق‌تر و بررسی مدل‌های یادگیری عمیق." onclick="navigateTo('s-future', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🔮</span>
                 <span class="tree-label">مسیرهای آینده</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-ethics" onclick="navigateTo('s-ethics', this)">
+              <button class="tree-toggle" data-target="s-ethics" data-summary="ملاحظات اخلاقی کاربرد هوش مصنوعی در طب تولیدمثل: شفافیت، عدالت، حفظ تصمیم نهایی نزد پزشک و بیمار، و پرهیز از قطعیت‌نمایی کاذب." onclick="navigateTo('s-ethics', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">⚖️</span>
                 <span class="tree-label">ملاحظات اخلاقی</span>
@@ -963,49 +1027,49 @@ a.cite:hover { text-decoration: underline; }
         </li>
         <!-- Chapter 7 -->
         <li class="tree-item">
-          <button class="tree-toggle" data-target="ch7" onclick="navigateTo('ch7', this)">
+          <button class="tree-toggle" data-target="ch7" data-summary="تحلیل SHAP و تفسیرپذیری: چگونه مدل تصمیم می‌گیرد، کدام ویژگی‌ها بیشترین نقش را دارند و چرا شفافیت در طب حیاتی است." onclick="navigateTo('ch7', this)">
             <span class="tree-arrow">▶</span>
             <span class="tree-icon">📊</span>
             <span class="tree-label">فصل ۷: تحلیل SHAP و تفسیرپذیری</span>
           </button>
           <ul class="tree-children">
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-shapley-theory" onclick="navigateTo('s-shapley-theory', this)">
+              <button class="tree-toggle" data-target="s-shapley-theory" data-summary="مقادیر شپلی ریشه در نظریه‌ی بازی‌های همکارانه دارند و سهم هر «بازیکن» (ویژگی) در نتیجه‌ی نهایی را به‌صورت منصفانه و یکتا تقسیم می‌کنند." onclick="navigateTo('s-shapley-theory', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🎲</span>
                 <span class="tree-label">مقادیر شپلی و نظریه بازی</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-shap-summary" onclick="navigateTo('s-shap-summary', this)">
+              <button class="tree-toggle" data-target="s-shap-summary" data-summary="نمودارهای خلاصه‌ی SHAP جهت و شدت اثر هر ویژگی بر پیش‌بینی را هم‌زمان نشان می‌دهند و دید کلی از رفتار مدل می‌دهند." onclick="navigateTo('s-shap-summary', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">📈</span>
                 <span class="tree-label">نمودارهای خلاصه SHAP</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-top-shap" onclick="navigateTo('s-top-shap', this)">
+              <button class="tree-toggle" data-target="s-top-shap" data-summary="بر پایه‌ی SHAP، الگوی هیستوپاتولوژی و نمره‌ی جانسن بیشترین تأثیر را بر خروجی مدل دارند، هم‌سو با شهود بالینی متخصصان." onclick="navigateTo('s-top-shap', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">⭐</span>
                 <span class="tree-label">مهم‌ترین ویژگی‌ها بر اساس SHAP</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-shap-interaction" onclick="navigateTo('s-shap-interaction', this)">
+              <button class="tree-toggle" data-target="s-shap-interaction" data-summary="اثرات تعاملی نشان می‌دهند تأثیر یک ویژگی به مقدار ویژگی دیگر وابسته است؛ مثلاً ترکیب سطح FSH و حجم بیضه معنای متفاوتی می‌یابد." onclick="navigateTo('s-shap-interaction', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🔗</span>
                 <span class="tree-label">اثرات تعاملی ویژگی‌ها</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-shap-vs-others" onclick="navigateTo('s-shap-vs-others', this)">
+              <button class="tree-toggle" data-target="s-shap-vs-others" data-summary="در مقایسه با LIME و اهمیت جایگشتی، SHAP مبنای نظری محکم‌تر، سازگاری محلی-کلی و تضمین‌های ریاضی بهتری برای تفسیر ارائه می‌دهد." onclick="navigateTo('s-shap-vs-others', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">⚖️</span>
                 <span class="tree-label">SHAP در مقابل LIME و سایر روش‌ها</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-clinical-xai" onclick="navigateTo('s-clinical-xai', this)">
+              <button class="tree-toggle" data-target="s-clinical-xai" data-summary="تفسیرپذیری در پزشکی بالینی برای جلب اعتماد پزشک، پاسخ‌گویی قانونی و پذیرش مدل در عمل ضروری است؛ جعبه‌ی سیاه در تصمیم‌های درمانی قابل‌قبول نیست." onclick="navigateTo('s-clinical-xai', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🏥</span>
                 <span class="tree-label">تفسیرپذیری در پزشکی بالینی</span>
@@ -1015,42 +1079,42 @@ a.cite:hover { text-decoration: underline; }
         </li>
         <!-- Chapter 8 -->
         <li class="tree-item">
-          <button class="tree-toggle" data-target="ch8" onclick="navigateTo('ch8', this)">
+          <button class="tree-toggle" data-target="ch8" data-summary="کالیبراسیون و تحلیل آستانه: چرا AUC به‌تنهایی کافی نیست و چگونه آستانه‌ی تصمیم را متناسب با هدف بالینی انتخاب کنیم." onclick="navigateTo('ch8', this)">
             <span class="tree-arrow">▶</span>
             <span class="tree-icon">🎯</span>
             <span class="tree-label">فصل ۸: کالیبراسیون و تحلیل آستانه</span>
           </button>
           <ul class="tree-children">
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-calibration" onclick="navigateTo('s-calibration', this)">
+              <button class="tree-toggle" data-target="s-calibration" data-summary="کالیبراسیون یعنی احتمال‌های پیش‌بینی‌شده با فراوانی واقعی رخدادها هم‌خوان باشند؛ مدلی با AUC خوب ممکن است هنوز بد-کالیبره باشد." onclick="navigateTo('s-calibration', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">📐</span>
                 <span class="tree-label">مفهوم کالیبراسیون مدل</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-calibration-curve" onclick="navigateTo('s-calibration-curve', this)">
+              <button class="tree-toggle" data-target="s-calibration-curve" data-summary="منحنی کالیبراسیون (نمودار اطمینان) و نمره‌ی بریر کیفیت احتمال‌های خروجی را می‌سنجند؛ نمره‌ی بریر کمتر یعنی کالیبراسیون بهتر." onclick="navigateTo('s-calibration-curve', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">📉</span>
                 <span class="tree-label">منحنی کالیبراسیون و نمره بریر</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-threshold" onclick="navigateTo('s-threshold', this)">
+              <button class="tree-toggle" data-target="s-threshold" data-summary="انتخاب آستانه‌ی بهینه‌ی احتمال تعیین می‌کند مدل چه زمانی «مثبت» پیش‌بینی کند؛ این انتخاب باید با هزینه‌ی بالینی خطاها هم‌سو باشد." onclick="navigateTo('s-threshold', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🎚️</span>
                 <span class="tree-label">انتخاب آستانه بهینه</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-sens-spec" onclick="navigateTo('s-sens-spec', this)">
+              <button class="tree-toggle" data-target="s-sens-spec" data-summary="توازن میان حساسیت و ویژگی: افزایش یکی معمولاً به‌بهای دیگری است و آستانه بسته به اینکه نگران از دست‌دادن موارد موفق باشیم یا جراحی بیهوده، تنظیم می‌شود." onclick="navigateTo('s-sens-spec', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">⚖️</span>
                 <span class="tree-label">حساسیت در برابر ویژگی</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-confusion" onclick="navigateTo('s-confusion', this)">
+              <button class="tree-toggle" data-target="s-confusion" data-summary="ماتریس درهم‌ریختگی در آستانه‌های مختلف نشان می‌دهد مدل در سناریوهای «رد قطعی» و «تأیید قطعی» چگونه عمل می‌کند و کدام خطاها رخ می‌دهند." onclick="navigateTo('s-confusion', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🧮</span>
                 <span class="tree-label">ماتریس درهم‌ریختگی و سناریوهای بالینی</span>
@@ -1060,42 +1124,42 @@ a.cite:hover { text-decoration: underline; }
         </li>
         <!-- Chapter 9 -->
         <li class="tree-item">
-          <button class="tree-toggle" data-target="ch9" onclick="navigateTo('ch9', this)">
+          <button class="tree-toggle" data-target="ch9" data-summary="تحلیل واریانس و پایداری: نوسان عملکرد مدل بین foldها، فواصل اطمینان و چرا پایداری برای استقرار بالینی مهم است." onclick="navigateTo('ch9', this)">
             <span class="tree-arrow">▶</span>
             <span class="tree-icon">📏</span>
             <span class="tree-label">فصل ۹: تحلیل واریانس و پایداری</span>
           </button>
           <ul class="tree-children">
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-variance-cv" onclick="navigateTo('s-variance-cv', this)">
+              <button class="tree-toggle" data-target="s-variance-cv" data-summary="واریانس عملکرد بین foldهای اعتبارسنجی نشان می‌دهد مدل چقدر به داده‌ی آموزشی خاص حساس است؛ واریانس کم یعنی نتیجه‌ی قابل‌اتکاتر." onclick="navigateTo('s-variance-cv', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">📊</span>
                 <span class="tree-label">واریانس بین foldها</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-ci-boot" onclick="navigateTo('s-ci-boot', this)">
+              <button class="tree-toggle" data-target="s-ci-boot" data-summary="فواصل اطمینان (CI: ۰٫۷۶۰۶–۰٫۷۸۷۰) و تحلیل بوت‌استرپ بازه‌ی واقع‌بینانه‌ی عملکرد مدل را به‌جای یک عدد منفرد ارائه می‌دهند." onclick="navigateTo('s-ci-boot', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">📐</span>
                 <span class="tree-label">فواصل اطمینان و بوت‌استرپ</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-variance-compare" onclick="navigateTo('s-variance-compare', this)">
+              <button class="tree-toggle" data-target="s-variance-compare" data-summary="مقایسه‌ی پایداری ۱۶ مدل نشان می‌دهد CatBoost با واریانس پایین (±۰٫۰۱۳۲) هم دقیق و هم پایدار است، که آن را برای کاربرد بالینی مناسب می‌سازد." onclick="navigateTo('s-variance-compare', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">⚖️</span>
                 <span class="tree-label">مقایسه پایداری ۱۶ مدل</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-overfit" onclick="navigateTo('s-overfit', this)">
+              <button class="tree-toggle" data-target="s-overfit" data-summary="شاخص‌های بیش‌برازش با مقایسه‌ی عملکرد آموزش و آزمون سنجیده می‌شوند؛ فاصله‌ی بزرگ هشدار بیش‌برازش است که اینجا کنترل شده است." onclick="navigateTo('s-overfit', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">⚠️</span>
                 <span class="tree-label">شاخص‌های بیش‌برازش</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-clinical-stability" onclick="navigateTo('s-clinical-stability', this)">
+              <button class="tree-toggle" data-target="s-clinical-stability" data-summary="پایداری در استقرار بالینی یعنی مدل روی بیماران و زمان‌های مختلف رفتار یکنواخت داشته باشد؛ بدون آن اعتماد بالینی شکل نمی‌گیرد." onclick="navigateTo('s-clinical-stability', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🏥</span>
                 <span class="tree-label">اهمیت پایداری در استقرار بالینی</span>
@@ -1105,49 +1169,49 @@ a.cite:hover { text-decoration: underline; }
         </li>
         <!-- Chapter 10 -->
         <li class="tree-item">
-          <button class="tree-toggle" data-target="ch10" onclick="navigateTo('ch10', this)">
+          <button class="tree-toggle" data-target="ch10" data-summary="خلاصه‌ی جامع نتایج: جدول کامل ۱۶ مدل، تحلیل رتبه‌بندی، یافته‌های کلیدی و جایگاه پروژه در میان مطالعات جهانی." onclick="navigateTo('ch10', this)">
             <span class="tree-arrow">▶</span>
             <span class="tree-icon">🏆</span>
             <span class="tree-label">فصل ۱۰: خلاصه جامع و مقایسه نهایی</span>
           </button>
           <ul class="tree-children">
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-full-results" onclick="navigateTo('s-full-results', this)">
+              <button class="tree-toggle" data-target="s-full-results" data-summary="جدول جامع عملکرد ۱۶ مدل شامل AUC، حساسیت، ویژگی و F1 که امکان مقایسه‌ی شفاف و مبتنی بر شواهد را فراهم می‌کند." onclick="navigateTo('s-full-results', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">📋</span>
                 <span class="tree-label">جدول جامع نتایج ۱۶ مدل</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-ranking" onclick="navigateTo('s-ranking', this)">
+              <button class="tree-toggle" data-target="s-ranking" data-summary="تحلیل رتبه‌بندی توضیح می‌دهد چرا CatBoost در صدر ایستاد و مدل‌های خطی به‌دلیل روابط غیرخطی داده در رتبه‌های پایین‌تر قرار گرفتند." onclick="navigateTo('s-ranking', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🥇</span>
                 <span class="tree-label">تحلیل رتبه‌بندی مدل‌ها</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-preop-full-detail" onclick="navigateTo('s-preop-full-detail', this)">
+              <button class="tree-toggle" data-target="s-preop-full-detail" data-summary="مقایسه‌ی تفصیلی مدل پیش‌عملیاتی و کامل: کدام ویژگی‌ها فاصله‌ی AUC را می‌سازند و هر مدل برای چه تصمیمی سودمندتر است." onclick="navigateTo('s-preop-full-detail', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🔬</span>
                 <span class="tree-label">مقایسه تفصیلی پیش‌عملیاتی و کامل</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-key-findings" onclick="navigateTo('s-key-findings', this)">
+              <button class="tree-toggle" data-target="s-key-findings" data-summary="یافته‌های کلیدی پروژه: برتری CatBoost، نقش محوری الگوی بافتی، اهمیت طراحی بدون نشت و دستیابی به AUC=۰٫۷۷۳۸ روی داده‌ی واقعی." onclick="navigateTo('s-key-findings', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">💎</span>
                 <span class="tree-label">یافته‌های کلیدی پروژه</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-intl-compare" onclick="navigateTo('s-intl-compare', this)">
+              <button class="tree-toggle" data-target="s-intl-compare" data-summary="مقایسه با مطالعات بین‌المللی نشان می‌دهد عملکرد مدل با بزرگ‌ترین کارهای منتشرشده رقابتی است و در بستر تک‌مرکزی رویان معتبر است." onclick="navigateTo('s-intl-compare', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">🌍</span>
                 <span class="tree-label">مقایسه با مطالعات بین‌المللی</span>
               </button>
             </li>
             <li class="tree-item">
-              <button class="tree-toggle" data-target="s-stat-sig" onclick="navigateTo('s-stat-sig', this)">
+              <button class="tree-toggle" data-target="s-stat-sig" data-summary="آزمون‌های معناداری آماری تأیید می‌کنند که تفاوت عملکرد میان مدل‌ها تصادفی نیست و برتری CatBoost از نظر آماری معنادار است." onclick="navigateTo('s-stat-sig', this)">
                 <span class="tree-arrow leaf">▶</span>
                 <span class="tree-icon">📊</span>
                 <span class="tree-label">معناداری آماری</span>
@@ -4387,5 +4451,66 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+
+<div id="mm-tooltip" role="tooltip">
+  <p class="mm-tip-text"></p>
+  <span class="mm-tip-link">مطالعه کامل بخش ←</span>
+</div>
+<script>
+(function(){
+  var tip = document.getElementById('mm-tooltip');
+  if(!tip) return;
+  var tipText = tip.querySelector('.mm-tip-text');
+  var tipLink = tip.querySelector('.mm-tip-link');
+  var currentBtn = null;
+  var hideTimer = null;
+
+  function showTip(btn){
+    var summary = btn.getAttribute('data-summary');
+    if(!summary) return;
+    clearTimeout(hideTimer);
+    currentBtn = btn;
+    tipText.textContent = summary;
+    tip.classList.add('visible');
+    // position: to the LEFT of the node (sidebar is on right in RTL)
+    var r = btn.getBoundingClientRect();
+    // measure tooltip after making it visible
+    var tw = tip.offsetWidth;
+    var th = tip.offsetHeight;
+    var left = r.left - tw - 14;
+    if(left < 8) left = r.right + 14; // fallback to right side if no room
+    var top = r.top + (r.height/2) - 20;
+    if(top < 8) top = 8;
+    if(top + th > window.innerHeight - 8) top = window.innerHeight - th - 8;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+    // arrow aligned to node center
+    var arrowTop = (r.top + r.height/2) - top - 6;
+    arrowTop = Math.max(8, Math.min(arrowTop, th - 18));
+    tip.style.setProperty('--arrow-top', arrowTop + 'px');
+  }
+  function scheduleHide(){
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(function(){ tip.classList.remove('visible'); currentBtn = null; }, 260);
+  }
+
+  document.querySelectorAll('.tree-toggle[data-summary]').forEach(function(btn){
+    btn.addEventListener('mouseenter', function(){ showTip(btn); });
+    btn.addEventListener('mouseleave', scheduleHide);
+  });
+  tip.addEventListener('mouseenter', function(){ clearTimeout(hideTimer); });
+  tip.addEventListener('mouseleave', scheduleHide);
+  tipLink.addEventListener('click', function(){
+    if(currentBtn && typeof navigateTo === 'function'){
+      var tgt = currentBtn.getAttribute('data-target');
+      navigateTo(tgt, currentBtn);
+    }
+    tip.classList.remove('visible');
+  });
+  // hide on scroll of the page content
+  window.addEventListener('scroll', function(){ if(tip.classList.contains('visible')) { tip.classList.remove('visible'); } }, true);
+})();
+</script>
+
 </body>
 </html>
