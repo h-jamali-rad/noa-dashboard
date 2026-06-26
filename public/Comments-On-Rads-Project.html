@@ -623,6 +623,236 @@ a.cite:hover { text-decoration: underline; }
 }
 @media (max-width: 720px) { #mm-tooltip { display: none !important; } }
 
+/* ============================================================ */
+/* ===== VIEW TABS (Content / Mindmap) ===== */
+/* ============================================================ */
+.view-tabs {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  margin: -18px auto 44px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 5;
+}
+.view-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 26px;
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all .22s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+}
+.view-tab .vt-icon { font-size: 1.15rem; line-height: 1; }
+.view-tab:hover {
+  color: var(--text-primary);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+.view-tab.active {
+  color: #07151f;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow), 0 6px 20px rgba(79,195,247,0.3);
+}
+
+/* View switching */
+#mindmapView { display: none; }
+body.view-mindmap #mindmapView { display: block; }
+body.view-mindmap .chapter,
+body.view-mindmap .references-section { display: none !important; }
+body.view-mindmap .content-area { max-width: 1180px; }
+body.view-mindmap .page-title { margin-bottom: 26px; }
+
+/* ============================================================ */
+/* ===== VISUAL TREE MINDMAP ===== */
+/* ============================================================ */
+.mm-wrap { position: relative; animation: mmFade .4s ease; }
+@keyframes mmFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.mm-head { text-align: center; margin-bottom: 18px; }
+.mm-head h2 { font-size: 1.45rem; color: var(--accent); font-weight: 800; margin-bottom: 6px; }
+.mm-head p { color: var(--text-muted); font-size: 0.88rem; }
+
+.mm-toolbar {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.mm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 15px;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .18s;
+}
+.mm-btn:hover { color: var(--text-primary); border-color: var(--accent); background: var(--bg-hover); }
+.mm-zoom-val { font-size: 0.8rem; color: var(--text-muted); min-width: 46px; text-align: center; }
+
+.mm-viewport {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 250px);
+  min-height: 560px;
+  overflow: auto;
+  background:
+    radial-gradient(circle at 80% 20%, rgba(79,195,247,0.06), transparent 60%),
+    var(--svg-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.4);
+  cursor: grab;
+}
+.mm-viewport.panning { cursor: grabbing; }
+
+.mm-stage {
+  position: absolute;
+  top: 0; right: 0;
+  transform-origin: top right;
+  transition: transform .18s ease;
+}
+.mm-links {
+  position: absolute;
+  top: 0; left: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 1;
+}
+.mm-link {
+  fill: none;
+  stroke-width: 2;
+  opacity: 0.55;
+  transition: opacity .2s, stroke-width .2s;
+}
+.mm-link.hl { opacity: 1; stroke-width: 3.2; }
+
+.mm-node {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 13px;
+  background: var(--bg-card);
+  border: 1.6px solid var(--c, var(--accent));
+  border-radius: 11px;
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.4);
+  transform: translate(-50%, -50%);
+  transition: box-shadow .18s, transform .18s, background .18s, border-color .18s;
+  z-index: 2;
+}
+.mm-node .mm-ic { font-size: 1.02rem; line-height: 1; }
+.mm-node .mm-lbl { line-height: 1.2; }
+.mm-node:hover {
+  background: var(--bg-hover);
+  box-shadow: 0 0 0 2px var(--c, var(--accent)), 0 0 22px -2px var(--c, var(--accent));
+  z-index: 6;
+}
+.mm-node.active {
+  box-shadow: 0 0 0 2.5px var(--c, var(--accent)), 0 0 26px -1px var(--c, var(--accent));
+}
+.mm-node.collapsed-parent { border-style: dashed; }
+
+/* Toggle badge (child count) */
+.mm-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  border-radius: 10px;
+  background: var(--c, var(--accent));
+  color: #07151f;
+  margin-inline-start: 2px;
+}
+
+/* Depth-specific styling */
+.mm-node.mm-d0 {
+  font-size: 1.02rem;
+  font-weight: 800;
+  padding: 13px 22px;
+  background: linear-gradient(135deg, #16344a, #0f2233);
+  border-width: 2.4px;
+  box-shadow: 0 0 0 3px var(--accent-glow), 0 6px 26px rgba(0,0,0,0.5);
+}
+.mm-node.mm-d1 { font-size: 0.9rem; font-weight: 700; padding: 10px 16px; }
+.mm-node.mm-d2 { font-size: 0.82rem; }
+.mm-node.mm-d3 { font-size: 0.78rem; font-weight: 500; }
+
+/* Mindmap node tooltip / popup */
+#mmTip {
+  position: fixed;
+  max-width: 310px;
+  min-width: 210px;
+  background: linear-gradient(160deg, #1d3148, #142233);
+  border: 1px solid var(--accent);
+  border-radius: 13px;
+  padding: 15px 16px 14px;
+  z-index: 10000;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(79,195,247,0.15);
+  display: none;
+  text-align: right;
+}
+#mmTip.show { display: block; animation: mmTipIn .16s ease; }
+@keyframes mmTipIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+#mmTip .mm-tip-title {
+  display: flex; align-items: center; gap: 7px;
+  font-weight: 800; font-size: 0.95rem; color: var(--accent);
+  margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+#mmTip .mm-tip-text { font-size: 0.84rem; line-height: 1.75; color: var(--text-secondary); margin-bottom: 13px; }
+#mmTip .mm-tip-go {
+  display: inline-flex; align-items: center; gap: 6px;
+  width: 100%; justify-content: center;
+  padding: 9px 14px; font-family: var(--font-body); font-size: 0.85rem; font-weight: 700;
+  color: #07151f; background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  border: none; border-radius: 9px; cursor: pointer; transition: filter .18s, transform .18s;
+}
+#mmTip .mm-tip-go:hover { filter: brightness(1.12); transform: translateY(-1px); }
+
+.mm-hint { text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 12px; }
+.mm-legend {
+  display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: center;
+  margin-top: 14px; padding: 12px; background: var(--bg-secondary);
+  border: 1px solid var(--border); border-radius: 12px;
+}
+.mm-legend .lg { display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; color: var(--text-secondary); }
+.mm-legend .lg .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+
+@media (max-width: 720px) {
+  .view-tab { padding: 9px 18px; font-size: 0.9rem; }
+  .mm-viewport { height: calc(100vh - 220px); }
+}
+
 </style>
 </head>
 <body>
@@ -1233,6 +1463,43 @@ a.cite:hover { text-decoration: underline; }
     <p class="subtitle">راهنمای تعاملی آموزشی — پروژه دکتری ۱۴۰۵</p>
     <span class="institute">🏥 پژوهشگاه رویان، تهران</span>
   </header>
+
+  <!-- ===== VIEW TABS ===== -->
+  <nav class="view-tabs" role="tablist" aria-label="نمای محتوا و نقشه ذهنی">
+    <button class="view-tab active" id="tab-content" role="tab" aria-selected="true" onclick="switchView('content')">
+      <span class="vt-icon">📄</span><span>محتوا</span>
+    </button>
+    <button class="view-tab" id="tab-mindmap" role="tab" aria-selected="false" onclick="switchView('mindmap')">
+      <span class="vt-icon">🧠</span><span>نقشه ذهنی</span>
+    </button>
+  </nav>
+
+  <!-- ===== VISUAL MINDMAP VIEW ===== -->
+  <section id="mindmapView" aria-label="نقشه ذهنی تعاملی پروژه">
+    <div class="mm-wrap">
+      <div class="mm-head">
+        <h2>🧠 نقشه ذهنی تعاملی پروژه</h2>
+        <p>روی هر گره کلیک کنید تا زیرشاخه‌ها باز/بسته شوند و خلاصه‌ی آن نمایش داده شود</p>
+      </div>
+      <div class="mm-toolbar">
+        <button class="mm-btn" onclick="mmExpandAll()">➕ گسترش همه</button>
+        <button class="mm-btn" onclick="mmCollapseAll()">➖ جمع کردن همه</button>
+        <span style="width:14px"></span>
+        <button class="mm-btn" onclick="mmZoom(-0.1)">🔍−</button>
+        <span class="mm-zoom-val" id="mmZoomVal">۱۰۰٪</span>
+        <button class="mm-btn" onclick="mmZoom(0.1)">🔍+</button>
+        <button class="mm-btn" onclick="mmResetView()">↺ بازنشانی</button>
+      </div>
+      <div class="mm-viewport" id="mmViewport">
+        <div class="mm-stage" id="mmStage">
+          <svg class="mm-links" id="mmLinks" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div id="mmNodes"></div>
+        </div>
+      </div>
+      <div class="mm-legend" id="mmLegend"></div>
+      <p class="mm-hint">💡 کلیک روی گره = باز/بسته شدن زیرشاخه‌ها • نگه‌داشتن نشانگر = نمایش خلاصه • دکمه «رفتن به بخش» = پرش به محتوای کامل • کشیدن فضای خالی = جابه‌جایی نما</p>
+    </div>
+  </section>
 
   <!-- ============================================================ -->
   <!-- CHAPTER 1 -->
@@ -4509,6 +4776,260 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   // hide on scroll of the page content
   window.addEventListener('scroll', function(){ if(tip.classList.contains('visible')) { tip.classList.remove('visible'); } }, true);
+})();
+</script>
+
+
+<!-- ===== MINDMAP NODE TOOLTIP ===== -->
+<div id="mmTip" role="dialog" aria-label="خلاصه گره">
+  <div class="mm-tip-title"></div>
+  <p class="mm-tip-text"></p>
+  <button class="mm-tip-go" type="button">📍 رفتن به بخش</button>
+</div>
+
+<!-- ===== TABS + VISUAL MINDMAP SCRIPT ===== -->
+<script>
+(function(){
+  "use strict";
+  var DATA = {"id":"page-top","icon":"🎯","label":"پیش‌بینی نتایج micro-TESE","summary":"نمای کلی پروژه: ساخت یک سامانه تصمیم‌یار مبتنی بر یادگیری ماشین برای پیش‌بینی موفقیت micro-TESE در بیماران NOA، با داده‌ی ۲٬۴۰۸ بیمار پژوهشگاه رویان و بهترین مدل CatBoost با AUC=۰٫۷۷۳۸.","children":[{"id":"ch1","icon":"🔬","label":"فصل ۱: آزواسپرمی و micro-TESE","summary":"مبانی زیستی و بالینی مسئله: آزواسپرمی غیرانسدادی (NOA) چیست، اسپرماتوژنز چگونه کار می‌کند و چرا micro-TESE روش انتخابی برای بازیابی اسپرم است.","children":[{"id":"s-sperm","icon":"🧫","label":"اسپرماتوژنز","summary":"اسپرماتوژنز فرآیند تولید اسپرم از سلول‌های بنیادی زایا در لوله‌های منی‌ساز است؛ شناخت آن برای درک اینکه چرا در NOA این فرآیند مختل می‌شود ضروری است.","children":[{"id":"s-sperm-stages","icon":"📊","label":"مراحل اسپرماتوژنز","summary":"مراحل پیوسته‌ی تبدیل اسپرماتوگونی به اسپرماتوزوآ (تکثیر، میوز و اسپرمیوژنز) که هر اختلال در آن‌ها می‌تواند به توقف تولید اسپرم بینجامد."},{"id":"s-sperm-focal","icon":"🔍","label":"اسپرماتوژنز کانونی","summary":"اسپرماتوژنز کانونی یعنی وجود جزایر کوچک و پراکنده‌ای از تولید اسپرم در بیضه‌ی بیماری که در کل ناتوان به‌نظر می‌رسد؛ همین جزایر هدف اصلی جست‌وجوی micro-TESE هستند."}]},{"id":"s-noa","icon":"⚠️","label":"آزواسپرمی غیرانسدادی","summary":"آزواسپرمی غیرانسدادی نبود اسپرم در منی به‌دلیل نارسایی تولید آن در بیضه است، نه انسداد مسیر؛ این تمایز کل رویکرد درمانی را تعیین می‌کند.","children":[{"id":"s-noa-types","icon":"📋","label":"انواع و طبقه‌بندی","summary":"طبقه‌بندی NOA بر پایه‌ی علت (پیش‌بیضه‌ای، بیضه‌ای و پس‌بیضه‌ای) و الگوی بافتی، که پیش‌آگهی بازیابی اسپرم را شکل می‌دهد."},{"id":"s-noa-genetic","icon":"🧬","label":"علل ژنتیکی","summary":"علل ژنتیکی مهم NOA شامل سندرم کلاین‌فلتر (47,XXY) و ریزحذف‌های کروموزوم Y در نواحی AZFa/b/c که هرکدام شانس بازیابی اسپرم را متفاوت می‌کنند."},{"id":"s-noa-histo","icon":"🔬","label":"الگوهای هیستوپاتولوژی","summary":"الگوهای هیستوپاتولوژی بیضه — سندرم تنها سلول سرتولی (SCO)، توقف بلوغ (MA) و هیپواسپرماتوژنز — قوی‌ترین نشانگرهای پیش‌آگهی موفقیت micro-TESE هستند."}]},{"id":"s-mtese","icon":"🏥","label":"روش micro-TESE","summary":"micro-TESE استخراج میکروسکوپی اسپرم از بیضه است که با بزرگ‌نمایی، لوله‌های منی‌ساز پرمحتواتر را شناسایی می‌کند و شانس یافتن اسپرم را بالا می‌برد.","children":[{"id":"s-mtese-vs","icon":"⚖️","label":"مقایسه با TESE مرسوم","summary":"در مقایسه با TESE مرسوم، روش میکروسکوپی بافت کمتری برمی‌دارد، آسیب عروقی کمتری دارد و نرخ بازیابی اسپرم بالاتری ارائه می‌دهد."},{"id":"s-mtese-rates","icon":"📈","label":"نرخ موفقیت در ادبیات","summary":"نرخ بازیابی اسپرم (SRR) در ادبیات بسته به مرکز و الگوی بافتی متغیر است (تقریباً ۴۰ تا ۶۰٪)؛ همین تغییرپذیری انگیزه‌ی ساخت مدل پیش‌بینی را تقویت می‌کند."}]},{"id":"s-why-predict","icon":"💡","label":"چرا پیش‌بینی مهم است","summary":"پیش‌بینی دقیق پیش از عمل به زوج‌ها و پزشک کمک می‌کند درباره‌ی انجام جراحی، آماده‌سازی روانی و گزینه‌های جایگزین تصمیم آگاهانه بگیرند."}],"color":"#4fc3f7"},{"id":"ch2","icon":"📊","label":"فصل ۲: مجموعه‌داده و ویژگی‌ها","summary":"معرفی مجموعه‌داده‌ی ۲٬۴۰۸ بیمار پژوهشگاه رویان، ۴۲ ویژگی بالینی واقعی و فلسفه‌ی طراحی بدون نشت اطلاعات.","children":[{"id":"s-dataset","icon":"🏛️","label":"معرفی مجموعه‌داده","summary":"داده‌ی ۲٬۴۰۸ بیمار NOA از پژوهشگاه رویان تهران؛ یکی از بزرگ‌ترین مجموعه‌های تک‌مرکزی برای این مسئله که اعتبار آماری مدل را پشتیبانی می‌کند."},{"id":"s-features","icon":"📐","label":"ویژگی‌های بالینی","summary":"۴۲ ویژگی بالینی، هورمونی و ژنتیکی واقعی بدون هیچ ویژگی مهندسی‌شده، تا مدل صرفاً بر پایه‌ی اطلاعات قابل‌اتکای بالینی آموزش ببیند.","children":[{"id":"s-feat-hormonal","icon":"💉","label":"هورمونی","summary":"ویژگی‌های هورمونی مانند FSH، LH، تستوسترون و پرولاکتین که وضعیت محور هیپوتالاموس–هیپوفیز–بیضه و توان اسپرم‌سازی را بازتاب می‌دهند."},{"id":"s-feat-genetic","icon":"🧬","label":"ژنتیکی","summary":"ویژگی‌های ژنتیکی مانند کاریوتایپ و وضعیت ریزحذف‌های Y که اطلاعات تعیین‌کننده‌ای درباره‌ی علت و پیش‌آگهی NOA فراهم می‌کنند."},{"id":"s-feat-clinical","icon":"🩺","label":"بالینی و دموگرافیک","summary":"ویژگی‌های بالینی و دموگرافیک نظیر سن، حجم بیضه و سابقه‌ی بالینی که تصویر کامل‌تری از وضعیت بیمار به مدل می‌دهند."}]},{"id":"s-leakfree","icon":"🛡️","label":"طراحی بدون نشت اطلاعات","summary":"طراحی بدون نشت اطلاعات تضمین می‌کند هیچ ویژگی‌ای که فقط حین یا پس از عمل در دسترس است وارد مدل نشود، تا برآورد عملکرد واقع‌بینانه بماند."},{"id":"s-target","icon":"🎯","label":"متغیر هدف","summary":"متغیر هدف یک نتیجه‌ی دودویی است: موفقیت یا شکست بازیابی اسپرم در micro-TESE، که مدل تلاش می‌کند آن را پیش‌بینی کند."}],"color":"#66bb6a"},{"id":"ch3","icon":"⚙️","label":"فصل ۳: پیش‌پردازش داده‌ها","summary":"گام‌های پیش‌پردازش داده: کدگذاری متغیرها، مدیریت داده‌های گمشده، مقیاس‌بندی و مقابله با عدم تعادل کلاسی، همگی با رعایت اصل بدون نشت.","children":[{"id":"s-encoding","icon":"🔤","label":"کدگذاری متغیرها","summary":"کدگذاری متغیرهای کیفی به عددی؛ انتخاب روش درست اینجا حیاتی است چون روش نادرست می‌تواند به نشت اطلاعات و خوش‌بینی کاذب منجر شود.","children":[{"id":"s-enc-ordinal","icon":"📊","label":"کدگذاری ترتیبی","summary":"کدگذاری ترتیبی برای متغیرهایی با ترتیب طبیعی (مانند شدت یک یافته) که رابطه‌ی رتبه‌ای میان مقادیر را حفظ می‌کند."},{"id":"s-enc-target","icon":"⚠️","label":"کدگذاری هدف و نشت اطلاعات","summary":"کدگذاری هدف می‌تواند با استفاده از مقدار هدف، اطلاعات برچسب را به ویژگی‌ها نشت دهد؛ در خط‌لوله‌ی ما همین مسئله موجب برآورد خوش‌بینانه‌ی نادرست می‌شد و کنار گذاشته شد."},{"id":"s-enc-onehot","icon":"🔢","label":"کدگذاری یک‌داغ","summary":"کدگذاری یک‌داغ هر دسته را به یک ستون دودویی مستقل تبدیل می‌کند و برای متغیرهای اسمی بدون ترتیب مناسب است."}]},{"id":"s-missing","icon":"❓","label":"مدیریت داده‌های گمشده","summary":"مدیریت داده‌های گمشده با راهبردهایی که از نشت جلوگیری می‌کنند؛ جای‌گذاری مقادیر باید درون چرخه‌ی اعتبارسنجی و فقط بر پایه‌ی داده‌ی آموزش انجام شود."},{"id":"s-scaling","icon":"📏","label":"مقیاس‌بندی ویژگی‌ها","summary":"مقیاس‌بندی ویژگی‌ها برای مدل‌های حساس به بزرگی مقادیر لازم است؛ مدل‌های درختی مانند CatBoost به آن نیاز چندانی ندارند."},{"id":"s-imbalance","icon":"⚖️","label":"مدیریت عدم تعادل کلاسی","summary":"عدم تعادل کلاسی (تفاوت تعداد موارد موفق و ناموفق) می‌تواند مدل را به‌سمت کلاس پرتعداد سوق دهد؛ اینجا با وزن‌دهی و نمونه‌گیری هوشمند کنترل شد.","children":[{"id":"s-imb-weights","icon":"🏋️","label":"وزن‌دهی کلاسی","summary":"وزن‌دهی کلاسی با افزایش جریمه‌ی خطای کلاس کم‌تعداد، مدل را وادار می‌کند به موارد نادرتر اما بالینی‌مهم توجه بیشتری کند."},{"id":"s-imb-smote","icon":"🔄","label":"SMOTE-NC","summary":"SMOTE-NC نمونه‌های مصنوعی از کلاس اقلیت برای داده‌های ترکیبی عددی-اسمی می‌سازد؛ این کار فقط روی داده‌ی آموزش و درون چرخه‌ی CV انجام شد تا نشتی رخ ندهد."}]},{"id":"s-no-feat-eng","icon":"🚫","label":"عدم مهندسی ویژگی","summary":"تصمیم آگاهانه به پرهیز از مهندسی ویژگی؛ ساختن ویژگی‌های ترکیبی می‌توانست نشت ایجاد کند و تفسیرپذیری بالینی را کاهش دهد."}],"color":"#ffa726"},{"id":"ch4","icon":"🔍","label":"فصل ۴: انتخاب ویژگی","summary":"انتخاب ویژگی: مرور روش‌های فیلتری، پوششی و تعبیه‌شده و توضیح اینکه چرا انتخاب مبتنی بر SHAP برای این پروژه برگزیده شد.","children":[{"id":"s-fs-methods","icon":"📋","label":"روش‌های انتخاب ویژگی","summary":"سه خانواده‌ی اصلی انتخاب ویژگی — فیلتری، پوششی و تعبیه‌شده — که از نظر دقت، هزینه‌ی محاسباتی و خطر بیش‌برازش با هم تفاوت دارند.","children":[{"id":"s-fs-filter","icon":"🔽","label":"روش‌های فیلتری","summary":"روش‌های فیلتری ویژگی‌ها را پیش از مدل‌سازی و بر پایه‌ی معیارهای آماری (مانند همبستگی) رتبه‌بندی می‌کنند؛ سریع‌اند اما تعامل میان ویژگی‌ها را نادیده می‌گیرند."},{"id":"s-fs-wrapper","icon":"🔁","label":"روش‌های پوششی","summary":"روش‌های پوششی زیرمجموعه‌های ویژگی را با آموزش مکرر مدل ارزیابی می‌کنند؛ دقیق‌ترند ولی پرهزینه و مستعد بیش‌برازش."},{"id":"s-fs-embedded","icon":"🌲","label":"روش‌های تعبیه‌شده","summary":"روش‌های تعبیه‌شده انتخاب ویژگی را درون خود فرآیند آموزش انجام می‌دهند (مانند اهمیت ویژگی در مدل‌های درختی) و تعادل خوبی میان دقت و هزینه دارند."}]},{"id":"s-shap-explain","icon":"🎯","label":"مقادیر شپلی و SHAP","summary":"مقادیر شپلی از نظریه‌ی بازی‌ها سهم منصفانه‌ی هر ویژگی در پیش‌بینی را می‌سنجند؛ ما از SHAP برای انتخاب ویژگی شفاف و قابل‌دفاع بالینی استفاده کردیم."},{"id":"s-feat-journey","icon":"🔽","label":"مسیر کاهش ویژگی‌ها","summary":"مسیر کاهش ویژگی‌ها از مجموعه‌ی خام تا ۴۲ ویژگی نهایی؛ ویژگی‌های با واریانس پایین، بدون معناداری بالینی یا همبستگی بالا حذف شدند."},{"id":"s-top-features","icon":"⭐","label":"مهم‌ترین ویژگی‌ها","summary":"مهم‌ترین ویژگی‌ها بر پایه‌ی تحلیل، عمدتاً الگوی هیستوپاتولوژی، نمره‌ی جانسن و نشانگرهای هورمونی که بیشترین قدرت پیش‌بینی را داشتند."}],"color":"#ab47bc"},{"id":"ch5","icon":"🤖","label":"فصل ۵: توسعه مدل و محک‌زنی","summary":"توسعه و محک‌زنی مدل: مقایسه‌ی ۱۶ الگوریتم با اعتبارسنجی متقاطع تودرتوی ۵×۵ و چرایی برتری CatBoost.","children":[{"id":"s-nested-cv","icon":"🔄","label":"اعتبارسنجی متقاطع تودرتو","summary":"اعتبارسنجی متقاطع تودرتو با جداسازی تنظیم ابرپارامتر (حلقه‌ی داخلی) از ارزیابی عملکرد (حلقه‌ی بیرونی) از نشت اطلاعات و خوش‌بینی کاذب جلوگیری می‌کند."},{"id":"s-all-models","icon":"📊","label":"۱۶ مدل ارزیابی‌شده","summary":"۱۶ مدل از رگرسیون لجستیک ساده تا گرادیان‌بوستینگ پیشرفته محک خوردند تا انتخاب بهترین الگوریتم بر پایه‌ی شواهد و نه حدس باشد."},{"id":"s-catboost","icon":"🏆","label":"CatBoost: مدل برنده","summary":"CatBoost با AUC=۰٫۷۷۳۸±۰٫۰۱۳۲ برنده شد؛ مدیریت بومی متغیرهای اسمی و بوستینگ ترتیبی آن مانع نشت هدف و بیش‌برازش می‌شود."},{"id":"s-preop-full","icon":"⚖️","label":"مدل پیش‌عملیاتی vs. کامل","summary":"مدل پیش‌عملیاتی (AUC=۰٫۶۳۷۴) فقط با داده‌ی پیش از جراحی و مدل کامل (AUC=۰٫۷۷۳۸) با همه‌ی ویژگی‌ها؛ فاصله‌ی این دو نشان‌دهنده‌ی اهمیت اطلاعات حین عمل است."}],"color":"#ef5350"},{"id":"ch6","icon":"🚀","label":"فصل ۶: کاربرد بالینی و آینده","summary":"کاربرد بالینی و آینده: نحوه‌ی استفاده‌ی واقعی از مدل، مقایسه با ادبیات، محدودیت‌ها، مسیرهای آینده و ملاحظات اخلاقی.","children":[{"id":"s-clinical-use","icon":"🏥","label":"سیستم تصمیم‌یار بالینی","summary":"سامانه‌ی تصمیم‌یار بالینی احتمال موفقیت را برای هر بیمار برآورد می‌کند تا مشاوره‌ی پیش از عمل دقیق‌تر و تصمیم‌گیری مشترک ممکن شود."},{"id":"s-lit-compare","icon":"📚","label":"مقایسه با ادبیات","summary":"مقایسه‌ی AUC مدل ما با مدل‌های پیش‌بینی منتشرشده نشان می‌دهد عملکرد آن رقابتی و در بسیاری موارد بهتر از کارهای پیشین است."},{"id":"s-limitations","icon":"⚠️","label":"محدودیت‌های مطالعه","summary":"محدودیت‌های مطالعه شامل ماهیت تک‌مرکزی و گذشته‌نگر بودن داده است که تعمیم‌پذیری نتایج را نیازمند اعتبارسنجی بیرونی می‌کند."},{"id":"s-future","icon":"🔮","label":"مسیرهای آینده","summary":"مسیرهای آینده: اعتبارسنجی چندمرکزی، مطالعات آینده‌نگر، یکپارچه‌سازی داده‌های ژنتیکی عمیق‌تر و بررسی مدل‌های یادگیری عمیق."},{"id":"s-ethics","icon":"⚖️","label":"ملاحظات اخلاقی","summary":"ملاحظات اخلاقی کاربرد هوش مصنوعی در طب تولیدمثل: شفافیت، عدالت، حفظ تصمیم نهایی نزد پزشک و بیمار، و پرهیز از قطعیت‌نمایی کاذب."}],"color":"#26c6da"},{"id":"ch7","icon":"📊","label":"فصل ۷: تحلیل SHAP و تفسیرپذیری","summary":"تحلیل SHAP و تفسیرپذیری: چگونه مدل تصمیم می‌گیرد، کدام ویژگی‌ها بیشترین نقش را دارند و چرا شفافیت در طب حیاتی است.","children":[{"id":"s-shapley-theory","icon":"🎲","label":"مقادیر شپلی و نظریه بازی","summary":"مقادیر شپلی ریشه در نظریه‌ی بازی‌های همکارانه دارند و سهم هر «بازیکن» (ویژگی) در نتیجه‌ی نهایی را به‌صورت منصفانه و یکتا تقسیم می‌کنند."},{"id":"s-shap-summary","icon":"📈","label":"نمودارهای خلاصه SHAP","summary":"نمودارهای خلاصه‌ی SHAP جهت و شدت اثر هر ویژگی بر پیش‌بینی را هم‌زمان نشان می‌دهند و دید کلی از رفتار مدل می‌دهند."},{"id":"s-top-shap","icon":"⭐","label":"مهم‌ترین ویژگی‌ها بر اساس SHAP","summary":"بر پایه‌ی SHAP، الگوی هیستوپاتولوژی و نمره‌ی جانسن بیشترین تأثیر را بر خروجی مدل دارند، هم‌سو با شهود بالینی متخصصان."},{"id":"s-shap-interaction","icon":"🔗","label":"اثرات تعاملی ویژگی‌ها","summary":"اثرات تعاملی نشان می‌دهند تأثیر یک ویژگی به مقدار ویژگی دیگر وابسته است؛ مثلاً ترکیب سطح FSH و حجم بیضه معنای متفاوتی می‌یابد."},{"id":"s-shap-vs-others","icon":"⚖️","label":"SHAP در مقابل LIME و سایر روش‌ها","summary":"در مقایسه با LIME و اهمیت جایگشتی، SHAP مبنای نظری محکم‌تر، سازگاری محلی-کلی و تضمین‌های ریاضی بهتری برای تفسیر ارائه می‌دهد."},{"id":"s-clinical-xai","icon":"🏥","label":"تفسیرپذیری در پزشکی بالینی","summary":"تفسیرپذیری در پزشکی بالینی برای جلب اعتماد پزشک، پاسخ‌گویی قانونی و پذیرش مدل در عمل ضروری است؛ جعبه‌ی سیاه در تصمیم‌های درمانی قابل‌قبول نیست."}],"color":"#ffca28"},{"id":"ch8","icon":"🎯","label":"فصل ۸: کالیبراسیون و تحلیل آستانه","summary":"کالیبراسیون و تحلیل آستانه: چرا AUC به‌تنهایی کافی نیست و چگونه آستانه‌ی تصمیم را متناسب با هدف بالینی انتخاب کنیم.","children":[{"id":"s-calibration","icon":"📐","label":"مفهوم کالیبراسیون مدل","summary":"کالیبراسیون یعنی احتمال‌های پیش‌بینی‌شده با فراوانی واقعی رخدادها هم‌خوان باشند؛ مدلی با AUC خوب ممکن است هنوز بد-کالیبره باشد."},{"id":"s-calibration-curve","icon":"📉","label":"منحنی کالیبراسیون و نمره بریر","summary":"منحنی کالیبراسیون (نمودار اطمینان) و نمره‌ی بریر کیفیت احتمال‌های خروجی را می‌سنجند؛ نمره‌ی بریر کمتر یعنی کالیبراسیون بهتر."},{"id":"s-threshold","icon":"🎚️","label":"انتخاب آستانه بهینه","summary":"انتخاب آستانه‌ی بهینه‌ی احتمال تعیین می‌کند مدل چه زمانی «مثبت» پیش‌بینی کند؛ این انتخاب باید با هزینه‌ی بالینی خطاها هم‌سو باشد."},{"id":"s-sens-spec","icon":"⚖️","label":"حساسیت در برابر ویژگی","summary":"توازن میان حساسیت و ویژگی: افزایش یکی معمولاً به‌بهای دیگری است و آستانه بسته به اینکه نگران از دست‌دادن موارد موفق باشیم یا جراحی بیهوده، تنظیم می‌شود."},{"id":"s-confusion","icon":"🧮","label":"ماتریس درهم‌ریختگی و سناریوهای بالینی","summary":"ماتریس درهم‌ریختگی در آستانه‌های مختلف نشان می‌دهد مدل در سناریوهای «رد قطعی» و «تأیید قطعی» چگونه عمل می‌کند و کدام خطاها رخ می‌دهند."}],"color":"#ec407a"},{"id":"ch9","icon":"📏","label":"فصل ۹: تحلیل واریانس و پایداری","summary":"تحلیل واریانس و پایداری: نوسان عملکرد مدل بین foldها، فواصل اطمینان و چرا پایداری برای استقرار بالینی مهم است.","children":[{"id":"s-variance-cv","icon":"📊","label":"واریانس بین foldها","summary":"واریانس عملکرد بین foldهای اعتبارسنجی نشان می‌دهد مدل چقدر به داده‌ی آموزشی خاص حساس است؛ واریانس کم یعنی نتیجه‌ی قابل‌اتکاتر."},{"id":"s-ci-boot","icon":"📐","label":"فواصل اطمینان و بوت‌استرپ","summary":"فواصل اطمینان (CI: ۰٫۷۶۰۶–۰٫۷۸۷۰) و تحلیل بوت‌استرپ بازه‌ی واقع‌بینانه‌ی عملکرد مدل را به‌جای یک عدد منفرد ارائه می‌دهند."},{"id":"s-variance-compare","icon":"⚖️","label":"مقایسه پایداری ۱۶ مدل","summary":"مقایسه‌ی پایداری ۱۶ مدل نشان می‌دهد CatBoost با واریانس پایین (±۰٫۰۱۳۲) هم دقیق و هم پایدار است، که آن را برای کاربرد بالینی مناسب می‌سازد."},{"id":"s-overfit","icon":"⚠️","label":"شاخص‌های بیش‌برازش","summary":"شاخص‌های بیش‌برازش با مقایسه‌ی عملکرد آموزش و آزمون سنجیده می‌شوند؛ فاصله‌ی بزرگ هشدار بیش‌برازش است که اینجا کنترل شده است."},{"id":"s-clinical-stability","icon":"🏥","label":"اهمیت پایداری در استقرار بالینی","summary":"پایداری در استقرار بالینی یعنی مدل روی بیماران و زمان‌های مختلف رفتار یکنواخت داشته باشد؛ بدون آن اعتماد بالینی شکل نمی‌گیرد."}],"color":"#7e57c2"},{"id":"ch10","icon":"🏆","label":"فصل ۱۰: خلاصه جامع و مقایسه نهایی","summary":"خلاصه‌ی جامع نتایج: جدول کامل ۱۶ مدل، تحلیل رتبه‌بندی، یافته‌های کلیدی و جایگاه پروژه در میان مطالعات جهانی.","children":[{"id":"s-full-results","icon":"📋","label":"جدول جامع نتایج ۱۶ مدل","summary":"جدول جامع عملکرد ۱۶ مدل شامل AUC، حساسیت، ویژگی و F1 که امکان مقایسه‌ی شفاف و مبتنی بر شواهد را فراهم می‌کند."},{"id":"s-ranking","icon":"🥇","label":"تحلیل رتبه‌بندی مدل‌ها","summary":"تحلیل رتبه‌بندی توضیح می‌دهد چرا CatBoost در صدر ایستاد و مدل‌های خطی به‌دلیل روابط غیرخطی داده در رتبه‌های پایین‌تر قرار گرفتند."},{"id":"s-preop-full-detail","icon":"🔬","label":"مقایسه تفصیلی پیش‌عملیاتی و کامل","summary":"مقایسه‌ی تفصیلی مدل پیش‌عملیاتی و کامل: کدام ویژگی‌ها فاصله‌ی AUC را می‌سازند و هر مدل برای چه تصمیمی سودمندتر است."},{"id":"s-key-findings","icon":"💎","label":"یافته‌های کلیدی پروژه","summary":"یافته‌های کلیدی پروژه: برتری CatBoost، نقش محوری الگوی بافتی، اهمیت طراحی بدون نشت و دستیابی به AUC=۰٫۷۷۳۸ روی داده‌ی واقعی."},{"id":"s-intl-compare","icon":"🌍","label":"مقایسه با مطالعات بین‌المللی","summary":"مقایسه با مطالعات بین‌المللی نشان می‌دهد عملکرد مدل با بزرگ‌ترین کارهای منتشرشده رقابتی است و در بستر تک‌مرکزی رویان معتبر است."},{"id":"s-stat-sig","icon":"📊","label":"معناداری آماری","summary":"آزمون‌های معناداری آماری تأیید می‌کنند که تفاوت عملکرد میان مدل‌ها تصادفی نیست و برتری CatBoost از نظر آماری معنادار است."}],"color":"#9ccc65"}]};
+
+  var ROW = 48, GAPX = 240, PAD = 50, ROOT_OFFSET = 140;
+  var FA = '۰۱۲۳۴۵۶۷۸۹';
+  function toFa(n){ return String(n).replace(/[0-9]/g, function(d){ return FA[+d]; }); }
+
+  var stage    = document.getElementById('mmStage');
+  var nodesLay = document.getElementById('mmNodes');
+  var svg      = document.getElementById('mmLinks');
+  var viewport = document.getElementById('mmViewport');
+  var legend   = document.getElementById('mmLegend');
+  var zoomVal  = document.getElementById('mmZoomVal');
+  var tip      = document.getElementById('mmTip');
+  var tipTitle = tip.querySelector('.mm-tip-title');
+  var tipText  = tip.querySelector('.mm-tip-text');
+  var tipGo    = tip.querySelector('.mm-tip-go');
+
+  var uid = 0, maxDepth = 0, mmRendered = false, zoom = 1;
+  var currentNode = null, pinned = false, hideTimer = null;
+
+  // --- prepare tree: parent refs, colors, default expansion ---
+  function prep(node, parent, color, depth){
+    node._uid = 'mm' + (uid++);
+    node._parent = parent;
+    node._color = node.color || color || '#4fc3f7';
+    node._expanded = (depth === 0); // root open, rest collapsed
+    if (node.children) node.children.forEach(function(c){ prep(c, node, node._color, depth + 1); });
+  }
+  prep(DATA, null, '#4fc3f7', 0);
+
+  // --- layout (tidy horizontal tree, RTL = root on right) ---
+  function layout(){
+    var rows = 0; maxDepth = 0;
+    (function walk(node, depth){
+      if (depth > maxDepth) maxDepth = depth;
+      node._d = depth;
+      var open = node._expanded && node.children && node.children.length;
+      if (open){
+        node.children.forEach(function(c){ walk(c, depth + 1); });
+        node._y = (node.children[0]._y + node.children[node.children.length - 1]._y) / 2;
+      } else {
+        node._y = rows * ROW + ROW / 2;
+        rows++;
+      }
+    })(DATA, 0);
+
+    var stageH = rows * ROW + PAD * 2;
+    var stageW = (maxDepth + 1) * GAPX + PAD * 2 + ROOT_OFFSET;
+
+    (function ax(node){
+      node._cx = stageW - PAD - ROOT_OFFSET - node._d * GAPX;
+      node._cy = node._y + PAD;
+      if (node._expanded && node.children) node.children.forEach(ax);
+    })(DATA);
+
+    stage.style.width = stageW + 'px';
+    stage.style.height = stageH + 'px';
+    svg.setAttribute('width', stageW);
+    svg.setAttribute('height', stageH);
+    svg.setAttribute('viewBox', '0 0 ' + stageW + ' ' + stageH);
+    return { w: stageW, h: stageH };
+  }
+
+  function visibleNodes(){
+    var out = [];
+    (function c(n){ out.push(n); if (n._expanded && n.children) n.children.forEach(c); })(DATA);
+    return out;
+  }
+
+  function render(){
+    layout();
+    var vis = visibleNodes();
+    nodesLay.innerHTML = '';
+    vis.forEach(function(n){
+      var el = document.createElement('div');
+      el.className = 'mm-node mm-d' + Math.min(n._d, 3);
+      el.style.setProperty('--c', n._color);
+      el.style.left = n._cx + 'px';
+      el.style.top  = n._cy + 'px';
+      var kids = n.children && n.children.length;
+      var badge = kids ? '<span class="mm-badge">' + (n._expanded ? '−' : toFa(n.children.length)) + '</span>' : '';
+      el.innerHTML = '<span class="mm-ic">' + (n.icon || '') + '</span><span class="mm-lbl">' + n.label + '</span>' + badge;
+      if (kids && !n._expanded) el.classList.add('collapsed-parent');
+      n._el = el;
+      el.addEventListener('mouseenter', function(){ if(!pinned){ showTip(n, false); } highlightPath(n, true); });
+      el.addEventListener('mouseleave', function(){ scheduleHide(); highlightPath(n, false); });
+      el.addEventListener('click', function(e){ e.stopPropagation(); onNodeClick(n); });
+      nodesLay.appendChild(el);
+    });
+    drawLinks(vis);
+  }
+
+  function drawLinks(vis){
+    var d = '';
+    vis.forEach(function(n){
+      if (!(n._expanded && n.children && n.children.length)) return;
+      var phw = n._el.offsetWidth / 2;
+      var px = n._cx - phw, py = n._cy;
+      n.children.forEach(function(c){
+        var chw = c._el.offsetWidth / 2;
+        var cx = c._cx + chw, cy = c._cy;
+        var mx = (px + cx) / 2;
+        d += '<path class="mm-link" data-uid="' + c._uid + '" stroke="' + c._color +
+             '" d="M ' + px + ' ' + py + ' C ' + mx + ' ' + py + ' ' + mx + ' ' + cy + ' ' + cx + ' ' + cy + '"/>';
+      });
+    });
+    svg.innerHTML = d;
+  }
+
+  function highlightPath(n, on){
+    var cur = n;
+    while (cur && cur._parent){
+      var p = svg.querySelector('.mm-link[data-uid="' + cur._uid + '"]');
+      if (p) p.classList.toggle('hl', on);
+      cur = cur._parent;
+    }
+    if (n._el) n._el.classList.toggle('active', on);
+  }
+
+  function onNodeClick(n){
+    if (n.children && n.children.length){ n._expanded = !n._expanded; render(); }
+    showTip(n, true);
+  }
+
+  // --- tooltip ---
+  function showTip(n, pin){
+    currentNode = n;
+    if (pin) pinned = true;
+    clearTimeout(hideTimer);
+    tipTitle.innerHTML = (n.icon || '') + ' ' + n.label;
+    tipText.textContent = n.summary || '';
+    tip.classList.add('show');
+    positionTip(n);
+  }
+  function positionTip(n){
+    if (!n._el) return;
+    var r = n._el.getBoundingClientRect();
+    var tw = tip.offsetWidth, th = tip.offsetHeight;
+    var left = r.left - tw - 12;
+    if (left < 8) left = r.right + 12;
+    if (left + tw > window.innerWidth - 8) left = window.innerWidth - tw - 8;
+    var top = r.top + r.height / 2 - th / 2;
+    if (top < 8) top = 8;
+    if (top + th > window.innerHeight - 8) top = window.innerHeight - th - 8;
+    tip.style.left = left + 'px';
+    tip.style.top  = top + 'px';
+  }
+  function scheduleHide(){
+    if (pinned) return;
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(function(){ tip.classList.remove('show'); }, 260);
+  }
+  tip.addEventListener('mouseenter', function(){ clearTimeout(hideTimer); });
+  tip.addEventListener('mouseleave', scheduleHide);
+  tipGo.addEventListener('click', function(){ if (currentNode) goToSection(currentNode.id); });
+
+  function goToSection(id){
+    tip.classList.remove('show'); pinned = false;
+    switchView('content');
+    setTimeout(function(){
+      var t = document.getElementById(id);
+      if (t){
+        t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        try {
+          t.animate(
+            [{ boxShadow: '0 0 0 3px rgba(79,195,247,0.95)' }, { boxShadow: '0 0 0 3px rgba(79,195,247,0)' }],
+            { duration: 1500, easing: 'ease-out' }
+          );
+        } catch(e){}
+      }
+    }, 80);
+  }
+
+  // --- view switching (tabs) ---
+  function switchView(view){
+    var body = document.body;
+    var tc = document.getElementById('tab-content');
+    var tm = document.getElementById('tab-mindmap');
+    if (view === 'mindmap'){
+      body.classList.add('view-mindmap');
+      tm.classList.add('active'); tm.setAttribute('aria-selected', 'true');
+      tc.classList.remove('active'); tc.setAttribute('aria-selected', 'false');
+      if (!mmRendered){ render(); buildLegend(); mmRendered = true; }
+      else { render(); }
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      setTimeout(mmFit, 30);
+    } else {
+      body.classList.remove('view-mindmap');
+      tc.classList.add('active'); tc.setAttribute('aria-selected', 'true');
+      tm.classList.remove('active'); tm.setAttribute('aria-selected', 'false');
+      tip.classList.remove('show'); pinned = false;
+    }
+  }
+  window.switchView = switchView;
+
+  function buildLegend(){
+    var html = '';
+    DATA.children.forEach(function(ch){
+      html += '<span class="lg"><span class="dot" style="background:' + ch._color + '"></span>' + ch.label + '</span>';
+    });
+    legend.innerHTML = html;
+  }
+
+  // --- zoom & fit ---
+  function applyZoom(){
+    stage.style.transform = 'scale(' + zoom + ')';
+    zoomVal.textContent = toFa(Math.round(zoom * 100)) + '٪';
+  }
+  function mmFit(){
+    // center root vertically, show right side (root) first
+    if (!DATA._el) return;
+    viewport.scrollLeft = viewport.scrollWidth;
+    viewport.scrollTop = Math.max(0, (DATA._cy * zoom) - viewport.clientHeight / 2);
+  }
+  window.mmZoom = function(d){ zoom = Math.min(2, Math.max(0.4, Math.round((zoom + d) * 10) / 10)); applyZoom(); };
+  window.mmResetView = function(){ zoom = 1; applyZoom(); render(); setTimeout(mmFit, 30); };
+  window.mmExpandAll = function(){ (function w(n){ if (n.children && n.children.length){ n._expanded = true; n.children.forEach(w); } })(DATA); render(); };
+  window.mmCollapseAll = function(){ (function w(n, d){ n._expanded = (d === 0); if (n.children) n.children.forEach(function(c){ w(c, d + 1); }); })(DATA, 0); render(); setTimeout(mmFit, 30); };
+
+  // --- panning (drag empty space) ---
+  var isDown = false, sx, sy, sl, st;
+  viewport.addEventListener('mousedown', function(e){
+    if (e.target.closest('.mm-node')) return;
+    isDown = true; viewport.classList.add('panning');
+    sx = e.clientX; sy = e.clientY; sl = viewport.scrollLeft; st = viewport.scrollTop;
+  });
+  window.addEventListener('mousemove', function(e){
+    if (!isDown) return;
+    viewport.scrollLeft = sl - (e.clientX - sx);
+    viewport.scrollTop  = st - (e.clientY - sy);
+  });
+  window.addEventListener('mouseup', function(){ isDown = false; viewport.classList.remove('panning'); });
+  viewport.addEventListener('click', function(e){
+    if (!e.target.closest('.mm-node') && !e.target.closest('#mmTip')){ tip.classList.remove('show'); pinned = false; }
+  });
+  viewport.addEventListener('scroll', function(){
+    if (tip.classList.contains('show') && currentNode){ positionTip(currentNode); }
+  });
+  window.addEventListener('resize', function(){ if (document.body.classList.contains('view-mindmap')) positionTip(currentNode || DATA); });
 })();
 </script>
 
