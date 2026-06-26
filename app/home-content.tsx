@@ -41,20 +41,20 @@ export default function HomeContent({
         </p>
         <div className="flex gap-3 mt-5">
           <Button asChild><Link href="/phase/preprocessing">Start pipeline <ArrowRight className="ml-1 h-4 w-4" /></Link></Button>
-          <Button asChild variant="outline"><a href="https://mtese-cdss-panel-83mdzx.abacusai.app" target="_blank" rel="noopener noreferrer">Open CDSS</a></Button>
+          <Button asChild variant="outline"><Link href="/cdss">Open CDSS</Link></Button>
         </div>
       </section>
       </AIAssistWrapper>
 
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <AIAssistWrapper id="home-stat-cohort" className="block">
-          <StatCard label="Patient Cohort" value="2,413" hint="NOA cases" icon={Users} accent="#0e7490" />
+          <StatCard label="Patient Cohort" value="2,408" hint="NOA cases" icon={Users} accent="#0e7490" />
         </AIAssistWrapper>
         <AIAssistWrapper id="home-stat-features" className="block">
-          <StatCard label="Features" value="73" hint="55 original + 18 engineered" icon={Layers} accent="#0d9488" />
+          <StatCard label="Features" value="42" hint="42 leak-free features" icon={Layers} accent="#0d9488" />
         </AIAssistWrapper>
         <AIAssistWrapper id="home-stat-best-model" className="block">
-          <StatCard label="Best Model (CatBoost)" value="AUC 0.8306" hint="95% CI 0.823–0.845" icon={Trophy} accent="#4f46e5" />
+          <StatCard label="Best Model (CatBoost)" value="AUC 0.7738" hint="95% CI 0.7606–0.7870" icon={Trophy} accent="#4f46e5" />
         </AIAssistWrapper>
         <AIAssistWrapper id="home-stat-figures" className="block">
           <StatCard label="Figures" value={String(counts.imgs)} hint="Updated curated visuals" icon={Images} accent="#c026d3" />
