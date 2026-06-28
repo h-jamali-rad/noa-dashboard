@@ -549,6 +549,77 @@ body {
 .cmp-impact strong { color: var(--accent2); }
 @media (max-width: 720px) { .cmp-cols { grid-template-columns: 1fr; } .cmp-col.v2 { border-left: none; border-bottom: 1px solid var(--border); } }
 
+/* ============================================================
+   V3 / Dropped column interactive tooltips
+   ============================================================ */
+/* info icons inside column headers */
+.v3-info, .drop-info {
+  display: inline-block; cursor: pointer; user-select: none;
+  font-size: 0.82rem; line-height: 1; margin-right: 0.28rem; margin-left: 0.28rem;
+  vertical-align: middle; transition: transform 0.18s ease, filter 0.18s ease;
+  filter: drop-shadow(0 0 2px rgba(0,255,136,0.0));
+}
+.v3-info { color: #00ff88; }
+.drop-info { color: #ff7676; opacity: 0.85; }
+.v3-info:hover { transform: scale(1.28); filter: drop-shadow(0 0 5px rgba(0,255,136,0.8)); }
+.drop-info:hover { transform: scale(1.28); filter: drop-shadow(0 0 5px rgba(255,118,118,0.8)); opacity: 1; }
+.v3-info.pinned, .drop-info.pinned { transform: scale(1.28); }
+
+/* dropped raw column header gets a subtle red dashed underline cue */
+.data-table-scroll thead th.dropped-col {
+  border-bottom: 2px dashed rgba(255,118,118,0.45);
+}
+
+/* floating tooltip box */
+#v3-tooltip-box {
+  position: fixed; z-index: 99999; direction: rtl; text-align: right;
+  max-width: 430px; min-width: 280px;
+  background: linear-gradient(155deg, #1a1a2e 0%, #16213e 100%);
+  color: #e8eefc;
+  border: 1.5px solid #00ff88;
+  border-radius: 12px;
+  padding: 0; overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,255,136,0.15), 0 0 22px rgba(0,255,136,0.18);
+  font-family: Vazirmatn, Tahoma, system-ui, sans-serif;
+  font-size: 0.92rem; line-height: 1.85;
+  opacity: 0; transform: translateY(8px) scale(0.97);
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(.34,1.56,.64,1);
+}
+#v3-tooltip-box.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+#v3-tooltip-box.dropped { border-color: #ff7676; box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,118,118,0.15), 0 0 22px rgba(255,118,118,0.18); }
+
+#v3-tooltip-box .tt-head {
+  padding: 0.7rem 0.95rem; background: rgba(0,255,136,0.10);
+  border-bottom: 1px solid rgba(0,255,136,0.35);
+  display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+}
+#v3-tooltip-box.dropped .tt-head { background: rgba(255,118,118,0.10); border-bottom-color: rgba(255,118,118,0.35); }
+#v3-tooltip-box .tt-title { font-size: 1.04rem; font-weight: 800; color: #6effb0; }
+#v3-tooltip-box.dropped .tt-title { color: #ffb0b0; }
+#v3-tooltip-box .tt-code {
+  font-size: 0.74rem; font-weight: 700; direction: ltr;
+  background: rgba(0,255,136,0.14); color: #9affd0;
+  border: 1px solid rgba(0,255,136,0.4); border-radius: 7px;
+  padding: 0.05rem 0.45rem;
+}
+#v3-tooltip-box.dropped .tt-badge {
+  font-size: 0.72rem; font-weight: 700; color: #ffb3b3;
+  background: rgba(255,118,118,0.16); border: 1px solid rgba(255,118,118,0.45);
+  border-radius: 7px; padding: 0.05rem 0.5rem;
+}
+#v3-tooltip-box .tt-body { padding: 0.65rem 0.95rem 0.85rem; }
+#v3-tooltip-box .tt-row { margin-bottom: 0.55rem; }
+#v3-tooltip-box .tt-row:last-child { margin-bottom: 0; }
+#v3-tooltip-box .tt-label {
+  display: block; font-size: 0.74rem; font-weight: 700; color: #00ff88;
+  margin-bottom: 0.12rem; letter-spacing: 0.2px;
+}
+#v3-tooltip-box.dropped .tt-label { color: #ff8c8c; }
+#v3-tooltip-box .tt-val { display: block; color: #e8eefc; font-size: 0.9rem; }
+#v3-tooltip-box .tt-val.mono { direction: ltr; text-align: left; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.82rem; background: rgba(255,255,255,0.05); border-radius: 6px; padding: 0.28rem 0.5rem; }
+#v3-tooltip-box .tt-val.example { color: #cdd7f0; font-style: italic; }
+
   </style>
 </head>
 <body>
@@ -2420,7 +2491,13 @@ function buildUnifiedTable() {
         + "<span class='exp-ico'>&#9654;</span>" + escAudit(h)
         + "<span class='v3-badge'>+" + map.v3.length + " V3</span></th>";
     } else {
-      thead += "<th>" + escAudit(h) + "</th>";
+      const dropKey = (typeof DROP_TIP_LOOKUP !== "undefined") ? DROP_TIP_LOOKUP[h] : null;
+      if (dropKey) {
+        thead += "<th class='dropped-col'>" + escAudit(h)
+          + " <span class='drop-info' data-droptip='" + escAudit(h) + "'>&#8505;&#65039;</span></th>";
+      } else {
+        thead += "<th>" + escAudit(h) + "</th>";
+      }
     }
   }
   thead += "</tr></thead>";
@@ -2460,8 +2537,11 @@ function expandCol(j) {
   if (th) {
     th.classList.add('open');
     let hh = "";
-    for (const c of map.v3)
-      hh += "<th class='v3c collapsed' data-v3grp='" + j + "'><div class='cw head'>" + escAudit(c.name) + "</div></th>";
+    for (const c of map.v3) {
+      const tip = (typeof V3_TIP_LOOKUP !== "undefined" && V3_TIP_LOOKUP[c.name])
+        ? " <span class='v3-info' data-v3tip='" + escAudit(c.name) + "'>&#8505;&#65039;</span>" : "";
+      hh += "<th class='v3c collapsed' data-v3grp='" + j + "'><div class='cw head'>" + escAudit(c.name) + tip + "</div></th>";
+    }
     th.insertAdjacentHTML('afterend', hh);
   }
 
@@ -2635,6 +2715,502 @@ function initV3Audit() {
     + "  ·  mtese_encoded_v3.csv · " + V3_DATASET.headers.length + " ستون پردازش‌شدهٔ V3"
     + "  ·  " + mapped + " ستون خام قابل گسترش (دارای نشان +V3)";
 }
+
+
+
+// ===== V3 COLUMN TOOLTIP DATA (embedded from v3_column_tooltips.json) =====
+const V3_TOOLTIPS = {
+  "pathology_columns": {
+    "rt_severity_score": {
+      "fa": "امتیاز شدت پاتولوژی بیضه راست",
+      "source": "Pathology-RT (متن آزاد انگلیسی)",
+      "method": "NLP Extraction → فرمول وزن‌دار",
+      "formula": "severity = Σ(درصد_پترن × وزن) / 100",
+      "weights": "SCO=5.0 | Severe_Hypo=4.0 | Hypo=3.0 | MA_Spermatogonial=2.5 | MA_Spermatocytic=2.0 | MA_ImmatureRound=1.5 | MA_Elongated=1.0 | CSTH=0.5",
+      "range": "0.0 – 9.5 (بالاتر = شدیدتر)",
+      "example": "SCO and CSTH (50/50) → (50×5.0 + 50×0.5)/100 = 2.75"
+    },
+    "lt_severity_score": {
+      "fa": "امتیاز شدت پاتولوژی بیضه چپ",
+      "source": "Pathology-LT (متن آزاد انگلیسی)",
+      "method": "NLP Extraction → فرمول وزن‌دار",
+      "formula": "severity = Σ(درصد_پترن × وزن) / 100",
+      "weights": "SCO=5.0 | Severe_Hypo=4.0 | Hypo=3.0 | MA_Spermatogonial=2.5 | MA_Spermatocytic=2.0 | MA_ImmatureRound=1.5 | MA_Elongated=1.0 | CSTH=0.5",
+      "range": "0.0 – 9.8",
+      "example": "SCO (100%) → 100×5.0/100 = 5.0"
+    },
+    "rt_dominant_pattern": {
+      "fa": "الگوی غالب بافتی بیضه راست",
+      "source": "Pathology-RT",
+      "method": "NLP → شناسایی پترن با بیشترین درصد → کد عددی ordinal",
+      "codes": "0=خالی/ندارد | 1.0=MA_Elongated | 1.5=Full Spermatogenesis | 3.0=MA_Spermatogonial | 3.5=MA_Spermatocytic | 4.0=Severe_Hypo | 4.5=CSTH | 5.0=Hypo | 7.0=Hypospermatogenesis | 9.0=SCO | 9.5=شدید",
+      "range": "0.0 – 9.5",
+      "example": "SCO (60%). CSTH (40%) → dominant = SCO → کد 9.0"
+    },
+    "lt_dominant_pattern": {
+      "fa": "الگوی غالب بافتی بیضه چپ",
+      "source": "Pathology-LT",
+      "method": "NLP → شناسایی پترن با بیشترین درصد → کد عددی ordinal",
+      "codes": "مشابه rt_dominant_pattern",
+      "range": "0.0 – 10.0"
+    },
+    "rt_pct_favorable": {
+      "fa": "درصد بافت مطلوب بیضه راست",
+      "source": "Pathology-RT",
+      "method": "NLP → مجموع درصد پترن‌های با پیش‌آگهی خوب",
+      "favorable_patterns": "Hypospermatogenesis + Late MA (Spermatocytic, ImmatureRound, Elongated)",
+      "range": "0 – 100%",
+      "example": "MA up to spermatocytic (60%). SCO (40%) → pct_favorable = 60%"
+    },
+    "lt_pct_favorable": {
+      "fa": "درصد بافت مطلوب بیضه چپ",
+      "source": "Pathology-LT",
+      "method": "مشابه rt_pct_favorable",
+      "range": "0 – 100%"
+    },
+    "rt_tissue_heterogeneity": {
+      "fa": "تنوع بافتی بیضه راست (آنتروپی شانون)",
+      "source": "Pathology-RT",
+      "method": "Shannon Entropy از توزیع درصد پترن‌ها",
+      "formula": "H = -Σ(p_i × log2(p_i)) — نرمالایز شده",
+      "range": "0.0 (یکنواخت/تک‌پترن) – 0.684 (متنوع/چندپترن)",
+      "example": "SCO (100%) → H=0 | SCO (50%) CSTH (50%) → H بالاتر"
+    },
+    "lt_tissue_heterogeneity": {
+      "fa": "تنوع بافتی بیضه چپ (آنتروپی شانون)",
+      "source": "Pathology-LT",
+      "method": "مشابه rt_tissue_heterogeneity",
+      "range": "0.0 – 0.667"
+    },
+    "rt_has_leydig": {
+      "fa": "وجود هایپرپلازی سلول لیدیگ در بیضه راست",
+      "source": "Pathology-RT",
+      "method": "NLP → جستجوی regex برای 'Leydig cell hyperplasia'",
+      "range": "0 (ندارد) یا 1 (دارد)",
+      "note": "فقط 69 مورد از 1894 = 3.6% مثبت"
+    },
+    "lt_has_leydig": {
+      "fa": "وجود هایپرپلازی سلول لیدیگ در بیضه چپ",
+      "source": "Pathology-LT",
+      "method": "NLP → جستجوی regex برای 'Leydig cell hyperplasia'",
+      "range": "0 یا 1",
+      "note": "فقط 48 مورد از 1223 = 3.9% مثبت"
+    }
+  },
+  "hormone_columns": {
+    "testosterone": {
+      "fa": "تستوسترون",
+      "source": "Testosterone (ستون خام)",
+      "method": "تبدیل متن به عدد — حذف فاصله‌ها، تبدیل pipe-delimited مقادیر (مثلاً '24 | 33.63') به میانگین",
+      "range": "عددی پیوسته (ng/dL)"
+    },
+    "lh": {
+      "fa": "هورمون LH",
+      "source": "LH (ستون خام)",
+      "method": "text-to-numeric parsing، حذف whitespace-only nulls",
+      "range": "عددی پیوسته (mIU/mL)"
+    },
+    "fsh": {
+      "fa": "هورمون FSH",
+      "source": "FSH (ستون خام)",
+      "method": "text-to-numeric parsing",
+      "range": "عددی پیوسته (mIU/mL)"
+    },
+    "prolactin": {
+      "fa": "پرولاکتین",
+      "source": "Prolactin (ستون خام)",
+      "method": "text-to-numeric parsing",
+      "range": "عددی پیوسته (ng/mL)"
+    },
+    "e2": {
+      "fa": "استرادیول (E2)",
+      "source": "Estradiol / E2 (ستون خام)",
+      "method": "text-to-numeric parsing",
+      "range": "عددی پیوسته (pg/mL)"
+    },
+    "t_e2_ratio": {
+      "fa": "نسبت تستوسترون به استرادیول",
+      "source": "محاسبه‌شده از Testosterone و E2",
+      "method": "t_e2_ratio = Testosterone / E2 → سپس z-score standardization",
+      "range": "عددی پیوسته (z-score نرمالایزشده)",
+      "note": "رتبه ۴ در SHAP importance — قوی‌ترین فیچر غیرپاتولوژی"
+    },
+    "seminal_ph": {
+      "fa": "pH مایع منی",
+      "source": "Seminal PH (ستون خام)",
+      "method": "تبدیل مستقیم متن به عدد",
+      "range": "عددی پیوسته"
+    }
+  },
+  "volume_columns": {
+    "testicular_vol_rt_guess": {
+      "fa": "حجم تخمینی بیضه راست (معاینه فیزیکی)",
+      "source": "Testicular vol (RT-Guess)",
+      "method": "تبدیل مستقیم — passthrough عددی",
+      "range": "mL"
+    },
+    "testicular_vol_lt_guess": {
+      "fa": "حجم تخمینی بیضه چپ (معاینه فیزیکی)",
+      "source": "Testicular vol (LT-Guess)",
+      "method": "passthrough عددی",
+      "range": "mL"
+    },
+    "sono_vol_rt": {
+      "fa": "حجم سونوگرافی بیضه راست",
+      "source": "محاسبه از RT-XYZ (Sono)",
+      "method": "فرمول بیضوی: Vol = 0.52 × X × Y × Z (یا مستقیم اگر تکی)",
+      "range": "mL"
+    },
+    "sono_vol_lt": {
+      "fa": "حجم سونوگرافی بیضه چپ",
+      "source": "محاسبه از LT-XYZ (Sono)",
+      "method": "فرمول بیضوی: Vol = 0.52 × X × Y × Z",
+      "range": "mL"
+    },
+    "orchidometer_rt": {
+      "fa": "اندازه‌گیری ارکیدومتر بیضه راست",
+      "source": "Orchidometer RT",
+      "method": "passthrough عددی",
+      "range": "mL"
+    },
+    "orchidometer_lt": {
+      "fa": "اندازه‌گیری ارکیدومتر بیضه چپ",
+      "source": "Orchidometer LT",
+      "method": "passthrough عددی",
+      "range": "mL"
+    },
+    "rt_volume_unified": {
+      "fa": "حجم یکپارچه بیضه راست",
+      "source": "ترکیب sono_vol_rt + orchidometer_rt + testicular_vol_rt_guess + Sakamoto",
+      "method": "اولویت: Sono > Orchidometer > Guess > Sakamoto → سپس z-score standardization",
+      "range": "z-score نرمالایزشده",
+      "note": "رتبه ۹ در SHAP importance"
+    },
+    "lt_volume_unified": {
+      "fa": "حجم یکپارچه بیضه چپ",
+      "source": "ترکیب sono_vol_lt + orchidometer_lt + testicular_vol_lt_guess + Sakamoto",
+      "method": "اولویت: Sono > Orchidometer > Guess > Sakamoto → z-score",
+      "range": "z-score نرمالایزشده",
+      "note": "رتبه ۸ در SHAP importance"
+    },
+    "total_testicular_volume": {
+      "fa": "حجم کل بیضه‌ها (دوطرفه)",
+      "source": "rt_volume_unified + lt_volume_unified",
+      "method": "جمع دو طرف → z-score standardization",
+      "range": "z-score نرمالایزشده"
+    }
+  },
+  "genetics_columns": {
+    "karyotype_severity": {
+      "fa": "شدت ناهنجاری کاریوتایپ",
+      "source": "Karyotype (متن خام)",
+      "method": "NLP text → کد ordinal 0-5",
+      "codes": "0=46,XY (نرمال) | 1=موزاییک خفیف | 2=ناهنجاری ساختاری | 3=47,XXY (کلاین‌فلتر) | 4=موزاییک شدید | 5=آزوسپرمی ژنتیکی شدید",
+      "range": "0 – 5"
+    },
+    "azf_deletion_severity": {
+      "fa": "شدت حذف AZF",
+      "source": "AZF Deletion (متن خام)",
+      "method": "متن → کد ordinal 0-2",
+      "codes": "0=بدون حذف | 1=حذف جزئی (AZFc تنها) | 2=حذف کامل (AZFa/b یا ترکیبی)",
+      "range": "0 – 2",
+      "note": "رتبه ۶ در SHAP importance"
+    }
+  },
+  "clinical_columns": {
+    "diabetes": {
+      "fa": "دیابت",
+      "source": "D.M",
+      "method": "تبدیل باینری: بله=1، خیر=0",
+      "range": "0 یا 1"
+    },
+    "tbx": {
+      "fa": "سل (توبرکلوز)",
+      "source": "T.BX",
+      "method": "تبدیل باینری",
+      "range": "0 یا 1"
+    },
+    "inguinal_hernia": {
+      "fa": "فتق اینگوینال",
+      "source": "Inguinal Hernia",
+      "method": "تبدیل باینری",
+      "range": "0 یا 1"
+    },
+    "orchiopexy": {
+      "fa": "ارکیوپکسی (جراحی بیضه نزول‌نکرده)",
+      "source": "Orchiopexy",
+      "method": "تبدیل باینری",
+      "range": "0 یا 1"
+    },
+    "has_infertile_family": {
+      "fa": "سابقه ناباروری در خانواده",
+      "source": "infertile family members",
+      "method": "تبدیل باینری: وجود عضو نابارور=1، بدون=0",
+      "range": "0 یا 1"
+    },
+    "surgery_severity": {
+      "fa": "شدت سابقه جراحی",
+      "source": "Surgery History (متن خام)",
+      "method": "NLP → کد ordinal 0-5 بر اساس نوع و تعداد جراحی",
+      "range": "0 (بدون جراحی) – 5 (جراحی‌های متعدد/شدید)"
+    },
+    "surgery_count": {
+      "fa": "تعداد جراحی‌های قبلی",
+      "source": "Surgery History",
+      "method": "شمارش تعداد جراحی‌های ذکرشده",
+      "range": "0+"
+    },
+    "substance_severity": {
+      "fa": "شدت مصرف مواد",
+      "source": "Habits (متن خام)",
+      "method": "NLP → کد ordinal 0-4 بر اساس نوع و شدت مصرف",
+      "codes": "0=بدون مصرف | 1=سیگار خفیف | 2=سیگار سنگین | 3=مواد مخدر | 4=مصرف ترکیبی",
+      "range": "0 – 4"
+    },
+    "substance_count": {
+      "fa": "تعداد انواع مواد مصرفی",
+      "source": "Habits",
+      "method": "شمارش تعداد انواع مختلف مواد",
+      "range": "0+"
+    },
+    "varicocele_grade": {
+      "fa": "درجه واریکوسل",
+      "source": "Varicocele (متن خام)",
+      "method": "متن → کد ordinal 0-3",
+      "codes": "0=بدون واریکوسل | 1=Grade I | 2=Grade II | 3=Grade III",
+      "range": "0 – 3"
+    },
+    "occupation_risk": {
+      "fa": "ریسک شغلی",
+      "source": "Occupation (متن خام)",
+      "method": "طبقه‌بندی مشاغل → کد ordinal 0-3 بر اساس مواجهه با حرارت/مواد شیمیایی",
+      "range": "0 (کم‌ریسک) – 3 (پرریسک)"
+    }
+  },
+  "demographic_columns": {
+    "age": {
+      "fa": "سن بیمار",
+      "source": "Age (ستون خام)",
+      "method": "passthrough عددی — بدون تبدیل",
+      "range": "عددی پیوسته (سال)",
+      "note": "رتبه ۷ در SHAP importance"
+    },
+    "bmi": {
+      "fa": "شاخص توده بدنی",
+      "source": "محاسبه از Height و Body Weight",
+      "method": "BMI = Weight(kg) / Height(m)² — ستون‌های Height و Weight حذف شدند",
+      "range": "عددی پیوسته (kg/m²)",
+      "note": "ستون‌های خام Hieght و Boby Weight جذب BMI شدند"
+    },
+    "is_iranian": {
+      "fa": "تابعیت ایرانی",
+      "source": "Race / Nationality",
+      "method": "تبدیل باینری: ایرانی=1، غیرایرانی=0",
+      "range": "0 یا 1"
+    }
+  },
+  "dropped_columns": {
+    "ID": {"reason": "شناسه — غیرپیش‌بین"},
+    "Roy-ID": {"reason": "شناسه رویان — غیرپیش‌بین"},
+    "Partner Age": {"reason": "سن همسر — غیرمرتبط با بیولوژی بیمار"},
+    "Hieght": {"reason": "جذب شده در BMI"},
+    "Boby Weight": {"reason": "جذب شده در BMI"},
+    "Cancer Type": {"reason": "100% missing"},
+    "Torsion of spermatic cord": {"reason": "100% missing"},
+    "Cancer Treatment": {"reason": "100% missing"},
+    "Surgery Therapeutic": {"reason": "100% missing"},
+    "SHBG": {"reason": "100% missing"},
+    "TSH": {"reason": "100% missing"},
+    "inhibin B": {"reason": "100% missing"},
+    "AMH": {"reason": "100% missing"},
+    "Infertility length": {"reason": "100% missing"},
+    "Hypertension": {"reason": "99.8% missing"},
+    "Sakamoto-RT/mL": {"reason": "جذب شده در volume_unified"},
+    "Sakamoto-LT/mL": {"reason": "جذب شده در volume_unified"},
+    "RT-XYZ (Sono)": {"reason": "جذب شده در sono_vol"},
+    "LT-XYZ (Sono)": {"reason": "جذب شده در sono_vol"},
+    "Successful Sperm Retrieval-1/2/3/4": {"reason": "لاگ نتیجه — نه ویژگی پیش‌بین"},
+    "Outcome2/3/4": {"reason": "لاگ نتیجه — نه ویژگی پیش‌بین"}
+  }
+};
+
+// ===== V3 / Dropped column tooltips (interactive, from v3_column_tooltips.json) =====
+// V3_TOOLTIPS is injected just above this block.
+
+// Flatten all V3 column groups into one lookup keyed by technical column name.
+const V3_TIP_LOOKUP = (function () {
+  const out = {};
+  const groups = ["pathology_columns", "hormone_columns", "volume_columns",
+                  "genetics_columns", "clinical_columns", "demographic_columns"];
+  for (const g of groups) {
+    const grp = V3_TOOLTIPS[g] || {};
+    for (const k in grp) out[k] = grp[k];
+  }
+  return out;
+})();
+
+// Map actual raw header names -> dropped reason. Handles JSON aliases / combined keys.
+const DROP_TIP_LOOKUP = (function () {
+  const d = V3_TOOLTIPS.dropped_columns || {};
+  const out = {};
+  // direct matches
+  for (const k in d) out[k] = d[k].reason;
+  // aliases for headers that differ from the JSON keys
+  const alias = {
+    "Sex Hormone-Binding Globulin": "SHBG",
+    "Successful Sperm Retrieval-1": "Successful Sperm Retrieval-1/2/3/4",
+    "Successful Sperm Retrieval-2": "Successful Sperm Retrieval-1/2/3/4",
+    "Successful Sperm Retrieval-3": "Successful Sperm Retrieval-1/2/3/4",
+    "Successful Sperm Retrieval-4": "Successful Sperm Retrieval-1/2/3/4",
+    "Outcome2": "Outcome2/3/4",
+    "Outcome3": "Outcome2/3/4",
+    "Outcome4": "Outcome2/3/4"
+  };
+  for (const h in alias) {
+    const key = alias[h];
+    if (d[key]) out[h] = d[key].reason;
+  }
+  return out;
+})();
+
+function ttEsc(s) {
+  if (s === null || s === undefined) return "";
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function ttRow(label, val, cls) {
+  if (val === null || val === undefined || val === "") return "";
+  return "<div class='tt-row'><span class='tt-label'>" + ttEsc(label) + "</span>"
+    + "<span class='tt-val" + (cls ? " " + cls : "") + "'>" + ttEsc(val) + "</span></div>";
+}
+
+function buildV3TooltipHTML(key) {
+  const d = V3_TIP_LOOKUP[key];
+  if (!d) return "";
+  let body = "";
+  body += ttRow("ستون خام منبع", d.source);
+  body += ttRow("نوع تبدیل / پردازش", d.method);
+  body += ttRow("فرمول", d.formula, "mono");
+  if (d.weights) body += ttRow("وزن‌ها", d.weights, "mono");
+  if (d.codes) body += ttRow("کدگذاری", d.codes, "mono");
+  if (d.favorable_patterns) body += ttRow("الگوهای مطلوب", d.favorable_patterns);
+  body += ttRow("بازهٔ مقادیر", d.range);
+  if (d.example) body += ttRow("مثال", d.example, "example");
+  if (d.note) body += ttRow("نکته", d.note);
+  const head = "<div class='tt-head'><span class='tt-title'>" + ttEsc(d.fa || key) + "</span>"
+    + "<span class='tt-code'>" + ttEsc(key) + "</span></div>";
+  return head + "<div class='tt-body'>" + body + "</div>";
+}
+
+function buildDropTooltipHTML(rawHeader) {
+  const reason = DROP_TIP_LOOKUP[rawHeader];
+  if (!reason) return "";
+  const head = "<div class='tt-head'><span class='tt-title'>" + ttEsc(rawHeader) + "</span>"
+    + "<span class='tt-badge'>حذف‌شده</span></div>";
+  const body = "<div class='tt-body'>" + ttRow("دلیل حذف از مجموعهٔ V3", reason) + "</div>";
+  return head + body;
+}
+
+// ---- floating tooltip element + interaction ----
+let _ttBox = null;
+let _ttPinned = false;       // pinned via click
+let _ttAnchor = null;        // currently anchored icon
+
+function _getTtBox() {
+  if (!_ttBox) {
+    _ttBox = document.createElement("div");
+    _ttBox.id = "v3-tooltip-box";
+    document.body.appendChild(_ttBox);
+    // keep open when hovering the box itself
+    _ttBox.addEventListener("mouseenter", () => { _ttBox._hovering = true; });
+    _ttBox.addEventListener("mouseleave", () => { _ttBox._hovering = false; if (!_ttPinned) hideTooltip(); });
+  }
+  return _ttBox;
+}
+
+function positionTooltip(anchor) {
+  const box = _getTtBox();
+  const r = anchor.getBoundingClientRect();
+  const bw = box.offsetWidth, bh = box.offsetHeight;
+  const margin = 10;
+  // default: below, right-aligned to icon (RTL)
+  let top = r.bottom + 8;
+  let left = r.right - bw;
+  if (left < margin) left = margin;
+  if (left + bw > window.innerWidth - margin) left = window.innerWidth - bw - margin;
+  // flip above if not enough space below
+  if (top + bh > window.innerHeight - margin) {
+    const above = r.top - bh - 8;
+    if (above >= margin) top = above;
+    else top = Math.max(margin, window.innerHeight - bh - margin);
+  }
+  box.style.top = top + "px";
+  box.style.left = left + "px";
+}
+
+function showTooltip(anchor) {
+  const box = _getTtBox();
+  let html = "", dropped = false;
+  if (anchor.classList.contains("v3-info")) {
+    html = buildV3TooltipHTML(anchor.getAttribute("data-v3tip"));
+  } else if (anchor.classList.contains("drop-info")) {
+    html = buildDropTooltipHTML(anchor.getAttribute("data-droptip"));
+    dropped = true;
+  }
+  if (!html) return;
+  box.innerHTML = html;
+  box.classList.toggle("dropped", dropped);
+  _ttAnchor = anchor;
+  // measure then position then reveal
+  box.style.opacity = "0";
+  box.classList.add("show");
+  positionTooltip(anchor);
+  requestAnimationFrame(() => { box.style.opacity = ""; positionTooltip(anchor); });
+}
+
+function hideTooltip() {
+  if (!_ttBox) return;
+  if (_ttBox._hovering) return;
+  _ttBox.classList.remove("show");
+  if (_ttAnchor) { _ttAnchor.classList.remove("pinned"); }
+  _ttAnchor = null;
+  _ttPinned = false;
+}
+
+// event delegation
+document.addEventListener("mouseover", function (e) {
+  const icon = e.target.closest(".v3-info, .drop-info");
+  if (icon && !_ttPinned) showTooltip(icon);
+});
+document.addEventListener("mouseout", function (e) {
+  const icon = e.target.closest(".v3-info, .drop-info");
+  if (icon && !_ttPinned) {
+    // delay to allow moving into the box
+    setTimeout(() => { if (!_ttBox || !_ttBox._hovering) hideTooltip(); }, 120);
+  }
+});
+document.addEventListener("click", function (e) {
+  const icon = e.target.closest(".v3-info, .drop-info");
+  if (icon) {
+    e.stopPropagation();
+    if (_ttPinned && _ttAnchor === icon) {
+      _ttPinned = false; icon.classList.remove("pinned"); hideTooltip();
+    } else {
+      _ttPinned = false; // reset so showTooltip runs
+      showTooltip(icon);
+      _ttPinned = true; icon.classList.add("pinned");
+    }
+    return;
+  }
+  // click outside closes a pinned tooltip
+  if (_ttPinned && _ttBox && !e.target.closest("#v3-tooltip-box")) {
+    _ttPinned = false; hideTooltip();
+  }
+}, true);
+// reposition on scroll/resize while visible
+window.addEventListener("scroll", function () { if (_ttAnchor && _ttBox && _ttBox.classList.contains("show")) positionTooltip(_ttAnchor); }, true);
+window.addEventListener("resize", function () { if (_ttAnchor && _ttBox && _ttBox.classList.contains("show")) positionTooltip(_ttAnchor); });
 
 </script>
 </body>
